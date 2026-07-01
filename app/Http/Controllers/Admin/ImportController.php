@@ -241,11 +241,11 @@ class ImportController extends Controller
                     'company_id' => $companyId,
                     'service_short' => $row['ServiceShort'] ?? 'Service',
                     'status' => $row['Status'] ?? 'Active',
-                    'start_date' => $row['StartDate'] ?? null,
-                    'end_date' => $row['EndDate'] ?? null,
+                    'start_date' => $this->cleanDate($row['StartDate'] ?? null),
+                    'end_date' => $this->cleanDate($row['EndDate'] ?? null),
                     'service_monthly_charge' => $row['ServiceMonthlyCharge'] ?? null,
                     'service_payment_frequency' => $row['ServicePaymentFrequency'] ?? null,
-                    'next_payment_date' => $row['NextPaymentDate'] ?? null,
+                    'next_payment_date' => $this->cleanDate($row['NextPaymentDate'] ?? null),
                     'stripe_subscription_id' => $subId,
                     'updated_at' => now(),
                     'created_at' => now(),
@@ -276,9 +276,9 @@ class ImportController extends Controller
                     'company_id' => $companyId,
                     'invoice_status' => $row['InvoiceStatus'] ?? 'Unpaid',
                     'invoice_amount' => $row['InvoiceAmount'] ?? 0,
-                    'invoice_date' => $row['InvoiceDate'] ?? null,
-                    'due_date' => $row['DueDate'] ?? null,
-                    'paid_date' => $row['PaidDate'] ?? null,
+                    'invoice_date' => $this->cleanDate($row['InvoiceDate'] ?? null),
+                    'due_date' => $this->cleanDate($row['DueDate'] ?? null),
+                    'paid_date' => $this->cleanDate($row['PaidDate'] ?? null),
                     'admin_notes' => $row['AdminNotes'] ?? null,
                     'customer_notes' => $row['CustomerNotes'] ?? null,
                     'amount_after_fees' => $row['AmountAfterFees'] ?? null,
@@ -345,8 +345,8 @@ class ImportController extends Controller
                 [
                     'company_id' => $companyId,
                     'registrar' => $row['Registrar'] ?? $row['DomainRegistrar'] ?? null,
-                    'registration_date' => $row['RegistrationDate'] ?? null,
-                    'expiry_date' => $row['ExpiryDate'] ?? $row['ExpirationDate'] ?? $row['RenewalDate'] ?? null,
+                    'registration_date' => $this->cleanDate($row['RegistrationDate'] ?? null),
+                    'expiry_date' => $this->cleanDate($row['ExpiryDate'] ?? $row['ExpirationDate'] ?? $row['RenewalDate'] ?? null),
                     'cost' => $row['Cost'] ?? $row['DomainCost'] ?? null,
                     'domain_admin_notes' => $row['DomainAdminNotes'] ?? $row['AdminNotes'] ?? $row['Notes'] ?? null,
                     'updated_at' => now(),
@@ -400,6 +400,18 @@ class ImportController extends Controller
         }
 
         return $count;
+    }
+
+    /**
+     * Convert invalid MySQL dates (0000-00-00, empty strings) to null.
+     */
+    private function cleanDate(?string $date): ?string
+    {
+        if ($date === null || $date === '' || $date === '0000-00-00' || $date === '0000-00-00 00:00:00') {
+            return null;
+        }
+
+        return $date;
     }
 
     private function summarise(array $results): string

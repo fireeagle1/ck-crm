@@ -10,14 +10,14 @@ use Illuminate\View\View;
 
 class SettingsController extends Controller
 {
-    public function index(): View
+    public function general(): View
     {
         $settings = [
             'site_name' => Setting::get('site_name', 'CK Enterprises UK'),
             'logo_path' => Setting::get('logo_path'),
         ];
 
-        return view('admin.settings.index', compact('settings'));
+        return view('admin.settings.general', compact('settings'));
     }
 
     public function update(Request $request)
@@ -30,7 +30,6 @@ class SettingsController extends Controller
         Setting::set('site_name', $request->input('site_name'));
 
         if ($request->hasFile('logo')) {
-            // Delete old logo if exists
             $oldPath = Setting::get('logo_path');
             if ($oldPath && Storage::disk('public')->exists($oldPath)) {
                 Storage::disk('public')->delete($oldPath);
@@ -54,5 +53,10 @@ class SettingsController extends Controller
         Setting::set('logo_path', null);
 
         return back()->with('success', 'Logo removed.');
+    }
+
+    public function import(): View
+    {
+        return view('admin.settings.import');
     }
 }

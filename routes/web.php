@@ -102,13 +102,14 @@ Route::middleware(['auth', 'verified', EnsureIsAdmin::class])->prefix('admin')->
     Route::post('/impersonate/stop', [Admin\UserController::class, 'stopImpersonating'])->name('impersonate.stop');
 
     // Import
-    Route::get('/import', [Admin\ImportController::class, 'index'])->name('import.index');
-    Route::post('/import', [Admin\ImportController::class, 'run'])->name('import.run');
+    Route::post('/settings/import', [Admin\ImportController::class, 'run'])->name('import.run');
 
-    // Settings
-    Route::get('/settings', [Admin\SettingsController::class, 'index'])->name('settings.index');
-    Route::put('/settings', [Admin\SettingsController::class, 'update'])->name('settings.update');
+    // Settings (with sub-pages)
+    Route::get('/settings', [Admin\SettingsController::class, 'general'])->name('settings.index');
+    Route::get('/settings/general', [Admin\SettingsController::class, 'general'])->name('settings.general');
+    Route::put('/settings/general', [Admin\SettingsController::class, 'update'])->name('settings.update');
     Route::delete('/settings/logo', [Admin\SettingsController::class, 'deleteLogo'])->name('settings.logo.delete');
+    Route::get('/settings/import', [Admin\SettingsController::class, 'import'])->name('settings.import');
 });
 
 /*
