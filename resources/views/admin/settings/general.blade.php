@@ -72,14 +72,34 @@
                         </div>
 
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">{{ $settings['logo_path'] ? 'Replace Logo' : 'Upload Logo' }} (landscape)</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">{{ $settings['logo_path'] ? 'Replace' : 'Upload' }} Light Logo (for dark backgrounds — nav bar, email header)</label>
                             <input type="file" name="logo" id="logo" accept="image/png,image/jpeg,image/svg+xml,image/webp"
                                    class="block w-full max-w-md text-sm text-gray-500
                                           file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0
                                           file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700
                                           hover:file:bg-blue-100">
-                            <p class="text-xs text-gray-500 mt-1">PNG, JPG, SVG, or WebP. Max 2MB. Landscape orientation recommended.</p>
+                            <p class="text-xs text-gray-500 mt-1">White/light logo for dark backgrounds. PNG with transparency recommended.</p>
                             @error('logo') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
+                        </div>
+
+                        {{-- Dark logo --}}
+                        <div>
+                            @if ($settings['logo_dark_path'])
+                                <div class="mb-3">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Current Dark Logo</label>
+                                    <div class="p-4 bg-white rounded-md border inline-block">
+                                        <img src="{{ asset($settings['logo_dark_path']) }}" alt="Dark logo" class="h-10 w-auto">
+                                    </div>
+                                </div>
+                            @endif
+                            <label class="block text-sm font-medium text-gray-700 mb-2">{{ $settings['logo_dark_path'] ? 'Replace' : 'Upload' }} Dark Logo (for light backgrounds — login page)</label>
+                            <input type="file" name="logo_dark" id="logo_dark" accept="image/png,image/jpeg,image/svg+xml,image/webp"
+                                   class="block w-full max-w-md text-sm text-gray-500
+                                          file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0
+                                          file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700
+                                          hover:file:bg-blue-100">
+                            <p class="text-xs text-gray-500 mt-1">Dark/coloured logo for white backgrounds. Used on login and registration screens.</p>
+                            @error('logo_dark') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
                         </div>
 
                         <div class="pt-2">

@@ -21,9 +21,9 @@
                 <div class="w-full max-w-md mx-auto">
                     {{-- Brand --}}
                     <div class="mb-8">
-                        @php $logoPath = \App\Models\Setting::get('logo_path'); @endphp
-                        @if ($logoPath)
-                            <img src="{{ asset($logoPath) }}" alt="{{ \App\Models\Setting::get('site_name', 'CK Enterprises') }}" class="h-12 w-auto mb-4">
+                        @php $logoDarkPath = \App\Models\Setting::get('logo_dark_path'); @endphp
+                        @if ($logoDarkPath)
+                            <img src="{{ asset($logoDarkPath) }}" alt="{{ \App\Models\Setting::get('site_name', 'CK Enterprises') }}" class="h-12 w-auto mb-4">
                         @else
                             <h1 class="text-3xl font-bold text-slate-900 tracking-tight">CK Enterprises</h1>
                         @endif

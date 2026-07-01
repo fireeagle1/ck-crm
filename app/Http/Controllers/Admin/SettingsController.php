@@ -15,6 +15,7 @@ class SettingsController extends Controller
         $settings = [
             'site_name' => Setting::get('site_name', 'CK Enterprises UK'),
             'logo_path' => Setting::get('logo_path'),
+            'logo_dark_path' => Setting::get('logo_dark_path'),
         ];
 
         return view('admin.settings.general', compact('settings'));
@@ -25,10 +26,12 @@ class SettingsController extends Controller
         $request->validate([
             'site_name' => 'required|string|max:255',
             'logo' => 'nullable|image|mimes:png,jpg,jpeg,svg,webp|max:2048',
+            'logo_dark' => 'nullable|image|mimes:png,jpg,jpeg,svg,webp|max:2048',
         ]);
 
         Setting::set('site_name', $request->input('site_name'));
 
+        // Light/transparent logo (for dark backgrounds — header, nav)
         if ($request->hasFile('logo')) {
             $oldPath = Setting::get('logo_path');
             if ($oldPath && file_exists(public_path($oldPath))) {
@@ -39,6 +42,19 @@ class SettingsController extends Controller
             $filename = 'logo-' . time() . '.' . $file->getClientOriginalExtension();
             $file->move(public_path('branding'), $filename);
             Setting::set('logo_path', 'branding/' . $filename);
+        }
+
+        // Dark logo (for light backgrounds — login page, emails)
+        if ($request->hasFile('logo_dark')) {
+            $oldPath = Setting::get('logo_dark_path');
+            if ($oldPath && file_exists(public_path($oldPath))) {
+                unlink(public_path($oldPath));
+            }
+
+            $file = $request->file('logo_dark');
+            $filename = 'logo-dark-' . time() . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('branding'), $filename);
+            Setting::set('logo_dark_path', 'branding/' . $filename);
         }
 
         return back()->with('success', 'Settings saved.');
