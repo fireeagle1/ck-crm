@@ -29,7 +29,7 @@
         </div>
     @endif
 
-    <main class="max-w-7xl mx-auto px-4 py-6 relative z-0">
+    <main class="max-w-7xl mx-auto px-4 py-6 relative" style="z-index: 1;">
         {{ $slot }}
     </main>
 </body>
