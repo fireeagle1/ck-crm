@@ -17,6 +17,7 @@ class Domain extends Model
         'registrar',
         'registration_date',
         'expiry_date',
+        'auto_renew',
         'domain_admin_notes',
         'enom_response',
     ];
@@ -25,6 +26,7 @@ class Domain extends Model
         'registration_date' => 'date',
         'expiry_date' => 'date',
         'cost' => 'decimal:2',
+        'auto_renew' => 'boolean',
     ];
 
     public function customer(): BelongsTo

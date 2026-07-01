@@ -32,6 +32,7 @@
                     <th class="px-4 py-3 text-left font-semibold text-gray-600">Customer</th>
                     <th class="px-4 py-3 text-left font-semibold text-gray-600">Registrar</th>
                     <th class="px-4 py-3 text-left font-semibold text-gray-600">Expiry</th>
+                    <th class="px-4 py-3 text-left font-semibold text-gray-600">Renew</th>
                     <th class="px-4 py-3 text-left font-semibold text-gray-600">Cost</th>
                     <th class="px-4 py-3 text-left font-semibold text-gray-600">Actions</th>
                 </tr>
@@ -61,6 +62,13 @@
                                 </span>
                             @else
                                 —
+                            @endif
+                        </td>
+                        <td class="px-4 py-3">
+                            @if ($domain->auto_renew)
+                                <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium bg-green-100 text-green-700">Auto</span>
+                            @else
+                                <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium bg-gray-100 text-gray-600">Manual</span>
                             @endif
                         </td>
                         <td class="px-4 py-3 text-gray-500">{{ $domain->cost ? '£' . number_format($domain->cost, 2) : '—' }}</td>

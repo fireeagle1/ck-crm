@@ -9,6 +9,7 @@
                 <tr>
                     <th class="px-4 py-3 text-left font-semibold text-gray-600">Domain</th>
                     <th class="px-4 py-3 text-left font-semibold text-gray-600">Expiry</th>
+                    <th class="px-4 py-3 text-left font-semibold text-gray-600">Renewal</th>
                     <th class="px-4 py-3 text-left font-semibold text-gray-600">Registrar</th>
                 </tr>
             </thead>
@@ -20,12 +21,19 @@
                     @endphp
                     <tr class="hover:bg-gray-50">
                         <td class="px-4 py-3 font-medium">{{ $domain->domain_name }}</td>
-                        <td class="px-4 py-3 {{ $urgency }}">{{ $domain->expiry_date?->format('Y-m-d') ?? '—' }}</td>
+                        <td class="px-4 py-3 {{ $urgency }}">{{ $domain->expiry_date?->format('M j, Y') ?? '—' }}</td>
+                        <td class="px-4 py-3">
+                            @if ($domain->auto_renew)
+                                <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium bg-green-100 text-green-700">Auto-renew</span>
+                            @else
+                                <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium bg-amber-100 text-amber-700">Manual</span>
+                            @endif
+                        </td>
                         <td class="px-4 py-3 text-gray-500">{{ $domain->registrar ?? '—' }}</td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="3" class="px-4 py-6 text-center text-gray-500">No domains.</td>
+                        <td colspan="4" class="px-4 py-6 text-center text-gray-500">No domains.</td>
                     </tr>
                 @endforelse
             </tbody>
