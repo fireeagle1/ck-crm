@@ -42,59 +42,6 @@
         </div>
     </div>
 
-    {{-- My Websites --}}
-    @if ($websites->isNotEmpty())
-        <section class="mb-8">
-            <div class="flex items-center justify-between mb-4">
-                <h2 class="text-xl font-bold">My Websites</h2>
-                <a href="{{ route('portal.services.index') }}" class="text-sm text-blue-600 hover:underline font-medium">All services &rarr;</a>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                @foreach ($websites as $site)
-                    <div class="bg-white rounded-lg border p-5 hover:shadow-md transition">
-                        <div class="flex items-start justify-between mb-2">
-                            <div>
-                                <h3 class="font-bold text-gray-900">{{ $site->domain_name ?? $site->service_short }}</h3>
-                                @if ($site->domain_name && $site->domain_name !== $site->service_short)
-                                    <p class="text-xs text-gray-400">{{ $site->service_short }}</p>
-                                @endif
-                            </div>
-                            <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold bg-green-100 text-green-700">Active</span>
-                        </div>
-
-                        @php
-                            $matchedDomain = $site->domain_name ? $customerDomains->firstWhere('domain_name', strtolower($site->domain_name)) : null;
-                        @endphp
-                        @if ($matchedDomain)
-                            <p class="text-xs text-gray-500 mb-3">
-                                Expires {{ $matchedDomain->expiry_date?->format('M j, Y') }}
-                                @if ($matchedDomain->auto_renew)
-                                    · <span class="text-green-600">Auto-renew</span>
-                                @endif
-                            </p>
-                        @endif
-
-                        <div class="flex flex-wrap gap-2 pt-3 border-t">
-                            @if ($site->cpanel_username)
-                                <form method="POST" action="{{ route('portal.services.sso.cpanel', $site) }}" class="inline">
-                                    @csrf
-                                    <button type="submit" class="px-3 py-1.5 bg-orange-500 text-white rounded text-xs font-semibold hover:bg-orange-600 transition">cPanel</button>
-                                </form>
-                                <form method="POST" action="{{ route('portal.services.sso.webmail', $site) }}" class="inline">
-                                    @csrf
-                                    <button type="submit" class="px-3 py-1.5 bg-blue-600 text-white rounded text-xs font-semibold hover:bg-blue-700 transition">Webmail</button>
-                                </form>
-                            @endif
-                            @if ($site->domain_name)
-                                <a href="https://{{ $site->domain_name }}" target="_blank" class="px-3 py-1.5 border rounded text-xs font-semibold text-gray-700 hover:bg-gray-50 transition">Visit Site</a>
-                            @endif
-                        </div>
-                    </div>
-                @endforeach
-            </div>
-        </section>
-    @endif
-
     {{-- Two-column: Tickets + Invoices --}}
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         {{-- Recent Tickets --}}
