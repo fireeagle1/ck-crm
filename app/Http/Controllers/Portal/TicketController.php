@@ -50,7 +50,7 @@ class TicketController extends Controller
             'asset_id' => 'nullable|exists:cmdb,device_id',
         ]);
 
-        Ticket::create([
+        $ticket = Ticket::create([
             'company_id' => $request->user()->company_id,
             'user_id' => $request->user()->id,
             'subject' => $validated['subject'],
@@ -60,6 +60,9 @@ class TicketController extends Controller
             'priority' => 'Normal',
             'status' => 'Open',
         ]);
+
+        // Notify all admins of new ticket
+        $this->notifyAdminsNewTicket($ticket, $request->user());
 
         return redirect()->route('portal.tickets.index')
             ->with('success', 'Ticket submitted successfully. We\'ll get back to you soon.');
@@ -132,20 +135,42 @@ class TicketController extends Controller
 
     private function notifyAgent(Ticket $ticket, TicketReply $reply): void
     {
-        $agent = User::find(1);
-        if (!$agent) return;
+        // Email all admin users
+        $admins = User::where('is_admin', true)->whereNotNull('email')->get();
 
-        try {
-            Mail::send('emails.ticket-reply', [
-                'ticket' => $ticket,
-                'reply' => $reply,
-                'recipientName' => $agent->first_name ?? 'Admin',
-            ], function ($message) use ($agent, $ticket) {
-                $message->to($agent->email)
-                        ->subject("Reply on INC{$ticket->ticket_id}: {$ticket->subject}");
-            });
-        } catch (\Exception) {
-            // Don't fail the request if email fails
+        foreach ($admins as $admin) {
+            try {
+                Mail::send('emails.ticket-reply', [
+                    'ticket' => $ticket,
+                    'reply' => $reply,
+                    'recipientName' => $admin->first_name ?? 'Admin',
+                ], function ($message) use ($admin, $ticket) {
+                    $message->to($admin->email)
+                            ->subject("Reply on INC{$ticket->ticket_id}: {$ticket->subject}");
+                });
+            } catch (\Exception) {
+                // Don't fail the request if email fails
+            }
+        }
+    }
+
+    private function notifyAdminsNewTicket(Ticket $ticket, $submittedBy): void
+    {
+        $admins = User::where('is_admin', true)->whereNotNull('email')->get();
+
+        foreach ($admins as $admin) {
+            try {
+                Mail::send('emails.ticket-new', [
+                    'ticket' => $ticket,
+                    'submittedBy' => $submittedBy,
+                    'recipientName' => $admin->first_name ?? 'Admin',
+                ], function ($message) use ($admin, $ticket) {
+                    $message->to($admin->email)
+                            ->subject("New Ticket INC{$ticket->ticket_id}: {$ticket->subject}");
+                });
+            } catch (\Exception) {
+                // Don't fail
+            }
         }
     }
 }
