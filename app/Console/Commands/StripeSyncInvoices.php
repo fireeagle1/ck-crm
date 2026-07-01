@@ -175,25 +175,25 @@ class StripeSyncInvoices extends Command
                 }
             }
 
-            // Calculate monthly charge
-            $monthlyCharge = 0;
+            // Store the actual charge amount (not a monthly conversion)
+            $actualCharge = 0;
+            $frequency = null;
             if (!empty($sub->items->data)) {
                 $price = $sub->items->data[0]->price;
-                $amount = $price->unit_amount / 100;
-                $monthlyCharge = match ($price->recurring?->interval) {
-                    'year' => round($amount / 12, 2),
-                    'month' => $amount,
-                    'week' => round($amount * 4.33, 2),
-                    default => $amount,
+                $actualCharge = $price->unit_amount / 100;
+                $interval = $price->recurring?->interval ?? 'month';
+                $intervalCount = $price->recurring?->interval_count ?? 1;
+
+                $frequency = match (true) {
+                    $interval === 'month' && $intervalCount === 1 => 'Monthly',
+                    $interval === 'month' && $intervalCount === 3 => 'Quarterly',
+                    $interval === 'month' && $intervalCount === 6 => 'Biannually',
+                    $interval === 'year' && $intervalCount === 1 => 'Annually',
+                    $interval === 'year' && $intervalCount === 2 => 'Biennially',
+                    $interval === 'week' => 'Weekly',
+                    default => 'Monthly',
                 };
             }
-
-            $frequency = match ($sub->items->data[0]->price->recurring?->interval ?? null) {
-                'month' => 'Monthly',
-                'year' => 'Annually',
-                'week' => 'Weekly',
-                default => null,
-            };
 
             Service::updateOrCreate(
                 ['stripe_subscription_id' => $sub->id],
@@ -203,7 +203,7 @@ class StripeSyncInvoices extends Command
                     'status' => $status,
                     'start_date' => date('Y-m-d', $sub->start_date),
                     'end_date' => $sub->canceled_at ? date('Y-m-d', $sub->canceled_at) : null,
-                    'service_monthly_charge' => $monthlyCharge,
+                    'service_monthly_charge' => $actualCharge,
                     'service_payment_frequency' => $frequency,
                     'next_payment_date' => $sub->current_period_end ? date('Y-m-d', $sub->current_period_end) : null,
                 ]
