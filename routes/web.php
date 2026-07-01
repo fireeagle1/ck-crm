@@ -32,7 +32,6 @@ Route::middleware(['auth', 'verified'])->prefix('portal')->name('portal.')->grou
     Route::get('/services/{service}', [Portal\ServiceController::class, 'show'])->name('services.show');
     Route::post('/services/{service}/sso/cpanel', [Portal\SsoController::class, 'cpanel'])->name('services.sso.cpanel');
     Route::post('/services/{service}/sso/webmail', [Portal\SsoController::class, 'webmail'])->name('services.sso.webmail');
-    Route::post('/services/{service}/sso/wordpress', [Portal\SsoController::class, 'wordpress'])->name('services.sso.wordpress');
 
     // Tickets
     Route::get('/tickets', [Portal\TicketController::class, 'index'])->name('tickets.index');
@@ -127,6 +126,8 @@ Route::middleware(['auth', 'verified', EnsureIsAdmin::class])->prefix('admin')->
     Route::get('/cleanup', [Admin\CleanupController::class, 'index'])->name('cleanup.index');
     Route::post('/cleanup/services', [Admin\CleanupController::class, 'deleteServices'])->name('cleanup.delete-services');
     Route::post('/cleanup/domains', [Admin\CleanupController::class, 'deleteDomains'])->name('cleanup.delete-domains');
+    Route::get('/cleanup/review', [Admin\ReviewWizardController::class, 'index'])->name('cleanup.review');
+    Route::post('/cleanup/review/delete', [Admin\ReviewWizardController::class, 'bulkDelete'])->name('cleanup.review.delete');
 
     // Settings (with sub-pages)
     Route::get('/settings', [Admin\SettingsController::class, 'general'])->name('settings.index');

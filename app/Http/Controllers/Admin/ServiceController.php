@@ -84,9 +84,25 @@ class ServiceController extends Controller
             'domain_registrar' => 'nullable|string|max:255',
         ]);
 
+        // Duplicate prevention: check if a service with the same domain already exists for this customer
+        if (!empty($validated['domain_name'])) {
+            $existing = Service::where('company_id', $validated['company_id'])
+                ->where('domain_name', $validated['domain_name'])
+                ->where('status', '!=', 'Cancelled')
+                ->first();
+
+            if ($existing) {
+                return back()->withInput()->with('error',
+                    "A service for '{$validated['domain_name']}' already exists for this customer: {$existing->service_short} (ID: {$existing->service_id}). Edit the existing service instead of creating a duplicate."
+                );
+            }
+        }
+
         $service = Service::create([
             'company_id' => $validated['company_id'],
             'service_short' => $validated['service_short'],
+            'service_type' => $validated['service_type'],
+            'domain_name' => $validated['domain_name'] ?? null,
             'status' => $validated['status'] ?? 'Active',
             'start_date' => $validated['start_date'] ?? now(),
             'end_date' => $validated['end_date'] ?? null,
