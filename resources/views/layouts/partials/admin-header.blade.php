@@ -7,10 +7,10 @@
         ['route' => 'admin.invoices.index', 'label' => 'Invoices'],
         ['route' => 'admin.domains.index', 'label' => 'Domains'],
     ];
-    $adminNavMore = [
-        ['route' => 'admin.assets.index', 'label' => 'CMDB / Assets'],
-        ['route' => 'admin.articles.index', 'label' => 'Knowledgebase'],
+    $adminNavCustomers = [
         ['route' => 'admin.users.index', 'label' => 'Users'],
+        ['route' => 'admin.assets.index', 'label' => 'Assets / CMDB'],
+        ['route' => 'admin.articles.index', 'label' => 'Knowledgebase'],
         ['route' => 'admin.communications.index', 'label' => 'Communications'],
     ];
     $adminNavTools = [
@@ -18,14 +18,12 @@
         ['route' => 'admin.services.stripe-mapping', 'label' => 'Stripe Mapping'],
         ['route' => 'admin.cleanup.index', 'label' => 'Data Cleanup'],
         ['route' => 'admin.cleanup.review', 'label' => 'Service Review'],
-        ['route' => 'admin.settings.import', 'label' => 'Import Data'],
         ['route' => 'admin.settings.tasks', 'label' => 'Scheduled Tasks'],
         ['route' => 'admin.settings.index', 'label' => 'Settings'],
     ];
 @endphp
 
 <header class="bg-slate-950 sticky top-0" style="z-index: 9999;">
-    {{-- Environment banner --}}
     @if (app()->environment('local', 'staging'))
         <div class="bg-red-600 text-white text-center text-xs font-bold py-1 px-4 tracking-wide uppercase">
             {{ app()->environment() }} &mdash; {{ request()->getHost() }}
@@ -69,16 +67,16 @@
                 </a>
             @endforeach
 
-            {{-- More dropdown --}}
+            {{-- Manage dropdown (customers-related) --}}
             <div class="relative" x-data="{ open: false }">
                 <button @click="open = !open" @click.away="open = false"
                         class="px-3 py-2 text-sm font-semibold whitespace-nowrap border-b-2 transition flex items-center gap-1
-                               {{ collect($adminNavMore)->contains(fn($i) => request()->routeIs($i['route'] . '*')) ? 'border-blue-400 text-white' : 'border-transparent text-gray-300 hover:text-white hover:border-gray-500' }}">
-                    More
+                               {{ collect($adminNavCustomers)->contains(fn($i) => request()->routeIs($i['route'] . '*')) ? 'border-blue-400 text-white' : 'border-transparent text-gray-300 hover:text-white hover:border-gray-500' }}">
+                    Manage
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
                 </button>
                 <div x-show="open" x-transition class="absolute left-0 mt-1 w-48 bg-white rounded-lg shadow-xl border py-1" style="z-index: 99999;">
-                    @foreach ($adminNavMore as $item)
+                    @foreach ($adminNavCustomers as $item)
                         <a href="{{ route($item['route']) }}"
                            class="block px-4 py-2 text-sm {{ request()->routeIs($item['route'] . '*') ? 'bg-blue-50 text-blue-700 font-medium' : 'text-gray-700 hover:bg-gray-50' }}">
                             {{ $item['label'] }}

@@ -50,6 +50,15 @@ class LoginRequest extends FormRequest
             ]);
         }
 
+        // Check if user is locked/disabled
+        $user = Auth::user();
+        if ($user->is_locked) {
+            Auth::logout();
+            throw ValidationException::withMessages([
+                'email' => 'Your account has been disabled. Please contact support.',
+            ]);
+        }
+
         RateLimiter::clear($this->throttleKey());
     }
 

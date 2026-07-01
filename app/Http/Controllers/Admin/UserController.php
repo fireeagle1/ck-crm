@@ -86,4 +86,17 @@ class UserController extends Controller
 
         return back()->with('success', "Password reset for {$user->full_name}.");
     }
+
+    public function toggleLock(User $user)
+    {
+        $user->update([
+            'is_locked' => !$user->is_locked,
+            'lock_until' => null,
+            'failed_attempts' => 0,
+        ]);
+
+        $status = $user->is_locked ? 'disabled' : 'enabled';
+
+        return back()->with('success', "Login {$status} for {$user->full_name}.");
+    }
 }

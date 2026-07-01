@@ -118,6 +118,7 @@ Route::middleware(['auth', 'verified', EnsureIsAdmin::class])->prefix('admin')->
     Route::post('/users', [Admin\UserController::class, 'store'])->name('users.store');
     Route::post('/users/{user}/impersonate', [Admin\UserController::class, 'impersonate'])->name('users.impersonate');
     Route::post('/users/{user}/reset-password', [Admin\UserController::class, 'resetPassword'])->name('users.reset-password');
+    Route::post('/users/{user}/toggle-lock', [Admin\UserController::class, 'toggleLock'])->name('users.toggle-lock');
     Route::post('/impersonate/stop', [Admin\UserController::class, 'stopImpersonating'])->name('impersonate.stop');
 
     // Import

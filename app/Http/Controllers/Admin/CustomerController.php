@@ -52,7 +52,12 @@ class CustomerController extends Controller
             ->where('invoice_status', 'Paid')
             ->sum('invoice_amount');
 
-        return view('admin.customers.show', compact('customer', 'totalIncome'));
+        $overdueInvoices = $customer->invoices()
+            ->where('invoice_status', 'Unpaid')
+            ->whereDate('due_date', '<', now())
+            ->count();
+
+        return view('admin.customers.show', compact('customer', 'totalIncome', 'overdueInvoices'));
     }
 
     public function edit(Customer $customer): View
