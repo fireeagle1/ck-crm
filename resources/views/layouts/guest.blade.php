@@ -9,7 +9,7 @@
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700&display=swap" rel="stylesheet" />
+        <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700,800&display=swap" rel="stylesheet" />
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -23,11 +23,11 @@
                     <div class="mb-8">
                         @php $logoPath = \App\Models\Setting::get('logo_path'); @endphp
                         @if ($logoPath)
-                            <img src="{{ asset($logoPath) }}" alt="{{ \App\Models\Setting::get('site_name', 'CK Enterprises') }}" class="h-10 w-auto mb-4">
+                            <img src="{{ asset($logoPath) }}" alt="{{ \App\Models\Setting::get('site_name', 'CK Enterprises') }}" class="h-12 w-auto mb-4">
                         @else
-                            <h1 class="text-2xl font-bold text-slate-900 tracking-tight">CK Enterprises</h1>
+                            <h1 class="text-3xl font-bold text-slate-900 tracking-tight">CK Enterprises</h1>
                         @endif
-                        <p class="text-sm text-gray-500 mt-1">Client Management Portal</p>
+                        <p class="text-sm text-gray-500 mt-2">Client Management Portal</p>
                     </div>
 
                     {{ $slot }}
@@ -36,15 +36,15 @@
 
             {{-- Right: Visual panel --}}
             <div class="hidden lg:block lg:w-1/2 relative">
-                <img src="https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80"
+                <img src="https://i0.wp.com/ckenterprises.co.uk/wp-content/uploads/2023/05/DJI_0160-scaled.jpg?fit=2560%2C1440&ssl=1"
                      alt=""
                      class="absolute inset-0 w-full h-full object-cover">
-                <div class="absolute inset-0 bg-slate-900/60"></div>
+                <div class="absolute inset-0 bg-slate-900/50"></div>
                 <div class="relative z-10 flex flex-col justify-end h-full p-12">
-                    <blockquote class="text-white/90 text-lg font-medium leading-relaxed max-w-md">
+                    <blockquote class="text-white/90 text-lg font-semibold leading-relaxed max-w-md">
                         "Managed IT services and web hosting you can rely on. Supporting businesses across the UK."
                     </blockquote>
-                    <p class="text-white/60 text-sm mt-4">CK Enterprises UK</p>
+                    <p class="text-white/60 text-sm mt-4 font-medium">CK Enterprises UK</p>
                 </div>
             </div>
         </div>

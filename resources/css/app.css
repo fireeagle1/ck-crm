@@ -1,3 +1,52 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+    body {
+        @apply text-gray-900 antialiased;
+        font-feature-settings: "kern" 1;
+        -webkit-font-smoothing: antialiased;
+    }
+
+    h1, h2, h3, h4 {
+        @apply font-bold tracking-tight;
+    }
+
+    h1 {
+        @apply text-2xl lg:text-3xl;
+    }
+}
+
+@layer components {
+    /* Bold primary buttons */
+    .btn-primary {
+        @apply inline-flex items-center justify-center px-4 py-2.5 bg-blue-600 text-white rounded-md text-sm font-semibold hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition shadow-sm;
+    }
+
+    .btn-secondary {
+        @apply inline-flex items-center justify-center px-4 py-2.5 border border-gray-300 bg-white text-gray-700 rounded-md text-sm font-semibold hover:bg-gray-50 transition;
+    }
+
+    .btn-danger {
+        @apply inline-flex items-center justify-center px-4 py-2.5 border border-red-200 text-red-600 rounded-md text-sm font-semibold hover:bg-red-50 transition;
+    }
+
+    /* Card component */
+    .card {
+        @apply bg-white rounded-lg shadow-sm border border-gray-200;
+    }
+
+    /* Stat cards - bolder */
+    .stat-card {
+        @apply bg-white rounded-lg p-5 shadow-sm border border-gray-200;
+    }
+
+    .stat-card .stat-value {
+        @apply text-3xl font-bold mt-1 tracking-tight;
+    }
+
+    .stat-card .stat-label {
+        @apply text-sm font-medium text-gray-500 uppercase tracking-wide;
+    }
+}
