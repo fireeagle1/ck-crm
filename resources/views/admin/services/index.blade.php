@@ -18,6 +18,7 @@
                     <th class="px-4 py-3 text-left font-semibold text-gray-600">Monthly</th>
                     <th class="px-4 py-3 text-left font-semibold text-gray-600">Frequency</th>
                     <th class="px-4 py-3 text-left font-semibold text-gray-600">Start</th>
+                    <th class="px-4 py-3 text-left font-semibold text-gray-600">Actions</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-100">
@@ -42,10 +43,18 @@
                         <td class="px-4 py-3">{{ $service->service_monthly_charge ? '£' . number_format($service->service_monthly_charge, 2) : '—' }}</td>
                         <td class="px-4 py-3 text-gray-500">{{ $service->service_payment_frequency ?? '—' }}</td>
                         <td class="px-4 py-3 text-gray-500">{{ $service->start_date?->format('Y-m-d') ?? '—' }}</td>
+                        <td class="px-4 py-3">
+                            <form method="POST" action="{{ route('admin.services.destroy', $service) }}" class="inline"
+                                  onsubmit="return confirm('Delete this service?')">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="text-red-600 hover:underline text-sm">Delete</button>
+                            </form>
+                        </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="6" class="px-4 py-6 text-center text-gray-500">No services.</td>
+                        <td colspan="7" class="px-4 py-6 text-center text-gray-500">No services.</td>
                     </tr>
                 @endforelse
             </tbody>

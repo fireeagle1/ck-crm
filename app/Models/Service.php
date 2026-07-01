@@ -15,6 +15,9 @@ class Service extends Model
     protected $fillable = [
         'company_id',
         'service_short',
+        'service_type',
+        'domain_name',
+        'cpanel_username',
         'status',
         'start_date',
         'end_date',

@@ -7,6 +7,16 @@
             <a href="{{ route('admin.customers.edit', $customer) }}" class="inline-flex items-center px-4 py-2 border rounded-md text-sm font-medium hover:bg-gray-50">
                 Edit
             </a>
+            @if ($customer->services->where('status', 'Active')->isEmpty())
+                <form method="POST" action="{{ route('admin.customers.destroy', $customer) }}"
+                      onsubmit="return confirm('Delete {{ $customer->company_name }}? This cannot be undone.')">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="inline-flex items-center px-4 py-2 border border-red-200 text-red-600 rounded-md text-sm font-medium hover:bg-red-50">
+                        Delete
+                    </button>
+                </form>
+            @endif
             <a href="{{ route('admin.customers.index') }}" class="text-sm text-blue-600 hover:underline self-center">&larr; Customers</a>
         </div>
     </div>

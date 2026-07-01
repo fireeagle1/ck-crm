@@ -65,7 +65,15 @@
                         </td>
                         <td class="px-4 py-3 text-gray-500">{{ $domain->cost ? '£' . number_format($domain->cost, 2) : '—' }}</td>
                         <td class="px-4 py-3">
-                            <a href="{{ route('admin.domains.edit', $domain) }}" class="text-blue-600 hover:underline text-sm">Edit</a>
+                            <div class="flex gap-2">
+                                <a href="{{ route('admin.domains.edit', $domain) }}" class="text-blue-600 hover:underline text-sm">Edit</a>
+                                <form method="POST" action="{{ route('admin.domains.destroy', $domain) }}" class="inline"
+                                      onsubmit="return confirm('Delete {{ $domain->domain_name }}?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="text-red-600 hover:underline text-sm">Delete</button>
+                                </form>
+                            </div>
                         </td>
                     </tr>
                 @empty

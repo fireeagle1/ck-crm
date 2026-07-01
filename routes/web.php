@@ -30,6 +30,8 @@ Route::middleware(['auth', 'verified'])->prefix('portal')->name('portal.')->grou
     // Services
     Route::get('/services', [Portal\ServiceController::class, 'index'])->name('services.index');
     Route::get('/services/{service}', [Portal\ServiceController::class, 'show'])->name('services.show');
+    Route::post('/services/{service}/sso/cpanel', [Portal\SsoController::class, 'cpanel'])->name('services.sso.cpanel');
+    Route::post('/services/{service}/sso/webmail', [Portal\SsoController::class, 'webmail'])->name('services.sso.webmail');
 
     // Tickets
     Route::get('/tickets', [Portal\TicketController::class, 'index'])->name('tickets.index');
@@ -70,6 +72,7 @@ Route::middleware(['auth', 'verified', EnsureIsAdmin::class])->prefix('admin')->
     Route::get('/services', [Admin\ServiceController::class, 'index'])->name('services.index');
     Route::get('/services/create', [Admin\ServiceController::class, 'create'])->name('services.create');
     Route::post('/services', [Admin\ServiceController::class, 'store'])->name('services.store');
+    Route::delete('/services/{service}', [Admin\ServiceController::class, 'destroy'])->name('services.destroy');
 
     // Tickets
     Route::get('/tickets', [Admin\TicketController::class, 'index'])->name('tickets.index');
@@ -89,6 +92,7 @@ Route::middleware(['auth', 'verified', EnsureIsAdmin::class])->prefix('admin')->
     Route::post('/domains', [Admin\DomainController::class, 'store'])->name('domains.store');
     Route::get('/domains/{domain}/edit', [Admin\DomainController::class, 'edit'])->name('domains.edit');
     Route::put('/domains/{domain}', [Admin\DomainController::class, 'update'])->name('domains.update');
+    Route::delete('/domains/{domain}', [Admin\DomainController::class, 'destroy'])->name('domains.destroy');
 
     // Knowledgebase Articles
     Route::resource('articles', Admin\ArticleController::class)->except('show');

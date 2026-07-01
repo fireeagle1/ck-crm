@@ -80,4 +80,18 @@ class CustomerController extends Controller
         return redirect()->route('admin.customers.show', $customer)
             ->with('success', 'Customer updated.');
     }
+
+    public function destroy(Customer $customer)
+    {
+        // Only allow deletion if the customer has no active services
+        if ($customer->services()->where('status', 'Active')->exists()) {
+            return back()->with('error', 'Cannot delete a customer with active services. Cancel or remove their services first.');
+        }
+
+        $name = $customer->company_name;
+        $customer->delete();
+
+        return redirect()->route('admin.customers.index')
+            ->with('success', "Customer '{$name}' deleted.");
+    }
 }

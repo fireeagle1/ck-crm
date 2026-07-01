@@ -152,4 +152,13 @@ class ServiceController extends Controller
 
         return $stripeCustomer->id;
     }
+
+    public function destroy(Service $service)
+    {
+        $name = $service->service_short;
+        $service->delete();
+
+        return redirect()->route('admin.services.index')
+            ->with('success', "Service '{$name}' deleted.");
+    }
 }

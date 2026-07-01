@@ -79,4 +79,13 @@ class DomainController extends Controller
 
         return back()->with('success', 'Domain updated.');
     }
+
+    public function destroy(Domain $domain)
+    {
+        $name = $domain->domain_name;
+        $domain->delete();
+
+        return redirect()->route('admin.domains.index')
+            ->with('success', "Domain '{$name}' deleted.");
+    }
 }
