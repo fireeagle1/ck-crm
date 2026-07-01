@@ -4,6 +4,26 @@
     <h1 class="text-2xl font-semibold mb-6">Settings</h1>
 
     <div class="bg-white rounded-lg shadow-sm border p-6 max-w-2xl">
+        {{-- Current logo + remove button (separate form, outside main form) --}}
+        @if ($settings['logo_path'])
+            <div class="mb-6 pb-6 border-b">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Current Logo</label>
+                <div class="mb-3 p-4 bg-gray-50 rounded-md border inline-block">
+                    <img src="{{ asset('storage/' . $settings['logo_path']) }}"
+                         alt="Current logo"
+                         class="h-12 w-auto">
+                </div>
+                <div>
+                    <form method="POST" action="{{ route('admin.settings.logo.delete') }}">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="text-sm text-red-600 hover:underline">Remove logo</button>
+                    </form>
+                </div>
+            </div>
+        @endif
+
+        {{-- Main settings form --}}
         <form method="POST" action="{{ route('admin.settings.update') }}" enctype="multipart/form-data">
             @csrf
             @method('PUT')
@@ -20,23 +40,7 @@
 
                 {{-- Logo Upload --}}
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Logo (landscape)</label>
-
-                    @if ($settings['logo_path'])
-                        <div class="mb-3 p-4 bg-gray-50 rounded-md border inline-block">
-                            <img src="{{ asset('storage/' . $settings['logo_path']) }}"
-                                 alt="Current logo"
-                                 class="h-12 w-auto">
-                        </div>
-                        <div class="mb-3">
-                            <form method="POST" action="{{ route('admin.settings.logo.delete') }}" class="inline">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="text-sm text-red-600 hover:underline">Remove logo</button>
-                            </form>
-                        </div>
-                    @endif
-
+                    <label class="block text-sm font-medium text-gray-700 mb-2">{{ $settings['logo_path'] ? 'Replace Logo' : 'Upload Logo' }} (landscape)</label>
                     <input type="file" name="logo" id="logo" accept="image/png,image/jpeg,image/svg+xml,image/webp"
                            class="block w-full text-sm text-gray-500
                                   file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0

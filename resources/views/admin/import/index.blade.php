@@ -61,8 +61,20 @@
                     </div>
                 </fieldset>
 
+                {{-- Fresh import option --}}
+                <fieldset class="border border-red-200 rounded-md p-4 bg-red-50">
+                    <legend class="text-sm font-semibold text-red-700 px-2">Fresh Import</legend>
+                    <label class="flex items-center gap-2 text-sm">
+                        <input type="hidden" name="fresh_import" value="0">
+                        <input type="checkbox" name="fresh_import" value="1"
+                               class="rounded border-red-300 text-red-600 shadow-sm focus:ring-red-500">
+                        <span class="text-red-800 font-medium">Truncate selected tables before importing</span>
+                    </label>
+                    <p class="text-xs text-red-600 mt-2">This will DELETE all existing data in the selected tables and replace it with the source data. Your admin account will be preserved. Use this to start clean.</p>
+                </fieldset>
+
                 <div class="bg-amber-50 border border-amber-200 rounded-md p-3 text-sm text-amber-800">
-                    <strong>Note:</strong> Import customers first if other tables have foreign keys. The importer uses updateOrCreate, so existing records will be updated rather than duplicated. User passwords from the old system will be preserved (bcrypt hashes are compatible).
+                    <strong>Note:</strong> Customers are always imported first. Duplicate Stripe IDs in the source data are handled automatically (only the first occurrence is kept). Rows referencing non-existent customers are skipped.
                 </div>
 
                 <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700">
