@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\Domain;
+use App\Models\ScheduledTaskLog;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
 
@@ -14,11 +15,14 @@ class EnomSyncDomains extends Command
 
     public function handle(): int
     {
+        $log = ScheduledTaskLog::begin('enom:sync');
+
         $username = config('services.enom.username');
         $password = config('services.enom.password');
         $sandbox = config('services.enom.sandbox', false);
 
         if (!$username || !$password) {
+            $log->fail('eNom credentials not configured.');
             $this->error('eNom credentials not configured. Set ENOM_USERNAME and ENOM_PASSWORD in .env');
             return self::FAILURE;
         }
@@ -88,6 +92,10 @@ class EnomSyncDomains extends Command
         } while ($page <= $totalPages);
 
         $this->info("✓ Synced {$totalSynced} domains from eNom.");
+
+        $log->complete("Synced {$totalSynced} domains from eNom.", [
+            'domains_synced' => $totalSynced,
+        ]);
 
         return self::SUCCESS;
     }

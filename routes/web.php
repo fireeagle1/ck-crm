@@ -110,6 +110,7 @@ Route::middleware(['auth', 'verified', EnsureIsAdmin::class])->prefix('admin')->
     Route::put('/settings/general', [Admin\SettingsController::class, 'update'])->name('settings.update');
     Route::delete('/settings/logo', [Admin\SettingsController::class, 'deleteLogo'])->name('settings.logo.delete');
     Route::get('/settings/import', [Admin\SettingsController::class, 'import'])->name('settings.import');
+    Route::get('/settings/scheduled-tasks', [Admin\SettingsController::class, 'scheduledTasks'])->name('settings.tasks');
 });
 
 /*

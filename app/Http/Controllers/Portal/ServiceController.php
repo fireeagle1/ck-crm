@@ -19,9 +19,12 @@ class ServiceController extends Controller
         return view('portal.services.index', compact('services'));
     }
 
-    public function show(Service $service): View
+    public function show(Request $request, Service $service): View
     {
-        $this->authorize('view', $service);
+        // Ensure the service belongs to the user's company
+        if ($service->company_id !== $request->user()->company_id) {
+            abort(403);
+        }
 
         return view('portal.services.show', compact('service'));
     }

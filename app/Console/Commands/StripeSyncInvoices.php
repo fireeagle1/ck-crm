@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\Customer;
 use App\Models\Invoice;
+use App\Models\ScheduledTaskLog;
 use App\Models\Service;
 use Illuminate\Console\Command;
 
@@ -15,7 +16,10 @@ class StripeSyncInvoices extends Command
 
     public function handle(): int
     {
+        $log = ScheduledTaskLog::begin('stripe:sync');
+
         if (!config('services.stripe.secret')) {
+            $log->fail('Stripe API key not configured.');
             $this->error('Stripe API key not configured. Set STRIPE_SECRET in .env');
             return self::FAILURE;
         }
@@ -29,6 +33,7 @@ class StripeSyncInvoices extends Command
         $customers = $query->get();
 
         if ($customers->isEmpty()) {
+            $log->complete('No customers with Stripe IDs found.', ['customers' => 0]);
             $this->warn('No customers with Stripe IDs found.');
             return self::SUCCESS;
         }
@@ -38,15 +43,14 @@ class StripeSyncInvoices extends Command
 
         $invoiceCount = 0;
         $subscriptionCount = 0;
+        $errors = [];
 
         foreach ($customers as $customer) {
             try {
-                // Sync invoices
                 $invoiceCount += $this->syncInvoices($customer);
-
-                // Sync subscriptions → services
                 $subscriptionCount += $this->syncSubscriptions($customer);
             } catch (\Exception $e) {
+                $errors[] = "{$customer->company_name}: {$e->getMessage()}";
                 $this->newLine();
                 $this->warn("  Error for {$customer->company_name}: {$e->getMessage()}");
             }
@@ -57,6 +61,18 @@ class StripeSyncInvoices extends Command
         $bar->finish();
         $this->newLine(2);
         $this->info("✓ Synced {$invoiceCount} invoices, {$subscriptionCount} subscriptions.");
+
+        $summary = "Synced {$invoiceCount} invoices, {$subscriptionCount} subscriptions.";
+        if ($errors) {
+            $summary .= ' Errors: ' . count($errors);
+        }
+
+        $log->complete($summary, [
+            'customers_processed' => $customers->count(),
+            'invoices_synced' => $invoiceCount,
+            'subscriptions_synced' => $subscriptionCount,
+            'errors' => $errors,
+        ]);
 
         return self::SUCCESS;
     }

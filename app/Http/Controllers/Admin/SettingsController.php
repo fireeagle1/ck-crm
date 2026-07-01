@@ -59,4 +59,21 @@ class SettingsController extends Controller
     {
         return view('admin.settings.import');
     }
+
+    public function scheduledTasks(): View
+    {
+        $logs = \App\Models\ScheduledTaskLog::orderByDesc('created_at')->paginate(30);
+
+        // Get the defined schedule
+        $schedule = app(\Illuminate\Console\Scheduling\Schedule::class);
+        $events = collect($schedule->events())->map(function ($event) {
+            return [
+                'command' => $event->command ?? $event->description ?? 'Closure',
+                'expression' => $event->expression,
+                'description' => $event->description,
+            ];
+        });
+
+        return view('admin.settings.scheduled-tasks', compact('logs', 'events'));
+    }
 }
