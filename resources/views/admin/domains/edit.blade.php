@@ -54,9 +54,16 @@
                     </div>
                     <div>
                         <label for="cost" class="block text-sm font-medium text-gray-700">Annual Cost (£)</label>
-                        <input type="number" step="0.01" min="0" name="cost" id="cost"
-                               value="{{ old('cost', $domain->cost) }}"
-                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                        @if ($domain->stripe_subscription_id)
+                            <input type="number" step="0.01" min="0" id="cost"
+                                   value="{{ $domain->cost }}" readonly disabled
+                                   class="mt-1 block w-full rounded-md border-gray-200 bg-gray-100 text-gray-500 shadow-sm cursor-not-allowed">
+                            <p class="text-xs text-amber-600 mt-1">🔒 Pricing synced from Stripe</p>
+                        @else
+                            <input type="number" step="0.01" min="0" name="cost" id="cost"
+                                   value="{{ old('cost', $domain->cost) }}"
+                                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                        @endif
                     </div>
                 </div>
 

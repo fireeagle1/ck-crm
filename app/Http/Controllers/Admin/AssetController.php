@@ -10,11 +10,22 @@ use Illuminate\View\View;
 
 class AssetController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
-        $assets = Asset::with('customer')
-            ->orderByDesc('device_id')
-            ->paginate(20);
+        $query = Asset::with('customer');
+
+        // Search by device name, serial number, or customer name
+        if ($q = $request->input('q')) {
+            $query->where(function ($qb) use ($q) {
+                $qb->where('device_name', 'like', "%{$q}%")
+                    ->orWhere('serial_number', 'like', "%{$q}%")
+                    ->orWhereHas('customer', function ($cq) use ($q) {
+                        $cq->where('company_name', 'like', "%{$q}%");
+                    });
+            });
+        }
+
+        $assets = $query->orderByDesc('device_id')->paginate(20);
 
         return view('admin.assets.index', compact('assets'));
     }

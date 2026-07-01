@@ -8,6 +8,18 @@
         </a>
     </div>
 
+    {{-- Search --}}
+    <div class="mb-4">
+        <form method="GET" action="{{ route('admin.assets.index') }}" class="flex items-center gap-2">
+            <input type="text" name="q" value="{{ request('q') }}" placeholder="Search by device name, serial number, or customer..."
+                   class="w-full max-w-md rounded-md border-gray-300 shadow-sm text-sm focus:ring-blue-500 focus:border-blue-500">
+            <button type="submit" class="px-4 py-2 bg-gray-100 border rounded-md text-sm font-medium hover:bg-gray-200">Search</button>
+            @if(request('q'))
+                <a href="{{ route('admin.assets.index') }}" class="text-sm text-gray-500 hover:text-gray-700">Clear</a>
+            @endif
+        </form>
+    </div>
+
     <div class="bg-white rounded-lg shadow-sm border overflow-hidden">
         <table class="min-w-full text-sm">
             <thead class="bg-gray-50 border-b">
@@ -43,12 +55,12 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="6" class="px-4 py-6 text-center text-gray-500">No assets.</td>
+                        <td colspan="6" class="px-4 py-6 text-center text-gray-500">No assets found.</td>
                     </tr>
                 @endforelse
             </tbody>
         </table>
     </div>
 
-    <div class="mt-4">{{ $assets->links() }}</div>
+    <div class="mt-4">{{ $assets->appends(request()->query())->links() }}</div>
 </x-admin-layout>

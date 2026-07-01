@@ -11,11 +11,26 @@ use Illuminate\View\View;
 
 class UserController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
-        $users = User::with('customer')
-            ->orderByDesc('last_login')
-            ->paginate(20);
+        $query = User::with('customer');
+
+        // Search by name or email
+        if ($q = $request->input('q')) {
+            $query->where(function ($qb) use ($q) {
+                $qb->where('first_name', 'like', "%{$q}%")
+                    ->orWhere('last_name', 'like', "%{$q}%")
+                    ->orWhere('name', 'like', "%{$q}%")
+                    ->orWhere('email', 'like', "%{$q}%");
+            });
+        }
+
+        // Hide disabled users by default
+        if (!$request->input('show_disabled')) {
+            $query->where('is_locked', false);
+        }
+
+        $users = $query->orderByDesc('last_login')->paginate(20);
 
         return view('admin.users.index', compact('users'));
     }

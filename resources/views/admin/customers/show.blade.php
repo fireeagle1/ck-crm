@@ -25,7 +25,7 @@
     @endif
 
     {{-- KPI strip --}}
-    <div class="grid grid-cols-2 sm:grid-cols-5 gap-4 mb-6">
+    <div class="grid grid-cols-3 sm:grid-cols-6 gap-3 mb-6">
         <div class="bg-white rounded-lg p-4 border">
             <p class="text-xs font-medium text-gray-500 uppercase">Services</p>
             <p class="text-2xl font-bold mt-1">{{ $customer->services->where('status', 'Active')->count() }}</p>
@@ -45,6 +45,15 @@
         <div class="bg-white rounded-lg p-4 border">
             <p class="text-xs font-medium text-gray-500 uppercase">Total Income</p>
             <p class="text-2xl font-bold mt-1">£{{ number_format($totalIncome, 2) }}</p>
+        </div>
+        <div class="bg-white rounded-lg p-4 border">
+            <p class="text-xs font-medium text-gray-500 uppercase">Billing</p>
+            @if ($customer->stripe_customer_id)
+                <a href="https://dashboard.stripe.com/customers/{{ $customer->stripe_customer_id }}" target="_blank"
+                   class="text-sm text-blue-600 hover:underline font-medium mt-1 inline-block">Open in Stripe →</a>
+            @else
+                <p class="text-sm text-gray-400 mt-1">Not linked</p>
+            @endif
         </div>
     </div>
 
@@ -90,8 +99,8 @@
             </thead>
             <tbody class="divide-y">
                 @forelse ($customer->services->sortByDesc('status') as $service)
-                    <tr class="hover:bg-gray-50">
-                        <td class="px-4 py-2 font-medium">{{ $service->service_short }}</td>
+                    <tr class="hover:bg-gray-50 cursor-pointer" onclick="window.location='{{ route('admin.services.show', $service) }}'">
+                        <td class="px-4 py-2 font-medium text-blue-600">{{ $service->service_short }}</td>
                         <td class="px-4 py-2 text-gray-500 text-xs font-mono">{{ $service->domain_name ?? '—' }}</td>
                         <td class="px-4 py-2 text-gray-600">
                             @if ($service->service_monthly_charge)
