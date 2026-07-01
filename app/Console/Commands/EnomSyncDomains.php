@@ -42,7 +42,7 @@ class EnomSyncDomains extends Command
                 'uid' => $username,
                 'pw' => $password,
                 'responsetype' => 'xml',
-                'Display' => 200,
+                'Display' => 100,
                 'Page' => 1,
             ]);
         } catch (\Exception $e) {
