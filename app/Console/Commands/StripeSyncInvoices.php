@@ -158,24 +158,7 @@ class StripeSyncInvoices extends Command
                 default => 'Suspended',
             };
 
-            // Get a descriptive name from the first line item
-            $name = 'Subscription';
-            if (!empty($sub->items->data)) {
-                $item = $sub->items->data[0];
-                $name = $item->price->nickname ?? $item->price->product ?? 'Subscription';
-
-                // Try to get product name
-                if (is_string($item->price->product)) {
-                    try {
-                        $product = \Stripe\Product::retrieve($item->price->product);
-                        $name = $product->name ?? $name;
-                    } catch (\Exception) {
-                        // keep the fallback name
-                    }
-                }
-            }
-
-            // Store the actual charge amount (not a monthly conversion)
+            // Store the actual charge amount
             $actualCharge = 0;
             $frequency = null;
             if (!empty($sub->items->data)) {
@@ -195,21 +178,27 @@ class StripeSyncInvoices extends Command
                 };
             }
 
-            Service::updateOrCreate(
-                ['stripe_subscription_id' => $sub->id],
-                [
-                    'company_id' => $customer->company_id,
-                    'service_short' => $name,
+            // ONLY update existing services — never create new ones
+            // New services should be created manually via the admin panel
+            $existingService = Service::where('stripe_subscription_id', $sub->id)->first();
+
+            if ($existingService) {
+                $existingService->update([
                     'status' => $status,
-                    'start_date' => date('Y-m-d', $sub->start_date),
-                    'end_date' => $sub->canceled_at ? date('Y-m-d', $sub->canceled_at) : null,
                     'service_monthly_charge' => $actualCharge,
                     'service_payment_frequency' => $frequency,
                     'next_payment_date' => $sub->current_period_end ? date('Y-m-d', $sub->current_period_end) : null,
-                ]
-            );
-
-            $count++;
+                    'end_date' => $sub->canceled_at ? date('Y-m-d', $sub->canceled_at) : null,
+                ]);
+                $count++;
+            }
+            // Also check domains table for this subscription
+            $existingDomain = \App\Models\Domain::where('stripe_subscription_id', $sub->id)->first();
+            if ($existingDomain) {
+                $existingDomain->update([
+                    'cost' => $actualCharge,
+                ]);
+            }
         }
 
         return $count;
