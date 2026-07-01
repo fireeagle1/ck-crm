@@ -34,10 +34,22 @@
                         <td class="px-4 py-3 text-gray-500">{{ $user->last_login?->diffForHumans() ?? 'Never' }}</td>
                         <td class="px-4 py-3">
                             @if (!$user->is_admin)
-                                <form method="POST" action="{{ route('admin.users.impersonate', $user) }}" class="inline">
-                                    @csrf
-                                    <button type="submit" class="text-blue-600 hover:underline text-sm">Impersonate</button>
-                                </form>
+                                <div class="flex gap-2">
+                                    <form method="POST" action="{{ route('admin.users.impersonate', $user) }}" class="inline">
+                                        @csrf
+                                        <button type="submit" class="text-blue-600 hover:underline text-sm">Impersonate</button>
+                                    </form>
+                                    <form method="POST" action="{{ route('admin.users.reset-password', $user) }}" class="inline"
+                                          x-data="{ show: false }">
+                                        @csrf
+                                        <button type="button" @click="show = !show" class="text-amber-600 hover:underline text-sm">Reset PW</button>
+                                        <div x-show="show" x-transition class="mt-1 flex gap-1">
+                                            <input type="password" name="new_password" placeholder="New password" required minlength="8"
+                                                   class="w-32 rounded border-gray-300 text-xs px-2 py-1">
+                                            <button type="submit" class="px-2 py-1 bg-amber-600 text-white rounded text-xs">Set</button>
+                                        </div>
+                                    </form>
+                                </div>
                             @endif
                         </td>
                     </tr>

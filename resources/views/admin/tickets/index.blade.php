@@ -22,6 +22,7 @@
                     <th class="px-4 py-3 text-left font-semibold text-gray-600">ID</th>
                     <th class="px-4 py-3 text-left font-semibold text-gray-600">Subject</th>
                     <th class="px-4 py-3 text-left font-semibold text-gray-600">Customer</th>
+                    <th class="px-4 py-3 text-left font-semibold text-gray-600">Asset</th>
                     <th class="px-4 py-3 text-left font-semibold text-gray-600">Status</th>
                     <th class="px-4 py-3 text-left font-semibold text-gray-600">Priority</th>
                     <th class="px-4 py-3 text-left font-semibold text-gray-600">Created</th>
@@ -37,6 +38,7 @@
                         </td>
                         <td class="px-4 py-3">{{ $ticket->subject }}</td>
                         <td class="px-4 py-3 text-gray-500">{{ $ticket->customer?->company_name ?? '—' }}</td>
+                        <td class="px-4 py-3 text-gray-500">{{ $ticket->asset?->device_name ?? '—' }}</td>
                         <td class="px-4 py-3">
                             <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium
                                 {{ $ticket->status === 'Open' ? 'bg-green-100 text-green-700' : ($ticket->status === 'Closed' ? 'bg-gray-100 text-gray-700' : 'bg-amber-100 text-amber-700') }}">
@@ -53,7 +55,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="6" class="px-4 py-6 text-center text-gray-500">No tickets found.</td>
+                        <td colspan="7" class="px-4 py-6 text-center text-gray-500">No tickets found.</td>
                     </tr>
                 @endforelse
             </tbody>

@@ -21,6 +21,10 @@ Route::get('/', function () {
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth', 'verified'])->prefix('portal')->name('portal.')->group(function () {
+    // Onboarding (must be before the onboarding middleware gate)
+    Route::get('/onboarding', [Portal\OnboardingController::class, 'show'])->name('onboarding.show');
+    Route::put('/onboarding', [Portal\OnboardingController::class, 'update'])->name('onboarding.update');
+
     Route::get('/dashboard', [Portal\DashboardController::class, 'index'])->name('dashboard');
 
     // Services
@@ -94,7 +98,12 @@ Route::middleware(['auth', 'verified', EnsureIsAdmin::class])->prefix('admin')->
     Route::get('/users/create', [Admin\UserController::class, 'create'])->name('users.create');
     Route::post('/users', [Admin\UserController::class, 'store'])->name('users.store');
     Route::post('/users/{user}/impersonate', [Admin\UserController::class, 'impersonate'])->name('users.impersonate');
+    Route::post('/users/{user}/reset-password', [Admin\UserController::class, 'resetPassword'])->name('users.reset-password');
     Route::post('/impersonate/stop', [Admin\UserController::class, 'stopImpersonating'])->name('impersonate.stop');
+
+    // Import
+    Route::get('/import', [Admin\ImportController::class, 'index'])->name('import.index');
+    Route::post('/import', [Admin\ImportController::class, 'run'])->name('import.run');
 
     // Settings
     Route::get('/settings', [Admin\SettingsController::class, 'index'])->name('settings.index');

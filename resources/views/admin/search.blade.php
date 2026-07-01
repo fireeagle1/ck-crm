@@ -115,5 +115,53 @@
                 </div>
             </div>
         @endif
+
+        {{-- Invoices --}}
+        @if (!empty($results['invoices']) && $results['invoices']->isNotEmpty())
+            <div class="bg-white rounded-lg shadow-sm border mb-4">
+                <div class="px-5 py-3 border-b">
+                    <h2 class="text-sm font-semibold text-gray-700">Invoices ({{ $results['invoices']->count() }})</h2>
+                </div>
+                <div class="divide-y divide-gray-100">
+                    @foreach ($results['invoices'] as $invoice)
+                        <div class="px-5 py-3 flex items-center justify-between">
+                            <div>
+                                <span class="font-medium font-mono text-sm">#{{ $invoice->invoice_id }}</span>
+                                <span class="text-sm text-gray-500 ml-2">{{ $invoice->customer?->company_name }}</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-sm font-medium">£{{ number_format($invoice->invoice_amount, 2) }}</span>
+                                <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium
+                                    {{ $invoice->invoice_status === 'Paid' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700' }}">
+                                    {{ $invoice->invoice_status }}
+                                </span>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        @endif
+
+        {{-- Assets --}}
+        @if (!empty($results['assets']) && $results['assets']->isNotEmpty())
+            <div class="bg-white rounded-lg shadow-sm border mb-4">
+                <div class="px-5 py-3 border-b">
+                    <h2 class="text-sm font-semibold text-gray-700">Assets ({{ $results['assets']->count() }})</h2>
+                </div>
+                <div class="divide-y divide-gray-100">
+                    @foreach ($results['assets'] as $asset)
+                        <div class="px-5 py-3">
+                            <a href="{{ route('admin.assets.show', $asset) }}" class="text-blue-600 hover:underline font-medium">
+                                {{ $asset->device_name }}
+                            </a>
+                            <span class="text-sm text-gray-500 ml-2">{{ $asset->customer?->company_name }}</span>
+                            @if ($asset->serial_number)
+                                <span class="text-xs text-gray-400 ml-2 font-mono">S/N: {{ $asset->serial_number }}</span>
+                            @endif
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        @endif
     @endif
 </x-admin-layout>

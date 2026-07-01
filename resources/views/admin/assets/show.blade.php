@@ -61,4 +61,40 @@
             </div>
         @endif
     </div>
+
+    {{-- Linked Tickets --}}
+    @if ($asset->tickets->isNotEmpty())
+        <div class="bg-white rounded-lg shadow-sm border overflow-hidden mt-6 max-w-3xl">
+            <div class="px-5 py-3 border-b">
+                <h2 class="text-lg font-semibold">Linked Incidents</h2>
+            </div>
+            <table class="min-w-full text-sm">
+                <thead class="bg-gray-50 border-b">
+                    <tr>
+                        <th class="px-4 py-3 text-left font-semibold text-gray-600">ID</th>
+                        <th class="px-4 py-3 text-left font-semibold text-gray-600">Subject</th>
+                        <th class="px-4 py-3 text-left font-semibold text-gray-600">Status</th>
+                        <th class="px-4 py-3 text-left font-semibold text-gray-600">Created</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    @foreach ($asset->tickets as $ticket)
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-4 py-3">
+                                <a href="{{ route('admin.tickets.show', $ticket) }}" class="text-blue-600 hover:underline">INC{{ $ticket->ticket_id }}</a>
+                            </td>
+                            <td class="px-4 py-3">{{ $ticket->subject }}</td>
+                            <td class="px-4 py-3">
+                                <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium
+                                    {{ $ticket->status === 'Open' ? 'bg-green-100 text-green-700' : ($ticket->status === 'Closed' ? 'bg-gray-100 text-gray-700' : 'bg-amber-100 text-amber-700') }}">
+                                    {{ $ticket->status }}
+                                </span>
+                            </td>
+                            <td class="px-4 py-3 text-gray-500">{{ $ticket->created_at->format('Y-m-d') }}</td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    @endif
 </x-admin-layout>

@@ -70,4 +70,20 @@ class UserController extends Controller
         return redirect()->route('admin.dashboard')
             ->with('info', 'Impersonation ended.');
     }
+
+    public function resetPassword(Request $request, User $user)
+    {
+        $validated = $request->validate([
+            'new_password' => 'required|min:8',
+        ]);
+
+        $user->update([
+            'password' => Hash::make($validated['new_password']),
+            'failed_attempts' => 0,
+            'is_locked' => false,
+            'lock_until' => null,
+        ]);
+
+        return back()->with('success', "Password reset for {$user->full_name}.");
+    }
 }

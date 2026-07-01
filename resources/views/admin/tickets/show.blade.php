@@ -120,6 +120,18 @@
                             </select>
                         </div>
 
+                        <div>
+                            <label for="asset_id" class="block text-sm font-medium text-gray-700">Linked Asset</label>
+                            <select name="asset_id" id="asset_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
+                                <option value="">None</option>
+                                @foreach ($assets as $asset)
+                                    <option value="{{ $asset->device_id }}" {{ $ticket->asset_id == $asset->device_id ? 'selected' : '' }}>
+                                        {{ $asset->device_name }} {{ $asset->device_type ? "({$asset->device_type})" : '' }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
                         <button type="submit" class="w-full px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700">
                             Update
                         </button>
@@ -147,6 +159,16 @@
                         <dt class="text-gray-500">Raised by</dt>
                         <dd>{{ $ticket->user?->full_name ?? '—' }}</dd>
                     </div>
+                    @if ($ticket->asset)
+                        <div class="flex justify-between">
+                            <dt class="text-gray-500">Asset</dt>
+                            <dd>
+                                <a href="{{ route('admin.assets.show', $ticket->asset) }}" class="text-blue-600 hover:underline">
+                                    {{ $ticket->asset->device_name }}
+                                </a>
+                            </dd>
+                        </div>
+                    @endif
                     <div class="flex justify-between">
                         <dt class="text-gray-500">Replies</dt>
                         <dd>{{ $ticket->replies->count() }}</dd>

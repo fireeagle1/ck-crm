@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Asset;
 use App\Models\Ticket;
 use App\Models\TicketReply;
 use Illuminate\Http\Request;
@@ -15,7 +16,7 @@ class TicketController extends Controller
     {
         $status = $request->get('status', 'open');
 
-        $query = Ticket::with(['customer', 'user'])->withCount('replies');
+        $query = Ticket::with(['customer', 'user', 'asset'])->withCount('replies');
 
         if ($status !== 'all') {
             $query->whereIn('status', ['Open', 'Pending', 'In Progress']);
@@ -28,9 +29,14 @@ class TicketController extends Controller
 
     public function show(Ticket $ticket): View
     {
-        $ticket->load(['customer', 'user', 'replies.user']);
+        $ticket->load(['customer', 'user', 'asset', 'replies.user']);
 
-        return view('admin.tickets.show', compact('ticket'));
+        // Get assets for this customer to allow linking
+        $assets = $ticket->company_id
+            ? Asset::where('customer_id', $ticket->company_id)->get()
+            : collect();
+
+        return view('admin.tickets.show', compact('ticket', 'assets'));
     }
 
     public function update(Request $request, Ticket $ticket)
@@ -38,6 +44,7 @@ class TicketController extends Controller
         $validated = $request->validate([
             'status' => 'required|in:Open,Pending,In Progress,Closed',
             'priority' => 'in:Low,Normal,High,Critical',
+            'asset_id' => 'nullable|exists:cmdb,device_id',
         ]);
 
         $ticket->update($validated);

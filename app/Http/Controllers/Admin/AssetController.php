@@ -46,7 +46,7 @@ class AssetController extends Controller
 
     public function show(Asset $asset): View
     {
-        $asset->load('customer');
+        $asset->load(['customer', 'tickets']);
 
         return view('admin.assets.show', compact('asset'));
     }

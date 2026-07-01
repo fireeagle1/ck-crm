@@ -16,6 +16,7 @@ class Ticket extends Model
     protected $fillable = [
         'company_id',
         'user_id',
+        'asset_id',
         'subject',
         'description',
         'status',
@@ -30,6 +31,11 @@ class Ticket extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function asset(): BelongsTo
+    {
+        return $this->belongsTo(Asset::class, 'asset_id', 'device_id');
     }
 
     public function replies(): HasMany

@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Asset;
 use App\Models\Customer;
 use App\Models\Domain;
+use App\Models\Invoice;
 use App\Models\Service;
 use App\Models\Ticket;
 use App\Models\User;
@@ -26,9 +28,11 @@ class SearchController extends Controller
 
             $results['tickets'] = Ticket::where('subject', 'LIKE', "%{$q}%")
                 ->orWhere('ticket_id', $q)
+                ->with('customer')
                 ->limit(10)->get();
 
             $results['services'] = Service::where('service_short', 'LIKE', "%{$q}%")
+                ->with('customer')
                 ->limit(10)->get();
 
             $results['domains'] = Domain::where('domain_name', 'LIKE', "%{$q}%")
@@ -37,6 +41,16 @@ class SearchController extends Controller
             $results['users'] = User::where('email', 'LIKE', "%{$q}%")
                 ->orWhere('first_name', 'LIKE', "%{$q}%")
                 ->orWhere('last_name', 'LIKE', "%{$q}%")
+                ->limit(10)->get();
+
+            $results['invoices'] = Invoice::where('stripe_invoice_id', 'LIKE', "%{$q}%")
+                ->orWhere('invoice_id', $q)
+                ->with('customer')
+                ->limit(10)->get();
+
+            $results['assets'] = Asset::where('device_name', 'LIKE', "%{$q}%")
+                ->orWhere('serial_number', 'LIKE', "%{$q}%")
+                ->with('customer')
                 ->limit(10)->get();
         }
 
