@@ -1,8 +1,3 @@
-@include('admin.settings.layout', ['title' => 'General Settings', 'slot' => $__env->yieldContent('settings-content')])
-
-@section('settings-content')
-@endsection
-
 <x-admin-layout>
     <x-slot:title>General Settings</x-slot:title>
 
