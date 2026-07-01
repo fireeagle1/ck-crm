@@ -66,4 +66,19 @@ class User extends Authenticatable
     {
         return $this->is_admin === true;
     }
+
+    /**
+     * Send the password reset notification using our branded template.
+     */
+    public function sendPasswordResetNotification($token): void
+    {
+        $url = url(route('password.reset', ['token' => $token, 'email' => $this->email], false));
+
+        \Illuminate\Support\Facades\Mail::send('emails.password-reset', [
+            'url' => $url,
+        ], function ($message) {
+            $message->to($this->email, $this->full_name)
+                    ->subject('Reset Your Password — ' . \App\Models\Setting::get('site_name', 'CK Enterprises UK'));
+        });
+    }
 }

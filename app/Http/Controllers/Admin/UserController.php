@@ -54,13 +54,28 @@ class UserController extends Controller
             'is_admin' => 'boolean',
         ]);
 
+        $plainPassword = $validated['password'];
         $validated['name'] = $validated['first_name'] . ' ' . $validated['last_name'];
         $validated['password'] = Hash::make($validated['password']);
 
-        User::create($validated);
+        $user = User::create($validated);
+
+        // Send welcome email
+        try {
+            \Illuminate\Support\Facades\Mail::send('emails.welcome', [
+                'recipientName' => $validated['first_name'],
+                'email' => $user->email,
+                'password' => $plainPassword,
+            ], function ($message) use ($user) {
+                $message->to($user->email, $user->full_name)
+                        ->subject('Welcome to ' . \App\Models\Setting::get('site_name', 'CK Enterprises UK'));
+            });
+        } catch (\Exception) {
+            // Don't fail if email fails
+        }
 
         return redirect()->route('admin.users.index')
-            ->with('success', 'User created.');
+            ->with('success', 'User created and welcome email sent.');
     }
 
     public function impersonate(User $user)

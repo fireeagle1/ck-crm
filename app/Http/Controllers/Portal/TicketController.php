@@ -38,7 +38,12 @@ class TicketController extends Controller
             ->orderBy('device_name')
             ->get();
 
-        return view('portal.tickets.create', compact('services', 'assets'));
+        $hasSupportPlan = Service::where('company_id', $companyId)
+            ->where('service_short', 'Technical Support Package')
+            ->where('status', 'Active')
+            ->exists();
+
+        return view('portal.tickets.create', compact('services', 'assets', 'hasSupportPlan'));
     }
 
     public function store(Request $request)
@@ -48,6 +53,8 @@ class TicketController extends Controller
             'description' => 'required|string',
             'service_id' => 'nullable|exists:services,service_id',
             'asset_id' => 'nullable|exists:cmdb,device_id',
+            'ticket_type' => 'in:Incident,Service Request',
+            'request_category' => 'nullable|string|max:100',
         ]);
 
         $ticket = Ticket::create([
@@ -57,6 +64,8 @@ class TicketController extends Controller
             'description' => $validated['description'],
             'service_id' => $validated['service_id'] ?? null,
             'asset_id' => $validated['asset_id'] ?? null,
+            'ticket_type' => $validated['ticket_type'] ?? 'Incident',
+            'request_category' => $validated['request_category'] ?? null,
             'priority' => 'Normal',
             'status' => 'Open',
         ]);

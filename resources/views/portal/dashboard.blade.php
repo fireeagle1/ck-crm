@@ -1,12 +1,17 @@
 <x-portal-layout>
     <x-slot:title>Dashboard</x-slot:title>
 
-    {{-- Welcome --}}
-    <div class="mb-8">
-        <h1 class="text-3xl font-bold tracking-tight">
-            {{ now()->hour < 12 ? 'Good morning' : (now()->hour < 18 ? 'Good afternoon' : 'Good evening') }}, {{ auth()->user()->first_name ?? 'there' }}.
-        </h1>
-        <p class="text-gray-500 mt-1">Here's an overview of your account with {{ \App\Models\Setting::get('site_name', 'CK Enterprises') }}.</p>
+    {{-- Hero image --}}
+    <div class="relative -mx-4 -mt-6 mb-8 h-48 sm:h-56 overflow-hidden rounded-b-lg sm:rounded-lg sm:mx-0 sm:mt-0">
+        <img src="https://i0.wp.com/ckenterprises.co.uk/wp-content/uploads/2023/05/DJI_0160-scaled.jpg?fit=2560%2C1440&ssl=1"
+             alt="" class="w-full h-full object-cover">
+        <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent"></div>
+        <div class="absolute bottom-0 left-0 p-6">
+            <h1 class="text-2xl sm:text-3xl font-bold text-white tracking-tight">
+                {{ now()->hour < 12 ? 'Good morning' : (now()->hour < 18 ? 'Good afternoon' : 'Good evening') }}, {{ auth()->user()->first_name ?? 'there' }}.
+            </h1>
+            <p class="text-white/70 mt-1 text-sm">Welcome to your {{ \App\Models\Setting::get('site_name', 'CK Enterprises') }} customer portal.</p>
+        </div>
     </div>
 
     {{-- Overdue invoice warning --}}

@@ -22,6 +22,8 @@ class Ticket extends Model
         'description',
         'status',
         'priority',
+        'ticket_type',
+        'request_category',
     ];
 
     public function customer(): BelongsTo
