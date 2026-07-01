@@ -81,6 +81,11 @@ Route::middleware(['auth', 'verified', EnsureIsAdmin::class])->prefix('admin')->
     Route::post('/users', [Admin\UserController::class, 'store'])->name('users.store');
     Route::post('/users/{user}/impersonate', [Admin\UserController::class, 'impersonate'])->name('users.impersonate');
     Route::post('/impersonate/stop', [Admin\UserController::class, 'stopImpersonating'])->name('impersonate.stop');
+
+    // Settings
+    Route::get('/settings', [Admin\SettingsController::class, 'index'])->name('settings.index');
+    Route::put('/settings', [Admin\SettingsController::class, 'update'])->name('settings.update');
+    Route::delete('/settings/logo', [Admin\SettingsController::class, 'deleteLogo'])->name('settings.logo.delete');
 });
 
 /*

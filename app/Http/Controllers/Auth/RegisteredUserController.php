@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\Customer;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
@@ -32,13 +33,26 @@ class RegisteredUserController extends Controller
     {
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
+            'company_name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
+        // Create the company record
+        $customer = Customer::create([
+            'company_name' => $request->company_name,
+            'customer_name' => $request->name,
+        ]);
+
+        // Split name into first/last
+        $nameParts = explode(' ', $request->name, 2);
+
         $user = User::create([
             'name' => $request->name,
+            'first_name' => $nameParts[0],
+            'last_name' => $nameParts[1] ?? '',
             'email' => $request->email,
+            'company_id' => $customer->company_id,
             'password' => Hash::make($request->password),
         ]);
 
@@ -46,6 +60,6 @@ class RegisteredUserController extends Controller
 
         Auth::login($user);
 
-        return redirect(route('dashboard', absolute: false));
+        return redirect(route('portal.dashboard', absolute: false));
     }
 }

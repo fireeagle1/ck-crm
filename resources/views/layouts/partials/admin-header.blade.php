@@ -7,6 +7,7 @@
         ['route' => 'admin.assets.index', 'label' => 'CMDB'],
         ['route' => 'admin.articles.index', 'label' => 'Knowledgebase'],
         ['route' => 'admin.users.index', 'label' => 'Users'],
+        ['route' => 'admin.settings.index', 'label' => 'Settings'],
     ];
 @endphp
 
@@ -22,7 +23,12 @@
         <div class="h-16 flex items-center justify-between">
             {{-- Brand --}}
             <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-2">
-                <span class="text-lg font-semibold tracking-wide">CK Admin</span>
+                @php $logoPath = \App\Models\Setting::get('logo_path'); @endphp
+                @if ($logoPath)
+                    <img src="{{ asset('storage/' . $logoPath) }}" alt="{{ \App\Models\Setting::get('site_name', 'CK Admin') }}" class="h-8 w-auto">
+                @else
+                    <span class="text-lg font-semibold tracking-wide">CK Admin</span>
+                @endif
             </a>
 
             {{-- Desktop nav --}}
