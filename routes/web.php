@@ -128,6 +128,7 @@ Route::middleware(['auth', 'verified', EnsureIsAdmin::class])->prefix('admin')->
     Route::post('/cleanup/domains', [Admin\CleanupController::class, 'deleteDomains'])->name('cleanup.delete-domains');
     Route::get('/cleanup/review', [Admin\ReviewWizardController::class, 'index'])->name('cleanup.review');
     Route::post('/cleanup/review/delete', [Admin\ReviewWizardController::class, 'bulkDelete'])->name('cleanup.review.delete');
+    Route::post('/cleanup/review/move-to-domain', [Admin\ReviewWizardController::class, 'moveToDomain'])->name('cleanup.review.move-to-domain');
 
     // Settings (with sub-pages)
     Route::get('/settings', [Admin\SettingsController::class, 'general'])->name('settings.index');

@@ -50,4 +50,41 @@ class ReviewWizardController extends Controller
 
         return back()->with('success', "{$count} service(s) deleted.");
     }
+
+    public function moveToDomain(Request $request)
+    {
+        $validated = $request->validate([
+            'service_id' => 'required|exists:services,service_id',
+            'customer' => 'required|exists:customers,company_id',
+        ]);
+
+        $service = Service::find($validated['service_id']);
+
+        if (!$service->domain_name) {
+            return back()->with('error', 'This service has no domain name to move.');
+        }
+
+        // Check if domain already exists
+        $existing = Domain::where('domain_name', strtolower($service->domain_name))->first();
+
+        if ($existing) {
+            // Just delete the service, domain already tracked
+            $service->delete();
+            return back()->with('success', "Domain '{$service->domain_name}' already in domains table. Service deleted.");
+        }
+
+        // Create domain record from the service
+        Domain::create([
+            'company_id' => $service->company_id,
+            'domain_name' => strtolower($service->domain_name),
+            'registrar' => 'Unknown',
+        ]);
+
+        // Delete the service
+        $domainName = $service->domain_name;
+        $service->delete();
+
+        return redirect()->route('admin.cleanup.review', ['customer' => $validated['customer']])
+            ->with('success', "Moved '{$domainName}' to domains table and removed the service.");
+    }
 }
