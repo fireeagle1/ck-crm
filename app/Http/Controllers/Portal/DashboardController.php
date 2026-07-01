@@ -62,6 +62,21 @@ class DashboardController extends Controller
             ->orderBy('expiry_date')
             ->get();
 
+        // Website services (hosting) — shown as cards on dashboard
+        $websites = Service::where('company_id', $companyId)
+            ->where('status', 'Active')
+            ->where(function ($q) {
+                $q->where('service_type', 'Web Hosting')
+                  ->orWhereNotNull('cpanel_username');
+            })
+            ->orderBy('service_short')
+            ->get();
+
+        // Customer's domains (for showing alongside services)
+        $customerDomains = Domain::where('company_id', $companyId)
+            ->orderBy('expiry_date')
+            ->get();
+
         return view('portal.dashboard', compact(
             'activeServices',
             'openTickets',
@@ -71,6 +86,8 @@ class DashboardController extends Controller
             'upcomingRenewals',
             'recentInvoices',
             'expiringDomainsList',
+            'websites',
+            'customerDomains',
         ));
     }
 }

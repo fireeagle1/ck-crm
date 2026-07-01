@@ -153,6 +153,48 @@ class ServiceController extends Controller
         return $stripeCustomer->id;
     }
 
+    public function show(Service $service): View
+    {
+        $service->load('customer');
+
+        // Try to fetch WHM account info if this is a hosting service
+        $whmInfo = null;
+        if ($service->cpanel_username && config('services.whm.host')) {
+            $whmInfo = $this->fetchWhmAccountInfo($service->cpanel_username);
+        }
+
+        return view('admin.services.show', compact('service', 'whmInfo'));
+    }
+
+    public function edit(Service $service): View
+    {
+        $service->load('customer');
+        $customers = Customer::orderBy('company_name')->get();
+
+        return view('admin.services.edit', compact('service', 'customers'));
+    }
+
+    public function update(Request $request, Service $service)
+    {
+        $validated = $request->validate([
+            'company_id' => 'required|exists:customers,company_id',
+            'service_short' => 'required|string|max:255',
+            'service_type' => 'nullable|string|max:50',
+            'domain_name' => 'nullable|string|max:255',
+            'cpanel_username' => 'nullable|string|max:255',
+            'status' => 'in:Active,Suspended,Cancelled',
+            'start_date' => 'nullable|date',
+            'end_date' => 'nullable|date',
+            'service_monthly_charge' => 'nullable|numeric|min:0',
+            'service_payment_frequency' => 'nullable|string',
+        ]);
+
+        $service->update($validated);
+
+        return redirect()->route('admin.services.show', $service)
+            ->with('success', 'Service updated.');
+    }
+
     public function destroy(Service $service)
     {
         $name = $service->service_short;
@@ -160,5 +202,46 @@ class ServiceController extends Controller
 
         return redirect()->route('admin.services.index')
             ->with('success', "Service '{$name}' deleted.");
+    }
+
+    private function fetchWhmAccountInfo(string $username): ?array
+    {
+        $host = config('services.whm.host');
+        $whmUser = config('services.whm.username');
+        $token = config('services.whm.token');
+
+        if (!$host || !$whmUser || !$token) {
+            return null;
+        }
+
+        try {
+            $response = \Illuminate\Support\Facades\Http::withHeaders([
+                'Authorization' => "WHM {$whmUser}:{$token}",
+            ])->withOptions(['verify' => false, 'timeout' => 10])
+              ->get("https://{$host}:2087/json-api/accountsummary", [
+                  'api.version' => 1,
+                  'user' => $username,
+              ]);
+
+            $data = $response->json();
+
+            if (($data['metadata']['result'] ?? 0) == 1 && !empty($data['data']['acct'][0])) {
+                $acct = $data['data']['acct'][0];
+                return [
+                    'domain' => $acct['domain'] ?? null,
+                    'plan' => $acct['plan'] ?? null,
+                    'disk_used' => $acct['diskused'] ?? null,
+                    'disk_limit' => $acct['disklimit'] ?? null,
+                    'ip' => $acct['ip'] ?? null,
+                    'start_date' => $acct['startdate'] ?? null,
+                    'suspended' => ($acct['suspended'] ?? 0) == 1,
+                    'email' => $acct['email'] ?? null,
+                ];
+            }
+        } catch (\Exception) {
+            // silently fail
+        }
+
+        return null;
     }
 }

@@ -72,7 +72,14 @@ Route::middleware(['auth', 'verified', EnsureIsAdmin::class])->prefix('admin')->
     Route::get('/services', [Admin\ServiceController::class, 'index'])->name('services.index');
     Route::get('/services/create', [Admin\ServiceController::class, 'create'])->name('services.create');
     Route::post('/services', [Admin\ServiceController::class, 'store'])->name('services.store');
+    Route::get('/services/{service}', [Admin\ServiceController::class, 'show'])->name('services.show');
+    Route::get('/services/{service}/edit', [Admin\ServiceController::class, 'edit'])->name('services.edit');
+    Route::put('/services/{service}', [Admin\ServiceController::class, 'update'])->name('services.update');
     Route::delete('/services/{service}', [Admin\ServiceController::class, 'destroy'])->name('services.destroy');
+
+    // Communications
+    Route::get('/communications', [Admin\CommunicationController::class, 'index'])->name('communications.index');
+    Route::post('/communications/send', [Admin\CommunicationController::class, 'send'])->name('communications.send');
 
     // Tickets
     Route::get('/tickets', [Admin\TicketController::class, 'index'])->name('tickets.index');

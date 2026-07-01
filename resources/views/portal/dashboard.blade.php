@@ -57,6 +57,75 @@
         </div>
     </div>
 
+    {{-- My Websites --}}
+    @if ($websites->isNotEmpty())
+        <section class="mb-6">
+            <div class="flex items-center justify-between mb-3">
+                <h2 class="text-lg font-semibold">My Websites</h2>
+                <a href="{{ route('portal.services.index') }}" class="text-sm text-blue-600 hover:underline">View all services</a>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                @foreach ($websites as $site)
+                    <div class="bg-white rounded-lg shadow-sm border p-5">
+                        <div class="flex items-start justify-between mb-3">
+                            <div>
+                                <h3 class="font-semibold text-gray-900">{{ $site->domain_name ?? $site->service_short }}</h3>
+                                @if ($site->domain_name && $site->domain_name !== $site->service_short)
+                                    <p class="text-xs text-gray-400 mt-0.5">{{ $site->service_short }}</p>
+                                @endif
+                            </div>
+                            <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium bg-green-100 text-green-700">Active</span>
+                        </div>
+
+                        {{-- Domain info if we manage it --}}
+                        @php
+                            $matchedDomain = $site->domain_name ? $customerDomains->firstWhere('domain_name', strtolower($site->domain_name)) : null;
+                        @endphp
+                        @if ($matchedDomain)
+                            <div class="flex items-center gap-3 text-xs text-gray-500 mb-3 pb-3 border-b">
+                                <span>Expires {{ $matchedDomain->expiry_date?->format('M j, Y') }}</span>
+                                @if ($matchedDomain->auto_renew)
+                                    <span class="inline-flex items-center rounded-full px-1.5 py-0.5 bg-green-50 text-green-600">Auto-renew</span>
+                                @endif
+                            </div>
+                        @endif
+
+                        {{-- Quick access buttons --}}
+                        <div class="flex flex-wrap gap-2">
+                            @if ($site->cpanel_username)
+                                <form method="POST" action="{{ route('portal.services.sso.cpanel', $site) }}" class="inline">
+                                    @csrf
+                                    <button type="submit" class="inline-flex items-center gap-1 px-2.5 py-1.5 bg-orange-500 text-white rounded text-xs font-medium hover:bg-orange-600 transition">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M12 5l7 7-7 7"/></svg>
+                                        cPanel
+                                    </button>
+                                </form>
+                                <form method="POST" action="{{ route('portal.services.sso.webmail', $site) }}" class="inline">
+                                    @csrf
+                                    <button type="submit" class="inline-flex items-center gap-1 px-2.5 py-1.5 bg-blue-500 text-white rounded text-xs font-medium hover:bg-blue-600 transition">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                                        Webmail
+                                    </button>
+                                </form>
+                            @endif
+                            @if ($site->domain_name)
+                                <a href="https://{{ $site->domain_name }}" target="_blank"
+                                   class="inline-flex items-center gap-1 px-2.5 py-1.5 border rounded text-xs font-medium text-gray-700 hover:bg-gray-50 transition">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                    Visit Site
+                                </a>
+                            @endif
+                            <a href="{{ route('portal.services.show', $site) }}"
+                               class="inline-flex items-center gap-1 px-2.5 py-1.5 border rounded text-xs font-medium text-gray-700 hover:bg-gray-50 transition">
+                                Details
+                            </a>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </section>
+    @endif
+
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {{-- Recent Tickets --}}
         <div class="bg-white rounded-lg shadow-sm border">
