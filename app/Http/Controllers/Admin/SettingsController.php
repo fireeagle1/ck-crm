@@ -31,12 +31,14 @@ class SettingsController extends Controller
 
         if ($request->hasFile('logo')) {
             $oldPath = Setting::get('logo_path');
-            if ($oldPath && Storage::disk('public')->exists($oldPath)) {
-                Storage::disk('public')->delete($oldPath);
+            if ($oldPath && file_exists(public_path($oldPath))) {
+                unlink(public_path($oldPath));
             }
 
-            $path = $request->file('logo')->store('branding', 'public');
-            Setting::set('logo_path', $path);
+            $file = $request->file('logo');
+            $filename = 'logo-' . time() . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('branding'), $filename);
+            Setting::set('logo_path', 'branding/' . $filename);
         }
 
         return back()->with('success', 'Settings saved.');
@@ -46,8 +48,8 @@ class SettingsController extends Controller
     {
         $path = Setting::get('logo_path');
 
-        if ($path && Storage::disk('public')->exists($path)) {
-            Storage::disk('public')->delete($path);
+        if ($path && file_exists(public_path($path))) {
+            unlink(public_path($path));
         }
 
         Setting::set('logo_path', null);
