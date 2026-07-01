@@ -18,6 +18,22 @@ class CommunicationController extends Controller
         return view('admin.communications.index', compact('customers'));
     }
 
+    public function preview(Request $request)
+    {
+        $request->validate([
+            'subject' => 'required|string|max:255',
+            'body' => 'required|string',
+        ]);
+
+        $html = view('emails.broadcast', [
+            'subject' => $request->input('subject'),
+            'emailBody' => $request->input('body'),
+            'recipientName' => 'Preview Customer',
+        ])->render();
+
+        return response($html);
+    }
+
     public function send(Request $request)
     {
         $validated = $request->validate([
@@ -28,7 +44,6 @@ class CommunicationController extends Controller
             'customer_ids.*' => 'exists:customers,company_id',
         ]);
 
-        // Get recipient emails
         $query = User::whereNotNull('email');
 
         if ($validated['recipients'] === 'selected') {
@@ -36,7 +51,6 @@ class CommunicationController extends Controller
         }
 
         $users = $query->get();
-
         $sentCount = 0;
 
         foreach ($users as $user) {
@@ -52,7 +66,6 @@ class CommunicationController extends Controller
 
                 $sentCount++;
             } catch (\Exception $e) {
-                // Log but continue
                 \Log::warning("Failed to send email to {$user->email}: {$e->getMessage()}");
             }
         }

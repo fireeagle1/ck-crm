@@ -18,6 +18,7 @@ class Domain extends Model
         'registration_date',
         'expiry_date',
         'auto_renew',
+        'stripe_subscription_id',
         'domain_admin_notes',
         'enom_response',
     ];

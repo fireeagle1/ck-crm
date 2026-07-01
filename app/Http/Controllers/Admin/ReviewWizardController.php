@@ -64,13 +64,19 @@ class ReviewWizardController extends Controller
             return back()->with('error', 'This service has no domain name to move.');
         }
 
-        // Check if domain already exists
         $existing = Domain::where('domain_name', strtolower($service->domain_name))->first();
 
         if ($existing) {
-            // Just delete the service, domain already tracked
+            // Update the existing domain with subscription ID if the service had one
+            if ($service->stripe_subscription_id && !$existing->stripe_subscription_id) {
+                $existing->update([
+                    'stripe_subscription_id' => $service->stripe_subscription_id,
+                    'cost' => $service->service_monthly_charge,
+                ]);
+            }
             $service->delete();
-            return back()->with('success', "Domain '{$service->domain_name}' already in domains table. Service deleted.");
+            return redirect()->route('admin.cleanup.review', ['customer' => $validated['customer']])
+                ->with('success', "Domain '{$service->domain_name}' already exists. Subscription transferred. Service deleted.");
         }
 
         // Create domain record from the service
@@ -78,13 +84,14 @@ class ReviewWizardController extends Controller
             'company_id' => $service->company_id,
             'domain_name' => strtolower($service->domain_name),
             'registrar' => 'Unknown',
+            'stripe_subscription_id' => $service->stripe_subscription_id,
+            'cost' => $service->service_monthly_charge,
         ]);
 
-        // Delete the service
         $domainName = $service->domain_name;
         $service->delete();
 
         return redirect()->route('admin.cleanup.review', ['customer' => $validated['customer']])
-            ->with('success', "Moved '{$domainName}' to domains table and removed the service.");
+            ->with('success', "Moved '{$domainName}' to domains table (with subscription) and removed the service.");
     }
 }

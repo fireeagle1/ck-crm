@@ -88,6 +88,7 @@
                                         $isDuplicate = $service->domain_name && $services->where('domain_name', $service->domain_name)->count() > 1;
                                         $isDomainOnly = !$service->cpanel_username && !$service->stripe_subscription_id && (!$service->service_monthly_charge || $service->service_monthly_charge <= 0);
                                         $alreadyInDomains = $service->domain_name && $domains->contains('domain_name', strtolower($service->domain_name));
+                                        $isDuplicateSub = $service->stripe_subscription_id && $services->where('stripe_subscription_id', $service->stripe_subscription_id)->count() > 1;
                                     @endphp
                                     <tr class="{{ $isDuplicate ? 'bg-amber-50' : ($isDomainOnly ? 'bg-red-50' : '') }}">
                                         <td class="px-3 py-2">
@@ -102,7 +103,12 @@
                                             @endif
                                         </td>
                                         <td class="px-3 py-2 font-mono text-xs">{{ $service->cpanel_username ?? '—' }}</td>
-                                        <td class="px-3 py-2 font-mono text-xs">{{ $service->stripe_subscription_id ? Str::limit($service->stripe_subscription_id, 12) : '—' }}</td>
+                                        <td class="px-3 py-2 font-mono text-xs">
+                                            {{ $service->stripe_subscription_id ? Str::limit($service->stripe_subscription_id, 12) : '—' }}
+                                            @if ($isDuplicateSub)
+                                                <span class="text-red-600 font-semibold">⚠ DUP</span>
+                                            @endif
+                                        </td>
                                         <td class="px-3 py-2 text-xs">{{ $service->service_monthly_charge ? '£' . number_format($service->service_monthly_charge, 2) : '—' }}</td>
                                         <td class="px-3 py-2">
                                             <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium
@@ -134,6 +140,7 @@
                             <span class="inline-flex items-center gap-1"><span class="w-3 h-3 rounded bg-amber-50 border border-amber-200"></span> Duplicate domain</span>
                             <span class="inline-flex items-center gap-1"><span class="w-3 h-3 rounded bg-red-50 border border-red-200"></span> No hosting/billing</span>
                             <span class="inline-flex items-center gap-1 text-green-600">✓ Already in domains table</span>
+                            <span class="inline-flex items-center gap-1 text-red-600">⚠ DUP = Same Stripe subscription on multiple services</span>
                         </div>
                         <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded-md text-sm font-semibold hover:bg-red-700">
                             Delete Selected

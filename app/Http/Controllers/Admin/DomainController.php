@@ -82,6 +82,7 @@ class DomainController extends Controller
             'registration_date' => 'nullable|date',
             'expiry_date' => 'nullable|date',
             'cost' => 'nullable|numeric|min:0',
+            'stripe_subscription_id' => 'nullable|string|max:255',
             'domain_admin_notes' => 'nullable|string',
         ]);
 

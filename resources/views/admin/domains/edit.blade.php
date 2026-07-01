@@ -66,6 +66,15 @@
                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">{{ old('domain_admin_notes', $domain->domain_admin_notes) }}</textarea>
                 </div>
 
+                <div>
+                    <label for="stripe_subscription_id" class="block text-sm font-medium text-gray-700">Stripe Subscription ID</label>
+                    <input type="text" name="stripe_subscription_id" id="stripe_subscription_id"
+                           value="{{ old('stripe_subscription_id', $domain->stripe_subscription_id) }}"
+                           placeholder="sub_..."
+                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 font-mono text-sm">
+                    <p class="text-xs text-gray-400 mt-1">If domain renewal is billed via a Stripe subscription, enter the ID here.</p>
+                </div>
+
                 <div class="flex gap-3 pt-2">
                     <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700">
                         Save Changes

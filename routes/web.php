@@ -85,6 +85,7 @@ Route::middleware(['auth', 'verified', EnsureIsAdmin::class])->prefix('admin')->
 
     // Communications
     Route::get('/communications', [Admin\CommunicationController::class, 'index'])->name('communications.index');
+    Route::post('/communications/preview', [Admin\CommunicationController::class, 'preview'])->name('communications.preview');
     Route::post('/communications/send', [Admin\CommunicationController::class, 'send'])->name('communications.send');
 
     // Tickets
