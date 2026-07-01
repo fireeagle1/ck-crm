@@ -298,6 +298,7 @@ class ImportController extends Controller
         $count = 0;
 
         $validCompanyIds = DB::table('customers')->pluck('company_id')->toArray();
+        $validUserIds = DB::table('users')->pluck('id')->toArray();
 
         while ($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
             $companyId = $row['CompanyID'] ?? null;
@@ -305,17 +306,23 @@ class ImportController extends Controller
                 continue;
             }
 
+            // Null out user_id if that user doesn't exist in the new DB
+            $userId = $row['UserID'] ?? null;
+            if ($userId && !in_array((int) $userId, $validUserIds)) {
+                $userId = null;
+            }
+
             DB::table('tickets')->updateOrInsert(
                 ['ticket_id' => $row['TicketID']],
                 [
                     'company_id' => $companyId,
-                    'user_id' => $row['UserID'] ?? null,
+                    'user_id' => $userId,
                     'subject' => $row['Subject'] ?? 'No subject',
                     'description' => $row['Description'] ?? null,
                     'status' => $row['Status'] ?? 'Open',
                     'priority' => $row['Priority'] ?? 'Normal',
                     'updated_at' => now(),
-                    'created_at' => $row['CreatedAt'] ?? $row['created_at'] ?? now(),
+                    'created_at' => $this->cleanDate($row['CreatedAt'] ?? $row['created_at'] ?? null) ?? now(),
                 ]
             );
             $count++;
