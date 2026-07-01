@@ -74,6 +74,26 @@ class SettingsController extends Controller
             ];
         });
 
-        return view('admin.settings.scheduled-tasks', compact('logs', 'events'));
+        // Available commands that can be run on demand
+        $runnableCommands = [
+            'stripe:sync' => 'Stripe Sync',
+            'enom:sync' => 'eNom Domain Sync',
+        ];
+
+        return view('admin.settings.scheduled-tasks', compact('logs', 'events', 'runnableCommands'));
+    }
+
+    public function runTask(Request $request)
+    {
+        $request->validate([
+            'command' => 'required|string|in:stripe:sync,enom:sync',
+        ]);
+
+        $command = $request->input('command');
+
+        \Illuminate\Support\Facades\Artisan::call($command);
+        $output = \Illuminate\Support\Facades\Artisan::output();
+
+        return back()->with('success', "Ran '{$command}'. Output: " . trim($output));
     }
 }

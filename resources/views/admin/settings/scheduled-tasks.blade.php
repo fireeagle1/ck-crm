@@ -61,6 +61,24 @@
                 <p class="text-xs text-gray-400 mt-3">These jobs are triggered by the cron: <code class="bg-gray-100 px-1 py-0.5 rounded">* * * * * cd /path && php artisan schedule:run</code></p>
             </div>
 
+            {{-- Run on demand --}}
+            <div class="bg-white rounded-lg shadow-sm border p-5 mb-6">
+                <h2 class="text-sm font-semibold text-gray-700 mb-3">Run on Demand</h2>
+                <p class="text-xs text-gray-500 mb-3">Manually trigger a sync immediately without waiting for the schedule.</p>
+                <div class="flex flex-wrap gap-2">
+                    @foreach ($runnableCommands as $cmd => $label)
+                        <form method="POST" action="{{ route('admin.settings.tasks.run') }}" class="inline">
+                            @csrf
+                            <input type="hidden" name="command" value="{{ $cmd }}">
+                            <button type="submit" class="inline-flex items-center gap-1.5 px-3 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700 transition">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                {{ $label }}
+                            </button>
+                        </form>
+                    @endforeach
+                </div>
+            </div>
+
             {{-- Task log --}}
             <div class="bg-white rounded-lg shadow-sm border overflow-hidden">
                 <div class="px-5 py-3 border-b flex items-center justify-between">
