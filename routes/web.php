@@ -39,6 +39,7 @@ Route::middleware(['auth', 'verified'])->prefix('portal')->name('portal.')->grou
     Route::post('/tickets', [Portal\TicketController::class, 'store'])->name('tickets.store');
     Route::get('/tickets/{ticket}', [Portal\TicketController::class, 'show'])->name('tickets.show');
     Route::post('/tickets/{ticket}/reply', [Portal\TicketController::class, 'reply'])->name('tickets.reply');
+    Route::post('/tickets/{ticket}/close', [Portal\TicketController::class, 'close'])->name('tickets.close');
 
     // Domains
     Route::get('/domains', [Portal\DomainController::class, 'index'])->name('domains.index');

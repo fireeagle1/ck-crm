@@ -17,6 +17,7 @@ class Ticket extends Model
         'company_id',
         'user_id',
         'asset_id',
+        'service_id',
         'subject',
         'description',
         'status',
@@ -36,6 +37,11 @@ class Ticket extends Model
     public function asset(): BelongsTo
     {
         return $this->belongsTo(Asset::class, 'asset_id', 'device_id');
+    }
+
+    public function service(): BelongsTo
+    {
+        return $this->belongsTo(Service::class, 'service_id', 'service_id');
     }
 
     public function replies(): HasMany

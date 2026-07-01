@@ -49,7 +49,7 @@
                                 <tr>
                                     <td style="font-size:12px; color:#6b7280; line-height:1.5;">
                                         {{ \App\Models\Setting::get('site_name', 'CK Enterprises UK') }}<br>
-                                        This email was sent from your customer management portal.<br>
+                                      
                                         <a href="{{ route('portal.account.show') }}" style="color:#2563eb; text-decoration:none;">Manage your account</a>
                                     </td>
                                 </tr>

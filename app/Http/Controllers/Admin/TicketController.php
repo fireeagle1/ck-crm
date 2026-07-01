@@ -57,7 +57,7 @@ class TicketController extends Controller
         $validated = $request->validate([
             'body' => 'required|string',
             'is_internal' => 'boolean',
-            'attachment' => 'nullable|file|max:10240', // 10MB max
+            'attachment' => 'nullable|file|max:10240',
         ]);
 
         $attachmentPath = null;
@@ -68,7 +68,7 @@ class TicketController extends Controller
             );
         }
 
-        TicketReply::create([
+        $reply = TicketReply::create([
             'ticket_id' => $ticket->ticket_id,
             'user_id' => $request->user()->id,
             'body' => $validated['body'],
@@ -81,6 +81,35 @@ class TicketController extends Controller
             $ticket->update(['status' => 'Open']);
         }
 
+        // Email the customer (only for non-internal replies)
+        if (!$request->boolean('is_internal')) {
+            $this->notifyCustomer($ticket, $reply);
+        }
+
         return back()->with('success', 'Reply added.');
+    }
+
+    private function notifyCustomer(Ticket $ticket, TicketReply $reply): void
+    {
+        // Find the ticket owner
+        $customer = $ticket->user;
+        if (!$customer?->email) {
+            // Fallback: first user on the company
+            $customer = \App\Models\User::where('company_id', $ticket->company_id)->first();
+        }
+        if (!$customer) return;
+
+        try {
+            \Illuminate\Support\Facades\Mail::send('emails.ticket-reply', [
+                'ticket' => $ticket,
+                'reply' => $reply,
+                'recipientName' => $customer->first_name ?? 'there',
+            ], function ($message) use ($customer, $ticket) {
+                $message->to($customer->email)
+                        ->subject("Update on INC{$ticket->ticket_id}: {$ticket->subject}");
+            });
+        } catch (\Exception) {
+            // Don't fail the request
+        }
     }
 }

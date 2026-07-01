@@ -3,9 +3,13 @@
 namespace App\Http\Controllers\Portal;
 
 use App\Http\Controllers\Controller;
+use App\Models\Asset;
+use App\Models\Service;
 use App\Models\Ticket;
 use App\Models\TicketReply;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\View\View;
 
 class TicketController extends Controller
@@ -20,9 +24,21 @@ class TicketController extends Controller
         return view('portal.tickets.index', compact('tickets'));
     }
 
-    public function create(): View
+    public function create(Request $request): View
     {
-        return view('portal.tickets.create');
+        $companyId = $request->user()->company_id;
+
+        $services = Service::where('company_id', $companyId)
+            ->where('status', 'Active')
+            ->orderBy('service_short')
+            ->get();
+
+        $assets = Asset::where('customer_id', $companyId)
+            ->where('asset_status', 'Active')
+            ->orderBy('device_name')
+            ->get();
+
+        return view('portal.tickets.create', compact('services', 'assets'));
     }
 
     public function store(Request $request)
@@ -30,7 +46,8 @@ class TicketController extends Controller
         $validated = $request->validate([
             'subject' => 'required|string|max:255',
             'description' => 'required|string',
-            'priority' => 'in:Low,Normal,High,Critical',
+            'service_id' => 'nullable|exists:services,service_id',
+            'asset_id' => 'nullable|exists:cmdb,device_id',
         ]);
 
         Ticket::create([
@@ -38,27 +55,30 @@ class TicketController extends Controller
             'user_id' => $request->user()->id,
             'subject' => $validated['subject'],
             'description' => $validated['description'],
-            'priority' => $validated['priority'] ?? 'Normal',
+            'service_id' => $validated['service_id'] ?? null,
+            'asset_id' => $validated['asset_id'] ?? null,
+            'priority' => 'Normal',
             'status' => 'Open',
         ]);
 
         return redirect()->route('portal.tickets.index')
-            ->with('success', 'Ticket submitted successfully.');
+            ->with('success', 'Ticket submitted successfully. We\'ll get back to you soon.');
     }
 
     public function show(Request $request, Ticket $ticket): View
     {
-        // Ensure the ticket belongs to the user's company
         if ($ticket->company_id !== $request->user()->company_id) {
             abort(403);
         }
 
-        // Load replies but exclude internal notes
-        $ticket->load(['user', 'replies' => function ($q) {
+        $ticket->load(['user', 'service', 'asset', 'replies' => function ($q) {
             $q->where('is_internal', false)->with('user')->orderBy('created_at');
         }]);
 
-        return view('portal.tickets.show', compact('ticket'));
+        // Support agent (user ID 1)
+        $agent = User::find(1);
+
+        return view('portal.tickets.show', compact('ticket', 'agent'));
     }
 
     public function reply(Request $request, Ticket $ticket)
@@ -80,7 +100,7 @@ class TicketController extends Controller
             );
         }
 
-        TicketReply::create([
+        $reply = TicketReply::create([
             'ticket_id' => $ticket->ticket_id,
             'user_id' => $request->user()->id,
             'body' => $validated['body'],
@@ -93,6 +113,39 @@ class TicketController extends Controller
             $ticket->update(['status' => 'Open']);
         }
 
+        // Email the admin/agent about the reply
+        $this->notifyAgent($ticket, $reply);
+
         return back()->with('success', 'Reply sent.');
+    }
+
+    public function close(Request $request, Ticket $ticket)
+    {
+        if ($ticket->company_id !== $request->user()->company_id) {
+            abort(403);
+        }
+
+        $ticket->update(['status' => 'Closed']);
+
+        return back()->with('success', 'Ticket closed.');
+    }
+
+    private function notifyAgent(Ticket $ticket, TicketReply $reply): void
+    {
+        $agent = User::find(1);
+        if (!$agent) return;
+
+        try {
+            Mail::send('emails.ticket-reply', [
+                'ticket' => $ticket,
+                'reply' => $reply,
+                'recipientName' => $agent->first_name ?? 'Admin',
+            ], function ($message) use ($agent, $ticket) {
+                $message->to($agent->email)
+                        ->subject("Reply on INC{$ticket->ticket_id}: {$ticket->subject}");
+            });
+        } catch (\Exception) {
+            // Don't fail the request if email fails
+        }
     }
 }
