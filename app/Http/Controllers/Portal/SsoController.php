@@ -23,15 +23,13 @@ class SsoController extends Controller
         $url = $this->createSession($service->cpanel_username, 'cpanel');
 
         if (!$url) {
-            return back()->with('error', 'Could not generate cPanel session. Please try again or contact support.');
+            // Error detail already flashed by createSession
+            return back();
         }
 
         return redirect($url);
     }
 
-    /**
-     * Generate a Webmail SSO session URL and redirect the user.
-     */
     public function webmail(Request $request, Service $service)
     {
         $this->guardAccess($request, $service);
@@ -43,7 +41,7 @@ class SsoController extends Controller
         $url = $this->createSession($service->cpanel_username, 'webmail');
 
         if (!$url) {
-            return back()->with('error', 'Could not generate Webmail session. Please try again or contact support.');
+            return back();
         }
 
         return redirect($url);
