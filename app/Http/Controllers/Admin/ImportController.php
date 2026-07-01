@@ -52,7 +52,7 @@ class ImportController extends Controller
 
         $results = [];
 
-        // Import customers
+        // Always import customers first (other tables depend on them)
         if ($request->boolean('import_customers')) {
             $results['customers'] = $this->importCustomers($source);
         }
@@ -149,11 +149,20 @@ class ImportController extends Controller
         $stmt = $source->query('SELECT * FROM Services ORDER BY ServiceID ASC');
         $count = 0;
 
+        // Get valid company IDs from the new database
+        $validCompanyIds = Customer::pluck('company_id')->toArray();
+
         while ($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
+            // Skip if the customer doesn't exist in the new DB
+            $companyId = $row['CompanyID'] ?? null;
+            if (!$companyId || !in_array((int) $companyId, $validCompanyIds)) {
+                continue;
+            }
+
             Service::updateOrCreate(
                 ['service_id' => $row['ServiceID']],
                 [
-                    'company_id' => $row['CompanyID'],
+                    'company_id' => $companyId,
                     'service_short' => $row['ServiceShort'] ?? 'Service',
                     'status' => $row['Status'] ?? 'Active',
                     'start_date' => $row['StartDate'] ?? null,
@@ -161,7 +170,7 @@ class ImportController extends Controller
                     'service_monthly_charge' => $row['ServiceMonthlyCharge'] ?? null,
                     'service_payment_frequency' => $row['ServicePaymentFrequency'] ?? null,
                     'next_payment_date' => $row['NextPaymentDate'] ?? null,
-                    'stripe_subscription_id' => $row['StripeSubscriptionID'] ?? null,
+                    'stripe_subscription_id' => !empty($row['StripeSubscriptionID']) ? $row['StripeSubscriptionID'] : null,
                 ]
             );
             $count++;
@@ -175,11 +184,18 @@ class ImportController extends Controller
         $stmt = $source->query('SELECT * FROM Invoices ORDER BY InvoiceID ASC');
         $count = 0;
 
+        $validCompanyIds = Customer::pluck('company_id')->toArray();
+
         while ($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
+            $companyId = $row['CompanyID'] ?? null;
+            if (!$companyId || !in_array((int) $companyId, $validCompanyIds)) {
+                continue;
+            }
+
             Invoice::updateOrCreate(
                 ['invoice_id' => $row['InvoiceID']],
                 [
-                    'company_id' => $row['CompanyID'],
+                    'company_id' => $companyId,
                     'invoice_status' => $row['InvoiceStatus'] ?? 'Unpaid',
                     'invoice_amount' => $row['InvoiceAmount'] ?? 0,
                     'invoice_date' => $row['InvoiceDate'] ?? null,
@@ -201,11 +217,18 @@ class ImportController extends Controller
         $stmt = $source->query('SELECT * FROM Tickets ORDER BY TicketID ASC');
         $count = 0;
 
+        $validCompanyIds = Customer::pluck('company_id')->toArray();
+
         while ($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
+            $companyId = $row['CompanyID'] ?? null;
+            if (!$companyId || !in_array((int) $companyId, $validCompanyIds)) {
+                continue;
+            }
+
             Ticket::updateOrCreate(
                 ['ticket_id' => $row['TicketID']],
                 [
-                    'company_id' => $row['CompanyID'],
+                    'company_id' => $companyId,
                     'user_id' => $row['UserID'] ?? null,
                     'subject' => $row['Subject'] ?? 'No subject',
                     'description' => $row['Description'] ?? null,
@@ -225,14 +248,23 @@ class ImportController extends Controller
         $stmt = $source->query('SELECT * FROM Domains ORDER BY DomainName ASC');
         $count = 0;
 
+        $validCompanyIds = Customer::pluck('company_id')->toArray();
+
         while ($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
             $domainName = $row['DomainName'] ?? $row['Domain'] ?? null;
             if (!$domainName) continue;
 
+            $companyId = $row['CompanyID'] ?? $row['CustomerID'] ?? null;
+
+            // Skip if company doesn't exist (but allow null company_id)
+            if ($companyId && !in_array((int) $companyId, $validCompanyIds)) {
+                $companyId = null;
+            }
+
             Domain::updateOrCreate(
                 ['domain_name' => strtolower($domainName)],
                 [
-                    'company_id' => $row['CompanyID'] ?? $row['CustomerID'] ?? null,
+                    'company_id' => $companyId,
                     'registrar' => $row['Registrar'] ?? $row['DomainRegistrar'] ?? null,
                     'registration_date' => $row['RegistrationDate'] ?? null,
                     'expiry_date' => $row['ExpiryDate'] ?? $row['ExpirationDate'] ?? $row['RenewalDate'] ?? null,
@@ -262,11 +294,20 @@ class ImportController extends Controller
         }
 
         $count = 0;
+        $validCompanyIds = Customer::pluck('company_id')->toArray();
+
         while ($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
+            $customerId = $row['CustomerID'] ?? $row['CompanyID'] ?? null;
+
+            // Skip if customer doesn't exist
+            if ($customerId && !in_array((int) $customerId, $validCompanyIds)) {
+                continue;
+            }
+
             Asset::updateOrCreate(
                 ['device_id' => $row['DeviceID'] ?? $row['AssetID'] ?? null],
                 [
-                    'customer_id' => $row['CustomerID'] ?? $row['CompanyID'] ?? null,
+                    'customer_id' => $customerId,
                     'device_name' => $row['DeviceName'] ?? $row['AssetName'] ?? 'Unknown',
                     'location' => $row['Location'] ?? null,
                     'asset_status' => $row['AssetStatus'] ?? $row['Status'] ?? 'Active',
