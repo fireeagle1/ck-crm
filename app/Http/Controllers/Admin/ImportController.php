@@ -240,6 +240,9 @@ class ImportController extends Controller
                 [
                     'company_id' => $companyId,
                     'service_short' => $row['ServiceShort'] ?? 'Service',
+                    'service_type' => $row['ServiceType'] ?? null,
+                    'domain_name' => !empty($row['DomainName']) ? $row['DomainName'] : null,
+                    'cpanel_username' => !empty($row['cPanelUsername']) ? $row['cPanelUsername'] : null,
                     'status' => $row['Status'] ?? 'Active',
                     'start_date' => $this->cleanDate($row['StartDate'] ?? null),
                     'end_date' => $this->cleanDate($row['EndDate'] ?? null),

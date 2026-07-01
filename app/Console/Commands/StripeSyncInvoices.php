@@ -125,6 +125,7 @@ class StripeSyncInvoices extends Command
                         'paid_date' => $stripeInvoice->status_transitions?->paid_at
                             ? date('Y-m-d', $stripeInvoice->status_transitions->paid_at)
                             : null,
+                        'stripe_hosted_url' => $stripeInvoice->hosted_invoice_url ?? null,
                         'invoice_items' => $items,
                     ]
                 );
