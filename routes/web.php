@@ -32,6 +32,7 @@ Route::middleware(['auth', 'verified'])->prefix('portal')->name('portal.')->grou
     Route::get('/services/{service}', [Portal\ServiceController::class, 'show'])->name('services.show');
     Route::post('/services/{service}/sso/cpanel', [Portal\SsoController::class, 'cpanel'])->name('services.sso.cpanel');
     Route::post('/services/{service}/sso/webmail', [Portal\SsoController::class, 'webmail'])->name('services.sso.webmail');
+    Route::post('/services/{service}/sso/wordpress', [Portal\SsoController::class, 'wordpress'])->name('services.sso.wordpress');
 
     // Tickets
     Route::get('/tickets', [Portal\TicketController::class, 'index'])->name('tickets.index');

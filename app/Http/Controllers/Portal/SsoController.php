@@ -48,6 +48,41 @@ class SsoController extends Controller
     }
 
     /**
+     * Generate a cPanel SSO session and redirect into Softaculous WordPress manager.
+     */
+    public function wordpress(Request $request, Service $service)
+    {
+        $this->guardAccess($request, $service);
+
+        if (!$service->cpanel_username) {
+            return back()->with('error', 'No cPanel username configured for this service.');
+        }
+
+        $url = $this->createSession($service->cpanel_username, 'cpaneld');
+
+        if (!$url) {
+            return back();
+        }
+
+        // The SSO URL looks like: https://server:2083/cpsess{token}/frontend/jupiter/...
+        // Replace the path after the session token with the Softaculous WordPress path
+        $parsed = parse_url($url);
+        $path = $parsed['path'] ?? '';
+
+        if (preg_match('#(/cpsess\d+/)#', $path, $matches)) {
+            $sessionPath = $matches[1];
+            $wpUrl = $parsed['scheme'] . '://' . $parsed['host']
+                   . (isset($parsed['port']) ? ':' . $parsed['port'] : '')
+                   . $sessionPath . 'frontend/jupiter/softaculous/index.live.php?act=wordpress';
+
+            return redirect($wpUrl);
+        }
+
+        // Fallback — just go to cPanel
+        return redirect($url);
+    }
+
+    /**
      * Create a WHM session URL for a given cPanel user.
      *
      * Uses WHM API: create_user_session
