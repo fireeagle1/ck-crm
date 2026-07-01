@@ -74,6 +74,8 @@ Route::middleware(['auth', 'verified', EnsureIsAdmin::class])->prefix('admin')->
     Route::get('/services/create', [Admin\ServiceController::class, 'create'])->name('services.create');
     Route::get('/services/cpanel-mapping', [Admin\CpanelMappingController::class, 'index'])->name('services.cpanel-mapping');
     Route::put('/services/cpanel-mapping', [Admin\CpanelMappingController::class, 'update'])->name('services.cpanel-mapping.update');
+    Route::get('/services/stripe-mapping', [Admin\StripeMappingController::class, 'index'])->name('services.stripe-mapping');
+    Route::put('/services/stripe-mapping', [Admin\StripeMappingController::class, 'update'])->name('services.stripe-mapping.update');
     Route::post('/services', [Admin\ServiceController::class, 'store'])->name('services.store');
     Route::get('/services/{service}', [Admin\ServiceController::class, 'show'])->name('services.show');
     Route::get('/services/{service}/edit', [Admin\ServiceController::class, 'edit'])->name('services.edit');

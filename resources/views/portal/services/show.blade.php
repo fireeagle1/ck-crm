@@ -43,6 +43,7 @@
             {{-- Service details --}}
             <div class="bg-white rounded-lg border p-6">
                 <h2 class="font-bold mb-4">Service Details</h2>
+                <p class="text-xs text-gray-400 mb-4">Billing information is synced from Stripe and may take up to 24 hours to reflect recent changes.</p>
                 <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4 text-sm">
                     <div>
                         <dt class="text-gray-500 font-medium">Status</dt>

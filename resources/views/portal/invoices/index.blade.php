@@ -3,6 +3,10 @@
 
     <h1 class="text-2xl font-semibold mb-4">Invoices</h1>
 
+    <div class="bg-blue-50 border border-blue-200 rounded-md p-3 mb-4 text-sm text-blue-800">
+        Invoices are synced from Stripe. Recent payments or changes may take up to 24 hours to appear here.
+    </div>
+
     <div class="bg-white rounded-lg shadow-sm border overflow-hidden">
         <table class="min-w-full text-sm">
             <thead class="bg-gray-50 border-b">
