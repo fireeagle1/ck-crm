@@ -119,13 +119,24 @@
                                         <td class="px-3 py-2 whitespace-nowrap">
                                             <div class="flex gap-1">
                                                 <a href="{{ route('admin.services.edit', $service) }}" class="text-blue-600 hover:underline text-xs">Edit</a>
-                                                @if ($service->domain_name && !$alreadyInDomains)
-                                                    <form method="POST" action="{{ route('admin.cleanup.review.move-to-domain') }}" class="inline">
-                                                        @csrf
-                                                        <input type="hidden" name="service_id" value="{{ $service->service_id }}">
-                                                        <input type="hidden" name="customer" value="{{ $current->company_id }}">
-                                                        <button type="submit" class="text-green-600 hover:underline text-xs">→ Domain</button>
-                                                    </form>
+                                                @if ($service->domain_name)
+                                                    @if ($alreadyInDomains)
+                                                        {{-- Domain exists — merge subscription into it and delete service --}}
+                                                        <form method="POST" action="{{ route('admin.cleanup.review.move-to-domain') }}" class="inline">
+                                                            @csrf
+                                                            <input type="hidden" name="service_id" value="{{ $service->service_id }}">
+                                                            <input type="hidden" name="customer" value="{{ $current->company_id }}">
+                                                            <button type="submit" class="text-purple-600 hover:underline text-xs font-medium">Merge</button>
+                                                        </form>
+                                                    @else
+                                                        {{-- Domain doesn't exist — create it from this service --}}
+                                                        <form method="POST" action="{{ route('admin.cleanup.review.move-to-domain') }}" class="inline">
+                                                            @csrf
+                                                            <input type="hidden" name="service_id" value="{{ $service->service_id }}">
+                                                            <input type="hidden" name="customer" value="{{ $current->company_id }}">
+                                                            <button type="submit" class="text-green-600 hover:underline text-xs">→ Domain</button>
+                                                        </form>
+                                                    @endif
                                                 @endif
                                             </div>
                                         </td>
