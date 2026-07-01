@@ -55,7 +55,7 @@
     </div>
 
     {{-- Navigation bar --}}
-    <div class="max-w-7xl mx-auto px-4">
+    <div class="max-w-7xl mx-auto px-4 relative z-50">
         <nav class="flex items-center gap-1 h-11 -mb-px overflow-x-auto">
             @foreach ($adminNavMain as $item)
                 <a href="{{ route($item['route']) }}"
