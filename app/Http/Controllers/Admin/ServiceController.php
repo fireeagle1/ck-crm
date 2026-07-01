@@ -73,15 +73,15 @@ class ServiceController extends Controller
         $validated = $request->validate([
             'company_id' => 'required|exists:customers,company_id',
             'service_short' => 'required|string|max:255',
-            'service_type' => 'required|in:Technical Support,Web Hosting,Domain Registration,Other',
+            'service_type' => 'required|in:Technical Support,Web Hosting,Other',
             'status' => 'in:Active,Suspended,Cancelled',
             'start_date' => 'nullable|date',
             'end_date' => 'nullable|date|after_or_equal:start_date',
             'service_monthly_charge' => 'nullable|numeric|min:0',
             'service_payment_frequency' => 'nullable|string',
             'stripe_price_id' => 'nullable|string',
-            'domain_name' => 'nullable|string|max:255',
-            'domain_registrar' => 'nullable|string|max:255',
+            'domain_name' => 'required_if:service_type,Web Hosting|nullable|string|max:255',
+            'cpanel_username' => 'nullable|string|max:255',
         ]);
 
         // Duplicate prevention: check if a service with the same domain already exists for this customer
@@ -103,6 +103,7 @@ class ServiceController extends Controller
             'service_short' => $validated['service_short'],
             'service_type' => $validated['service_type'],
             'domain_name' => $validated['domain_name'] ?? null,
+            'cpanel_username' => $validated['cpanel_username'] ?? null,
             'status' => $validated['status'] ?? 'Active',
             'start_date' => $validated['start_date'] ?? now(),
             'end_date' => $validated['end_date'] ?? null,
@@ -132,17 +133,6 @@ class ServiceController extends Controller
                 return redirect()->route('admin.services.index')
                     ->with('success', 'Service created but Stripe subscription failed: ' . $e->getMessage());
             }
-        }
-
-        // Add domain record if provided
-        if (!empty($validated['domain_name'])) {
-            Domain::updateOrCreate(
-                ['domain_name' => strtolower($validated['domain_name'])],
-                [
-                    'company_id' => $validated['company_id'],
-                    'registrar' => $validated['domain_registrar'] ?? 'eNom',
-                ]
-            );
         }
 
         return redirect()->route('admin.services.index')

@@ -44,12 +44,16 @@
                         <td class="px-4 py-3 text-gray-500">{{ $service->service_payment_frequency ?? '—' }}</td>
                         <td class="px-4 py-3 text-gray-500">{{ $service->start_date?->format('Y-m-d') ?? '—' }}</td>
                         <td class="px-4 py-3">
-                            <form method="POST" action="{{ route('admin.services.destroy', $service) }}" class="inline"
-                                  onsubmit="return confirm('Delete this service?')">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="text-red-600 hover:underline text-sm">Delete</button>
-                            </form>
+                            <div class="flex gap-2">
+                                <a href="{{ route('admin.services.show', $service) }}" class="text-blue-600 hover:underline text-sm">View</a>
+                                <a href="{{ route('admin.services.edit', $service) }}" class="text-gray-600 hover:underline text-sm">Edit</a>
+                                <form method="POST" action="{{ route('admin.services.destroy', $service) }}" class="inline"
+                                      onsubmit="return confirm('Delete this service?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="text-red-600 hover:underline text-sm">Delete</button>
+                                </form>
+                            </div>
                         </td>
                     </tr>
                 @empty
