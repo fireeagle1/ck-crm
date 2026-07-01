@@ -20,7 +20,7 @@ class SsoController extends Controller
             return back()->with('error', 'No cPanel username configured for this service.');
         }
 
-        $url = $this->createSession($service->cpanel_username, 'cpanel');
+        $url = $this->createSession($service->cpanel_username, 'cpaneld');
 
         if (!$url) {
             // Error detail already flashed by createSession
@@ -38,7 +38,7 @@ class SsoController extends Controller
             return back()->with('error', 'No cPanel username configured for this service.');
         }
 
-        $url = $this->createSession($service->cpanel_username, 'webmail');
+        $url = $this->createSession($service->cpanel_username, 'webmaild');
 
         if (!$url) {
             return back();
