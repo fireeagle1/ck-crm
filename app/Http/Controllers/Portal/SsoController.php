@@ -61,6 +61,7 @@ class SsoController extends Controller
         $token = config('services.whm.token');
 
         if (!$host || !$whmUser || !$token) {
+            session()->flash('error', 'WHM not configured. Set WHM_HOST, WHM_USERNAME, WHM_API_TOKEN in .env');
             return null;
         }
 
@@ -71,13 +72,13 @@ class SsoController extends Controller
                 'Authorization' => "WHM {$whmUser}:{$token}",
             ])
             ->withOptions([
-                'verify' => false, // WHM often uses self-signed certs
+                'verify' => false,
                 'timeout' => 15,
             ])
             ->get($apiUrl, [
                 'api.version' => 1,
                 'user' => $username,
-                'service' => $service, // 'cpanel' or 'webmail'
+                'service' => $service,
             ]);
 
             $data = $response->json();
@@ -86,19 +87,12 @@ class SsoController extends Controller
                 return $data['data']['url'];
             }
 
-            \Log::warning('WHM SSO failed', [
-                'user' => $username,
-                'service' => $service,
-                'response' => $data,
-            ]);
+            $reason = $data['metadata']['reason'] ?? $data['errors'][0] ?? 'Unknown WHM error';
+            session()->flash('error', "WHM SSO failed for '{$username}': {$reason}");
 
             return null;
         } catch (\Exception $e) {
-            \Log::error('WHM SSO error', [
-                'user' => $username,
-                'error' => $e->getMessage(),
-            ]);
-
+            session()->flash('error', "WHM connection error: {$e->getMessage()}");
             return null;
         }
     }
