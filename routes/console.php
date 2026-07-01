@@ -3,6 +3,11 @@
 use App\Models\ScheduledTaskLog;
 use Illuminate\Support\Facades\Schedule;
 
+// Heartbeat — runs every 5 minutes to confirm cron is working
+Schedule::call(function () {
+    ScheduledTaskLog::begin('heartbeat')->complete('Cron is running.');
+})->everyFiveMinutes();
+
 // Stripe invoice & subscription sync — daily at 2am
 Schedule::command('stripe:sync')->dailyAt('02:00');
 
