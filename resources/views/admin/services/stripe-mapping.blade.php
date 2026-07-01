@@ -87,6 +87,103 @@
                 <option value="{{ $sc['id'] }}">{{ $sc['name'] }} ({{ $sc['email'] }})</option>
             @endforeach
         </datalist>
+    @endif
+
+    {{-- Subscription datalist --}}
+    @if (!empty($stripeSubscriptions))
+        <datalist id="stripe-subscriptions">
+            @foreach ($stripeSubscriptions as $sub)
+                <option value="{{ $sub['id'] }}">{{ $sub['customer_name'] }} — £{{ $sub['amount'] }}/{{ $sub['interval'] }} ({{ $sub['status'] }})</option>
+            @endforeach
+        </datalist>
+    @endif
+
+    {{-- Service → Subscription Mapping --}}
+    <div class="bg-white rounded-lg border overflow-hidden mt-6">
+        <div class="px-5 py-4 border-b">
+            <h2 class="font-bold">Service → Subscription Mapping</h2>
+            <p class="text-xs text-gray-500 mt-1">Link each CRM service to its Stripe subscription ID. The sync will then update billing data for these services.</p>
+        </div>
+        <form method="POST" action="{{ route('admin.services.stripe-mapping.subscriptions') }}">
+            @csrf
+            @method('PUT')
+            <table class="min-w-full text-sm">
+                <thead class="bg-gray-50 border-b">
+                    <tr>
+                        <th class="px-5 py-3 text-left font-semibold text-gray-600">Service</th>
+                        <th class="px-5 py-3 text-left font-semibold text-gray-600">Customer</th>
+                        <th class="px-5 py-3 text-left font-semibold text-gray-600">Stripe Subscription ID</th>
+                        <th class="px-5 py-3 text-left font-semibold text-gray-600">Status</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y">
+                    @foreach ($services as $i => $service)
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-5 py-3">
+                                <input type="hidden" name="subscriptions[{{ $i }}][service_id]" value="{{ $service->service_id }}">
+                                <span class="font-medium">{{ $service->service_short }}</span>
+                            </td>
+                            <td class="px-5 py-3 text-gray-600">{{ $service->customer?->company_name ?? '—' }}</td>
+                            <td class="px-5 py-3">
+                                <input type="text" name="subscriptions[{{ $i }}][stripe_subscription_id]"
+                                       value="{{ $service->stripe_subscription_id }}"
+                                       placeholder="sub_..."
+                                       class="w-64 rounded border-gray-300 text-sm px-2 py-1 font-mono focus:ring-blue-500 focus:border-blue-500"
+                                       list="stripe-subscriptions">
+                            </td>
+                            <td class="px-5 py-3">
+                                @if ($service->stripe_subscription_id)
+                                    <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium bg-green-100 text-green-700">Linked</span>
+                                @else
+                                    <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium bg-gray-100 text-gray-600">Not linked</span>
+                                @endif
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+            <div class="px-5 py-3 border-t bg-gray-50">
+                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-semibold hover:bg-blue-700">
+                    Save Subscription Mappings
+                </button>
+            </div>
+        </form>
+    </div>
+
+    {{-- Stripe subscriptions reference --}}
+    @if (!empty($stripeSubscriptions))
+        <div class="mt-6 bg-white rounded-lg border p-5">
+            <h2 class="font-bold mb-3">Stripe Subscriptions Reference ({{ count($stripeSubscriptions) }})</h2>
+            <p class="text-xs text-gray-500 mb-3">Copy a subscription ID to paste into the mapping above.</p>
+            <div class="max-h-64 overflow-y-auto">
+                <table class="min-w-full text-xs">
+                    <thead class="border-b sticky top-0 bg-white">
+                        <tr>
+                            <th class="px-3 py-1 text-left font-semibold">ID</th>
+                            <th class="px-3 py-1 text-left font-semibold">Customer</th>
+                            <th class="px-3 py-1 text-left font-semibold">Amount</th>
+                            <th class="px-3 py-1 text-left font-semibold">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y">
+                        @foreach ($stripeSubscriptions as $sub)
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-3 py-1.5 font-mono">{{ $sub['id'] }}</td>
+                                <td class="px-3 py-1.5">{{ $sub['customer_name'] }}</td>
+                                <td class="px-3 py-1.5">£{{ $sub['amount'] }}/{{ $sub['interval'] }}</td>
+                                <td class="px-3 py-1.5">
+                                    <span class="inline-flex items-center rounded-full px-1.5 py-0.5 text-xs
+                                        {{ $sub['status'] === 'active' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600' }}">
+                                        {{ $sub['status'] }}
+                                    </span>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    @endif
 
         <div class="mt-6 bg-white rounded-lg border p-5">
             <h2 class="font-bold mb-3">Stripe Customers ({{ count($stripeCustomers) }})</h2>
@@ -112,5 +209,4 @@
                 </table>
             </div>
         </div>
-    @endif
 </x-admin-layout>

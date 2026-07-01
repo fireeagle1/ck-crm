@@ -23,10 +23,17 @@ class StripeMappingController extends Controller
               ->orWhere('stripe_customer_id', '');
         })->orderBy('company_name')->get();
 
-        // Fetch Stripe customers for reference
-        $stripeCustomers = $this->fetchStripeCustomers();
+        // Services that need subscription mapping
+        $services = \App\Models\Service::with('customer')
+            ->where('status', 'Active')
+            ->orderBy('service_short')
+            ->get();
 
-        return view('admin.services.stripe-mapping', compact('mapped', 'unmapped', 'stripeCustomers'));
+        // Fetch Stripe customers and subscriptions for reference
+        $stripeCustomers = $this->fetchStripeCustomers();
+        $stripeSubscriptions = $this->fetchStripeSubscriptions();
+
+        return view('admin.services.stripe-mapping', compact('mapped', 'unmapped', 'services', 'stripeCustomers', 'stripeSubscriptions'));
     }
 
     public function update(Request $request)
@@ -49,6 +56,28 @@ class StripeMappingController extends Controller
         }
 
         return back()->with('success', "{$updated} customer(s) updated.");
+    }
+
+    public function updateSubscriptions(Request $request)
+    {
+        $validated = $request->validate([
+            'subscriptions' => 'required|array',
+            'subscriptions.*.service_id' => 'required|exists:services,service_id',
+            'subscriptions.*.stripe_subscription_id' => 'nullable|string|max:255',
+        ]);
+
+        $updated = 0;
+        foreach ($validated['subscriptions'] as $mapping) {
+            $service = \App\Models\Service::find($mapping['service_id']);
+            $newId = !empty($mapping['stripe_subscription_id']) ? $mapping['stripe_subscription_id'] : null;
+
+            if ($service && $service->stripe_subscription_id !== $newId) {
+                $service->update(['stripe_subscription_id' => $newId]);
+                $updated++;
+            }
+        }
+
+        return back()->with('success', "{$updated} service(s) updated.");
     }
 
     private function fetchStripeCustomers(): array
@@ -84,6 +113,48 @@ class StripeMappingController extends Controller
 
             usort($customers, fn($a, $b) => strcasecmp($a['name'], $b['name']));
             return $customers;
+        } catch (\Exception) {
+            return [];
+        }
+    }
+
+    private function fetchStripeSubscriptions(): array
+    {
+        if (!config('services.stripe.secret')) {
+            return [];
+        }
+
+        try {
+            $subscriptions = [];
+            $result = \Stripe\Subscription::all([
+                'limit' => 100,
+                'status' => 'all',
+                'expand' => ['data.customer'],
+            ]);
+
+            foreach ($result->data as $sub) {
+                $productName = 'Subscription';
+                if (!empty($sub->items->data[0]->price->nickname)) {
+                    $productName = $sub->items->data[0]->price->nickname;
+                }
+
+                $customerName = '';
+                if (is_object($sub->customer)) {
+                    $customerName = $sub->customer->name ?? $sub->customer->email ?? '';
+                }
+
+                $subscriptions[] = [
+                    'id' => $sub->id,
+                    'customer_id' => is_object($sub->customer) ? $sub->customer->id : $sub->customer,
+                    'customer_name' => $customerName,
+                    'product' => $productName,
+                    'status' => $sub->status,
+                    'amount' => !empty($sub->items->data[0]) ? number_format($sub->items->data[0]->price->unit_amount / 100, 2) : '0.00',
+                    'interval' => $sub->items->data[0]->price->recurring->interval ?? 'month',
+                ];
+            }
+
+            return $subscriptions;
         } catch (\Exception) {
             return [];
         }
