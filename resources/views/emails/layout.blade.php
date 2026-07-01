@@ -15,7 +15,7 @@
                         <td style="background-color:#0f172a; padding:24px 32px; border-radius:8px 8px 0 0;">
                             @php $logoPath = \App\Models\Setting::get('logo_path'); @endphp
                             @if ($logoPath)
-                                <img src="{{ asset('storage/' . $logoPath) }}" alt="{{ \App\Models\Setting::get('site_name', 'CK Enterprises UK') }}" style="height:32px; width:auto;">
+                                <img src="{{ asset($logoPath) }}" alt="{{ \App\Models\Setting::get('site_name', 'CK Enterprises UK') }}" style="height:32px; width:auto;">
                             @else
                                 <span style="color:#ffffff; font-size:18px; font-weight:600; letter-spacing:-0.025em;">CK Enterprises UK</span>
                             @endif

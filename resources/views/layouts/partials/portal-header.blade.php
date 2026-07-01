@@ -28,7 +28,7 @@
             <a href="{{ route('portal.dashboard') }}" class="flex items-center gap-2">
                 @php $logoPath = \App\Models\Setting::get('logo_path'); @endphp
                 @if ($logoPath)
-                    <img src="{{ asset('storage/' . $logoPath) }}" alt="{{ \App\Models\Setting::get('site_name', 'CK Enterprises') }}" class="h-8 w-auto">
+                    <img src="{{ asset($logoPath) }}" alt="{{ \App\Models\Setting::get('site_name', 'CK Enterprises') }}" class="h-8 w-auto">
                 @else
                     <span class="text-lg font-semibold tracking-wide">CK Enterprises</span>
                 @endif

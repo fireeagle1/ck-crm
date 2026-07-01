@@ -43,7 +43,7 @@
                     <div class="mb-6 pb-6 border-b">
                         <label class="block text-sm font-medium text-gray-700 mb-2">Current Logo</label>
                         <div class="mb-3 p-4 bg-gray-50 rounded-md border inline-block">
-                            <img src="{{ asset('storage/' . $settings['logo_path']) }}"
+                            <img src="{{ asset($settings['logo_path']) }}"
                                  alt="Current logo"
                                  class="h-12 w-auto">
                         </div>

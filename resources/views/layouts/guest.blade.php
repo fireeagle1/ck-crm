@@ -23,7 +23,7 @@
                     <div class="mb-8">
                         @php $logoPath = \App\Models\Setting::get('logo_path'); @endphp
                         @if ($logoPath)
-                            <img src="{{ asset('storage/' . $logoPath) }}" alt="{{ \App\Models\Setting::get('site_name', 'CK Enterprises') }}" class="h-10 w-auto mb-4">
+                            <img src="{{ asset($logoPath) }}" alt="{{ \App\Models\Setting::get('site_name', 'CK Enterprises') }}" class="h-10 w-auto mb-4">
                         @else
                             <h1 class="text-2xl font-bold text-slate-900 tracking-tight">CK Enterprises</h1>
                         @endif
