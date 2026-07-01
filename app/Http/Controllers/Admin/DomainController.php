@@ -20,12 +20,22 @@ class DomainController extends Controller
             $query->whereDate('expiry_date', '<=', now()->addDays(30))
                   ->whereDate('expiry_date', '>=', now());
         } elseif ($filter === 'expired') {
-            $query->whereDate('expiry_date', '<', now());
+            // Only show expired in last year, not ancient ones
+            $query->whereDate('expiry_date', '<', now())
+                  ->whereDate('expiry_date', '>=', now()->subYear());
+        } else {
+            // Default "all" hides domains expired over 1 year
+            $query->where(function ($q) {
+                $q->whereNull('expiry_date')
+                  ->orWhereDate('expiry_date', '>=', now()->subYear());
+            });
         }
 
         $domains = $query->orderBy('expiry_date')->paginate(20);
 
-        $totalDomains = Domain::count();
+        $totalDomains = Domain::where(function ($q) {
+            $q->whereNull('expiry_date')->orWhereDate('expiry_date', '>=', now()->subYear());
+        })->count();
         $expiringCount = Domain::whereDate('expiry_date', '<=', now()->addDays(30))
             ->whereDate('expiry_date', '>=', now())->count();
         $expiredCount = Domain::whereDate('expiry_date', '<', now())->count();

@@ -121,6 +121,11 @@ Route::middleware(['auth', 'verified', EnsureIsAdmin::class])->prefix('admin')->
     // Import
     Route::post('/settings/import', [Admin\ImportController::class, 'run'])->name('import.run');
 
+    // Cleanup
+    Route::get('/cleanup', [Admin\CleanupController::class, 'index'])->name('cleanup.index');
+    Route::post('/cleanup/services', [Admin\CleanupController::class, 'deleteServices'])->name('cleanup.delete-services');
+    Route::post('/cleanup/domains', [Admin\CleanupController::class, 'deleteDomains'])->name('cleanup.delete-domains');
+
     // Settings (with sub-pages)
     Route::get('/settings', [Admin\SettingsController::class, 'general'])->name('settings.index');
     Route::get('/settings/general', [Admin\SettingsController::class, 'general'])->name('settings.general');

@@ -12,6 +12,11 @@ class DomainController extends Controller
     public function index(Request $request): View
     {
         $domains = Domain::where('company_id', $request->user()->company_id)
+            ->where(function ($q) {
+                // Show domains that haven't expired, or expired less than 1 year ago
+                $q->whereNull('expiry_date')
+                  ->orWhereDate('expiry_date', '>=', now()->subYear());
+            })
             ->orderBy('expiry_date')
             ->paginate(10);
 

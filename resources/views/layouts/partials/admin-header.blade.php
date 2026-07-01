@@ -16,6 +16,7 @@
     $adminNavTools = [
         ['route' => 'admin.services.cpanel-mapping', 'label' => 'cPanel Mapping'],
         ['route' => 'admin.services.stripe-mapping', 'label' => 'Stripe Mapping'],
+        ['route' => 'admin.cleanup.index', 'label' => 'Data Cleanup'],
         ['route' => 'admin.settings.import', 'label' => 'Import Data'],
         ['route' => 'admin.settings.tasks', 'label' => 'Scheduled Tasks'],
         ['route' => 'admin.settings.index', 'label' => 'Settings'],
