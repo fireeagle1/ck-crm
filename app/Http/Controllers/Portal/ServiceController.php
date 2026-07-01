@@ -16,14 +16,20 @@ class ServiceController extends Controller
 
         $services = Service::where('company_id', $companyId)
             ->where('service_short', '!=', 'Technical Support Package')
-            ->where('status', '!=', 'Cancelled')
+            ->whereNotIn('status', ['Cancelled'])
             ->orderByDesc('service_id')
             ->paginate(10);
+
+        // Check if they have support plan
+        $hasSupportPlan = Service::where('company_id', $companyId)
+            ->where('service_short', 'Technical Support Package')
+            ->where('status', 'Active')
+            ->exists();
 
         // Get customer's domains so we can show the tick
         $domains = Domain::where('company_id', $companyId)->get();
 
-        return view('portal.services.index', compact('services', 'domains'));
+        return view('portal.services.index', compact('services', 'domains', 'hasSupportPlan'));
     }
 
     public function show(Request $request, Service $service): View

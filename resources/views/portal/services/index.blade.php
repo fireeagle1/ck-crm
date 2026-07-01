@@ -4,6 +4,19 @@
     <h1 class="text-3xl font-bold tracking-tight mb-2">My Services</h1>
     <p class="text-gray-500 mb-6">Your active services and websites managed by {{ \App\Models\Setting::get('site_name', 'CK Enterprises') }}.</p>
 
+    {{-- Support plan banner --}}
+    @if ($hasSupportPlan)
+        <div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-6 flex items-center justify-between">
+            <div>
+                <p class="font-semibold text-green-900">Technical Support Package</p>
+                <p class="text-sm text-green-700">Your account includes technical support. Need help? Open a ticket.</p>
+            </div>
+            <a href="{{ route('portal.tickets.create') }}" class="px-4 py-2 bg-green-700 text-white rounded-md text-sm font-semibold hover:bg-green-800 transition shrink-0">
+                Open Ticket
+            </a>
+        </div>
+    @endif
+
     @if ($services->isEmpty())
         <div class="bg-white rounded-lg border p-8 text-center">
             <p class="text-gray-500">No active services.</p>

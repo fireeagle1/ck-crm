@@ -26,6 +26,18 @@
                         If you need any changes made to your website or email, just open a support ticket and we'll take care of it.
                     </p>
                 </div>
+            @elseif ($service->service_short === 'Technical Support Package' || $service->service_type === 'Technical Support')
+                <div class="bg-green-50 border border-green-200 rounded-lg p-5">
+                    <h2 class="font-bold text-green-900 mb-2">Technical Support Package</h2>
+                    <p class="text-sm text-green-800 leading-relaxed mb-4">
+                        Your account includes our Technical Support Package. This covers website changes, hardware support,
+                        and day-to-day technical assistance. Submit a request below and our team will get back to you.
+                    </p>
+                    <a href="{{ route('portal.tickets.create') }}" class="inline-flex items-center gap-2 px-4 py-2.5 bg-green-700 text-white rounded-md text-sm font-semibold hover:bg-green-800 transition">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+                        Submit Support Request
+                    </a>
+                </div>
             @endif
 
             {{-- Service details --}}
