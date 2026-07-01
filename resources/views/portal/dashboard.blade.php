@@ -9,6 +9,24 @@
         <p class="text-gray-500 mt-1">Here's an overview of your account with {{ \App\Models\Setting::get('site_name', 'CK Enterprises') }}.</p>
     </div>
 
+    {{-- Overdue invoice warning --}}
+    @if ($overdueInvoices->isNotEmpty())
+        <div class="bg-red-600 text-white rounded-lg p-4 mb-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="font-bold">You have {{ $overdueInvoices->count() }} overdue invoice{{ $overdueInvoices->count() > 1 ? 's' : '' }}</p>
+                    <p class="text-sm text-red-100 mt-0.5">
+                        Total outstanding: £{{ number_format($overdueInvoices->sum('invoice_amount'), 2) }}.
+                        Please make payment at your earliest convenience.
+                    </p>
+                </div>
+                <a href="{{ route('portal.invoices.index') }}" class="px-4 py-2 bg-white text-red-600 rounded-md text-sm font-semibold hover:bg-red-50 transition shrink-0">
+                    View Invoices
+                </a>
+            </div>
+        </div>
+    @endif
+
     {{-- KPI strip --}}
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <div class="bg-white rounded-lg p-5 border">

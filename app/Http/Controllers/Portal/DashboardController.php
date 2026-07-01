@@ -77,6 +77,12 @@ class DashboardController extends Controller
             ->orderBy('expiry_date')
             ->get();
 
+        // Overdue invoices
+        $overdueInvoices = Invoice::where('company_id', $companyId)
+            ->where('invoice_status', 'Unpaid')
+            ->whereDate('due_date', '<', now())
+            ->get();
+
         return view('portal.dashboard', compact(
             'activeServices',
             'openTickets',
@@ -88,6 +94,7 @@ class DashboardController extends Controller
             'expiringDomainsList',
             'websites',
             'customerDomains',
+            'overdueInvoices',
         ));
     }
 }

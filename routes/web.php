@@ -96,6 +96,7 @@ Route::middleware(['auth', 'verified', EnsureIsAdmin::class])->prefix('admin')->
 
     // Invoices
     Route::get('/invoices', [Admin\InvoiceController::class, 'index'])->name('invoices.index');
+    Route::post('/invoices/{invoice}/remind', [Admin\InvoiceController::class, 'remind'])->name('invoices.remind');
 
     // Assets (CMDB)
     Route::resource('assets', Admin\AssetController::class);
