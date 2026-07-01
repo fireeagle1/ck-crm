@@ -27,7 +27,6 @@
                         @else
                             <h1 class="text-3xl font-bold text-slate-900 tracking-tight">CK Enterprises</h1>
                         @endif
-                        <p class="text-sm text-gray-500 mt-2">Client Management Portal</p>
                     </div>
 
                     {{ $slot }}
@@ -41,9 +40,7 @@
                      class="absolute inset-0 w-full h-full object-cover">
                 <div class="absolute inset-0 bg-slate-900/50"></div>
                 <div class="relative z-10 flex flex-col justify-end h-full p-12">
-                    <blockquote class="text-white/90 text-lg font-semibold leading-relaxed max-w-md">
-                        "Managed IT services and web hosting you can rely on. Supporting businesses across the UK."
-                    </blockquote>
+                    
                     <p class="text-white/60 text-sm mt-4 font-medium">CK Enterprises UK</p>
                 </div>
             </div>
