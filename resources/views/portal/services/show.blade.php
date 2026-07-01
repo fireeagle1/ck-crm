@@ -113,7 +113,7 @@
                                 </div>
                                 <div>
                                     <p class="text-sm font-semibold text-gray-900">cPanel</p>
-                                    <p class="text-xs text-gray-500">Files, databases, DNS</p>
+                                    <p class="text-xs text-gray-500">Files, databases, WordPress</p>
                                 </div>
                             </button>
                         </form>

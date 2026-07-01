@@ -17,7 +17,7 @@
                     <p class="font-bold">You have {{ $overdueInvoices->count() }} overdue invoice{{ $overdueInvoices->count() > 1 ? 's' : '' }}</p>
                     <p class="text-sm text-red-100 mt-0.5">
                         Total outstanding: £{{ number_format($overdueInvoices->sum('invoice_amount'), 2) }}.
-                        Please make payment at your earliest convenience.
+                        Please make payment at your earliest convenience to avoid any service disruption.
                     </p>
                 </div>
                 <a href="{{ route('portal.invoices.index') }}" class="px-4 py-2 bg-white text-red-600 rounded-md text-sm font-semibold hover:bg-red-50 transition shrink-0">
