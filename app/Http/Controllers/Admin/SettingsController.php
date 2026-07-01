@@ -91,7 +91,10 @@ class SettingsController extends Controller
 
         $command = $request->input('command');
 
-        \Illuminate\Support\Facades\Artisan::call($command);
+        // Run with --debug for enom to capture response info
+        $params = $command === 'enom:sync' ? ['--debug' => true] : [];
+
+        \Illuminate\Support\Facades\Artisan::call($command, $params);
         $output = \Illuminate\Support\Facades\Artisan::output();
 
         return back()->with('success', "Ran '{$command}'. Output: " . trim($output));
