@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Ticket;
+use App\Models\TicketReply;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class TicketController extends Controller
@@ -13,7 +15,7 @@ class TicketController extends Controller
     {
         $status = $request->get('status', 'open');
 
-        $query = Ticket::with(['customer', 'user']);
+        $query = Ticket::with(['customer', 'user'])->withCount('replies');
 
         if ($status !== 'all') {
             $query->whereIn('status', ['Open', 'Pending', 'In Progress']);
@@ -26,7 +28,7 @@ class TicketController extends Controller
 
     public function show(Ticket $ticket): View
     {
-        $ticket->load(['customer', 'user']);
+        $ticket->load(['customer', 'user', 'replies.user']);
 
         return view('admin.tickets.show', compact('ticket'));
     }
@@ -41,5 +43,37 @@ class TicketController extends Controller
         $ticket->update($validated);
 
         return back()->with('success', 'Ticket updated.');
+    }
+
+    public function reply(Request $request, Ticket $ticket)
+    {
+        $validated = $request->validate([
+            'body' => 'required|string',
+            'is_internal' => 'boolean',
+            'attachment' => 'nullable|file|max:10240', // 10MB max
+        ]);
+
+        $attachmentPath = null;
+        if ($request->hasFile('attachment')) {
+            $attachmentPath = $request->file('attachment')->store(
+                "tickets/{$ticket->ticket_id}",
+                'public'
+            );
+        }
+
+        TicketReply::create([
+            'ticket_id' => $ticket->ticket_id,
+            'user_id' => $request->user()->id,
+            'body' => $validated['body'],
+            'is_internal' => $request->boolean('is_internal'),
+            'attachment_path' => $attachmentPath,
+        ]);
+
+        // Re-open ticket if it was closed and admin replies
+        if ($ticket->status === 'Closed') {
+            $ticket->update(['status' => 'Open']);
+        }
+
+        return back()->with('success', 'Reply added.');
     }
 }

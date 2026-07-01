@@ -3,6 +3,7 @@
         ['route' => 'portal.dashboard', 'label' => 'Dashboard'],
         ['route' => 'portal.services.index', 'label' => 'My Websites'],
         ['route' => 'portal.tickets.index', 'label' => 'Support Tickets'],
+        ['route' => 'portal.invoices.index', 'label' => 'Invoices'],
         ['route' => 'portal.knowledgebase.index', 'label' => 'Knowledgebase'],
         ['route' => 'portal.domains.index', 'label' => 'Domains'],
         ['route' => 'portal.account.show', 'label' => 'Account'],

@@ -14,6 +14,7 @@ class Invoice extends Model
 
     protected $fillable = [
         'company_id',
+        'stripe_invoice_id',
         'invoice_status',
         'paid_date',
         'invoice_amount',

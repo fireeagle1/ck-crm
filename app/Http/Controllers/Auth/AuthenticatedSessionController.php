@@ -28,6 +28,12 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
+        // Log the login + update last_login
+        $user = $request->user();
+        $user->update(['last_login' => now()]);
+
+        \App\Models\EventLog::log($user->id, 'Login successful', 200);
+
         return redirect()->intended(route('portal.dashboard', absolute: false));
     }
 

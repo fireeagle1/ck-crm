@@ -4,6 +4,8 @@
         ['route' => 'admin.customers.index', 'label' => 'Customers'],
         ['route' => 'admin.tickets.index', 'label' => 'Tickets'],
         ['route' => 'admin.services.index', 'label' => 'Services'],
+        ['route' => 'admin.invoices.index', 'label' => 'Invoices'],
+        ['route' => 'admin.domains.index', 'label' => 'Domains'],
         ['route' => 'admin.assets.index', 'label' => 'CMDB'],
         ['route' => 'admin.articles.index', 'label' => 'Knowledgebase'],
         ['route' => 'admin.users.index', 'label' => 'Users'],
@@ -44,8 +46,14 @@
 
             {{-- Right side --}}
             <div class="flex items-center gap-3">
+                {{-- Search --}}
+                <form action="{{ route('admin.search') }}" method="GET" class="hidden md:block">
+                    <input type="text" name="q" placeholder="Search..." value="{{ request('q') }}"
+                           class="w-48 rounded-md bg-white/10 border-0 text-sm text-white placeholder-gray-400 px-3 py-1.5 focus:ring-2 focus:ring-white/30 focus:bg-white/20">
+                </form>
+
                 <a href="{{ route('portal.dashboard') }}" class="text-xs text-gray-300 hover:text-white">
-                    &larr; Customer portal
+                    &larr; Portal
                 </a>
 
                 <form method="POST" action="{{ route('logout') }}">

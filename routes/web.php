@@ -32,6 +32,7 @@ Route::middleware(['auth', 'verified'])->prefix('portal')->name('portal.')->grou
     Route::get('/tickets/create', [Portal\TicketController::class, 'create'])->name('tickets.create');
     Route::post('/tickets', [Portal\TicketController::class, 'store'])->name('tickets.store');
     Route::get('/tickets/{ticket}', [Portal\TicketController::class, 'show'])->name('tickets.show');
+    Route::post('/tickets/{ticket}/reply', [Portal\TicketController::class, 'reply'])->name('tickets.reply');
 
     // Domains
     Route::get('/domains', [Portal\DomainController::class, 'index'])->name('domains.index');
@@ -46,6 +47,7 @@ Route::middleware(['auth', 'verified'])->prefix('portal')->name('portal.')->grou
 
     // Billing
     Route::post('/billing/portal', [Portal\BillingController::class, 'portal'])->name('billing.portal');
+    Route::get('/invoices', [Portal\BillingController::class, 'invoices'])->name('invoices.index');
 });
 
 /*
@@ -55,6 +57,7 @@ Route::middleware(['auth', 'verified'])->prefix('portal')->name('portal.')->grou
 */
 Route::middleware(['auth', 'verified', EnsureIsAdmin::class])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [Admin\DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/search', Admin\SearchController::class)->name('search');
 
     // Customers
     Route::resource('customers', Admin\CustomerController::class);
@@ -68,9 +71,20 @@ Route::middleware(['auth', 'verified', EnsureIsAdmin::class])->prefix('admin')->
     Route::get('/tickets', [Admin\TicketController::class, 'index'])->name('tickets.index');
     Route::get('/tickets/{ticket}', [Admin\TicketController::class, 'show'])->name('tickets.show');
     Route::put('/tickets/{ticket}', [Admin\TicketController::class, 'update'])->name('tickets.update');
+    Route::post('/tickets/{ticket}/reply', [Admin\TicketController::class, 'reply'])->name('tickets.reply');
+
+    // Invoices
+    Route::get('/invoices', [Admin\InvoiceController::class, 'index'])->name('invoices.index');
 
     // Assets (CMDB)
     Route::resource('assets', Admin\AssetController::class);
+
+    // Domains
+    Route::get('/domains', [Admin\DomainController::class, 'index'])->name('domains.index');
+    Route::get('/domains/create', [Admin\DomainController::class, 'create'])->name('domains.create');
+    Route::post('/domains', [Admin\DomainController::class, 'store'])->name('domains.store');
+    Route::get('/domains/{domain}/edit', [Admin\DomainController::class, 'edit'])->name('domains.edit');
+    Route::put('/domains/{domain}', [Admin\DomainController::class, 'update'])->name('domains.update');
 
     // Knowledgebase Articles
     Route::resource('articles', Admin\ArticleController::class)->except('show');
