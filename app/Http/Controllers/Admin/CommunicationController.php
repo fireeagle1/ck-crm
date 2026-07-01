@@ -40,13 +40,13 @@ class CommunicationController extends Controller
             'subject' => 'required|string|max:255',
             'body' => 'required|string',
             'recipients' => 'required|in:all,selected',
-            'customer_ids' => 'required_if:recipients,selected|array',
+            'customer_ids' => 'nullable|array',
             'customer_ids.*' => 'exists:customers,company_id',
         ]);
 
         $query = User::whereNotNull('email');
 
-        if ($validated['recipients'] === 'selected') {
+        if ($validated['recipients'] === 'selected' && !empty($validated['customer_ids'])) {
             $query->whereIn('company_id', $validated['customer_ids']);
         }
 

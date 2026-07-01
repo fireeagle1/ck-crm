@@ -51,6 +51,9 @@ Route::middleware(['auth', 'verified'])->prefix('portal')->name('portal.')->grou
     // Account
     Route::get('/account', [Portal\AccountController::class, 'show'])->name('account.show');
     Route::put('/account', [Portal\AccountController::class, 'update'])->name('account.update');
+    Route::put('/account/company', [Portal\AccountController::class, 'updateCompany'])->name('account.company.update');
+    Route::post('/account/users', [Portal\AccountController::class, 'addUser'])->name('account.users.add');
+    Route::post('/account/users/{user}/reset-password', [Portal\AccountController::class, 'sendPasswordReset'])->name('account.users.reset-password');
 
     // Billing
     Route::post('/billing/portal', [Portal\BillingController::class, 'portal'])->name('billing.portal');
