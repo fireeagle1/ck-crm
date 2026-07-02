@@ -187,6 +187,60 @@
         </table>
     </div>
 
+    {{-- Projects --}}
+    <div class="bg-white rounded-lg border overflow-hidden mb-6">
+        <div class="px-5 py-3 border-b flex items-center justify-between">
+            <h2 class="font-bold">Projects ({{ $customer->projects->count() }})</h2>
+            <a href="{{ route('admin.projects.create') }}" class="text-sm text-blue-600 hover:underline">+ Add</a>
+        </div>
+        <table class="min-w-full text-sm">
+            <thead class="bg-gray-50 border-b">
+                <tr>
+                    <th class="px-4 py-2 text-left font-semibold text-gray-600">Title</th>
+                    <th class="px-4 py-2 text-left font-semibold text-gray-600">Status</th>
+                    <th class="px-4 py-2 text-left font-semibold text-gray-600">Progress</th>
+                    <th class="px-4 py-2 text-left font-semibold text-gray-600">Created</th>
+                    <th class="px-4 py-2"></th>
+                </tr>
+            </thead>
+            <tbody class="divide-y">
+                @forelse ($customer->projects->sortByDesc('created_at') as $project)
+                    <tr class="hover:bg-gray-50 cursor-pointer" onclick="window.location='{{ route('admin.projects.show', $project) }}'">
+                        <td class="px-4 py-2 font-medium text-blue-600">{{ $project->title }}</td>
+                        <td class="px-4 py-2">
+                            @php
+                                $projectStatusColors = [
+                                    'Not Started' => 'bg-gray-100 text-gray-700',
+                                    'In Progress' => 'bg-blue-100 text-blue-700',
+                                    'On Hold' => 'bg-yellow-100 text-yellow-700',
+                                    'Awaiting Approval' => 'bg-purple-100 text-purple-700',
+                                    'Completed' => 'bg-green-100 text-green-700',
+                                ];
+                            @endphp
+                            <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium {{ $projectStatusColors[$project->status] ?? 'bg-gray-100 text-gray-700' }}">
+                                {{ $project->status }}
+                            </span>
+                        </td>
+                        <td class="px-4 py-2">
+                            <div class="flex items-center gap-2">
+                                <div class="w-20 bg-gray-200 rounded-full h-2">
+                                    <div class="bg-blue-600 h-2 rounded-full" style="width: {{ $project->progress_percentage }}%"></div>
+                                </div>
+                                <span class="text-xs text-gray-500">{{ $project->progress_percentage }}%</span>
+                            </div>
+                        </td>
+                        <td class="px-4 py-2 text-gray-500">{{ $project->created_at->format('M j, Y') }}</td>
+                        <td class="px-4 py-2">
+                            <a href="{{ route('admin.projects.show', $project) }}" class="text-blue-600 hover:underline text-xs">View</a>
+                        </td>
+                    </tr>
+                @empty
+                    <tr><td colspan="5" class="px-4 py-4 text-center text-gray-500">No projects.</td></tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+
     {{-- Users --}}
     <div class="bg-white rounded-lg border overflow-hidden mb-6">
         <div class="px-5 py-3 border-b">

@@ -69,7 +69,7 @@ class CustomerController extends Controller
 
     public function show(Customer $customer): View
     {
-        $customer->load(['services', 'invoices', 'tickets', 'users', 'assets', 'domains', 'articles']);
+        $customer->load(['services', 'invoices', 'tickets', 'users', 'assets', 'domains', 'articles', 'projects']);
 
         $totalIncome = $customer->invoices()
             ->where('invoice_status', 'Paid')

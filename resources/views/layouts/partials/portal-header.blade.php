@@ -5,9 +5,16 @@
         ['route' => 'portal.tickets.index', 'label' => 'Support'],
         ['route' => 'portal.invoices.index', 'label' => 'Invoices'],
         ['route' => 'portal.domains.index', 'label' => 'Domains'],
-        ['route' => 'portal.projects.index', 'label' => 'Projects'],
         ['route' => 'portal.knowledgebase.index', 'label' => 'Help'],
     ];
+
+    $hasActiveProjects = \App\Models\Project::where('company_id', auth()->user()->company_id)
+        ->where('status', '!=', 'Completed')
+        ->exists();
+
+    if ($hasActiveProjects) {
+        array_splice($nav, 5, 0, [['route' => 'portal.projects.index', 'label' => 'Projects']]);
+    }
 @endphp
 
 <header class="bg-slate-950 sticky top-0 z-40">
