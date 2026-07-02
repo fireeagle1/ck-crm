@@ -131,19 +131,6 @@
                             </button>
                         </form>
 
-                        <form method="POST" action="{{ route('portal.services.sso.wordpress', $service) }}">
-                            @csrf
-                            <button type="submit" class="w-full flex items-center gap-3 px-4 py-3 rounded-md border hover:bg-gray-50 transition text-left">
-                                <div class="h-9 w-9 rounded-md bg-indigo-100 flex items-center justify-center shrink-0">
-                                    <svg class="w-5 h-5 text-indigo-600" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm-1.5 15.5L7 12l1.5-1.5 2 2 4-4L16 10l-5.5 7.5z"/></svg>
-                                </div>
-                                <div>
-                                    <p class="text-sm font-semibold text-gray-900">WordPress</p>
-                                    <p class="text-xs text-gray-500">Manage your website</p>
-                                </div>
-                            </button>
-                        </form>
-
                         @if ($service->domain_name)
                             <a href="https://{{ $service->domain_name }}" target="_blank"
                                class="w-full flex items-center gap-3 px-4 py-3 rounded-md border hover:bg-gray-50 transition">

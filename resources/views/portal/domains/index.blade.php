@@ -33,7 +33,9 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="4" class="px-4 py-6 text-center text-gray-500">No domains.</td>
+                        <td colspan="4" class="px-4 py-6 text-center text-gray-500">
+                            You don't currently have any domains registered through us. Your domain may be managed by a third-party registrar.
+                        </td>
                     </tr>
                 @endforelse
             </tbody>
