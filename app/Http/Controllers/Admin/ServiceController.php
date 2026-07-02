@@ -82,6 +82,9 @@ class ServiceController extends Controller
             'stripe_price_id' => 'nullable|string',
             'domain_name' => 'required_if:service_type,Web Hosting|nullable|string|max:255',
             'cpanel_username' => 'nullable|string|max:255',
+            'provision_whm' => 'nullable|boolean',
+            'whm_package' => 'nullable|string|max:255',
+            'contact_email' => 'nullable|email',
         ]);
 
         // Duplicate prevention: check if a service with the same domain already exists for this customer
@@ -111,6 +114,17 @@ class ServiceController extends Controller
             'service_payment_frequency' => $validated['service_payment_frequency'],
         ]);
 
+        // Provision WHM account if requested
+        $whmMessage = '';
+        if ($request->boolean('provision_whm') && $validated['cpanel_username'] && $validated['domain_name']) {
+            $whmMessage = $this->provisionWhmAccount(
+                $validated['cpanel_username'],
+                $validated['domain_name'],
+                $validated['whm_package'] ?? 'ckhostco_Basic',
+                $validated['contact_email'] ?? null
+            );
+        }
+
         // Create Stripe subscription if a price was selected
         if (!empty($validated['stripe_price_id']) && config('services.stripe.secret')) {
             try {
@@ -136,7 +150,45 @@ class ServiceController extends Controller
         }
 
         return redirect()->route('admin.services.index')
-            ->with('success', 'Service created.');
+            ->with('success', 'Service created.' . ($whmMessage ? ' ' . $whmMessage : ''));
+    }
+
+    private function provisionWhmAccount(string $username, string $domain, string $package, ?string $email): string
+    {
+        $host = config('services.whm.host');
+        $whmUser = config('services.whm.username');
+        $token = config('services.whm.token');
+
+        if (!$host || !$whmUser || !$token) {
+            return 'WHM not configured — account not provisioned.';
+        }
+
+        $password = bin2hex(random_bytes(8)) . 'Aa1!';
+
+        try {
+            $response = \Illuminate\Support\Facades\Http::withHeaders([
+                'Authorization' => "WHM {$whmUser}:{$token}",
+            ])->withOptions(['verify' => false, 'timeout' => 30])
+              ->get("https://{$host}:2087/json-api/createacct", [
+                  'api.version' => 1,
+                  'username' => $username,
+                  'domain' => $domain,
+                  'plan' => $package,
+                  'password' => $password,
+                  'contactemail' => $email ?? 'support@ckenterprises.co.uk',
+              ]);
+
+            $data = $response->json();
+
+            if (($data['metadata']['result'] ?? 0) == 1) {
+                return 'WHM account provisioned successfully.';
+            }
+
+            $reason = $data['metadata']['reason'] ?? 'Unknown error';
+            return "WHM provisioning failed: {$reason}";
+        } catch (\Exception $e) {
+            return "WHM error: {$e->getMessage()}";
+        }
     }
 
     private function ensureStripeCustomer(Customer $customer): string

@@ -59,12 +59,42 @@
                             @error('domain_name') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
                         </div>
                         <div>
-                            <label for="cpanel_username" class="block text-sm font-medium text-gray-700">cPanel Username</label>
+                            <label for="cpanel_username" class="block text-sm font-medium text-gray-700">cPanel Username <span class="text-red-500">*</span></label>
                             <input type="text" name="cpanel_username" id="cpanel_username" value="{{ old('cpanel_username') }}"
                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                                   placeholder="e.g. ckhostco_example">
-                            <p class="text-xs text-gray-400 mt-1">Required for SSO (single sign-on to cPanel/Webmail).</p>
+                                   placeholder="e.g. ckhostco_example"
+                                   :required="serviceType === 'Web Hosting'">
                         </div>
+                    </div>
+
+                    {{-- WHM Provisioning --}}
+                    <div class="mt-4 pt-4 border-t border-blue-200">
+                        <div class="flex items-center gap-2 mb-3">
+                            <input type="checkbox" name="provision_whm" id="provision_whm" value="1"
+                                   class="rounded border-gray-300 text-blue-600 shadow-sm focus:ring-blue-500"
+                                   {{ old('provision_whm') ? 'checked' : '' }}>
+                            <label for="provision_whm" class="text-sm font-semibold text-blue-900">Create cPanel account in WHM</label>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label for="whm_package" class="block text-sm font-medium text-gray-700">WHM Package</label>
+                                <select name="whm_package" id="whm_package" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                                    <option value="">Select package...</option>
+                                    <option value="ckhostco_Basic" {{ old('whm_package') === 'ckhostco_Basic' ? 'selected' : '' }}>Basic</option>
+                                    <option value="ckhostco_Personal" {{ old('whm_package') === 'ckhostco_Personal' ? 'selected' : '' }}>Personal</option>
+                                    <option value="ckhostco_Personal Plus" {{ old('whm_package') === 'ckhostco_Personal Plus' ? 'selected' : '' }}>Personal Plus</option>
+                                    <option value="ckhostco_Business Plus" {{ old('whm_package') === 'ckhostco_Business Plus' ? 'selected' : '' }}>Business Plus</option>
+                                    <option value="ckhostco_Unlimited" {{ old('whm_package') === 'ckhostco_Unlimited' ? 'selected' : '' }}>Unlimited</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="contact_email" class="block text-sm font-medium text-gray-700">Contact Email</label>
+                                <input type="email" name="contact_email" id="contact_email" value="{{ old('contact_email') }}"
+                                       placeholder="customer@example.com"
+                                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                            </div>
+                        </div>
+                        <p class="text-xs text-blue-700 mt-2">If ticked, a cPanel account will be created on your WHM server with a random password. The customer can sign in via SSO from the portal.</p>
                     </div>
                 </div>
 
