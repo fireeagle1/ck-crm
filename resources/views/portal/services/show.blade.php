@@ -23,7 +23,6 @@
                     <p class="text-sm text-blue-800 leading-relaxed">
                         Your website is hosted on our managed servers. This includes your website files, email accounts, databases, and DNS.
                         You can access your hosting control panel (cPanel) and webmail using the quick access buttons.
-                        If you need any changes made to your website or email, just open a support ticket and we'll take care of it.
                     </p>
                 </div>
             @elseif ($service->service_short === 'Technical Support Package' || $service->service_type === 'Technical Support')

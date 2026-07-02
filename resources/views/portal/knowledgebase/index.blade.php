@@ -9,7 +9,13 @@
                class="bg-white rounded-lg shadow-sm border p-5 hover:shadow-md transition">
                 <h3 class="font-semibold text-gray-900">{{ $article->title }}</h3>
                 <p class="text-sm text-gray-500 mt-1">{{ $article->category ?? 'General' }}</p>
-                <p class="text-xs text-gray-400 mt-2">{{ $article->created_at->format('M j, Y') }}</p>
+                <p class="text-xs text-gray-400 mt-2">
+                    @if ($article->updated_at->gt($article->created_at->addMinute()))
+                        Updated {{ $article->updated_at->diffForHumans() }}
+                    @else
+                        {{ $article->created_at->format('M j, Y') }}
+                    @endif
+                </p>
             </a>
         @empty
             <p class="text-gray-500 col-span-full">No articles available.</p>

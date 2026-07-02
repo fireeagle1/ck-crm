@@ -36,6 +36,12 @@ class ArticleController extends Controller
             'is_public' => 'boolean',
         ]);
 
+        // Sanitize HTML content - allow safe formatting tags only
+        $validated['content'] = strip_tags(
+            $validated['content'],
+            '<p><br><strong><b><em><i><u><a><ul><ol><li><h1><h2><h3><blockquote><pre><code><del><sub><sup><span><div>'
+        );
+
         Article::create($validated);
 
         return redirect()->route('admin.articles.index')
@@ -58,6 +64,12 @@ class ArticleController extends Controller
             'company_id' => 'nullable|exists:customers,company_id',
             'is_public' => 'boolean',
         ]);
+
+        // Sanitize HTML content - allow safe formatting tags only
+        $validated['content'] = strip_tags(
+            $validated['content'],
+            '<p><br><strong><b><em><i><u><a><ul><ol><li><h1><h2><h3><blockquote><pre><code><del><sub><sup><span><div>'
+        );
 
         $article->update($validated);
 
