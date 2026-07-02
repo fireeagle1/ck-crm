@@ -5,13 +5,12 @@
     <div class="relative -mx-4 -mt-6 mb-8 overflow-hidden sm:rounded-lg sm:mx-0 sm:mt-0" style="height: 180px;">
         <img src="https://i0.wp.com/ckenterprises.co.uk/wp-content/uploads/2023/05/DJI_0160-scaled.jpg?fit=2560%2C1440&ssl=1"
              alt="" class="w-full h-full object-cover object-center">
-        <div class="absolute inset-0 bg-slate-900/60"></div>
+        <div class="absolute inset-0 bg-slate-900/80"></div>
         <div class="absolute inset-0 flex items-center px-6 sm:px-8">
             <div>
                 <h1 class="text-2xl sm:text-3xl font-bold text-white tracking-tight drop-shadow-lg">
                     {{ now()->hour < 12 ? 'Good morning' : (now()->hour < 18 ? 'Good afternoon' : 'Good evening') }}, {{ auth()->user()->first_name ?? 'there' }}.
                 </h1>
-                <p class="text-white/80 mt-1 text-sm drop-shadow">Your {{ \App\Models\Setting::get('site_name', 'CK Enterprises') }} customer portal.</p>
             </div>
         </div>
     </div>
