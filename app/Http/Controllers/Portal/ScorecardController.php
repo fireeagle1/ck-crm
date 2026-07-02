@@ -25,6 +25,17 @@ class ScorecardController extends Controller
             abort(403);
         }
 
+        return $this->buildScorecard($companyId);
+    }
+
+    public function adminScorecard(\App\Models\Customer $customer): View
+    {
+        return $this->buildScorecard($customer->company_id);
+    }
+
+    private function buildScorecard(int $companyId): View
+    {
+
         // This month stats
         $thisMonth = now()->startOfMonth();
         $lastMonth = now()->subMonth()->startOfMonth();

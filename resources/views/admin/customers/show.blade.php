@@ -4,6 +4,9 @@
     <div class="flex items-center justify-between mb-6">
         <h1 class="text-2xl font-bold">{{ $customer->company_name }}</h1>
         <div class="flex gap-2">
+            @if ($customer->services->where('service_type', 'Technical Support')->where('status', 'Active')->isNotEmpty())
+                <a href="{{ route('admin.customers.scorecard', $customer) }}" class="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-md text-sm font-semibold hover:bg-green-700">Scorecard</a>
+            @endif
             <a href="{{ route('admin.customers.edit', $customer) }}" class="inline-flex items-center px-4 py-2 border rounded-md text-sm font-semibold hover:bg-gray-50">Edit</a>
             @if ($customer->services->where('status', 'Active')->isEmpty())
                 <form method="POST" action="{{ route('admin.customers.destroy', $customer) }}"

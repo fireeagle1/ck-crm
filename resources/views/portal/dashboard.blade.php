@@ -5,12 +5,13 @@
     <div class="relative -mx-4 -mt-6 mb-8 overflow-hidden sm:rounded-lg sm:mx-0 sm:mt-0" style="height: 180px;">
         <img src="https://i0.wp.com/ckenterprises.co.uk/wp-content/uploads/2023/05/DJI_0160-scaled.jpg?fit=2560%2C1440&ssl=1"
              alt="" class="w-full h-full object-cover object-center">
-        <div class="absolute inset-0 bg-slate-900/80"></div>
+        <div class="absolute inset-0" style="background: rgba(15, 23, 42, 0.7);"></div>
         <div class="absolute inset-0 flex items-center px-6 sm:px-8">
             <div>
-                <h1 class="text-2xl sm:text-3xl font-bold text-white tracking-tight drop-shadow-lg">
+                <h1 class="text-2xl sm:text-3xl font-bold text-white tracking-tight">
                     {{ now()->hour < 12 ? 'Good morning' : (now()->hour < 18 ? 'Good afternoon' : 'Good evening') }}, {{ auth()->user()->first_name ?? 'there' }}.
                 </h1>
+                <p class="text-white mt-1 text-sm" style="opacity: 0.8;">Your {{ \App\Models\Setting::get('site_name', 'CK Enterprises') }} customer portal.</p>
             </div>
         </div>
     </div>
@@ -34,46 +35,22 @@
     @endif
 
     {{-- KPI strip --}}
-    <div class="grid grid-cols-2 lg:grid-cols-{{ $hasSupportPlan ? '5' : '4' }} gap-4 mb-8">
-        <div class="bg-white rounded-lg p-5 border">
+    <div class="grid grid-cols-3 gap-4 mb-8">
+        <a href="{{ route('portal.services.index') }}" class="bg-white rounded-lg p-5 border hover:shadow-md transition">
             <p class="text-sm font-medium text-gray-500 uppercase tracking-wide">Services</p>
             <p class="text-3xl font-bold mt-1">{{ $activeServices }}</p>
-            <a href="{{ route('portal.services.index') }}" class="text-sm text-blue-600 hover:underline mt-1 inline-block">View all &rarr;</a>
-        </div>
-        <div class="bg-white rounded-lg p-5 border">
+        </a>
+        <a href="{{ route('portal.tickets.index') }}" class="bg-white rounded-lg p-5 border hover:shadow-md transition">
             <p class="text-sm font-medium text-gray-500 uppercase tracking-wide">Open Tickets</p>
             <p class="text-3xl font-bold mt-1 {{ $openTickets > 0 ? 'text-amber-600' : '' }}">{{ $openTickets }}</p>
-            <a href="{{ route('portal.tickets.index') }}" class="text-sm text-blue-600 hover:underline mt-1 inline-block">View all &rarr;</a>
-        </div>
-        <div class="bg-white rounded-lg p-5 border">
+        </a>
+        <a href="{{ route('portal.domains.index') }}" class="bg-white rounded-lg p-5 border hover:shadow-md transition">
             <p class="text-sm font-medium text-gray-500 uppercase tracking-wide">Domains</p>
             <p class="text-3xl font-bold mt-1">{{ $customerDomains->count() }}</p>
             @if ($expiringDomains > 0)
                 <p class="text-xs text-amber-600 font-medium mt-1">{{ $expiringDomains }} expiring soon</p>
-            @else
-                <a href="{{ route('portal.domains.index') }}" class="text-sm text-blue-600 hover:underline mt-1 inline-block">View all &rarr;</a>
             @endif
-        </div>
-        <div class="bg-white rounded-lg p-5 border">
-            <p class="text-sm font-medium text-gray-500 uppercase tracking-wide">Quick Actions</p>
-            <div class="mt-2 space-y-1">
-                <a href="{{ route('portal.tickets.create') }}" class="block text-sm text-blue-600 hover:underline font-medium">+ New ticket</a>
-                <form action="{{ route('portal.billing.portal') }}" method="POST" class="inline">
-                    @csrf
-                    <button type="submit" class="text-sm text-blue-600 hover:underline font-medium">Manage billing ↗</button>
-                </form>
-            </div>
-        </div>
-        @if ($hasSupportPlan)
-            <div class="bg-green-50 rounded-lg p-5 border border-green-200">
-                <p class="text-sm font-medium text-green-800 uppercase tracking-wide">Support</p>
-                <p class="text-sm text-green-700 mt-1">Technical Support Package</p>
-                <div class="mt-2 space-y-1">
-                    <a href="{{ route('portal.tickets.create') }}" class="block text-sm text-green-800 font-semibold hover:underline">Raise Request →</a>
-                    <a href="{{ route('portal.scorecard') }}" class="block text-sm text-green-800 font-semibold hover:underline">Monthly Scorecard →</a>
-                </div>
-            </div>
-        @endif
+        </a>
     </div>
 
     {{-- Two-column: Tickets + Invoices --}}

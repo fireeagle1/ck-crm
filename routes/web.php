@@ -55,9 +55,6 @@ Route::middleware(['auth', 'verified'])->prefix('portal')->name('portal.')->grou
     Route::post('/account/users', [Portal\AccountController::class, 'addUser'])->name('account.users.add');
     Route::post('/account/users/{user}/reset-password', [Portal\AccountController::class, 'sendPasswordReset'])->name('account.users.reset-password');
 
-    // Scorecard
-    Route::get('/scorecard', [Portal\ScorecardController::class, 'index'])->name('scorecard');
-
     // Billing
     Route::post('/billing/portal', [Portal\BillingController::class, 'portal'])->name('billing.portal');
     Route::get('/invoices', [Portal\BillingController::class, 'invoices'])->name('invoices.index');
@@ -74,6 +71,7 @@ Route::middleware(['auth', 'verified', EnsureIsAdmin::class])->prefix('admin')->
 
     // Customers
     Route::resource('customers', Admin\CustomerController::class);
+    Route::get('/customers/{customer}/scorecard', [Portal\ScorecardController::class, 'adminScorecard'])->name('customers.scorecard');
 
     // Services
     Route::get('/services', [Admin\ServiceController::class, 'index'])->name('services.index');
