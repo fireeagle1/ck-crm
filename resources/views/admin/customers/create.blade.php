@@ -30,12 +30,6 @@
                         <input type="text" name="phone_number" id="phone_number" value="{{ old('phone_number') }}"
                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
                     </div>
-                    <div>
-                        <label for="stripe_customer_id" class="block text-sm font-medium text-gray-700">Stripe ID</label>
-                        <input type="text" name="stripe_customer_id" id="stripe_customer_id" value="{{ old('stripe_customer_id') }}"
-                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                               placeholder="cus_...">
-                    </div>
                 </div>
 
                 <div>

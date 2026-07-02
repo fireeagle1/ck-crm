@@ -15,6 +15,7 @@ class TicketController extends Controller
     public function index(Request $request): View
     {
         $status = $request->get('status', 'open');
+        $search = $request->get('q', '');
 
         $query = Ticket::with(['customer', 'user', 'asset'])->withCount('replies');
 
@@ -22,9 +23,19 @@ class TicketController extends Controller
             $query->whereIn('status', ['Open', 'Pending', 'In Progress']);
         }
 
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('subject', 'like', "%{$search}%")
+                  ->orWhere('ticket_id', $search)
+                  ->orWhereHas('customer', function ($cq) use ($search) {
+                      $cq->where('company_name', 'like', "%{$search}%");
+                  });
+            });
+        }
+
         $tickets = $query->orderByDesc('created_at')->paginate(20);
 
-        return view('admin.tickets.index', compact('tickets', 'status'));
+        return view('admin.tickets.index', compact('tickets', 'status', 'search'));
     }
 
     public function show(Ticket $ticket): View

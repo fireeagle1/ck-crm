@@ -39,7 +39,7 @@ class TicketController extends Controller
             ->get();
 
         $hasSupportPlan = Service::where('company_id', $companyId)
-            ->where('service_short', 'Technical Support Package')
+            ->where('service_type', 'Technical Support')
             ->where('status', 'Active')
             ->exists();
 

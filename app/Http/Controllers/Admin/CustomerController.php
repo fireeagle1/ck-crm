@@ -9,10 +9,18 @@ use Illuminate\View\View;
 
 class CustomerController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
-        $customers = Customer::withCount(['services', 'users', 'tickets'])
-            ->orderByDesc('company_id')
+        $query = Customer::withCount(['services', 'users', 'tickets']);
+
+        if ($q = $request->input('q')) {
+            $query->where(function ($qb) use ($q) {
+                $qb->where('company_name', 'like', "%{$q}%")
+                    ->orWhere('customer_name', 'like', "%{$q}%");
+            });
+        }
+
+        $customers = $query->orderByDesc('company_id')
             ->paginate(20);
 
         return view('admin.customers.index', compact('customers'));
@@ -35,13 +43,28 @@ class CustomerController extends Controller
             'state' => 'nullable|string|max:255',
             'postal_code' => 'nullable|string|max:20',
             'country' => 'nullable|string|max:100',
-            'stripe_customer_id' => 'nullable|string|max:255',
         ]);
 
         $customer = Customer::create($validated);
 
-        return redirect()->route('admin.customers.show', $customer)
-            ->with('success', 'Customer created.');
+        // Auto-create Stripe customer if Stripe is configured
+        if (config('services.stripe.secret')) {
+            try {
+                $stripeCustomer = \Stripe\Customer::create([
+                    'name' => $validated['company_name'],
+                    'phone' => $validated['phone_number'] ?? null,
+                    'metadata' => ['company_id' => $customer->company_id],
+                ]);
+
+                $customer->update(['stripe_customer_id' => $stripeCustomer->id]);
+            } catch (\Exception) {
+                // Don't fail — they can link Stripe later
+            }
+        }
+
+        // Redirect to add service for this customer
+        return redirect()->route('admin.services.create', ['company_id' => $customer->company_id])
+            ->with('success', 'Customer created' . ($customer->stripe_customer_id ? ' and linked to Stripe.' : '.') . ' Now add their first service.');
     }
 
     public function show(Customer $customer): View

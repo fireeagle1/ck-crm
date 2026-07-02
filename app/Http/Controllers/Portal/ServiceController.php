@@ -22,7 +22,7 @@ class ServiceController extends Controller
 
         // Check if they have support plan
         $hasSupportPlan = Service::where('company_id', $companyId)
-            ->where('service_short', 'Technical Support Package')
+            ->where('service_type', 'Technical Support')
             ->where('status', 'Active')
             ->exists();
 

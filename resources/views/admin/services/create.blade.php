@@ -18,7 +18,7 @@
                         <select name="company_id" id="company_id" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
                             <option value="">Select customer...</option>
                             @foreach ($customers as $customer)
-                                <option value="{{ $customer->company_id }}" {{ old('company_id') == $customer->company_id ? 'selected' : '' }}>
+                                <option value="{{ $customer->company_id }}" {{ old('company_id', request('company_id')) == $customer->company_id ? 'selected' : '' }}>
                                     {{ $customer->company_name }}
                                 </option>
                             @endforeach
