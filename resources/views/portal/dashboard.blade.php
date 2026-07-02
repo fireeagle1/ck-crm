@@ -34,7 +34,7 @@
     @endif
 
     {{-- KPI strip --}}
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+    <div class="grid grid-cols-2 lg:grid-cols-{{ $hasSupportPlan ? '5' : '4' }} gap-4 mb-8">
         <div class="bg-white rounded-lg p-5 border">
             <p class="text-sm font-medium text-gray-500 uppercase tracking-wide">Services</p>
             <p class="text-3xl font-bold mt-1">{{ $activeServices }}</p>
@@ -60,10 +60,17 @@
                 <a href="{{ route('portal.tickets.create') }}" class="block text-sm text-blue-600 hover:underline font-medium">+ New ticket</a>
                 <form action="{{ route('portal.billing.portal') }}" method="POST" class="inline">
                     @csrf
-                    <button type="submit" class="text-sm text-blue-600 hover:underline font-medium">Manage billing</button>
+                    <button type="submit" class="text-sm text-blue-600 hover:underline font-medium">Manage billing ↗</button>
                 </form>
             </div>
         </div>
+        @if ($hasSupportPlan)
+            <div class="bg-green-50 rounded-lg p-5 border border-green-200">
+                <p class="text-sm font-medium text-green-800 uppercase tracking-wide">Support</p>
+                <p class="text-sm text-green-700 mt-1">Technical Support Package</p>
+                <a href="{{ route('portal.tickets.create') }}" class="inline-block mt-2 text-sm text-green-800 font-semibold hover:underline">Raise Request →</a>
+            </div>
+        @endif
     </div>
 
     {{-- Two-column: Tickets + Invoices --}}

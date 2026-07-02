@@ -2,17 +2,17 @@
     <x-slot:title>My Services</x-slot:title>
 
     <h1 class="text-3xl font-bold tracking-tight mb-2">My Services</h1>
-    <p class="text-gray-500 mb-6">Your active services and websites managed by {{ \App\Models\Setting::get('site_name', 'CK Enterprises') }}.</p>
+    <p class="text-gray-500 mb-6">Your active services managed by {{ \App\Models\Setting::get('site_name', 'CK Enterprises') }}.</p>
 
     {{-- Support plan banner --}}
     @if ($hasSupportPlan)
         <div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-6 flex items-center justify-between">
             <div>
                 <p class="font-semibold text-green-900">Technical Support Package</p>
-                <p class="text-sm text-green-700">Your account includes technical support. Need help? Open a ticket.</p>
+                <p class="text-sm text-green-700">Your account includes technical support. Need help? Raise a request.</p>
             </div>
             <a href="{{ route('portal.tickets.create') }}" class="px-4 py-2 bg-green-700 text-white rounded-md text-sm font-semibold hover:bg-green-800 transition shrink-0">
-                Open Ticket
+                Raise Request
             </a>
         </div>
     @endif
@@ -31,32 +31,32 @@
                         <th class="px-5 py-3 text-center font-semibold text-gray-600">Domain with us</th>
                         <th class="px-5 py-3 text-left font-semibold text-gray-600">Billing</th>
                         <th class="px-5 py-3 text-left font-semibold text-gray-600">Status</th>
-                        <th class="px-5 py-3 text-left font-semibold text-gray-600"></th>
                     </tr>
                 </thead>
                 <tbody class="divide-y">
                     @foreach ($services as $service)
                         @php
-                            $matchedDomain = $service->domain_name ? $domains->firstWhere('domain_name', strtolower($service->domain_name)) : null;
+                            $isTechSupport = $service->service_type === 'Technical Support';
+                            $matchedDomain = !$isTechSupport && $service->domain_name ? $domains->firstWhere('domain_name', strtolower($service->domain_name)) : null;
                         @endphp
-                        <tr class="hover:bg-gray-50">
+                        <tr class="hover:bg-gray-50 cursor-pointer" onclick="window.location='{{ route('portal.services.show', $service) }}'">
                             <td class="px-5 py-4">
-                                <p class="font-semibold text-gray-900">{{ $service->service_short }}</p>
+                                <p class="font-semibold text-blue-600">{{ $service->service_short }}</p>
                                 @if ($service->service_type)
                                     <p class="text-xs text-gray-400">{{ $service->service_type }}</p>
                                 @endif
                             </td>
                             <td class="px-5 py-4">
-                                @if ($service->domain_name)
-                                    <a href="https://{{ $service->domain_name }}" target="_blank" class="text-blue-600 hover:underline text-sm">
-                                        {{ $service->domain_name }}
-                                    </a>
+                                @if (!$isTechSupport && $service->domain_name)
+                                    <span class="text-sm text-gray-700">{{ $service->domain_name }}</span>
                                 @else
-                                    <span class="text-gray-400">—</span>
+                                    <span class="text-gray-300">—</span>
                                 @endif
                             </td>
                             <td class="px-5 py-4 text-center">
-                                @if ($matchedDomain)
+                                @if ($isTechSupport)
+                                    <span class="text-gray-300">—</span>
+                                @elseif ($matchedDomain)
                                     <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-green-100">
                                         <svg class="w-3.5 h-3.5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
                                     </span>
@@ -78,9 +78,6 @@
                                     {{ $service->status === 'Active' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700' }}">
                                     {{ $service->status }}
                                 </span>
-                            </td>
-                            <td class="px-5 py-4">
-                                <a href="{{ route('portal.services.show', $service) }}" class="text-sm text-blue-600 hover:underline font-medium">Manage</a>
                             </td>
                         </tr>
                     @endforeach
