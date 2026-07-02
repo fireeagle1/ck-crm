@@ -88,5 +88,4 @@ class OneOffInvoiceController extends Controller
             return back()->withInput()->with('error', 'Stripe error: ' . $e->getMessage());
         }
     }
-    }
 }
