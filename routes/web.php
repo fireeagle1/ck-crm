@@ -55,6 +55,9 @@ Route::middleware(['auth', 'verified'])->prefix('portal')->name('portal.')->grou
     Route::post('/account/users', [Portal\AccountController::class, 'addUser'])->name('account.users.add');
     Route::post('/account/users/{user}/reset-password', [Portal\AccountController::class, 'sendPasswordReset'])->name('account.users.reset-password');
 
+    // Scorecard
+    Route::get('/scorecard', [Portal\ScorecardController::class, 'index'])->name('scorecard');
+
     // Billing
     Route::post('/billing/portal', [Portal\BillingController::class, 'portal'])->name('billing.portal');
     Route::get('/invoices', [Portal\BillingController::class, 'invoices'])->name('invoices.index');
@@ -99,6 +102,8 @@ Route::middleware(['auth', 'verified', EnsureIsAdmin::class])->prefix('admin')->
 
     // Invoices
     Route::get('/invoices', [Admin\InvoiceController::class, 'index'])->name('invoices.index');
+    Route::get('/invoices/create', [Admin\OneOffInvoiceController::class, 'create'])->name('invoices.create');
+    Route::post('/invoices', [Admin\OneOffInvoiceController::class, 'store'])->name('invoices.store');
     Route::post('/invoices/{invoice}/remind', [Admin\InvoiceController::class, 'remind'])->name('invoices.remind');
 
     // Assets (CMDB)

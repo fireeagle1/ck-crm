@@ -68,7 +68,10 @@
             <div class="bg-green-50 rounded-lg p-5 border border-green-200">
                 <p class="text-sm font-medium text-green-800 uppercase tracking-wide">Support</p>
                 <p class="text-sm text-green-700 mt-1">Technical Support Package</p>
-                <a href="{{ route('portal.tickets.create') }}" class="inline-block mt-2 text-sm text-green-800 font-semibold hover:underline">Raise Request →</a>
+                <div class="mt-2 space-y-1">
+                    <a href="{{ route('portal.tickets.create') }}" class="block text-sm text-green-800 font-semibold hover:underline">Raise Request →</a>
+                    <a href="{{ route('portal.scorecard') }}" class="block text-sm text-green-800 font-semibold hover:underline">Monthly Scorecard →</a>
+                </div>
             </div>
         @endif
     </div>

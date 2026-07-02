@@ -3,6 +3,7 @@
 
     <div class="flex items-center justify-between mb-4">
         <h1 class="text-2xl font-bold">Invoices</h1>
+        <a href="{{ route('admin.invoices.create') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-semibold hover:bg-blue-700">+ Create Invoice</a>
     </div>
 
     {{-- Filters + Search --}}
