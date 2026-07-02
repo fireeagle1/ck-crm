@@ -16,6 +16,7 @@ class SettingsController extends Controller
             'site_name' => Setting::get('site_name', 'CK Enterprises UK'),
             'logo_path' => Setting::get('logo_path'),
             'logo_dark_path' => Setting::get('logo_dark_path'),
+            'favicon_path' => Setting::get('favicon_path'),
         ];
 
         return view('admin.settings.general', compact('settings'));
@@ -27,6 +28,7 @@ class SettingsController extends Controller
             'site_name' => 'required|string|max:255',
             'logo' => 'nullable|image|mimes:png,jpg,jpeg,svg,webp|max:2048',
             'logo_dark' => 'nullable|image|mimes:png,jpg,jpeg,svg,webp|max:2048',
+            'favicon' => 'nullable|mimes:ico,png,svg|max:512',
         ]);
 
         Setting::set('site_name', $request->input('site_name'));
@@ -55,6 +57,19 @@ class SettingsController extends Controller
             $filename = 'logo-dark-' . time() . '.' . $file->getClientOriginalExtension();
             $file->move(public_path('branding'), $filename);
             Setting::set('logo_dark_path', 'branding/' . $filename);
+        }
+
+        // Favicon
+        if ($request->hasFile('favicon')) {
+            $oldPath = Setting::get('favicon_path');
+            if ($oldPath && file_exists(public_path($oldPath))) {
+                unlink(public_path($oldPath));
+            }
+
+            $file = $request->file('favicon');
+            $filename = 'favicon-' . time() . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('branding'), $filename);
+            Setting::set('favicon_path', 'branding/' . $filename);
         }
 
         return back()->with('success', 'Settings saved.');

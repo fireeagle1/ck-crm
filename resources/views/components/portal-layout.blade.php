@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $title ?? 'CK Enterprises UK' }}</title>
+    @php $faviconPath = \App\Models\Setting::get('favicon_path'); @endphp
+    @if ($faviconPath)
+        <link rel="icon" href="{{ asset($faviconPath) }}">
+    @endif
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="bg-gray-100 text-gray-900 antialiased">

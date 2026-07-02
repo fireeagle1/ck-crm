@@ -102,6 +102,27 @@
                             @error('logo_dark') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
                         </div>
 
+                        {{-- Favicon --}}
+                        <div>
+                            @if ($settings['favicon_path'])
+                                <div class="mb-3">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Current Favicon</label>
+                                    <div class="p-3 bg-gray-50 rounded-md border inline-flex items-center gap-3">
+                                        <img src="{{ asset($settings['favicon_path']) }}" alt="Favicon" class="h-8 w-8">
+                                        <span class="text-xs text-gray-500">{{ $settings['favicon_path'] }}</span>
+                                    </div>
+                                </div>
+                            @endif
+                            <label class="block text-sm font-medium text-gray-700 mb-2">{{ $settings['favicon_path'] ? 'Replace' : 'Upload' }} Favicon</label>
+                            <input type="file" name="favicon" id="favicon" accept=".ico,.png,.svg,image/png,image/svg+xml,image/x-icon"
+                                   class="block w-full max-w-md text-sm text-gray-500
+                                          file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0
+                                          file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700
+                                          hover:file:bg-blue-100">
+                            <p class="text-xs text-gray-500 mt-1">Browser tab icon. Recommended: 32×32px .ico or .png file.</p>
+                            @error('favicon') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
+                        </div>
+
                         <div class="pt-2">
                             <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700">
                                 Save Settings

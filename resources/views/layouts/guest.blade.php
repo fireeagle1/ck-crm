@@ -7,6 +7,12 @@
 
         <title>{{ config('app.name', 'CK Enterprises UK') }}</title>
 
+        <!-- Favicon -->
+        @php $faviconPath = \App\Models\Setting::get('favicon_path'); @endphp
+        @if ($faviconPath)
+            <link rel="icon" href="{{ asset($faviconPath) }}">
+        @endif
+
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700,800&display=swap" rel="stylesheet" />
