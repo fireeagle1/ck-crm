@@ -78,6 +78,32 @@ class UserController extends Controller
             ->with('success', 'User created and welcome email sent.');
     }
 
+    public function edit(User $user): View
+    {
+        $customers = Customer::orderBy('company_name')->get();
+
+        return view('admin.users.edit', compact('user', 'customers'));
+    }
+
+    public function update(Request $request, User $user)
+    {
+        $validated = $request->validate([
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $user->id,
+            'company_id' => 'required|exists:customers,company_id',
+            'phone_number' => 'nullable|string|max:20',
+            'is_admin' => 'boolean',
+        ]);
+
+        $validated['name'] = $validated['first_name'] . ' ' . $validated['last_name'];
+
+        $user->update($validated);
+
+        return redirect()->route('admin.users.edit', $user)
+            ->with('success', 'User updated successfully.');
+    }
+
     public function impersonate(User $user)
     {
         $admin = auth()->user();

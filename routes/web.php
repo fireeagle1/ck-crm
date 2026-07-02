@@ -122,6 +122,8 @@ Route::middleware(['auth', 'verified', EnsureIsAdmin::class])->prefix('admin')->
     Route::get('/users', [Admin\UserController::class, 'index'])->name('users.index');
     Route::get('/users/create', [Admin\UserController::class, 'create'])->name('users.create');
     Route::post('/users', [Admin\UserController::class, 'store'])->name('users.store');
+    Route::get('/users/{user}/edit', [Admin\UserController::class, 'edit'])->name('users.edit');
+    Route::put('/users/{user}', [Admin\UserController::class, 'update'])->name('users.update');
     Route::post('/users/{user}/impersonate', [Admin\UserController::class, 'impersonate'])->name('users.impersonate');
     Route::post('/users/{user}/reset-password', [Admin\UserController::class, 'resetPassword'])->name('users.reset-password');
     Route::post('/users/{user}/toggle-lock', [Admin\UserController::class, 'toggleLock'])->name('users.toggle-lock');
