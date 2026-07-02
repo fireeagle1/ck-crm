@@ -60,4 +60,9 @@ class Customer extends Model
     {
         return $this->hasMany(Article::class, 'company_id', 'company_id');
     }
+
+    public function projects(): HasMany
+    {
+        return $this->hasMany(Project::class, 'company_id', 'company_id');
+    }
 }

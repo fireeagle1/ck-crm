@@ -44,6 +44,13 @@ Route::middleware(['auth', 'verified'])->prefix('portal')->name('portal.')->grou
     // Domains
     Route::get('/domains', [Portal\DomainController::class, 'index'])->name('domains.index');
 
+    // Projects
+    Route::get('/projects', [Portal\ProjectController::class, 'index'])->name('projects.index');
+    Route::get('/projects/{project}', [Portal\ProjectController::class, 'show'])->name('projects.show');
+    Route::get('/projects/{project}/documents/{document}/download', [Portal\ProjectController::class, 'downloadDocument'])->name('projects.documents.download');
+    Route::post('/projects/{project}/approvals/{approval}/approve', [Portal\ProjectApprovalController::class, 'approve'])->name('projects.approvals.approve');
+    Route::post('/projects/{project}/approvals/{approval}/reject', [Portal\ProjectApprovalController::class, 'reject'])->name('projects.approvals.reject');
+
     // Knowledgebase
     Route::get('/knowledgebase', [Portal\KnowledgebaseController::class, 'index'])->name('knowledgebase.index');
     Route::get('/knowledgebase/{article}', [Portal\KnowledgebaseController::class, 'show'])->name('knowledgebase.show');
@@ -106,6 +113,20 @@ Route::middleware(['auth', 'verified', EnsureIsAdmin::class])->prefix('admin')->
 
     // Assets (CMDB)
     Route::resource('assets', Admin\AssetController::class);
+
+    // Projects
+    Route::resource('projects', Admin\ProjectController::class);
+    Route::post('/projects/{project}/reopen', [Admin\ProjectController::class, 'reopen'])->name('projects.reopen');
+
+    Route::prefix('projects/{project}')->name('projects.')->group(function () {
+        Route::resource('tasks', Admin\ProjectTaskController::class)->except(['show']);
+        Route::post('tasks/reorder', [Admin\ProjectTaskController::class, 'reorder'])->name('tasks.reorder');
+        Route::resource('documents', Admin\ProjectDocumentController::class)->only(['store', 'destroy']);
+        Route::post('comments', [Admin\ProjectCommentController::class, 'store'])->name('comments.store');
+        Route::resource('decisions', Admin\ProjectDecisionController::class)->except(['show']);
+        Route::post('approvals/document/{document}', [Admin\ProjectApprovalController::class, 'requestDocumentApproval'])->name('approvals.document');
+        Route::post('approvals/completion', [Admin\ProjectApprovalController::class, 'requestCompletionApproval'])->name('approvals.completion');
+    });
 
     // Domains
     Route::get('/domains', [Admin\DomainController::class, 'index'])->name('domains.index');

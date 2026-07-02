@@ -5,6 +5,7 @@
         ['route' => 'portal.tickets.index', 'label' => 'Support'],
         ['route' => 'portal.invoices.index', 'label' => 'Invoices'],
         ['route' => 'portal.domains.index', 'label' => 'Domains'],
+        ['route' => 'portal.projects.index', 'label' => 'Projects'],
         ['route' => 'portal.knowledgebase.index', 'label' => 'Help'],
     ];
 @endphp
