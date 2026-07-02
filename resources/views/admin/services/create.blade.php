@@ -55,15 +55,17 @@
                             <input type="text" name="domain_name" id="domain_name" value="{{ old('domain_name') }}"
                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"
                                    placeholder="example.co.uk"
-                                   :required="serviceType === 'Web Hosting'">
+                                   :required="serviceType === 'Web Hosting'"
+                                   @input="generateUsername()">
                             @error('domain_name') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
                         </div>
                         <div>
                             <label for="cpanel_username" class="block text-sm font-medium text-gray-700">cPanel Username <span class="text-red-500">*</span></label>
-                            <input type="text" name="cpanel_username" id="cpanel_username" value="{{ old('cpanel_username') }}"
+                            <input type="text" name="cpanel_username" id="cpanel_username" x-model="cpanelUsername"
                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                                   placeholder="e.g. ckhostco_example"
-                                   :required="serviceType === 'Web Hosting'">
+                                   placeholder="Auto-generated from domain"
+                                   :required="serviceType === 'Web Hosting'" maxlength="16">
+                            <p class="text-xs text-gray-400 mt-1">Max 16 chars. Auto-generated — edit if needed.</p>
                         </div>
                     </div>
 
@@ -89,9 +91,10 @@
                             </div>
                             <div>
                                 <label for="contact_email" class="block text-sm font-medium text-gray-700">Contact Email</label>
-                                <input type="email" name="contact_email" id="contact_email" value="{{ old('contact_email') }}"
+                                <input type="email" name="contact_email" id="contact_email" x-model="contactEmail"
                                        placeholder="customer@example.com"
                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                                <p class="text-xs text-gray-400 mt-1">Auto-filled from customer account.</p>
                             </div>
                         </div>
                         <p class="text-xs text-blue-700 mt-2">If ticked, a cPanel account will be created on your WHM server with a random password. The customer can sign in via SSO from the portal.</p>
@@ -151,7 +154,53 @@
 
     <script>
         function serviceForm() {
-            return { serviceType: '{{ old('service_type', 'Web Hosting') }}' }
+            return {
+                serviceType: '{{ old('service_type', 'Web Hosting') }}',
+                cpanelUsername: '{{ old('cpanel_username') }}',
+                contactEmail: '{{ old('contact_email') }}',
+                customerEmails: @json($customerEmails),
+                existingUsernames: @json($existingUsernames),
+
+                generateUsername() {
+                    const domain = document.getElementById('domain_name').value.trim().toLowerCase();
+                    if (!domain) return;
+
+                    // Take the SLD (part before first dot), strip non-alpha, prefix with ckhostco_
+                    let sld = domain.split('.')[0].replace(/[^a-z0-9]/g, '');
+                    let base = 'ckhostco_' + sld;
+
+                    // cPanel usernames max 16 chars
+                    if (base.length > 16) base = base.substring(0, 16);
+
+                    // Check for duplicates and add number if needed
+                    let username = base;
+                    let counter = 1;
+                    while (this.existingUsernames.includes(username)) {
+                        username = base.substring(0, 14) + counter;
+                        counter++;
+                    }
+
+                    this.cpanelUsername = username;
+                },
+
+                init() {
+                    // Watch customer selection to auto-fill email
+                    this.$watch('serviceType', () => {});
+                    const select = document.getElementById('company_id');
+                    if (select) {
+                        select.addEventListener('change', () => {
+                            const id = select.value;
+                            if (id && this.customerEmails[id]) {
+                                this.contactEmail = this.customerEmails[id];
+                            }
+                        });
+                        // Auto-fill on load if customer is pre-selected
+                        if (select.value && this.customerEmails[select.value] && !this.contactEmail) {
+                            this.contactEmail = this.customerEmails[select.value];
+                        }
+                    }
+                }
+            }
         }
     </script>
 </x-admin-layout>

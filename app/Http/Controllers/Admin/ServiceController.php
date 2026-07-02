@@ -22,7 +22,16 @@ class ServiceController extends Controller
 
     public function create(): View
     {
-        $customers = Customer::orderBy('company_name')->get();
+        $customers = Customer::with('users')->orderBy('company_name')->get();
+
+        // Build a map of customer_id => email for JS autofill
+        $customerEmails = $customers->mapWithKeys(function ($c) {
+            $email = $c->users->first()?->email ?? '';
+            return [$c->company_id => $email];
+        });
+
+        // Get existing cpanel usernames so we don't generate duplicates
+        $existingUsernames = Service::whereNotNull('cpanel_username')->pluck('cpanel_username')->toArray();
 
         // Fetch Stripe prices if configured
         $stripePrices = [];
@@ -65,7 +74,7 @@ class ServiceController extends Controller
             }
         }
 
-        return view('admin.services.create', compact('customers', 'stripePrices'));
+        return view('admin.services.create', compact('customers', 'stripePrices', 'customerEmails', 'existingUsernames'));
     }
 
     public function store(Request $request)
