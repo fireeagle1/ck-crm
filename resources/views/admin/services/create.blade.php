@@ -36,12 +36,15 @@
                     </div>
                 </div>
 
-                {{-- Service name --}}
+                {{-- Service name (auto-fills from Stripe selection) --}}
                 <div>
                     <label for="service_short" class="block text-sm font-semibold text-gray-700">Service Name <span class="text-red-500">*</span></label>
-                    <input type="text" name="service_short" id="service_short" required value="{{ old('service_short') }}"
+                    <input type="text" name="service_short" id="service_short" required x-model="serviceName"
                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                           placeholder="e.g. Charity Level Hosting">
+                           :class="stripeSelected ? 'bg-gray-100 text-gray-500' : ''"
+                           :readonly="stripeSelected"
+                           placeholder="Auto-filled from Stripe product">
+                    <p class="text-xs text-gray-400 mt-1" x-show="stripeSelected">Name set by Stripe product. Change the product in Stripe to update.</p>
                     @error('service_short') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
                 </div>
 
@@ -104,42 +107,26 @@
                 {{-- Stripe price --}}
                 @if (!empty($stripePrices))
                     <div>
-                        <label for="stripe_price_id" class="block text-sm font-semibold text-gray-700">Stripe Subscription</label>
-                        <select name="stripe_price_id" id="stripe_price_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                            <option value="">No Stripe subscription (manual billing)</option>
+                        <label for="stripe_price_id" class="block text-sm font-semibold text-gray-700">Stripe Subscription <span class="text-red-500">*</span></label>
+                        <select name="stripe_price_id" id="stripe_price_id" @change="onStripeChange($event)"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                            <option value="" data-name="">Select a Stripe product...</option>
                             @foreach ($stripePrices as $price)
-                                <option value="{{ $price['id'] }}" {{ old('stripe_price_id') === $price['id'] ? 'selected' : '' }}>
+                                <option value="{{ $price['id'] }}" data-name="{{ $price['product_name'] }}"
+                                    {{ old('stripe_price_id') === $price['id'] ? 'selected' : '' }}>
                                     {{ $price['label'] }}
                                 </option>
                             @endforeach
                         </select>
-                        <p class="text-xs text-gray-500 mt-1">If selected, pricing will be managed by Stripe and synced automatically. The first invoice will be sent to the customer.</p>
+                        <p class="text-xs text-gray-500 mt-1">The service name and billing will be managed by Stripe.</p>
                     </div>
                 @endif
 
-                {{-- Manual billing (only if no Stripe) --}}
-                <div class="grid grid-cols-3 gap-4">
-                    <div>
-                        <label for="service_monthly_charge" class="block text-sm font-medium text-gray-700">Monthly Charge (£)</label>
-                        <input type="number" step="0.01" min="0" name="service_monthly_charge" id="service_monthly_charge"
-                               value="{{ old('service_monthly_charge') }}"
-                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                        <p class="text-xs text-gray-400 mt-1">Will be overwritten by Stripe if a subscription is linked.</p>
-                    </div>
-                    <div>
-                        <label for="service_payment_frequency" class="block text-sm font-medium text-gray-700">Frequency</label>
-                        <select name="service_payment_frequency" id="service_payment_frequency" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                            <option value="">—</option>
-                            <option value="Monthly" {{ old('service_payment_frequency') === 'Monthly' ? 'selected' : '' }}>Monthly</option>
-                            <option value="Quarterly" {{ old('service_payment_frequency') === 'Quarterly' ? 'selected' : '' }}>Quarterly</option>
-                            <option value="Annually" {{ old('service_payment_frequency') === 'Annually' ? 'selected' : '' }}>Annually</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label for="start_date" class="block text-sm font-medium text-gray-700">Start Date</label>
-                        <input type="date" name="start_date" id="start_date" value="{{ old('start_date', date('Y-m-d')) }}"
-                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                    </div>
+                {{-- Start date --}}
+                <div class="max-w-xs">
+                    <label for="start_date" class="block text-sm font-medium text-gray-700">Start Date</label>
+                    <input type="date" name="start_date" id="start_date" value="{{ old('start_date', date('Y-m-d')) }}"
+                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
                 </div>
 
                 <div class="flex gap-3 pt-2">
@@ -158,21 +145,30 @@
                 serviceType: '{{ old('service_type', 'Web Hosting') }}',
                 cpanelUsername: '{{ old('cpanel_username') }}',
                 contactEmail: '{{ old('contact_email') }}',
+                serviceName: '{{ old('service_short') }}',
+                stripeSelected: false,
                 customerEmails: @json($customerEmails),
                 existingUsernames: @json($existingUsernames),
+
+                onStripeChange(event) {
+                    const option = event.target.selectedOptions[0];
+                    const name = option?.dataset?.name || '';
+                    if (name) {
+                        this.serviceName = name;
+                        this.stripeSelected = true;
+                    } else {
+                        this.stripeSelected = false;
+                    }
+                },
 
                 generateUsername() {
                     const domain = document.getElementById('domain_name').value.trim().toLowerCase();
                     if (!domain) return;
 
-                    // Take the SLD (part before first dot), strip non-alpha, prefix with ckhostco_
                     let sld = domain.split('.')[0].replace(/[^a-z0-9]/g, '');
                     let base = 'ckhostco_' + sld;
-
-                    // cPanel usernames max 16 chars
                     if (base.length > 16) base = base.substring(0, 16);
 
-                    // Check for duplicates and add number if needed
                     let username = base;
                     let counter = 1;
                     while (this.existingUsernames.includes(username)) {
@@ -184,8 +180,6 @@
                 },
 
                 init() {
-                    // Watch customer selection to auto-fill email
-                    this.$watch('serviceType', () => {});
                     const select = document.getElementById('company_id');
                     if (select) {
                         select.addEventListener('change', () => {
@@ -194,9 +188,17 @@
                                 this.contactEmail = this.customerEmails[id];
                             }
                         });
-                        // Auto-fill on load if customer is pre-selected
                         if (select.value && this.customerEmails[select.value] && !this.contactEmail) {
                             this.contactEmail = this.customerEmails[select.value];
+                        }
+                    }
+                    // Check if Stripe was pre-selected (old value)
+                    const stripeSelect = document.getElementById('stripe_price_id');
+                    if (stripeSelect && stripeSelect.value) {
+                        this.stripeSelected = true;
+                        const opt = stripeSelect.selectedOptions[0];
+                        if (opt?.dataset?.name && !this.serviceName) {
+                            this.serviceName = opt.dataset.name;
                         }
                     }
                 }
