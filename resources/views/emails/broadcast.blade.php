@@ -6,7 +6,7 @@
     </p>
 
     <div style="font-size:14px; color:#374151; line-height:1.7;">
-        {!! $emailBody !!}
+        {!! nl2br($emailBody) !!}
     </div>
 
     <p style="margin:24px 0 0; font-size:14px; color:#374151; line-height:1.6;">
