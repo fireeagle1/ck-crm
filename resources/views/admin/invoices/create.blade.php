@@ -6,8 +6,8 @@
         <a href="{{ route('admin.invoices.index') }}" class="text-sm text-blue-600 hover:underline">&larr; Invoices</a>
     </div>
 
-    <div class="bg-white rounded-lg border p-6 max-w-3xl" x-data="invoiceForm()">
-        <form method="POST" action="{{ route('admin.invoices.store') }}">
+    <div class="bg-white rounded-lg border p-6 max-w-3xl">
+        <form method="POST" action="{{ route('admin.invoices.store') }}" x-data="invoiceForm()">
             @csrf
 
             <div class="space-y-5">
@@ -38,12 +38,17 @@
                     <div class="space-y-2">
                         <template x-for="(item, index) in items" :key="index">
                             <div class="flex gap-2 items-start">
-                                <input type="text" :name="'items['+index+'][description]'" x-model="item.description"
+                                <input type="text" x-model="item.description"
+                                       :name="`items[${index}][description]`"
                                        placeholder="Description" required
                                        class="flex-1 rounded-md border-gray-300 shadow-sm text-sm focus:ring-blue-500 focus:border-blue-500">
-                                <input type="number" :name="'items['+index+'][amount]'" x-model="item.amount"
-                                       placeholder="£" step="0.01" min="0.01" required
-                                       class="w-28 rounded-md border-gray-300 shadow-sm text-sm focus:ring-blue-500 focus:border-blue-500">
+                                <div class="relative w-28">
+                                    <span class="absolute left-3 top-2 text-gray-400 text-sm">£</span>
+                                    <input type="number" x-model="item.amount"
+                                           :name="`items[${index}][amount]`"
+                                           placeholder="0.00" step="0.01" min="0.01" required
+                                           class="w-full pl-7 rounded-md border-gray-300 shadow-sm text-sm focus:ring-blue-500 focus:border-blue-500">
+                                </div>
                                 <button type="button" @click="items.splice(index, 1)" x-show="items.length > 1"
                                         class="px-2 py-2 text-red-500 hover:text-red-700 text-sm">✕</button>
                             </div>

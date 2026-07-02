@@ -20,6 +20,11 @@ class OneOffInvoiceController extends Controller
 
     public function store(Request $request)
     {
+        // Debug: if items are empty, it's a form submission issue
+        if (empty($request->input('items'))) {
+            return back()->withInput()->with('error', 'No line items received. Please add at least one item.');
+        }
+
         $validated = $request->validate([
             'company_id' => 'required|exists:customers,company_id',
             'items' => 'required|array|min:1',
@@ -39,46 +44,49 @@ class OneOffInvoiceController extends Controller
             foreach ($validated['items'] as $item) {
                 \Stripe\InvoiceItem::create([
                     'customer' => $customer->stripe_customer_id,
-                    'amount' => (int) round($item['amount'] * 100),
+                    'amount' => (int) round(floatval($item['amount']) * 100),
                     'currency' => 'gbp',
                     'description' => $item['description'],
                 ]);
             }
 
-            // Create the invoice (it automatically picks up pending items for this customer)
-            $invoice = \Stripe\Invoice::create([
+            // Create the invoice — picks up all pending items for this customer
+            $stripeInvoice = \Stripe\Invoice::create([
                 'customer' => $customer->stripe_customer_id,
                 'collection_method' => 'send_invoice',
-                'days_until_due' => $validated['days_until_due'],
+                'days_until_due' => (int) $validated['days_until_due'],
             ]);
 
-            // Finalize it (locks the line items)
-            $invoice = $invoice->finalizeInvoice();
+            // Finalize (locks the line items onto the invoice)
+            $stripeInvoice = \Stripe\Invoice::retrieve($stripeInvoice->id);
+            $stripeInvoice->finalizeInvoice();
 
-            // Send it
-            $invoice->sendInvoice();
+            // Re-retrieve to get the hosted URL
+            $stripeInvoice = \Stripe\Invoice::retrieve($stripeInvoice->id);
 
-            // Sync this invoice to our local DB immediately
-            \App\Models\Invoice::updateOrCreate(
-                ['stripe_invoice_id' => $invoice->id],
-                [
-                    'company_id' => $customer->company_id,
-                    'invoice_status' => 'Unpaid',
-                    'invoice_amount' => $invoice->amount_due / 100,
-                    'invoice_date' => date('Y-m-d', $invoice->created),
-                    'due_date' => $invoice->due_date ? date('Y-m-d', $invoice->due_date) : null,
-                    'stripe_hosted_url' => $invoice->hosted_invoice_url ?? null,
-                    'invoice_items' => collect($validated['items'])->map(fn($i) => [
-                        'description' => $i['description'],
-                        'amount' => $i['amount'],
-                    ])->toArray(),
-                ]
-            );
+            // Send it to the customer
+            $stripeInvoice->sendInvoice();
+
+            // Save locally
+            \App\Models\Invoice::create([
+                'company_id' => $customer->company_id,
+                'stripe_invoice_id' => $stripeInvoice->id,
+                'stripe_hosted_url' => $stripeInvoice->hosted_invoice_url ?? null,
+                'invoice_status' => 'Unpaid',
+                'invoice_amount' => $stripeInvoice->amount_due / 100,
+                'invoice_date' => now()->format('Y-m-d'),
+                'due_date' => $stripeInvoice->due_date ? date('Y-m-d', $stripeInvoice->due_date) : now()->addDays($validated['days_until_due'])->format('Y-m-d'),
+                'invoice_items' => collect($validated['items'])->map(fn($i) => [
+                    'description' => $i['description'],
+                    'amount' => floatval($i['amount']),
+                ])->toArray(),
+            ]);
 
             return redirect()->route('admin.invoices.index')
-                ->with('success', "Invoice created and sent to {$customer->company_name}. Total: £" . number_format(collect($validated['items'])->sum('amount'), 2));
+                ->with('success', "Invoice #{$stripeInvoice->number} created and sent to {$customer->company_name}.");
         } catch (\Exception $e) {
             return back()->withInput()->with('error', 'Stripe error: ' . $e->getMessage());
         }
+    }
     }
 }
