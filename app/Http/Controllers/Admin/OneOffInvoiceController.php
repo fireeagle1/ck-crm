@@ -35,27 +35,45 @@ class OneOffInvoiceController extends Controller
         }
 
         try {
-            // Create invoice items
+            // Create pending invoice items first
             foreach ($validated['items'] as $item) {
                 \Stripe\InvoiceItem::create([
                     'customer' => $customer->stripe_customer_id,
-                    'amount' => (int) round($item['amount'] * 100), // Convert to pence
+                    'amount' => (int) round($item['amount'] * 100),
                     'currency' => 'gbp',
                     'description' => $item['description'],
                 ]);
             }
 
-            // Create and send the invoice
+            // Create the invoice (it automatically picks up pending items for this customer)
             $invoice = \Stripe\Invoice::create([
                 'customer' => $customer->stripe_customer_id,
                 'collection_method' => 'send_invoice',
                 'days_until_due' => $validated['days_until_due'],
-                'auto_advance' => true,
             ]);
 
-            // Finalize and send
-            $invoice->finalizeInvoice();
+            // Finalize it (locks the line items)
+            $invoice = $invoice->finalizeInvoice();
+
+            // Send it
             $invoice->sendInvoice();
+
+            // Sync this invoice to our local DB immediately
+            \App\Models\Invoice::updateOrCreate(
+                ['stripe_invoice_id' => $invoice->id],
+                [
+                    'company_id' => $customer->company_id,
+                    'invoice_status' => 'Unpaid',
+                    'invoice_amount' => $invoice->amount_due / 100,
+                    'invoice_date' => date('Y-m-d', $invoice->created),
+                    'due_date' => $invoice->due_date ? date('Y-m-d', $invoice->due_date) : null,
+                    'stripe_hosted_url' => $invoice->hosted_invoice_url ?? null,
+                    'invoice_items' => collect($validated['items'])->map(fn($i) => [
+                        'description' => $i['description'],
+                        'amount' => $i['amount'],
+                    ])->toArray(),
+                ]
+            );
 
             return redirect()->route('admin.invoices.index')
                 ->with('success', "Invoice created and sent to {$customer->company_name}. Total: £" . number_format(collect($validated['items'])->sum('amount'), 2));
