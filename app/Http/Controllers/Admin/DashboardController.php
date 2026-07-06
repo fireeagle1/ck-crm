@@ -13,6 +13,11 @@ use Illuminate\View\View;
 
 class DashboardController extends Controller
 {
+    /**
+     * Statuses that should be excluded from all financial reporting.
+     */
+    private const EXCLUDED_STATUSES = ['Void', 'Uncollectible'];
+
     public function index(): View
     {
         // Ticket stats
@@ -24,22 +29,23 @@ class DashboardController extends Controller
         $activeServices = Service::where('status', 'Active')->count();
         $totalCustomers = Customer::count();
 
-        // Revenue KPIs
-        $mrr = Service::where('status', 'Active')
-            ->whereNotNull('service_monthly_charge')
-            ->sum('service_monthly_charge');
+        // Revenue KPIs — normalise charges to monthly based on billing frequency
+        $mrr = $this->calculateMrr();
         $arr = $mrr * 12;
 
-        // Overdue invoices
+        // Overdue invoices — exclude void/uncollectible
         $overdueInvoices = Invoice::where('invoice_status', 'Unpaid')
+            ->whereNotIn('invoice_status', self::EXCLUDED_STATUSES)
             ->where('due_date', '<', now())
             ->count();
         $overdueAmount = Invoice::where('invoice_status', 'Unpaid')
+            ->whereNotIn('invoice_status', self::EXCLUDED_STATUSES)
             ->where('due_date', '<', now())
             ->sum('invoice_amount');
 
-        // Revenue this month
+        // Revenue this month — exclude void/uncollectible
         $revenueThisMonth = Invoice::where('invoice_status', 'Paid')
+            ->whereNotIn('invoice_status', self::EXCLUDED_STATUSES)
             ->whereMonth('paid_date', now()->month)
             ->whereYear('paid_date', now()->year)
             ->sum('invoice_amount');
@@ -78,5 +84,25 @@ class DashboardController extends Controller
             'recentTickets',
             'recentLogins',
         ));
+    }
+
+    /**
+     * Calculate true MRR by normalising each service's charge to a monthly value
+     * based on its payment frequency.
+     */
+    private function calculateMrr(): float
+    {
+        $services = Service::where('status', 'Active')
+            ->whereNotNull('service_monthly_charge')
+            ->where('service_monthly_charge', '>', 0)
+            ->get(['service_monthly_charge', 'service_payment_frequency']);
+
+        return $services->sum(function ($service) {
+            return match ($service->service_payment_frequency) {
+                'Quarterly' => (float) $service->service_monthly_charge / 3,
+                'Annually'  => (float) $service->service_monthly_charge / 12,
+                default     => (float) $service->service_monthly_charge, // Monthly or null
+            };
+        });
     }
 }
