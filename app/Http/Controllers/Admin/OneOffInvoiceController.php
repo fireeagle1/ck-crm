@@ -40,22 +40,24 @@ class OneOffInvoiceController extends Controller
         }
 
         try {
-            // Create pending invoice items first
+            // Create the invoice as a draft first
+            $stripeInvoice = \Stripe\Invoice::create([
+                'customer' => $customer->stripe_customer_id,
+                'collection_method' => 'send_invoice',
+                'days_until_due' => (int) $validated['days_until_due'],
+                'pending_invoice_items_behavior' => 'exclude',
+            ]);
+
+            // Create invoice items attached to the draft invoice
             foreach ($validated['items'] as $item) {
                 \Stripe\InvoiceItem::create([
                     'customer' => $customer->stripe_customer_id,
+                    'invoice' => $stripeInvoice->id,
                     'amount' => (int) round(floatval($item['amount']) * 100),
                     'currency' => 'gbp',
                     'description' => $item['description'],
                 ]);
             }
-
-            // Create the invoice — picks up all pending items for this customer
-            $stripeInvoice = \Stripe\Invoice::create([
-                'customer' => $customer->stripe_customer_id,
-                'collection_method' => 'send_invoice',
-                'days_until_due' => (int) $validated['days_until_due'],
-            ]);
 
             // Finalize (locks the line items onto the invoice)
             $stripeInvoice = \Stripe\Invoice::retrieve($stripeInvoice->id);

@@ -34,6 +34,11 @@ class AuthenticatedSessionController extends Controller
 
         \App\Models\EventLog::log($user->id, 'Login successful', 200);
 
+        // Redirect admins to admin dashboard, regular users to portal
+        if ($user->isAdmin()) {
+            return redirect()->intended(route('admin.dashboard', absolute: false));
+        }
+
         return redirect()->intended(route('portal.dashboard', absolute: false));
     }
 
