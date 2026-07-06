@@ -39,12 +39,36 @@
                 </div>
 
                 <div>
-                    <label for="content" class="block text-sm font-medium text-gray-700 mb-1">Content <span class="text-red-500">*</span></label>
-                    <textarea name="content" id="content" rows="12" required
-                              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                              placeholder="Write your article content here...">{{ old('content') }}</textarea>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Content <span class="text-red-500">*</span></label>
+                    <div class="border border-gray-300 rounded-md shadow-sm overflow-hidden focus-within:ring-1 focus-within:ring-blue-500 focus-within:border-blue-500">
+                        <div class="flex items-center gap-1 px-2 py-1.5 bg-gray-50 border-b border-gray-300">
+                            <button type="button" onclick="formatDoc('bold')" title="Bold" class="px-2 py-1 text-sm font-bold rounded hover:bg-gray-200">B</button>
+                            <button type="button" onclick="formatDoc('italic')" title="Italic" class="px-2 py-1 text-sm italic rounded hover:bg-gray-200">I</button>
+                            <button type="button" onclick="formatDoc('createLink')" title="Link" class="px-2 py-1 text-sm rounded hover:bg-gray-200">🔗</button>
+                            <span class="w-px h-5 bg-gray-300 mx-1"></span>
+                            <button type="button" onclick="formatDoc('formatBlock', 'h2')" title="Heading" class="px-2 py-1 text-sm font-semibold rounded hover:bg-gray-200">H</button>
+                            <button type="button" onclick="formatDoc('formatBlock', 'p')" title="Paragraph" class="px-2 py-1 text-sm rounded hover:bg-gray-200">¶</button>
+                        </div>
+                        <div id="editor" contenteditable="true"
+                             class="min-h-[250px] p-3 prose prose-sm max-w-none focus:outline-none"
+                             oninput="document.getElementById('content').value = this.innerHTML">
+                            {!! old('content') !!}
+                        </div>
+                    </div>
+                    <input type="hidden" name="content" id="content" value="{{ old('content') }}">
                     @error('content') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
                 </div>
+
+                <script>
+                    function formatDoc(command, value = null) {
+                        if (command === 'createLink') {
+                            value = prompt('Enter URL:', 'https://');
+                            if (!value) return;
+                        }
+                        document.execCommand(command, false, value);
+                        document.getElementById('content').value = document.getElementById('editor').innerHTML;
+                    }
+                </script>
 
                 <div class="flex items-center gap-2">
                     <input type="hidden" name="is_public" value="0">
