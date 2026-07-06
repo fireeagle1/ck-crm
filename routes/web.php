@@ -101,6 +101,8 @@ Route::middleware(['auth', 'verified', EnsureIsAdmin::class])->prefix('admin')->
 
     // Tickets
     Route::get('/tickets', [Admin\TicketController::class, 'index'])->name('tickets.index');
+    Route::get('/tickets/create', [Admin\TicketController::class, 'create'])->name('tickets.create');
+    Route::post('/tickets', [Admin\TicketController::class, 'store'])->name('tickets.store');
     Route::get('/tickets/{ticket}', [Admin\TicketController::class, 'show'])->name('tickets.show');
     Route::put('/tickets/{ticket}', [Admin\TicketController::class, 'update'])->name('tickets.update');
     Route::post('/tickets/{ticket}/reply', [Admin\TicketController::class, 'reply'])->name('tickets.reply');

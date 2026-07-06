@@ -4,9 +4,13 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Asset;
+use App\Models\Customer;
+use App\Models\Service;
 use App\Models\Ticket;
 use App\Models\TicketReply;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
@@ -38,6 +42,69 @@ class TicketController extends Controller
         return view('admin.tickets.index', compact('tickets', 'status', 'search'));
     }
 
+    public function create(Request $request): View
+    {
+        $customers = Customer::orderBy('company_name')->get();
+        $selectedCustomer = $request->get('customer_id');
+
+        $assets = collect();
+        $services = collect();
+
+        if ($selectedCustomer) {
+            $assets = Asset::where('customer_id', $selectedCustomer)
+                ->where('asset_status', 'Active')
+                ->orderBy('device_name')
+                ->get();
+            $services = Service::where('company_id', $selectedCustomer)
+                ->where('status', 'Active')
+                ->orderBy('service_short')
+                ->get();
+        }
+
+        return view('admin.tickets.create', compact('customers', 'selectedCustomer', 'assets', 'services'));
+    }
+
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'company_id' => 'required|exists:customers,company_id',
+            'subject' => 'required|string|max:255',
+            'description' => 'required|string',
+            'ticket_type' => 'required|in:Incident,Service Request',
+            'priority' => 'required|in:Low,Normal,High,Critical',
+            'request_category' => 'nullable|string|max:100',
+            'service_id' => 'nullable|exists:services,service_id',
+            'asset_id' => 'nullable|exists:cmdb,device_id',
+            'notify_customer' => 'boolean',
+        ]);
+
+        // Find the primary user for this customer (to assign as ticket owner)
+        $customerUser = User::where('company_id', $validated['company_id'])
+            ->where('is_admin', false)
+            ->first();
+
+        $ticket = Ticket::create([
+            'company_id' => $validated['company_id'],
+            'user_id' => $customerUser?->id,
+            'subject' => $validated['subject'],
+            'description' => $validated['description'],
+            'ticket_type' => $validated['ticket_type'],
+            'priority' => $validated['priority'],
+            'request_category' => $validated['request_category'] ?? null,
+            'service_id' => $validated['service_id'] ?? null,
+            'asset_id' => $validated['asset_id'] ?? null,
+            'status' => 'Open',
+        ]);
+
+        // Send confirmation email to customer if checkbox was ticked
+        if ($request->boolean('notify_customer')) {
+            $this->notifyCustomerTicketCreated($ticket);
+        }
+
+        return redirect()->route('admin.tickets.show', $ticket)
+            ->with('success', 'Ticket INC' . $ticket->ticket_id . ' created successfully.');
+    }
+
     public function show(Ticket $ticket): View
     {
         $ticket->load(['customer', 'user', 'asset', 'replies.user']);
@@ -55,6 +122,7 @@ class TicketController extends Controller
         $validated = $request->validate([
             'status' => 'required|in:Open,Pending,In Progress,Closed',
             'priority' => 'in:Low,Normal,High,Critical',
+            'ticket_type' => 'in:Incident,Service Request',
             'asset_id' => 'nullable|exists:cmdb,device_id',
         ]);
 
@@ -106,12 +174,12 @@ class TicketController extends Controller
         $customer = $ticket->user;
         if (!$customer?->email) {
             // Fallback: first user on the company
-            $customer = \App\Models\User::where('company_id', $ticket->company_id)->first();
+            $customer = User::where('company_id', $ticket->company_id)->first();
         }
         if (!$customer) return;
 
         try {
-            \Illuminate\Support\Facades\Mail::send('emails.ticket-reply', [
+            Mail::send('emails.ticket-reply', [
                 'ticket' => $ticket,
                 'reply' => $reply,
                 'recipientName' => $customer->first_name ?? 'there',
@@ -121,6 +189,31 @@ class TicketController extends Controller
             });
         } catch (\Exception) {
             // Don't fail the request
+        }
+    }
+
+    private function notifyCustomerTicketCreated(Ticket $ticket): void
+    {
+        // Find users for this company to notify
+        $recipients = User::where('company_id', $ticket->company_id)
+            ->where('is_admin', false)
+            ->whereNotNull('email')
+            ->get();
+
+        if ($recipients->isEmpty()) return;
+
+        foreach ($recipients as $recipient) {
+            try {
+                Mail::send('emails.ticket-opened', [
+                    'ticket' => $ticket,
+                    'recipientName' => $recipient->first_name ?? 'there',
+                ], function ($message) use ($recipient, $ticket) {
+                    $message->to($recipient->email)
+                            ->subject("Ticket Opened: INC{$ticket->ticket_id} — {$ticket->subject}");
+                });
+            } catch (\Exception) {
+                // Don't fail the request
+            }
         }
     }
 }

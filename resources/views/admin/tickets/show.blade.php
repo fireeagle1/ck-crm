@@ -121,6 +121,16 @@
                         </div>
 
                         <div>
+                            <label for="ticket_type" class="block text-sm font-medium text-gray-700">Type</label>
+                            <select name="ticket_type" id="ticket_type" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
+                                @foreach (['Incident', 'Service Request'] as $t)
+                                    <option value="{{ $t }}" {{ $ticket->ticket_type === $t ? 'selected' : '' }}>{{ $t }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        </div>
+
+                        <div>
                             <label for="asset_id" class="block text-sm font-medium text-gray-700">Linked Asset</label>
                             <select name="asset_id" id="asset_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
                                 <option value="">None</option>

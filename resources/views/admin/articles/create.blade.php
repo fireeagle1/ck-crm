@@ -1,14 +1,6 @@
 <x-admin-layout>
     <x-slot:title>New Article</x-slot:title>
 
-    {{-- Trix Editor --}}
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/trix/2.1.1/trix.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/trix/2.1.1/trix.umd.min.js"></script>
-    <style>
-        trix-editor { min-height: 300px; }
-        trix-toolbar .trix-button-group--file-tools { display: none !important; }
-    </style>
-
     <div class="flex items-center justify-between mb-4">
         <h1 class="text-2xl font-semibold">New Article</h1>
         <a href="{{ route('admin.articles.index') }}" class="text-sm text-blue-600 hover:underline">&larr; Articles</a>
@@ -47,9 +39,10 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Content <span class="text-red-500">*</span></label>
-                    <input id="content" type="hidden" name="content" value="{{ old('content') }}">
-                    <trix-editor input="content" class="trix-content rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"></trix-editor>
+                    <label for="content" class="block text-sm font-medium text-gray-700 mb-1">Content <span class="text-red-500">*</span></label>
+                    <textarea name="content" id="content" rows="12" required
+                              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                              placeholder="Write your article content here...">{{ old('content') }}</textarea>
                     @error('content') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
                 </div>
 
