@@ -28,7 +28,7 @@
         @endif
 
         <div class="bg-white rounded-lg border p-6">
-            <form method="POST" action="{{ route('portal.tickets.store') }}">
+            <form method="POST" action="{{ route('portal.tickets.store') }}" enctype="multipart/form-data">
                 @csrf
                 <input type="hidden" name="ticket_type" :value="ticketType">
 
@@ -90,6 +90,14 @@
                                   placeholder="Please provide as much detail as possible..."
                                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">{{ old('description') }}</textarea>
                         @error('description') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
+                    </div>
+
+                    <div>
+                        <label for="attachment" class="block text-sm font-semibold text-gray-700">Attachment</label>
+                        <input type="file" name="attachment" id="attachment"
+                               class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                        <p class="text-xs text-gray-400 mt-1">Optional. Max 10MB.</p>
+                        @error('attachment') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
                     </div>
 
                     <div class="flex gap-3 pt-2">

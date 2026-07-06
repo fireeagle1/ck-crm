@@ -11,14 +11,38 @@ class KnowledgebaseController extends Controller
 {
     public function index(Request $request): View
     {
-        $articles = Article::where(function ($q) use ($request) {
+        $query = Article::where(function ($q) use ($request) {
+            $q->where('is_public', true)
+              ->orWhere('company_id', $request->user()->company_id);
+        });
+
+        // Search
+        if ($search = $request->input('search')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('content', 'like', "%{$search}%");
+            });
+        }
+
+        // Category filter
+        if ($category = $request->input('category')) {
+            $query->where('category', $category);
+        }
+
+        $articles = $query->orderByDesc('created_at')->paginate(12)->withQueryString();
+
+        // Get distinct categories for the filter tabs
+        $categories = Article::where(function ($q) use ($request) {
             $q->where('is_public', true)
               ->orWhere('company_id', $request->user()->company_id);
         })
-        ->orderByDesc('created_at')
-        ->paginate(12);
+        ->whereNotNull('category')
+        ->distinct()
+        ->pluck('category')
+        ->sort()
+        ->values();
 
-        return view('portal.knowledgebase.index', compact('articles'));
+        return view('portal.knowledgebase.index', compact('articles', 'categories'));
     }
 
     public function show(Article $article): View

@@ -23,6 +23,15 @@
                 <div class="prose prose-sm max-w-none text-gray-700">
                     {!! nl2br(e($ticket->description)) !!}
                 </div>
+                @if ($ticket->attachment_path)
+                    <div class="mt-3 pt-3 border-t">
+                        <a href="{{ asset('storage/' . $ticket->attachment_path) }}" target="_blank"
+                           class="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>
+                            Attachment
+                        </a>
+                    </div>
+                @endif
             </div>
 
             {{-- Replies thread --}}
@@ -193,6 +202,34 @@
                     </div>
                 </dl>
             </div>
+
+            {{-- Activity Log --}}
+            @if ($ticket->activities->isNotEmpty())
+                <div class="bg-white rounded-lg shadow-sm border p-5">
+                    <h2 class="text-sm font-semibold text-gray-700 mb-3">Activity Log</h2>
+                    <div class="space-y-3">
+                        @foreach ($ticket->activities->sortByDesc('created_at') as $activity)
+                            <div class="flex gap-2 text-xs">
+                                <div class="flex-shrink-0 mt-0.5">
+                                    <div class="h-5 w-5 rounded-full bg-gray-100 flex items-center justify-center">
+                                        @if ($activity->type === 'status_changed')
+                                            <svg class="w-3 h-3 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                                        @elseif ($activity->type === 'priority_changed')
+                                            <svg class="w-3 h-3 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg>
+                                        @else
+                                            <svg class="w-3 h-3 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                        @endif
+                                    </div>
+                                </div>
+                                <div>
+                                    <p class="text-gray-700">{{ $activity->description }}</p>
+                                    <p class="text-gray-400">{{ $activity->created_at->format('M j, Y H:i') }}</p>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
         </div>
     </div>
 </x-admin-layout>

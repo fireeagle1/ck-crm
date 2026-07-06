@@ -16,12 +16,30 @@ class TicketController extends Controller
 {
     public function index(Request $request): View
     {
-        $tickets = Ticket::where('company_id', $request->user()->company_id)
-            ->withCount('replies')
-            ->orderByDesc('created_at')
-            ->paginate(10);
+        $status = $request->get('status', 'open');
+        $search = $request->get('q', '');
 
-        return view('portal.tickets.index', compact('tickets'));
+        $query = Ticket::where('company_id', $request->user()->company_id)
+            ->withCount('replies');
+
+        // Filter by status
+        if ($status === 'open') {
+            $query->whereIn('status', ['Open', 'Pending', 'In Progress']);
+        } elseif ($status === 'closed') {
+            $query->where('status', 'Closed');
+        }
+
+        // Search by subject
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('subject', 'like', "%{$search}%")
+                  ->orWhere('ticket_id', $search);
+            });
+        }
+
+        $tickets = $query->orderByDesc('created_at')->paginate(10);
+
+        return view('portal.tickets.index', compact('tickets', 'status', 'search'));
     }
 
     public function create(Request $request): View
@@ -55,7 +73,13 @@ class TicketController extends Controller
             'asset_id' => 'nullable|exists:cmdb,device_id',
             'ticket_type' => 'in:Incident,Service Request',
             'request_category' => 'nullable|string|max:100',
+            'attachment' => 'nullable|file|max:10240',
         ]);
+
+        $attachmentPath = null;
+        if ($request->hasFile('attachment')) {
+            $attachmentPath = $request->file('attachment')->store('tickets/attachments', 'public');
+        }
 
         $ticket = Ticket::create([
             'company_id' => $request->user()->company_id,
@@ -66,6 +90,7 @@ class TicketController extends Controller
             'asset_id' => $validated['asset_id'] ?? null,
             'ticket_type' => $validated['ticket_type'] ?? 'Incident',
             'request_category' => $validated['request_category'] ?? null,
+            'attachment_path' => $attachmentPath,
             'priority' => 'Normal',
             'status' => 'Open',
         ]);

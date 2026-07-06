@@ -20,6 +20,7 @@ class Ticket extends Model
         'service_id',
         'subject',
         'description',
+        'attachment_path',
         'status',
         'priority',
         'ticket_type',
@@ -49,5 +50,10 @@ class Ticket extends Model
     public function replies(): HasMany
     {
         return $this->hasMany(TicketReply::class, 'ticket_id', 'ticket_id');
+    }
+
+    public function activities(): HasMany
+    {
+        return $this->hasMany(TicketActivity::class, 'ticket_id', 'ticket_id');
     }
 }

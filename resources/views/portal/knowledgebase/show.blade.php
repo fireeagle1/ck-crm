@@ -2,7 +2,7 @@
     <x-slot:title>{{ $article->title }}</x-slot:title>
 
     <div class="flex items-center justify-between mb-4">
-        <a href="{{ route('portal.knowledgebase.index') }}" class="text-sm text-blue-600 hover:underline">&larr; Knowledgebase</a>
+        <a href="{{ route('portal.knowledgebase.index') }}" class="text-sm text-blue-600 hover:underline">&larr; Back to Help Centre</a>
     </div>
 
     <article class="bg-white rounded-lg shadow-sm border p-6 max-w-3xl">
@@ -25,4 +25,13 @@
             {!! $article->content !!}
         </div>
     </article>
+
+    {{-- Still need help? --}}
+    <div class="mt-6 max-w-3xl bg-gray-50 border border-gray-200 rounded-lg p-4 flex items-center justify-between">
+        <p class="text-sm text-gray-600">Still need help with this?</p>
+        <a href="{{ route('portal.tickets.create') }}"
+           class="px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700">
+            Raise a Ticket
+        </a>
+    </div>
 </x-portal-layout>

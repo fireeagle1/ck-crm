@@ -7,6 +7,7 @@ use App\Models\Asset;
 use App\Models\Customer;
 use App\Models\Service;
 use App\Models\Ticket;
+use App\Models\TicketActivity;
 use App\Models\TicketReply;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -107,7 +108,7 @@ class TicketController extends Controller
 
     public function show(Ticket $ticket): View
     {
-        $ticket->load(['customer', 'user', 'asset', 'replies.user']);
+        $ticket->load(['customer', 'user', 'asset', 'replies.user', 'activities.user']);
 
         // Get assets for this customer to allow linking
         $assets = $ticket->company_id
@@ -126,7 +127,53 @@ class TicketController extends Controller
             'asset_id' => 'nullable|exists:cmdb,device_id',
         ]);
 
+        $changes = [];
+
+        // Track status change
+        if (isset($validated['status']) && $validated['status'] !== $ticket->status) {
+            $changes[] = [
+                'type' => 'status_changed',
+                'old_value' => $ticket->status,
+                'new_value' => $validated['status'],
+            ];
+        }
+
+        // Track priority change
+        if (isset($validated['priority']) && $validated['priority'] !== $ticket->priority) {
+            $changes[] = [
+                'type' => 'priority_changed',
+                'old_value' => $ticket->priority,
+                'new_value' => $validated['priority'],
+            ];
+        }
+
+        // Track type change
+        if (isset($validated['ticket_type']) && $validated['ticket_type'] !== $ticket->ticket_type) {
+            $changes[] = [
+                'type' => 'type_changed',
+                'old_value' => $ticket->ticket_type,
+                'new_value' => $validated['ticket_type'],
+            ];
+        }
+
+        $oldStatus = $ticket->status;
         $ticket->update($validated);
+
+        // Log activity
+        foreach ($changes as $change) {
+            TicketActivity::create([
+                'ticket_id' => $ticket->ticket_id,
+                'user_id' => $request->user()->id,
+                'type' => $change['type'],
+                'old_value' => $change['old_value'],
+                'new_value' => $change['new_value'],
+            ]);
+        }
+
+        // Email customer if status changed
+        if (isset($validated['status']) && $validated['status'] !== $oldStatus) {
+            $this->notifyCustomerStatusChange($ticket, $oldStatus, $validated['status']);
+        }
 
         return back()->with('success', 'Ticket updated.');
     }
@@ -210,6 +257,32 @@ class TicketController extends Controller
                 ], function ($message) use ($recipient, $ticket) {
                     $message->to($recipient->email)
                             ->subject("Ticket Opened: INC{$ticket->ticket_id} — {$ticket->subject}");
+                });
+            } catch (\Exception) {
+                // Don't fail the request
+            }
+        }
+    }
+
+    private function notifyCustomerStatusChange(Ticket $ticket, string $oldStatus, string $newStatus): void
+    {
+        $recipients = User::where('company_id', $ticket->company_id)
+            ->where('is_admin', false)
+            ->whereNotNull('email')
+            ->get();
+
+        if ($recipients->isEmpty()) return;
+
+        foreach ($recipients as $recipient) {
+            try {
+                Mail::send('emails.ticket-status-changed', [
+                    'ticket' => $ticket,
+                    'oldStatus' => $oldStatus,
+                    'newStatus' => $newStatus,
+                    'recipientName' => $recipient->first_name ?? 'there',
+                ], function ($message) use ($recipient, $ticket, $newStatus) {
+                    $message->to($recipient->email)
+                            ->subject("INC{$ticket->ticket_id} Status Update: {$newStatus}");
                 });
             } catch (\Exception) {
                 // Don't fail the request
