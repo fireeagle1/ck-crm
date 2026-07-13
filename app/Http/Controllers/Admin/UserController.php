@@ -55,10 +55,16 @@ class UserController extends Controller
         ]);
 
         $plainPassword = $validated['password'];
+        $isAdmin = $request->boolean('is_admin');
+
+        // Remove is_admin from mass-assignment data — set explicitly
+        unset($validated['is_admin']);
         $validated['name'] = $validated['first_name'] . ' ' . $validated['last_name'];
         $validated['password'] = Hash::make($validated['password']);
 
         $user = User::create($validated);
+        $user->is_admin = $isAdmin;
+        $user->save();
 
         // Send welcome email
         try {
@@ -96,31 +102,39 @@ class UserController extends Controller
             'is_admin' => 'boolean',
         ]);
 
+        $isAdmin = $request->boolean('is_admin');
+
+        // Remove is_admin from mass-assignment data — set explicitly
+        unset($validated['is_admin']);
         $validated['name'] = $validated['first_name'] . ' ' . $validated['last_name'];
 
         $user->update($validated);
+        $user->is_admin = $isAdmin;
+        $user->save();
 
         return redirect()->route('admin.users.edit', $user)
             ->with('success', 'User updated successfully.');
     }
 
-    public function impersonate(User $user)
+    public function impersonate(Request $request, User $user)
     {
         $admin = auth()->user();
 
         session()->put('impersonating_from', $admin->id);
         auth()->login($user);
+        $request->session()->regenerate();
 
         return redirect()->route('portal.dashboard')
             ->with('info', 'Now impersonating ' . $user->full_name);
     }
 
-    public function stopImpersonating()
+    public function stopImpersonating(Request $request)
     {
         $adminId = session()->pull('impersonating_from');
 
         if ($adminId) {
             auth()->loginUsingId($adminId);
+            $request->session()->regenerate();
         }
 
         return redirect()->route('admin.dashboard')
@@ -133,23 +147,21 @@ class UserController extends Controller
             'new_password' => 'required|min:8',
         ]);
 
-        $user->update([
-            'password' => Hash::make($validated['new_password']),
-            'failed_attempts' => 0,
-            'is_locked' => false,
-            'lock_until' => null,
-        ]);
+        $user->password = Hash::make($validated['new_password']);
+        $user->failed_attempts = 0;
+        $user->is_locked = false;
+        $user->lock_until = null;
+        $user->save();
 
         return back()->with('success', "Password reset for {$user->full_name}.");
     }
 
     public function toggleLock(User $user)
     {
-        $user->update([
-            'is_locked' => !$user->is_locked,
-            'lock_until' => null,
-            'failed_attempts' => 0,
-        ]);
+        $user->is_locked = !$user->is_locked;
+        $user->lock_until = null;
+        $user->failed_attempts = 0;
+        $user->save();
 
         $status = $user->is_locked ? 'disabled' : 'enabled';
 

@@ -67,7 +67,7 @@ class SsoController extends Controller
                 'Authorization' => "WHM {$whmUser}:{$token}",
             ])
             ->withOptions([
-                'verify' => false,
+                'verify' => true,
                 'timeout' => 15,
             ])
             ->get($apiUrl, [

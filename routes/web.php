@@ -36,9 +36,9 @@ Route::middleware(['auth', 'verified'])->prefix('portal')->name('portal.')->grou
     // Tickets
     Route::get('/tickets', [Portal\TicketController::class, 'index'])->name('tickets.index');
     Route::get('/tickets/create', [Portal\TicketController::class, 'create'])->name('tickets.create');
-    Route::post('/tickets', [Portal\TicketController::class, 'store'])->name('tickets.store');
+    Route::post('/tickets', [Portal\TicketController::class, 'store'])->middleware('throttle:10,1')->name('tickets.store');
     Route::get('/tickets/{ticket}', [Portal\TicketController::class, 'show'])->name('tickets.show');
-    Route::post('/tickets/{ticket}/reply', [Portal\TicketController::class, 'reply'])->name('tickets.reply');
+    Route::post('/tickets/{ticket}/reply', [Portal\TicketController::class, 'reply'])->middleware('throttle:20,1')->name('tickets.reply');
     Route::post('/tickets/{ticket}/close', [Portal\TicketController::class, 'close'])->name('tickets.close');
 
     // Domains
@@ -59,8 +59,8 @@ Route::middleware(['auth', 'verified'])->prefix('portal')->name('portal.')->grou
     Route::get('/account', [Portal\AccountController::class, 'show'])->name('account.show');
     Route::put('/account', [Portal\AccountController::class, 'update'])->name('account.update');
     Route::put('/account/company', [Portal\AccountController::class, 'updateCompany'])->name('account.company.update');
-    Route::post('/account/users', [Portal\AccountController::class, 'addUser'])->name('account.users.add');
-    Route::post('/account/users/{user}/reset-password', [Portal\AccountController::class, 'sendPasswordReset'])->name('account.users.reset-password');
+    Route::post('/account/users', [Portal\AccountController::class, 'addUser'])->middleware('throttle:5,1')->name('account.users.add');
+    Route::post('/account/users/{user}/reset-password', [Portal\AccountController::class, 'sendPasswordReset'])->middleware('throttle:5,1')->name('account.users.reset-password');
 
     // Billing
     Route::post('/billing/portal', [Portal\BillingController::class, 'portal'])->name('billing.portal');
@@ -152,8 +152,8 @@ Route::middleware(['auth', 'verified', EnsureIsAdmin::class])->prefix('admin')->
     Route::post('/users/{user}/toggle-lock', [Admin\UserController::class, 'toggleLock'])->name('users.toggle-lock');
     Route::post('/impersonate/stop', [Admin\UserController::class, 'stopImpersonating'])->name('impersonate.stop');
 
-    // Import
-    Route::post('/settings/import', [Admin\ImportController::class, 'run'])->name('import.run');
+    // Import — REMOVED for security (SSRF risk from arbitrary database connections)
+    // Route::post('/settings/import', [Admin\ImportController::class, 'run'])->name('import.run');
 
     // Cleanup
     Route::get('/cleanup', [Admin\CleanupController::class, 'index'])->name('cleanup.index');

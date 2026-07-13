@@ -21,13 +21,15 @@ class User extends Authenticatable
         'password',
         'company_id',
         'phone_number',
-        'is_admin',
-        'failed_attempts',
-        'is_locked',
-        'lock_until',
         'last_login',
         'last_failed_login',
     ];
+
+    /**
+     * Attributes that must be set explicitly (not mass-assignable for security).
+     * Use $user->is_admin = true, $user->is_locked = true, etc.
+     */
+    protected $guarded_note = 'is_admin, is_locked, failed_attempts, lock_until are intentionally excluded from $fillable';
 
     protected $hidden = [
         'password',

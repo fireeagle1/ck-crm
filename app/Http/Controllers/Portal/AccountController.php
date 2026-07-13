@@ -57,6 +57,15 @@ class AccountController extends Controller
 
     public function addUser(Request $request)
     {
+        // Cap at 10 users per company
+        $existingCount = User::where('company_id', $request->user()->company_id)
+            ->where('is_admin', false)
+            ->count();
+
+        if ($existingCount >= 10) {
+            return back()->with('error', 'Maximum of 10 users per company reached. Please contact support to increase this limit.');
+        }
+
         $validated = $request->validate([
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',

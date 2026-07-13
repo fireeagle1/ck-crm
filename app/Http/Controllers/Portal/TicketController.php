@@ -73,7 +73,7 @@ class TicketController extends Controller
             'asset_id' => 'nullable|exists:cmdb,device_id',
             'ticket_type' => 'in:Incident,Service Request',
             'request_category' => 'nullable|string|max:100',
-            'attachment' => 'nullable|file|max:10240',
+            'attachment' => 'nullable|file|mimes:pdf,jpg,jpeg,png,gif,doc,docx,xls,xlsx,csv,txt,zip,rar,7z|max:10240',
         ]);
 
         $attachmentPath = null;
@@ -126,7 +126,7 @@ class TicketController extends Controller
 
         $validated = $request->validate([
             'body' => 'required|string',
-            'attachment' => 'nullable|file|max:10240',
+            'attachment' => 'nullable|file|mimes:pdf,jpg,jpeg,png,gif,doc,docx,xls,xlsx,csv,txt,zip,rar,7z|max:10240',
         ]);
 
         $attachmentPath = null;

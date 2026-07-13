@@ -197,13 +197,18 @@ class ImportController extends Controller
                 'password' => $row['Password'] ?? Hash::make('changeme123'),
                 'company_id' => $companyId,
                 'phone_number' => $row['PhoneNumber'] ?? null,
-                'is_admin' => (int) ($row['IsAdmin'] ?? 0) === 1,
             ];
+
+            $isAdmin = (int) ($row['IsAdmin'] ?? 0) === 1;
 
             if ($existing) {
                 $existing->update($data);
+                $existing->is_admin = $isAdmin;
+                $existing->save();
             } else {
-                User::create($data);
+                $user = User::create($data);
+                $user->is_admin = $isAdmin;
+                $user->save();
             }
             $count++;
         }

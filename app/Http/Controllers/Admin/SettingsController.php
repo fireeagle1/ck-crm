@@ -26,9 +26,9 @@ class SettingsController extends Controller
     {
         $request->validate([
             'site_name' => 'required|string|max:255',
-            'logo' => 'nullable|image|mimes:png,jpg,jpeg,svg,webp|max:2048',
-            'logo_dark' => 'nullable|image|mimes:png,jpg,jpeg,svg,webp|max:2048',
-            'favicon' => 'nullable|mimes:ico,png,svg|max:512',
+            'logo' => 'nullable|image|mimes:png,jpg,jpeg,webp|max:2048',
+            'logo_dark' => 'nullable|image|mimes:png,jpg,jpeg,webp|max:2048',
+            'favicon' => 'nullable|mimes:ico,png|max:512',
         ]);
 
         Setting::set('site_name', $request->input('site_name'));
