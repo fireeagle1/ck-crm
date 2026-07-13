@@ -94,8 +94,30 @@
                     </form>
                 </div>
             @else
-                <div class="bg-gray-50 rounded-lg border p-4 text-center text-sm text-gray-500">
-                    This ticket is closed. <a href="{{ route('portal.tickets.create') }}" class="text-blue-600 hover:underline font-medium">Open a new ticket</a> if you need further help.
+                <div class="bg-white rounded-lg border p-5">
+                    <div class="bg-gray-50 rounded-lg p-4 mb-4">
+                        <p class="text-sm text-gray-600">This ticket is closed. If you still need help, you can reply below and it will be re-opened automatically.</p>
+                    </div>
+                    <form method="POST" action="{{ route('portal.tickets.reply', $ticket) }}" enctype="multipart/form-data">
+                        @csrf
+                        <div class="space-y-3">
+                            <textarea name="body" rows="3" required placeholder="Type your message to re-open this ticket..."
+                                      class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">{{ old('body') }}</textarea>
+                            @error('body') <p class="text-red-600 text-sm">{{ $message }}</p> @enderror
+
+                            <div class="flex items-center justify-between">
+                                <label class="flex items-center gap-1 text-sm text-gray-500 cursor-pointer hover:text-gray-700">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>
+                                    <span>Attach file</span>
+                                    <input type="file" name="attachment" class="hidden">
+                                </label>
+
+                                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-semibold hover:bg-blue-700 transition">
+                                    Re-open &amp; Reply
+                                </button>
+                            </div>
+                        </div>
+                    </form>
                 </div>
             @endif
         </div>

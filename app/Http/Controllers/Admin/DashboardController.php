@@ -24,6 +24,16 @@ class DashboardController extends Controller
         $openTickets = Ticket::whereIn('status', ['Open', 'Pending', 'In Progress'])->count();
         $criticalTickets = Ticket::whereIn('status', ['Open', 'Pending', 'In Progress'])
             ->where('priority', 'Critical')->count();
+        $highTickets = Ticket::whereIn('status', ['Open', 'Pending', 'In Progress'])
+            ->where('priority', 'High')->count();
+        $overdueTickets = Ticket::whereIn('status', ['Open', 'Pending', 'In Progress'])
+            ->whereNotNull('due_at')
+            ->where('due_at', '<', now())
+            ->count();
+        $avgResponseTime = Ticket::whereNotNull('first_replied_at')
+            ->whereRaw('first_replied_at > created_at')
+            ->selectRaw('AVG(TIMESTAMPDIFF(MINUTE, created_at, first_replied_at)) as avg_minutes')
+            ->value('avg_minutes');
 
         // Service stats
         $activeServices = Service::where('status', 'Active')->count();
@@ -73,6 +83,9 @@ class DashboardController extends Controller
         return view('admin.dashboard', compact(
             'openTickets',
             'criticalTickets',
+            'highTickets',
+            'overdueTickets',
+            'avgResponseTime',
             'activeServices',
             'totalCustomers',
             'mrr',

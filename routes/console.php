@@ -19,3 +19,6 @@ Schedule::call(function () {
     $deleted = ScheduledTaskLog::prune(30);
     ScheduledTaskLog::begin('log:prune')->complete("Pruned {$deleted} old log entries.", ['deleted' => $deleted]);
 })->dailyAt('04:00');
+
+// Ticket daily digest — 8am, only sends if there are open tickets
+Schedule::command('tickets:daily-digest')->dailyAt('08:00');

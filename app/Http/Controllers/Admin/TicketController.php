@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Asset;
+use App\Models\CannedResponse;
 use App\Models\Customer;
 use App\Models\Service;
 use App\Models\Ticket;
@@ -126,7 +127,10 @@ class TicketController extends Controller
             ? User::where('company_id', $ticket->company_id)->where('is_admin', false)->orderBy('first_name')->get()
             : collect();
 
-        return view('admin.tickets.show', compact('ticket', 'assets', 'users'));
+        // Canned responses for quick reply
+        $cannedResponses = CannedResponse::orderBy('sort_order')->orderBy('title')->get();
+
+        return view('admin.tickets.show', compact('ticket', 'assets', 'users', 'cannedResponses'));
     }
 
     public function update(Request $request, Ticket $ticket)
@@ -137,6 +141,7 @@ class TicketController extends Controller
             'ticket_type' => 'in:Incident,Service Request',
             'asset_id' => 'nullable|exists:cmdb,device_id',
             'user_id' => 'nullable|exists:users,id',
+            'due_at' => 'nullable|date',
         ]);
 
         $changes = [];
@@ -224,6 +229,11 @@ class TicketController extends Controller
             'is_internal' => $request->boolean('is_internal'),
             'attachment_path' => $attachmentPath,
         ]);
+
+        // Track first reply time for SLA reporting
+        if (!$ticket->first_replied_at && !$request->boolean('is_internal')) {
+            $ticket->update(['first_replied_at' => now()]);
+        }
 
         // Re-open ticket if it was closed and admin replies
         if ($ticket->status === 'Closed') {

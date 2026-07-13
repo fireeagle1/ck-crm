@@ -41,7 +41,12 @@
                 @forelse ($tickets as $ticket)
                     <tr class="hover:bg-gray-50 cursor-pointer" onclick="window.location='{{ route('admin.tickets.show', $ticket) }}'">
                         <td class="px-4 py-3 font-medium text-blue-600">INC{{ $ticket->ticket_id }}</td>
-                        <td class="px-4 py-3">{{ Str::limit($ticket->subject, 40) }}</td>
+                        <td class="px-4 py-3">
+                            {{ Str::limit($ticket->subject, 40) }}
+                            @if ($ticket->due_at && $ticket->due_at->isPast() && $ticket->status !== 'Closed')
+                                <span class="inline-flex items-center ml-1 text-xs text-red-600 font-medium">⏰ overdue</span>
+                            @endif
+                        </td>
                         <td class="px-4 py-3 text-gray-500">{{ $ticket->customer?->company_name ?? '—' }}</td>
                         <td class="px-4 py-3">
                             <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium

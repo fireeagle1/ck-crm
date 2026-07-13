@@ -33,21 +33,40 @@
         <div class="bg-white rounded-lg p-5 shadow-sm border">
             <p class="text-sm text-gray-500">Open Tickets</p>
             <p class="text-3xl font-semibold mt-1">{{ $openTickets }}</p>
-            @if ($criticalTickets > 0)
-                <p class="text-xs text-red-500 mt-1">{{ $criticalTickets }} critical</p>
-            @endif
+            <div class="mt-2 space-y-1 text-xs">
+                @if ($criticalTickets > 0)
+                    <p class="text-red-600 font-medium">{{ $criticalTickets }} critical</p>
+                @endif
+                @if ($highTickets > 0)
+                    <p class="text-orange-600 font-medium">{{ $highTickets }} high</p>
+                @endif
+                @if ($overdueTickets > 0)
+                    <p class="text-red-500 font-medium">{{ $overdueTickets }} overdue</p>
+                @endif
+            </div>
+        </div>
+        <div class="bg-white rounded-lg p-5 shadow-sm border">
+            <p class="text-sm text-gray-500">Avg. First Response</p>
+            <p class="text-3xl font-semibold mt-1">
+                @if ($avgResponseTime)
+                    @if ($avgResponseTime < 60)
+                        {{ round($avgResponseTime) }}m
+                    @else
+                        {{ round($avgResponseTime / 60, 1) }}h
+                    @endif
+                @else
+                    —
+                @endif
+            </p>
+            <p class="text-xs text-gray-400 mt-1">Average time to first reply</p>
         </div>
         <div class="bg-white rounded-lg p-5 shadow-sm border">
             <p class="text-sm text-gray-500">Quick Actions</p>
             <div class="mt-2 space-y-1">
                 <a href="{{ route('admin.customers.create') }}" class="block text-sm text-blue-600 hover:underline">+ Add customer</a>
                 <a href="{{ route('admin.services.create') }}" class="block text-sm text-blue-600 hover:underline">+ Add service</a>
-                <a href="{{ route('admin.users.create') }}" class="block text-sm text-blue-600 hover:underline">+ Add user</a>
+                <a href="{{ route('admin.tickets.create') }}" class="block text-sm text-blue-600 hover:underline">+ Create ticket</a>
             </div>
-        </div>
-        <div class="bg-white rounded-lg p-5 shadow-sm border">
-            <p class="text-sm text-gray-500">Domains Expiring (30d)</p>
-            <p class="text-3xl font-semibold mt-1 {{ $expiringDomains->count() > 0 ? 'text-amber-600' : '' }}">{{ $expiringDomains->count() }}</p>
         </div>
     </div>
 

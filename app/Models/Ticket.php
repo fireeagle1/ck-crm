@@ -21,10 +21,17 @@ class Ticket extends Model
         'subject',
         'description',
         'attachment_path',
+        'first_replied_at',
+        'due_at',
         'status',
         'priority',
         'ticket_type',
         'request_category',
+    ];
+
+    protected $casts = [
+        'first_replied_at' => 'datetime',
+        'due_at' => 'datetime',
     ];
 
     public function customer(): BelongsTo

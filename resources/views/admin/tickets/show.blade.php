@@ -70,12 +70,26 @@
             @endforeach
 
             {{-- Reply form --}}
-            <div class="bg-white rounded-lg shadow-sm border p-5">
+            <div class="bg-white rounded-lg shadow-sm border p-5" x-data>
                 <h3 class="text-sm font-semibold text-gray-700 mb-3">Add Reply</h3>
                 <form method="POST" action="{{ route('admin.tickets.reply', $ticket) }}" enctype="multipart/form-data">
                     @csrf
                     <div class="space-y-3">
-                        <textarea name="body" rows="4" required placeholder="Type your reply..."
+                        {{-- Canned response selector --}}
+                        @if ($cannedResponses->isNotEmpty())
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Quick Response</label>
+                                <select @change="if ($event.target.value) { $refs.replyBody.value = $event.target.value; $event.target.value = ''; }"
+                                        class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
+                                    <option value="">Insert a canned response...</option>
+                                    @foreach ($cannedResponses as $canned)
+                                        <option value="{{ $canned->body }}">{{ $canned->title }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        @endif
+
+                        <textarea name="body" rows="4" required placeholder="Type your reply..." x-ref="replyBody"
                                   class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">{{ old('body') }}</textarea>
                         @error('body') <p class="text-red-600 text-sm">{{ $message }}</p> @enderror
 
@@ -163,6 +177,13 @@
                             </select>
                         </div>
 
+                        <div>
+                            <label for="due_at" class="block text-sm font-medium text-gray-700">Due Date</label>
+                            <input type="date" name="due_at" id="due_at"
+                                   value="{{ $ticket->due_at?->format('Y-m-d') }}"
+                                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
+                        </div>
+
                         <button type="submit" class="w-full px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700">
                             Update
                         </button>
@@ -212,6 +233,23 @@
                         <dt class="text-gray-500">Updated</dt>
                         <dd>{{ $ticket->updated_at->format('M j, Y H:i') }}</dd>
                     </div>
+                    @if ($ticket->first_replied_at)
+                        <div class="flex justify-between">
+                            <dt class="text-gray-500">First Response</dt>
+                            <dd>{{ $ticket->created_at->diffForHumans($ticket->first_replied_at, true) }}</dd>
+                        </div>
+                    @endif
+                    @if ($ticket->due_at)
+                        <div class="flex justify-between">
+                            <dt class="text-gray-500">Due</dt>
+                            <dd class="{{ $ticket->due_at->isPast() && $ticket->status !== 'Closed' ? 'text-red-600 font-medium' : '' }}">
+                                {{ $ticket->due_at->format('M j, Y') }}
+                                @if ($ticket->due_at->isPast() && $ticket->status !== 'Closed')
+                                    (overdue)
+                                @endif
+                            </dd>
+                        </div>
+                    @endif
                 </dl>
             </div>
 
