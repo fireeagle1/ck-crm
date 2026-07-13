@@ -51,6 +51,23 @@
                         <input type="hidden" name="ticket_type" :value="ticketType">
                     </div>
 
+                    {{-- Assigned To --}}
+                    @if ($users->isNotEmpty())
+                        <div>
+                            <label for="user_id" class="block text-sm font-semibold text-gray-700">Assigned To</label>
+                            <select name="user_id" id="user_id"
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
+                                <option value="">Auto (primary contact)</option>
+                                @foreach ($users as $u)
+                                    <option value="{{ $u->id }}" {{ old('user_id') == $u->id ? 'selected' : '' }}>
+                                        {{ $u->full_name }} ({{ $u->email }})
+                                    </option>
+                                @endforeach
+                            </select>
+                            <p class="text-xs text-gray-500 mt-1">Leave as "Auto" to assign to the primary contact for this customer.</p>
+                        </div>
+                    @endif
+
                     {{-- Category (for service requests) --}}
                     <div x-show="ticketType === 'Service Request'" x-transition>
                         <label for="request_category" class="block text-sm font-semibold text-gray-700">Category</label>

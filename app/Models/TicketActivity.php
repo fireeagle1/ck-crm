@@ -34,6 +34,7 @@ class TicketActivity extends Model
             'status_changed' => "{$who} changed status from {$this->old_value} to {$this->new_value}",
             'priority_changed' => "{$who} changed priority from {$this->old_value} to {$this->new_value}",
             'type_changed' => "{$who} changed type from {$this->old_value} to {$this->new_value}",
+            'assigned_changed' => "{$who} reassigned ticket from {$this->old_value} to {$this->new_value}",
             'created' => "{$who} created this ticket",
             'closed' => "{$who} closed this ticket",
             default => $this->note ?? "{$who} updated this ticket",

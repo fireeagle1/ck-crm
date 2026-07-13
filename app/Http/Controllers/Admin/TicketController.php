@@ -50,6 +50,7 @@ class TicketController extends Controller
 
         $assets = collect();
         $services = collect();
+        $users = collect();
 
         if ($selectedCustomer) {
             $assets = Asset::where('customer_id', $selectedCustomer)
@@ -60,15 +61,20 @@ class TicketController extends Controller
                 ->where('status', 'Active')
                 ->orderBy('service_short')
                 ->get();
+            $users = User::where('company_id', $selectedCustomer)
+                ->where('is_admin', false)
+                ->orderBy('first_name')
+                ->get();
         }
 
-        return view('admin.tickets.create', compact('customers', 'selectedCustomer', 'assets', 'services'));
+        return view('admin.tickets.create', compact('customers', 'selectedCustomer', 'assets', 'services', 'users'));
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
             'company_id' => 'required|exists:customers,company_id',
+            'user_id' => 'nullable|exists:users,id',
             'subject' => 'required|string|max:255',
             'description' => 'required|string',
             'ticket_type' => 'required|in:Incident,Service Request',
@@ -79,14 +85,14 @@ class TicketController extends Controller
             'notify_customer' => 'boolean',
         ]);
 
-        // Find the primary user for this customer (to assign as ticket owner)
-        $customerUser = User::where('company_id', $validated['company_id'])
+        // Use selected user or fall back to primary user for this customer
+        $assignedUserId = $validated['user_id'] ?? User::where('company_id', $validated['company_id'])
             ->where('is_admin', false)
-            ->first();
+            ->first()?->id;
 
         $ticket = Ticket::create([
             'company_id' => $validated['company_id'],
-            'user_id' => $customerUser?->id,
+            'user_id' => $assignedUserId,
             'subject' => $validated['subject'],
             'description' => $validated['description'],
             'ticket_type' => $validated['ticket_type'],
@@ -115,7 +121,12 @@ class TicketController extends Controller
             ? Asset::where('customer_id', $ticket->company_id)->get()
             : collect();
 
-        return view('admin.tickets.show', compact('ticket', 'assets'));
+        // Get users for this customer to allow reassignment
+        $users = $ticket->company_id
+            ? User::where('company_id', $ticket->company_id)->where('is_admin', false)->orderBy('first_name')->get()
+            : collect();
+
+        return view('admin.tickets.show', compact('ticket', 'assets', 'users'));
     }
 
     public function update(Request $request, Ticket $ticket)
@@ -125,6 +136,7 @@ class TicketController extends Controller
             'priority' => 'in:Low,Normal,High,Critical',
             'ticket_type' => 'in:Incident,Service Request',
             'asset_id' => 'nullable|exists:cmdb,device_id',
+            'user_id' => 'nullable|exists:users,id',
         ]);
 
         $changes = [];
@@ -153,6 +165,17 @@ class TicketController extends Controller
                 'type' => 'type_changed',
                 'old_value' => $ticket->ticket_type,
                 'new_value' => $validated['ticket_type'],
+            ];
+        }
+
+        // Track assigned user change
+        if (array_key_exists('user_id', $validated) && (int) ($validated['user_id'] ?? 0) !== (int) ($ticket->user_id ?? 0)) {
+            $oldUser = $ticket->user?->full_name ?? 'Unassigned';
+            $newUser = isset($validated['user_id']) ? User::find($validated['user_id'])?->full_name ?? 'Unassigned' : 'Unassigned';
+            $changes[] = [
+                'type' => 'assigned_changed',
+                'old_value' => $oldUser,
+                'new_value' => $newUser,
             ];
         }
 
