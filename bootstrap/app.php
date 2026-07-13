@@ -18,6 +18,9 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         $middleware->redirectGuestsTo('/login');
+        $middleware->redirectUsersTo(function (Request $request) {
+            return $request->user()?->isAdmin() ? '/admin/dashboard' : '/portal/dashboard';
+        });
 
         // Trust all proxies (Cloudflare)
         $middleware->trustProxies(at: '*');
