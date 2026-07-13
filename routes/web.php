@@ -17,6 +17,13 @@ Route::get('/', function () {
 
 /*
 |--------------------------------------------------------------------------
+| cPanel Integration Redirects (legacy WHMCS links)
+|--------------------------------------------------------------------------
+*/
+Route::get('/integration/index.html', [\App\Http\Controllers\CpanelIntegrationController::class, 'redirect'])->name('cpanel.integration');
+
+/*
+|--------------------------------------------------------------------------
 | Customer Portal (authenticated users)
 |--------------------------------------------------------------------------
 */
@@ -61,6 +68,10 @@ Route::middleware(['auth', 'verified'])->prefix('portal')->name('portal.')->grou
     Route::put('/account/company', [Portal\AccountController::class, 'updateCompany'])->name('account.company.update');
     Route::post('/account/users', [Portal\AccountController::class, 'addUser'])->middleware('throttle:5,1')->name('account.users.add');
     Route::post('/account/users/{user}/reset-password', [Portal\AccountController::class, 'sendPasswordReset'])->middleware('throttle:5,1')->name('account.users.reset-password');
+
+    // Upgrade / Service Requests
+    Route::get('/upgrade-request', [Portal\UpgradeRequestController::class, 'show'])->name('upgrade-request.show');
+    Route::post('/upgrade-request', [Portal\UpgradeRequestController::class, 'store'])->middleware('throttle:5,1')->name('upgrade-request.store');
 
     // Billing
     Route::post('/billing/portal', [Portal\BillingController::class, 'portal'])->name('billing.portal');
