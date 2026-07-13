@@ -13,6 +13,7 @@
         ['route' => 'admin.assets.index', 'label' => 'Assets / CMDB'],
         ['route' => 'admin.articles.index', 'label' => 'Knowledgebase'],
         ['route' => 'admin.communications.index', 'label' => 'Communications'],
+        ['route' => 'admin.canned-responses.index', 'label' => 'Canned Responses'],
     ];
     $adminNavTools = [
         ['route' => 'admin.services.cpanel-mapping', 'label' => 'cPanel Mapping'],

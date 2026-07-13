@@ -171,6 +171,9 @@ Route::middleware(['auth', 'verified', EnsureIsAdmin::class])->prefix('admin')->
     Route::get('/settings/import', [Admin\SettingsController::class, 'import'])->name('settings.import');
     Route::get('/settings/scheduled-tasks', [Admin\SettingsController::class, 'scheduledTasks'])->name('settings.tasks');
     Route::post('/settings/scheduled-tasks/run', [Admin\SettingsController::class, 'runTask'])->name('settings.tasks.run');
+
+    // Canned Responses
+    Route::resource('canned-responses', Admin\CannedResponseController::class)->except(['show']);
 });
 
 /*
