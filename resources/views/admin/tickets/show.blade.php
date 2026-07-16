@@ -209,7 +209,13 @@
                     </div>
                     <div class="flex justify-between">
                         <dt class="text-gray-500">Raised by</dt>
-                        <dd>{{ $ticket->user?->full_name ?? '—' }}</dd>
+                        <dd>
+                            @if ($ticket->user)
+                                <a href="{{ route('admin.users.edit', $ticket->user) }}" class="text-blue-600 hover:underline">{{ $ticket->user->full_name }}</a>
+                            @else
+                                —
+                            @endif
+                        </dd>
                     </div>
                     @if ($ticket->asset)
                         <div class="flex justify-between">

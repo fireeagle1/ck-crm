@@ -40,7 +40,13 @@
                                 {{ $asset->device_name }}
                             </a>
                         </td>
-                        <td class="px-4 py-3 text-gray-500">{{ $asset->customer?->company_name ?? '—' }}</td>
+                        <td class="px-4 py-3">
+                            @if ($asset->customer)
+                                <a href="{{ route('admin.customers.show', $asset->customer) }}" class="text-blue-600 hover:underline">{{ $asset->customer->company_name }}</a>
+                            @else
+                                <span class="text-gray-500">—</span>
+                            @endif
+                        </td>
                         <td class="px-4 py-3 text-gray-500">{{ $asset->device_type ?? '—' }}</td>
                         <td class="px-4 py-3 text-gray-500">{{ $asset->location ?? '—' }}</td>
                         <td class="px-4 py-3">

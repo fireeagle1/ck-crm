@@ -2,6 +2,18 @@
     <x-slot:title>New Ticket</x-slot:title>
 
     <div class="max-w-2xl" x-data="{ ticketType: '{{ old('ticket_type', 'Incident') }}' }">
+        @if (!empty($prefill['subject']) || !empty($prefill['description']))
+            <div class="mb-6 rounded-lg border border-green-200 bg-green-50 p-4">
+                <div class="flex items-start gap-3">
+                    <span class="text-green-600 text-xl">🌐</span>
+                    <div>
+                        <p class="font-semibold text-green-800">Thanks for submitting through your website!</p>
+                        <p class="text-sm text-green-700 mt-1">We've pre-filled some details from your site. Please describe your issue below and hit Submit.</p>
+                    </div>
+                </div>
+            </div>
+        @endif
+
         <h1 class="text-3xl font-bold tracking-tight mb-2">Raise a Request</h1>
         <p class="text-gray-500 mb-6">Tell us what you need help with and our team will get back to you.</p>
 

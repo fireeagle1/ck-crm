@@ -31,8 +31,10 @@
             </thead>
             <tbody class="divide-y">
                 @forelse ($customers as $customer)
-                    <tr class="hover:bg-gray-50 cursor-pointer" onclick="window.location='{{ route('admin.customers.show', $customer) }}'">
-                        <td class="px-4 py-3 font-medium text-blue-600">{{ $customer->company_name ?: '—' }}</td>
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-4 py-3 font-medium">
+                            <a href="{{ route('admin.customers.show', $customer) }}" class="text-blue-600 hover:underline">{{ $customer->company_name ?: '—' }}</a>
+                        </td>
                         <td class="px-4 py-3 text-gray-500">{{ $customer->customer_name ?? '—' }}</td>
                         <td class="px-4 py-3">{{ $customer->services_count }}</td>
                         <td class="px-4 py-3">{{ $customer->users_count }}</td>

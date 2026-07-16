@@ -39,15 +39,23 @@
             </thead>
             <tbody class="divide-y">
                 @forelse ($tickets as $ticket)
-                    <tr class="hover:bg-gray-50 cursor-pointer" onclick="window.location='{{ route('admin.tickets.show', $ticket) }}'">
-                        <td class="px-4 py-3 font-medium text-blue-600">INC{{ $ticket->ticket_id }}</td>
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-4 py-3 font-medium">
+                            <a href="{{ route('admin.tickets.show', $ticket) }}" class="text-blue-600 hover:underline">INC{{ $ticket->ticket_id }}</a>
+                        </td>
                         <td class="px-4 py-3">
                             {{ Str::limit($ticket->subject, 40) }}
                             @if ($ticket->due_at && $ticket->due_at->isPast() && $ticket->status !== 'Closed')
                                 <span class="inline-flex items-center ml-1 text-xs text-red-600 font-medium">⏰ overdue</span>
                             @endif
                         </td>
-                        <td class="px-4 py-3 text-gray-500">{{ $ticket->customer?->company_name ?? '—' }}</td>
+                        <td class="px-4 py-3">
+                            @if ($ticket->customer)
+                                <a href="{{ route('admin.customers.show', $ticket->customer) }}" class="text-blue-600 hover:underline">{{ $ticket->customer->company_name }}</a>
+                            @else
+                                <span class="text-gray-500">—</span>
+                            @endif
+                        </td>
                         <td class="px-4 py-3">
                             <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium
                                 {{ $ticket->status === 'Open' ? 'bg-green-100 text-green-700' : ($ticket->status === 'Closed' ? 'bg-gray-100 text-gray-700' : 'bg-amber-100 text-amber-700') }}">

@@ -40,9 +40,17 @@
             <tbody class="divide-y divide-gray-100">
                 @forelse ($users as $user)
                     <tr class="hover:bg-gray-50 {{ $user->is_locked ? 'opacity-60' : '' }}">
-                        <td class="px-4 py-3 font-medium">{{ $user->full_name }}</td>
+                        <td class="px-4 py-3 font-medium">
+                            <a href="{{ route('admin.users.edit', $user) }}" class="text-blue-600 hover:underline">{{ $user->full_name }}</a>
+                        </td>
                         <td class="px-4 py-3 text-gray-500">{{ $user->email }}</td>
-                        <td class="px-4 py-3 text-gray-500">{{ $user->customer?->company_name ?? '—' }}</td>
+                        <td class="px-4 py-3">
+                            @if ($user->customer)
+                                <a href="{{ route('admin.customers.show', $user->customer) }}" class="text-blue-600 hover:underline">{{ $user->customer->company_name }}</a>
+                            @else
+                                <span class="text-gray-500">—</span>
+                            @endif
+                        </td>
                         <td class="px-4 py-3">
                             @if ($user->is_admin)
                                 <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium bg-purple-100 text-purple-700">Admin</span>

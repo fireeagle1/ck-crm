@@ -85,7 +85,12 @@
                                 INC{{ $ticket->ticket_id }}
                             </a>
                             <span class="text-sm text-gray-700 ml-2">{{ Str::limit($ticket->subject, 40) }}</span>
-                            <p class="text-xs text-gray-400">{{ $ticket->customer?->company_name }} · {{ $ticket->created_at->diffForHumans() }}</p>
+                            <p class="text-xs text-gray-400">
+                                @if ($ticket->customer)
+                                    <a href="{{ route('admin.customers.show', $ticket->customer) }}" class="text-blue-600 hover:underline">{{ $ticket->customer->company_name }}</a>
+                                @endif
+                                · {{ $ticket->created_at->diffForHumans() }}
+                            </p>
                         </div>
                         <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium
                             {{ $ticket->priority === 'Critical' ? 'bg-red-100 text-red-700' : ($ticket->priority === 'High' ? 'bg-orange-100 text-orange-700' : 'bg-blue-100 text-blue-700') }}">
@@ -111,7 +116,11 @@
                             <div class="px-5 py-3 flex items-center justify-between">
                                 <div>
                                     <p class="text-sm font-medium">{{ $domain->domain_name }}</p>
-                                    <p class="text-xs text-gray-400">{{ $domain->customer?->company_name }}</p>
+                                    <p class="text-xs text-gray-400">
+                                        @if ($domain->customer)
+                                            <a href="{{ route('admin.customers.show', $domain->customer) }}" class="text-blue-600 hover:underline">{{ $domain->customer->company_name }}</a>
+                                        @endif
+                                    </p>
                                 </div>
                                 <span class="text-sm font-medium {{ $daysLeft < 0 ? 'text-red-600' : ($daysLeft <= 7 ? 'text-red-500' : 'text-amber-600') }}">
                                     {{ $daysLeft < 0 ? 'Expired ' . abs($daysLeft) . 'd ago' : $daysLeft . 'd left' }}
@@ -129,7 +138,7 @@
                 <div class="divide-y divide-gray-100">
                     @forelse ($recentLogins as $login)
                         <div class="px-5 py-3 flex items-center justify-between">
-                            <span class="text-sm">{{ $login->full_name }}</span>
+                            <a href="{{ route('admin.users.edit', $login) }}" class="text-sm text-blue-600 hover:underline">{{ $login->full_name }}</a>
                             <span class="text-xs text-gray-500">{{ $login->last_login->diffForHumans() }}</span>
                         </div>
                     @empty

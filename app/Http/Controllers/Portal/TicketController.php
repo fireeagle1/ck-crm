@@ -61,11 +61,22 @@ class TicketController extends Controller
             ->where('status', 'Active')
             ->exists();
 
-        // Allow pre-filling from URL query parameters (used by WordPress plugin)
+        // Allow pre-filling from URL query parameters (used by WordPress plugin).
+        // Store in session so the data survives the login redirect if needed.
         $prefill = [
             'subject' => $request->query('subject'),
             'description' => $request->query('description'),
         ];
+
+        // If we have prefill data from URL, persist it in session
+        if ($prefill['subject'] || $prefill['description']) {
+            session(['ticket_prefill' => $prefill]);
+        }
+
+        // Fall back to session data (from before login redirect)
+        if (!$prefill['subject'] && !$prefill['description'] && session()->has('ticket_prefill')) {
+            $prefill = session()->pull('ticket_prefill');
+        }
 
         return view('portal.tickets.create', compact('services', 'assets', 'hasSupportPlan', 'prefill'));
     }

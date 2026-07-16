@@ -259,7 +259,9 @@
             <tbody class="divide-y">
                 @forelse ($customer->users as $user)
                     <tr class="hover:bg-gray-50">
-                        <td class="px-4 py-2 font-medium">{{ $user->full_name }}</td>
+                        <td class="px-4 py-2 font-medium">
+                            <a href="{{ route('admin.users.edit', $user) }}" class="text-blue-600 hover:underline">{{ $user->full_name }}</a>
+                        </td>
                         <td class="px-4 py-2 text-gray-500">{{ $user->email }}</td>
                         <td class="px-4 py-2 text-gray-500">{{ $user->last_login?->diffForHumans() ?? 'Never' }}</td>
                         <td class="px-4 py-2">
