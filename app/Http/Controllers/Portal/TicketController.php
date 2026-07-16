@@ -61,7 +61,13 @@ class TicketController extends Controller
             ->where('status', 'Active')
             ->exists();
 
-        return view('portal.tickets.create', compact('services', 'assets', 'hasSupportPlan'));
+        // Allow pre-filling from URL query parameters (used by WordPress plugin)
+        $prefill = [
+            'subject' => $request->query('subject'),
+            'description' => $request->query('description'),
+        ];
+
+        return view('portal.tickets.create', compact('services', 'assets', 'hasSupportPlan', 'prefill'));
     }
 
     public function store(Request $request)

@@ -50,7 +50,7 @@
 
                     <div>
                         <label for="subject" class="block text-sm font-semibold text-gray-700">Subject <span class="text-red-500">*</span></label>
-                        <input type="text" name="subject" id="subject" required value="{{ old('subject') }}"
+                        <input type="text" name="subject" id="subject" required value="{{ old('subject', $prefill['subject'] ?? '') }}"
                                placeholder="Brief summary of your issue or request"
                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
                         @error('subject') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
@@ -88,7 +88,7 @@
                         <label for="description" class="block text-sm font-semibold text-gray-700">Description <span class="text-red-500">*</span></label>
                         <textarea name="description" id="description" rows="6" required
                                   placeholder="Please provide as much detail as possible..."
-                                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">{{ old('description') }}</textarea>
+                                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">{{ old('description', $prefill['description'] ?? '') }}</textarea>
                         @error('description') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
                     </div>
 
