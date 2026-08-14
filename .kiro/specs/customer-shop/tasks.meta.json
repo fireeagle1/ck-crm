@@ -1,0 +1,221 @@
+{
+  "pbtResults": {},
+  "executionHistory": {
+    "1.1 Create migrations for customer_tiers and customer_tier_assignments tables": [
+      {
+        "executionId": "cc824f51-3c45-4e4b-b899-a6d58eb8fa4d",
+        "chatSessionId": "sess_fbc9d6ce-c70b-4029-971e-4898cd933730",
+        "timestamp": 1786742243243
+      },
+      {
+        "executionId": "cc824f51-3c45-4e4b-b899-a6d58eb8fa4d",
+        "chatSessionId": "sess_fbc9d6ce-c70b-4029-971e-4898cd933730",
+        "timestamp": 1786742252124
+      }
+    ],
+    "1.2 Create migration for products table": [
+      {
+        "executionId": "cc824f51-3c45-4e4b-b899-a6d58eb8fa4d",
+        "chatSessionId": "sess_fbc9d6ce-c70b-4029-971e-4898cd933730",
+        "timestamp": 1786742243276
+      },
+      {
+        "executionId": "cc824f51-3c45-4e4b-b899-a6d58eb8fa4d",
+        "chatSessionId": "sess_fbc9d6ce-c70b-4029-971e-4898cd933730",
+        "timestamp": 1786742252927
+      }
+    ],
+    "1.3 Create migrations for product_visibilities, product_visibility_customers, and product_visibility_tiers tables": [
+      {
+        "executionId": "cc824f51-3c45-4e4b-b899-a6d58eb8fa4d",
+        "chatSessionId": "sess_fbc9d6ce-c70b-4029-971e-4898cd933730",
+        "timestamp": 1786742243306
+      },
+      {
+        "executionId": "cc824f51-3c45-4e4b-b899-a6d58eb8fa4d",
+        "chatSessionId": "sess_fbc9d6ce-c70b-4029-971e-4898cd933730",
+        "timestamp": 1786742253809
+      }
+    ],
+    "1.4 Create migrations for orders and order_items tables": [
+      {
+        "executionId": "cc824f51-3c45-4e4b-b899-a6d58eb8fa4d",
+        "chatSessionId": "sess_fbc9d6ce-c70b-4029-971e-4898cd933730",
+        "timestamp": 1786742243327
+      },
+      {
+        "executionId": "cc824f51-3c45-4e4b-b899-a6d58eb8fa4d",
+        "chatSessionId": "sess_fbc9d6ce-c70b-4029-971e-4898cd933730",
+        "timestamp": 1786742254775
+      }
+    ],
+    "1.5 Create Eloquent models: Product, ProductVisibility, CustomerTier, Order, OrderItem": [
+      {
+        "executionId": "cc824f51-3c45-4e4b-b899-a6d58eb8fa4d",
+        "chatSessionId": "sess_fbc9d6ce-c70b-4029-971e-4898cd933730",
+        "timestamp": 1786742243346
+      }
+    ],
+    "2. Checkpoint - Run migrations and verify models": [
+      {
+        "executionId": "cc824f51-3c45-4e4b-b899-a6d58eb8fa4d",
+        "chatSessionId": "sess_fbc9d6ce-c70b-4029-971e-4898cd933730",
+        "timestamp": 1786742243368
+      }
+    ],
+    "3.1 Implement CartService": [
+      {
+        "executionId": "cc824f51-3c45-4e4b-b899-a6d58eb8fa4d",
+        "chatSessionId": "sess_fbc9d6ce-c70b-4029-971e-4898cd933730",
+        "timestamp": 1786742243400
+      }
+    ],
+    "3.2 Implement StripeService": [
+      {
+        "executionId": "cc824f51-3c45-4e4b-b899-a6d58eb8fa4d",
+        "chatSessionId": "sess_fbc9d6ce-c70b-4029-971e-4898cd933730",
+        "timestamp": 1786742243420
+      }
+    ],
+    "3.3 Implement CheckoutService": [
+      {
+        "executionId": "cc824f51-3c45-4e4b-b899-a6d58eb8fa4d",
+        "chatSessionId": "sess_fbc9d6ce-c70b-4029-971e-4898cd933730",
+        "timestamp": 1786742243438
+      }
+    ],
+    "3.4 Implement FulfilmentService": [
+      {
+        "executionId": "cc824f51-3c45-4e4b-b899-a6d58eb8fa4d",
+        "chatSessionId": "sess_fbc9d6ce-c70b-4029-971e-4898cd933730",
+        "timestamp": 1786742243458
+      }
+    ],
+    "3.5 Create CheckoutResult value object": [
+      {
+        "executionId": "cc824f51-3c45-4e4b-b899-a6d58eb8fa4d",
+        "chatSessionId": "sess_fbc9d6ce-c70b-4029-971e-4898cd933730",
+        "timestamp": 1786742243477
+      }
+    ],
+    "4.1 Implement Admin\\ShopProductController": [
+      {
+        "executionId": "cc824f51-3c45-4e4b-b899-a6d58eb8fa4d",
+        "chatSessionId": "sess_fbc9d6ce-c70b-4029-971e-4898cd933730",
+        "timestamp": 1786742243501
+      }
+    ],
+    "4.2 Create admin product Blade views": [
+      {
+        "executionId": "cc824f51-3c45-4e4b-b899-a6d58eb8fa4d",
+        "chatSessionId": "sess_fbc9d6ce-c70b-4029-971e-4898cd933730",
+        "timestamp": 1786742243525
+      }
+    ],
+    "5.1 Implement Admin\\CustomerTierController": [
+      {
+        "executionId": "cc824f51-3c45-4e4b-b899-a6d58eb8fa4d",
+        "chatSessionId": "sess_fbc9d6ce-c70b-4029-971e-4898cd933730",
+        "timestamp": 1786742243544
+      }
+    ],
+    "5.2 Create admin tier Blade view": [
+      {
+        "executionId": "cc824f51-3c45-4e4b-b899-a6d58eb8fa4d",
+        "chatSessionId": "sess_fbc9d6ce-c70b-4029-971e-4898cd933730",
+        "timestamp": 1786742243566
+      }
+    ],
+    "6.1 Implement Portal\\ShopController": [
+      {
+        "executionId": "cc824f51-3c45-4e4b-b899-a6d58eb8fa4d",
+        "chatSessionId": "sess_fbc9d6ce-c70b-4029-971e-4898cd933730",
+        "timestamp": 1786742243590
+      }
+    ],
+    "6.2 Create portal shop Blade views": [
+      {
+        "executionId": "cc824f51-3c45-4e4b-b899-a6d58eb8fa4d",
+        "chatSessionId": "sess_fbc9d6ce-c70b-4029-971e-4898cd933730",
+        "timestamp": 1786742243610
+      }
+    ],
+    "7.1 Implement Portal\\CartController": [
+      {
+        "executionId": "cc824f51-3c45-4e4b-b899-a6d58eb8fa4d",
+        "chatSessionId": "sess_fbc9d6ce-c70b-4029-971e-4898cd933730",
+        "timestamp": 1786742243629
+      }
+    ],
+    "7.2 Create portal cart Blade view": [
+      {
+        "executionId": "cc824f51-3c45-4e4b-b899-a6d58eb8fa4d",
+        "chatSessionId": "sess_fbc9d6ce-c70b-4029-971e-4898cd933730",
+        "timestamp": 1786742243649
+      }
+    ],
+    "8. Checkpoint - Verify admin and portal flows work end-to-end": [
+      {
+        "executionId": "cc824f51-3c45-4e4b-b899-a6d58eb8fa4d",
+        "chatSessionId": "sess_fbc9d6ce-c70b-4029-971e-4898cd933730",
+        "timestamp": 1786742243668
+      }
+    ],
+    "9.1 Implement StripeWebhookController": [
+      {
+        "executionId": "cc824f51-3c45-4e4b-b899-a6d58eb8fa4d",
+        "chatSessionId": "sess_fbc9d6ce-c70b-4029-971e-4898cd933730",
+        "timestamp": 1786742243687
+      }
+    ],
+    "10.1 Implement Admin\\ShopOrderController": [
+      {
+        "executionId": "cc824f51-3c45-4e4b-b899-a6d58eb8fa4d",
+        "chatSessionId": "sess_fbc9d6ce-c70b-4029-971e-4898cd933730",
+        "timestamp": 1786742243710
+      }
+    ],
+    "10.2 Create admin order Blade views": [
+      {
+        "executionId": "cc824f51-3c45-4e4b-b899-a6d58eb8fa4d",
+        "chatSessionId": "sess_fbc9d6ce-c70b-4029-971e-4898cd933730",
+        "timestamp": 1786742243728
+      }
+    ],
+    "11.1 Implement Portal\\OrderController": [
+      {
+        "executionId": "cc824f51-3c45-4e4b-b899-a6d58eb8fa4d",
+        "chatSessionId": "sess_fbc9d6ce-c70b-4029-971e-4898cd933730",
+        "timestamp": 1786742243750
+      }
+    ],
+    "11.2 Create portal order Blade views": [
+      {
+        "executionId": "cc824f51-3c45-4e4b-b899-a6d58eb8fa4d",
+        "chatSessionId": "sess_fbc9d6ce-c70b-4029-971e-4898cd933730",
+        "timestamp": 1786742243772
+      }
+    ],
+    "12.1 Register all routes in web.php": [
+      {
+        "executionId": "cc824f51-3c45-4e4b-b899-a6d58eb8fa4d",
+        "chatSessionId": "sess_fbc9d6ce-c70b-4029-971e-4898cd933730",
+        "timestamp": 1786742243792
+      }
+    ],
+    "12.2 Register service providers and bind services": [
+      {
+        "executionId": "cc824f51-3c45-4e4b-b899-a6d58eb8fa4d",
+        "chatSessionId": "sess_fbc9d6ce-c70b-4029-971e-4898cd933730",
+        "timestamp": 1786742243812
+      }
+    ],
+    "13. Final checkpoint - Full integration verification": [
+      {
+        "executionId": "cc824f51-3c45-4e4b-b899-a6d58eb8fa4d",
+        "chatSessionId": "sess_fbc9d6ce-c70b-4029-971e-4898cd933730",
+        "timestamp": 1786742243839
+      }
+    ]
+  }
+}

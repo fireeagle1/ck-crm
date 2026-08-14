@@ -9,6 +9,7 @@ use App\Models\Invoice;
 use App\Models\Service;
 use App\Models\Ticket;
 use App\Models\User;
+use App\Services\MrrCalculator;
 use Illuminate\View\View;
 
 class DashboardController extends Controller
@@ -40,7 +41,7 @@ class DashboardController extends Controller
         $totalCustomers = Customer::count();
 
         // Revenue KPIs — normalise charges to monthly based on billing frequency
-        $mrr = $this->calculateMrr();
+        $mrr = app(MrrCalculator::class)->calculate();
         $arr = $mrr * 12;
 
         // Overdue invoices — exclude void/uncollectible
@@ -99,42 +100,4 @@ class DashboardController extends Controller
         ));
     }
 
-    /**
-     * Calculate true MRR by normalising each service's charge to a monthly value.
-     *
-     * For Stripe-managed services: `service_monthly_charge` stores the charge per
-     * billing cycle (from Stripe's unit_amount), so we divide by the cycle length.
-     *
-     * For manually-entered services (no stripe_subscription_id): the charge is
-     * already entered as a monthly amount by the admin, so we use it as-is.
-     */
-    private function calculateMrr(): float
-    {
-        $services = Service::where('status', 'Active')
-            ->whereNotNull('service_monthly_charge')
-            ->where('service_monthly_charge', '>', 0)
-            ->get(['service_monthly_charge', 'service_payment_frequency', 'stripe_subscription_id']);
-
-        return $services->sum(function ($service) {
-            $charge = (float) $service->service_monthly_charge;
-
-            // Manual services are entered as monthly — no conversion needed
-            if (empty($service->stripe_subscription_id)) {
-                return $charge;
-            }
-
-            // Stripe-synced: divide by number of months in the billing cycle
-            $months = match ($service->service_payment_frequency) {
-                'Weekly'      => 0.25,   // ~1 week ≈ 0.25 months
-                'Monthly'     => 1,
-                'Quarterly'   => 3,
-                'Biannually'  => 6,
-                'Annually'    => 12,
-                'Biennially'  => 24,
-                default       => 1,
-            };
-
-            return $charge / $months;
-        });
-    }
 }

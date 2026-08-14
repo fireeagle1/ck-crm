@@ -1,0 +1,26 @@
+// swift-tools-version: 5.9
+import PackageDescription
+
+let package = Package(
+    name: "CKAdmin",
+    platforms: [
+        .iOS(.v17)
+    ],
+    products: [
+        .library(
+            name: "CKAdmin",
+            targets: ["CKAdmin"]
+        ),
+    ],
+    targets: [
+        .target(
+            name: "CKAdmin",
+            path: "CKAdmin"
+        ),
+        .testTarget(
+            name: "CKAdminTests",
+            dependencies: ["CKAdmin"],
+            path: "CKAdminTests"
+        ),
+    ]
+)

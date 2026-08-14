@@ -1,0 +1,12 @@
+{
+  "": {
+    "swift-dependencies": "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdminTests.build/primary.swiftdeps"
+  },
+  "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdminTests/CKAdminTests.swift": {
+    "dependencies": "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdminTests.build/CKAdminTests.d",
+    "object": "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdminTests.build/CKAdminTests.swift.o",
+    "swiftmodule": "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdminTests.build/CKAdminTests~partial.swiftmodule",
+    "swift-dependencies": "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdminTests.build/CKAdminTests.swiftdeps",
+    "diagnostics": "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdminTests.build/CKAdminTests.dia"
+  }
+}

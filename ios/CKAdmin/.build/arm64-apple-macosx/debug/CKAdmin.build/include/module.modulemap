@@ -1,0 +1,3 @@
+module CKAdmin {
+    header "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/include/CKAdmin-Swift.h"
+}

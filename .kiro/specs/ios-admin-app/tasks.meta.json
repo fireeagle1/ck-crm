@@ -1,0 +1,683 @@
+{
+  "pbtResults": {},
+  "executionHistory": {
+    "1.1 Install Laravel Sanctum and configure token authentication": [
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786738780243
+      },
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786738789444
+      },
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786738959749
+      }
+    ],
+    "1.2 Create DeviceToken migration and model": [
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786738780523
+      },
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786738790265
+      },
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786738960568
+      }
+    ],
+    "1.3 Create `routes/api.php` with admin route group and middleware stack": [
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786738780566
+      },
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786738964921
+      },
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786739110448
+      }
+    ],
+    "1.4 Update EnsureIsAdmin middleware to return JSON for API requests": [
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786738780601
+      },
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786738965794
+      },
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786739111295
+      }
+    ],
+    "2.1 Implement AuthController with login, refresh, and logout endpoints": [
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786738780638
+      },
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786739116161
+      },
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786739353004
+      }
+    ],
+    "3.1 Extract MrrCalculator service class": [
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786738780664
+      },
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786739117052
+      },
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786739351023
+      }
+    ],
+    "3.2 Create DashboardService with metrics aggregation": [
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786738780691
+      },
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786739357744
+      }
+    ],
+    "3.3 Implement DashboardController API endpoint": [
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786738780737
+      },
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786739604357
+      },
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786739766276
+      }
+    ],
+    "4. Checkpoint — Backend infrastructure and dashboard": [
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786738780766
+      },
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786740128956
+      }
+    ],
+    "5.1 Implement CustomerController with index, store, show, update, destroy": [
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786738780792
+      },
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786739605273
+      }
+    ],
+    "6.1 Implement ServiceController with index, store, show, update, destroy": [
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786738780832
+      },
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786739785758
+      }
+    ],
+    "7.1 Implement TicketController with index, store, show, update, and reply": [
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786738780858
+      },
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786739969413
+      },
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786740117499
+      }
+    ],
+    "8.1 Implement InvoiceController with index, store, and remind": [
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786738780884
+      },
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786739970281
+      }
+    ],
+    "9. Checkpoint — All CRUD API endpoints complete": [
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786738780907
+      },
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786740130123
+      }
+    ],
+    "10.1 Implement DeviceTokenController with store and destroy": [
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786738780932
+      },
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786740139374
+      },
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786740389679
+      }
+    ],
+    "10.2 Create APNs notification channel and notification classes": [
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786738780959
+      },
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786740403875
+      }
+    ],
+    "10.3 Wire notification dispatching into ticket and invoice events": [
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786738780989
+      },
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786740634419
+      },
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786740910219
+      }
+    ],
+    "11. Checkpoint — Backend API complete": [
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786738781013
+      },
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786740917288
+      }
+    ],
+    "12.1 Create Xcode project structure and base app entry point": [
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786738781036
+      },
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786739117919
+      },
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786739352205
+      }
+    ],
+    "12.2 Implement AuthManager with Keychain storage and login/logout flows": [
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786738781064
+      },
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786739358471
+      }
+    ],
+    "12.3 Implement APIClient with token-bearing requests and error mapping": [
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786738781099
+      },
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786739606169
+      },
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786739768580
+      }
+    ],
+    "13.1 Create LoginView with email/password fields and auth state routing": [
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786738781131
+      },
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786739786613
+      }
+    ],
+    "14.1 Implement tab-based navigation with main ContentView": [
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786738781153
+      },
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786739971188
+      }
+    ],
+    "14.2 Implement DashboardView with KPI metrics and recent activity": [
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786738781177
+      },
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786740140290
+      }
+    ],
+    "15.1 Implement CustomerListView with search and pagination": [
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786738781210
+      },
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786740404702
+      },
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786740624234
+      }
+    ],
+    "15.2 Implement CustomerDetailView and CustomerFormView for CRUD": [
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786738781249
+      },
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786740635321
+      },
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786740911254
+      }
+    ],
+    "16.1 Implement ServiceListView with status filter and pagination": [
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786738781276
+      },
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786740636151
+      },
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786740911985
+      }
+    ],
+    "16.2 Implement ServiceDetailView and ServiceFormView for CRUD": [
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786738781298
+      },
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786740922238
+      }
+    ],
+    "17.1 Implement TicketListView with status/priority filters and pagination": [
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786738781324
+      },
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786740923133
+      },
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786741243775
+      }
+    ],
+    "17.2 Implement TicketDetailView with thread and reply functionality": [
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786738781348
+      },
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786741250573
+      }
+    ],
+    "17.3 Implement TicketCreateView for new ticket creation": [
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786738781379
+      },
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786741251442
+      }
+    ],
+    "18.1 Implement InvoiceListView with status filter and pagination": [
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786738781405
+      },
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786740924019
+      }
+    ],
+    "18.2 Implement InvoiceCreateView for one-off invoice creation": [
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786738781443
+      },
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786741252333
+      },
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786742010593
+      }
+    ],
+    "19. Checkpoint — iOS CRUD screens complete": [
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786738781473
+      },
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786742018562
+      }
+    ],
+    "20.1 Implement PushManager for APNs registration and token forwarding": [
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786738781498
+      },
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786742023559
+      }
+    ],
+    "21. Final checkpoint — Full integration": [
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786738781522
+      },
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786742197743
+      }
+    ],
+    "1. Backend infrastructure setup": [
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786739111325
+      }
+    ],
+    "2. Authentication API": [
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786739353035
+      }
+    ],
+    "2.2 Write property tests for authentication (Properties 1–4)": [
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786739595172
+      }
+    ],
+    "3. Dashboard API": [
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786739766309
+      }
+    ],
+    "12. iOS app scaffolding and networking layer": [
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786739768609
+      }
+    ],
+    "3.4 Write property tests for dashboard metrics (Properties 5–8)": [
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786739780093
+      }
+    ],
+    "5.2 Write property tests for customer management (Properties 9, 10, 12–14, 19)": [
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786739781342
+      }
+    ],
+    "5. Customer CRUD API": [
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786739781378
+      }
+    ],
+    "6.2 Write property tests for service management (Properties 9, 10, 12–14)": [
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786739963375
+      }
+    ],
+    "6. Service CRUD API": [
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786739963413
+      }
+    ],
+    "7. Ticket Management API": [
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786740117541
+      }
+    ],
+    "7.2 Write property tests for ticket management (Properties 9, 10, 12–16)": [
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786740122965
+      }
+    ],
+    "8.2 Write property tests for invoice management (Properties 9–12, 14)": [
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786740124057
+      }
+    ],
+    "8. Invoice Management API": [
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786740124090
+      }
+    ],
+    "10.4 Write property tests for device token management (Properties 17, 18)": [
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786740395446
+      }
+    ],
+    "10. Push Notifications Backend": [
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786740910260
+      }
+    ],
+    "15. iOS Customer Screens": [
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786740911290
+      }
+    ],
+    "18. iOS Invoice Screens": [
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786742010634
+      }
+    ],
+    "13. iOS Authentication UI": [
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786742212012
+      }
+    ],
+    "14. iOS Dashboard and Navigation": [
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786742212713
+      }
+    ],
+    "16. iOS Service Screens": [
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786742213439
+      }
+    ],
+    "17. iOS Ticket Screens": [
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786742214246
+      }
+    ],
+    "20. iOS Push Notifications": [
+      {
+        "executionId": "c64433f4-9b83-4fc3-a572-05895334bd8d",
+        "chatSessionId": "sess_5f99ce10-d23b-4dcf-a11d-f39e3662c84a",
+        "timestamp": 1786742215037
+      }
+    ]
+  }
+}

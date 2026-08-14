@@ -1,0 +1,1136 @@
+{
+  "builtTestProducts" : [
+    {
+      "binaryPath" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdminPackageTests.xctest/Contents/MacOS/CKAdminPackageTests",
+      "packagePath" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin",
+      "productName" : "CKAdminPackageTests"
+    }
+  ],
+  "copyCommands" : {
+
+  },
+  "explicitTargetDependencyImportCheckingMode" : {
+    "none" : {
+
+    }
+  },
+  "generatedSourceTargetSet" : [
+
+  ],
+  "pluginDescriptions" : [
+
+  ],
+  "swiftCommands" : {
+    "C.CKAdmin-arm64-apple-macosx-debug.module" : {
+      "executable" : "/Library/Developer/CommandLineTools/usr/bin/swiftc",
+      "fileList" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/sources",
+      "importPath" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/Modules",
+      "inputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/CKAdminApp.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Models/CustomerDetail.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Models/CustomerResponse.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Models/DashboardResponse.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Models/InvoiceResponse.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Models/ServiceDetail.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Models/ServiceResponse.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Models/TicketDetail.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Models/TicketResponse.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Services/APIClient.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Services/AuthManager.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Views/Auth/LoginView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Views/ContentView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Views/Customers/CustomerDetailView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Views/Customers/CustomerFormView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Views/Customers/CustomerListView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Views/Customers/CustomerListViewModel.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Views/Dashboard/DashboardView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Views/Dashboard/DashboardViewModel.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Views/Invoices/InvoiceCreateView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Views/Invoices/InvoiceListView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Views/Invoices/InvoiceListViewModel.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Views/Services/ServiceDetailView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Views/Services/ServiceFormView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Views/Services/ServiceListView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Views/Services/ServiceListViewModel.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Views/Tickets/TicketCreateView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Views/Tickets/TicketDetailView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Views/Tickets/TicketDetailViewModel.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Views/Tickets/TicketListView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Views/Tickets/TicketListViewModel.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/swift-version--1AB21518FC5DEDBE.txt"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/sources"
+        }
+      ],
+      "isLibrary" : true,
+      "moduleName" : "CKAdmin",
+      "moduleOutputPath" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/Modules/CKAdmin.swiftmodule",
+      "objects" : [
+        "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/CKAdminApp.swift.o",
+        "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/CustomerDetail.swift.o",
+        "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/CustomerResponse.swift.o",
+        "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/DashboardResponse.swift.o",
+        "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/InvoiceResponse.swift.o",
+        "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/ServiceDetail.swift.o",
+        "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/ServiceResponse.swift.o",
+        "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/TicketDetail.swift.o",
+        "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/TicketResponse.swift.o",
+        "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/APIClient.swift.o",
+        "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/AuthManager.swift.o",
+        "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/LoginView.swift.o",
+        "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/ContentView.swift.o",
+        "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/CustomerDetailView.swift.o",
+        "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/CustomerFormView.swift.o",
+        "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/CustomerListView.swift.o",
+        "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/CustomerListViewModel.swift.o",
+        "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/DashboardView.swift.o",
+        "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/DashboardViewModel.swift.o",
+        "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/InvoiceCreateView.swift.o",
+        "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/InvoiceListView.swift.o",
+        "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/InvoiceListViewModel.swift.o",
+        "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/ServiceDetailView.swift.o",
+        "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/ServiceFormView.swift.o",
+        "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/ServiceListView.swift.o",
+        "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/ServiceListViewModel.swift.o",
+        "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/TicketCreateView.swift.o",
+        "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/TicketDetailView.swift.o",
+        "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/TicketDetailViewModel.swift.o",
+        "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/TicketListView.swift.o",
+        "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/TicketListViewModel.swift.o"
+      ],
+      "otherArguments" : [
+        "-target",
+        "arm64-apple-macosx10.13",
+        "-incremental",
+        "-enable-batch-mode",
+        "-serialize-diagnostics",
+        "-index-store-path",
+        "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/index/store",
+        "-Onone",
+        "-enable-testing",
+        "-j14",
+        "-DSWIFT_PACKAGE",
+        "-DDEBUG",
+        "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+        "-module-cache-path",
+        "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/ModuleCache",
+        "-parseable-output",
+        "-parse-as-library",
+        "-emit-objc-header",
+        "-emit-objc-header-path",
+        "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/include/CKAdmin-Swift.h",
+        "-swift-version",
+        "5",
+        "-I",
+        "/Library/Developer/CommandLineTools/Library/Developer/Frameworks",
+        "-L",
+        "/Library/Developer/CommandLineTools/Library/Developer/Frameworks",
+        "-plugin-path",
+        "/Library/Developer/CommandLineTools/usr/lib/swift/host/plugins/testing",
+        "-sdk",
+        "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk",
+        "-g",
+        "-Xcc",
+        "-isysroot",
+        "-Xcc",
+        "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk",
+        "-Xcc",
+        "-fPIC",
+        "-Xcc",
+        "-g",
+        "-package-name",
+        "ckadmin"
+      ],
+      "outputFileMapPath" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/output-file-map.json",
+      "outputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/CKAdminApp.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/CustomerDetail.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/CustomerResponse.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/DashboardResponse.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/InvoiceResponse.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/ServiceDetail.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/ServiceResponse.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/TicketDetail.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/TicketResponse.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/APIClient.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/AuthManager.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/LoginView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/ContentView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/CustomerDetailView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/CustomerFormView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/CustomerListView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/CustomerListViewModel.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/DashboardView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/DashboardViewModel.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/InvoiceCreateView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/InvoiceListView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/InvoiceListViewModel.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/ServiceDetailView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/ServiceFormView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/ServiceListView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/ServiceListViewModel.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/TicketCreateView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/TicketDetailView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/TicketDetailViewModel.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/TicketListView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/TicketListViewModel.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/Modules/CKAdmin.swiftmodule"
+        }
+      ],
+      "prepareForIndexing" : false,
+      "sources" : [
+        "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/CKAdminApp.swift",
+        "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Models/CustomerDetail.swift",
+        "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Models/CustomerResponse.swift",
+        "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Models/DashboardResponse.swift",
+        "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Models/InvoiceResponse.swift",
+        "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Models/ServiceDetail.swift",
+        "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Models/ServiceResponse.swift",
+        "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Models/TicketDetail.swift",
+        "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Models/TicketResponse.swift",
+        "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Services/APIClient.swift",
+        "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Services/AuthManager.swift",
+        "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Views/Auth/LoginView.swift",
+        "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Views/ContentView.swift",
+        "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Views/Customers/CustomerDetailView.swift",
+        "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Views/Customers/CustomerFormView.swift",
+        "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Views/Customers/CustomerListView.swift",
+        "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Views/Customers/CustomerListViewModel.swift",
+        "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Views/Dashboard/DashboardView.swift",
+        "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Views/Dashboard/DashboardViewModel.swift",
+        "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Views/Invoices/InvoiceCreateView.swift",
+        "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Views/Invoices/InvoiceListView.swift",
+        "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Views/Invoices/InvoiceListViewModel.swift",
+        "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Views/Services/ServiceDetailView.swift",
+        "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Views/Services/ServiceFormView.swift",
+        "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Views/Services/ServiceListView.swift",
+        "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Views/Services/ServiceListViewModel.swift",
+        "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Views/Tickets/TicketCreateView.swift",
+        "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Views/Tickets/TicketDetailView.swift",
+        "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Views/Tickets/TicketDetailViewModel.swift",
+        "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Views/Tickets/TicketListView.swift",
+        "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Views/Tickets/TicketListViewModel.swift"
+      ],
+      "tempsPath" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build",
+      "wholeModuleOptimization" : false
+    },
+    "C.CKAdminPackageTests-arm64-apple-macosx-debug.module" : {
+      "executable" : "/Library/Developer/CommandLineTools/usr/bin/swiftc",
+      "fileList" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdminPackageTests.build/sources",
+      "importPath" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/Modules",
+      "inputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdminPackageTests.derived/runner.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/swift-version--1AB21518FC5DEDBE.txt"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/Modules/CKAdminTests.swiftmodule"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdminPackageTests.build/sources"
+        }
+      ],
+      "isLibrary" : true,
+      "moduleName" : "CKAdminPackageTests",
+      "moduleOutputPath" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/Modules/CKAdminPackageTests.swiftmodule",
+      "objects" : [
+        "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdminPackageTests.build/runner.swift.o"
+      ],
+      "otherArguments" : [
+        "-target",
+        "arm64-apple-macosx10.13",
+        "-incremental",
+        "-enable-batch-mode",
+        "-serialize-diagnostics",
+        "-index-store-path",
+        "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/index/store",
+        "-Onone",
+        "-enable-testing",
+        "-Xfrontend",
+        "-enable-cross-import-overlays",
+        "-j14",
+        "-DSWIFT_PACKAGE",
+        "-DDEBUG",
+        "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+        "-module-cache-path",
+        "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/ModuleCache",
+        "-parseable-output",
+        "-parse-as-library",
+        "-emit-objc-header",
+        "-emit-objc-header-path",
+        "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdminPackageTests.build/include/CKAdminPackageTests-Swift.h",
+        "-I",
+        "/Library/Developer/CommandLineTools/Library/Developer/Frameworks",
+        "-L",
+        "/Library/Developer/CommandLineTools/Library/Developer/Frameworks",
+        "-plugin-path",
+        "/Library/Developer/CommandLineTools/usr/lib/swift/host/plugins/testing",
+        "-sdk",
+        "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk",
+        "-g",
+        "-Xcc",
+        "-isysroot",
+        "-Xcc",
+        "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk",
+        "-Xcc",
+        "-fPIC",
+        "-Xcc",
+        "-g",
+        "-package-name",
+        "ckadmin"
+      ],
+      "outputFileMapPath" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdminPackageTests.build/output-file-map.json",
+      "outputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdminPackageTests.build/runner.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/Modules/CKAdminPackageTests.swiftmodule"
+        }
+      ],
+      "prepareForIndexing" : false,
+      "sources" : [
+        "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdminPackageTests.derived/runner.swift"
+      ],
+      "tempsPath" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdminPackageTests.build",
+      "wholeModuleOptimization" : false
+    },
+    "C.CKAdminTests-arm64-apple-macosx-debug.module" : {
+      "executable" : "/Library/Developer/CommandLineTools/usr/bin/swiftc",
+      "fileList" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdminTests.build/sources",
+      "importPath" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/Modules",
+      "inputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdminTests/CKAdminTests.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/swift-version--1AB21518FC5DEDBE.txt"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/Modules/CKAdmin.swiftmodule"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdminTests.build/sources"
+        }
+      ],
+      "isLibrary" : true,
+      "moduleName" : "CKAdminTests",
+      "moduleOutputPath" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/Modules/CKAdminTests.swiftmodule",
+      "objects" : [
+        "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdminTests.build/CKAdminTests.swift.o"
+      ],
+      "otherArguments" : [
+        "-target",
+        "arm64-apple-macosx10.13",
+        "-incremental",
+        "-enable-batch-mode",
+        "-serialize-diagnostics",
+        "-index-store-path",
+        "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/index/store",
+        "-Onone",
+        "-enable-testing",
+        "-Xfrontend",
+        "-enable-cross-import-overlays",
+        "-j14",
+        "-DSWIFT_PACKAGE",
+        "-DDEBUG",
+        "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+        "-module-cache-path",
+        "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/ModuleCache",
+        "-parseable-output",
+        "-parse-as-library",
+        "-swift-version",
+        "5",
+        "-I",
+        "/Library/Developer/CommandLineTools/Library/Developer/Frameworks",
+        "-L",
+        "/Library/Developer/CommandLineTools/Library/Developer/Frameworks",
+        "-plugin-path",
+        "/Library/Developer/CommandLineTools/usr/lib/swift/host/plugins/testing",
+        "-sdk",
+        "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk",
+        "-g",
+        "-Xcc",
+        "-isysroot",
+        "-Xcc",
+        "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk",
+        "-Xcc",
+        "-fPIC",
+        "-Xcc",
+        "-g",
+        "-package-name",
+        "ckadmin"
+      ],
+      "outputFileMapPath" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdminTests.build/output-file-map.json",
+      "outputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdminTests.build/CKAdminTests.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/Modules/CKAdminTests.swiftmodule"
+        }
+      ],
+      "prepareForIndexing" : false,
+      "sources" : [
+        "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdminTests/CKAdminTests.swift"
+      ],
+      "tempsPath" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdminTests.build",
+      "wholeModuleOptimization" : false
+    }
+  },
+  "swiftFrontendCommands" : {
+
+  },
+  "swiftTargetScanArgs" : {
+    "CKAdmin" : [
+      "/Library/Developer/CommandLineTools/usr/bin/swiftc",
+      "-module-name",
+      "CKAdmin",
+      "-package-name",
+      "ckadmin",
+      "-c",
+      "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/CKAdminApp.swift",
+      "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Models/CustomerDetail.swift",
+      "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Models/CustomerResponse.swift",
+      "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Models/DashboardResponse.swift",
+      "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Models/InvoiceResponse.swift",
+      "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Models/ServiceDetail.swift",
+      "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Models/ServiceResponse.swift",
+      "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Models/TicketDetail.swift",
+      "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Models/TicketResponse.swift",
+      "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Services/APIClient.swift",
+      "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Services/AuthManager.swift",
+      "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Views/Auth/LoginView.swift",
+      "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Views/ContentView.swift",
+      "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Views/Customers/CustomerDetailView.swift",
+      "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Views/Customers/CustomerFormView.swift",
+      "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Views/Customers/CustomerListView.swift",
+      "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Views/Customers/CustomerListViewModel.swift",
+      "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Views/Dashboard/DashboardView.swift",
+      "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Views/Dashboard/DashboardViewModel.swift",
+      "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Views/Invoices/InvoiceCreateView.swift",
+      "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Views/Invoices/InvoiceListView.swift",
+      "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Views/Invoices/InvoiceListViewModel.swift",
+      "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Views/Services/ServiceDetailView.swift",
+      "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Views/Services/ServiceFormView.swift",
+      "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Views/Services/ServiceListView.swift",
+      "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Views/Services/ServiceListViewModel.swift",
+      "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Views/Tickets/TicketCreateView.swift",
+      "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Views/Tickets/TicketDetailView.swift",
+      "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Views/Tickets/TicketDetailViewModel.swift",
+      "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Views/Tickets/TicketListView.swift",
+      "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Views/Tickets/TicketListViewModel.swift",
+      "-I",
+      "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/Modules",
+      "-target",
+      "arm64-apple-macosx10.13",
+      "-incremental",
+      "-enable-batch-mode",
+      "-serialize-diagnostics",
+      "-index-store-path",
+      "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/index/store",
+      "-Onone",
+      "-enable-testing",
+      "-j14",
+      "-DSWIFT_PACKAGE",
+      "-DDEBUG",
+      "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+      "-module-cache-path",
+      "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/ModuleCache",
+      "-parseable-output",
+      "-parse-as-library",
+      "-emit-objc-header",
+      "-emit-objc-header-path",
+      "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/include/CKAdmin-Swift.h",
+      "-swift-version",
+      "5",
+      "-I",
+      "/Library/Developer/CommandLineTools/Library/Developer/Frameworks",
+      "-L",
+      "/Library/Developer/CommandLineTools/Library/Developer/Frameworks",
+      "-plugin-path",
+      "/Library/Developer/CommandLineTools/usr/lib/swift/host/plugins/testing",
+      "-sdk",
+      "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk",
+      "-g",
+      "-Xcc",
+      "-isysroot",
+      "-Xcc",
+      "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk",
+      "-Xcc",
+      "-fPIC",
+      "-Xcc",
+      "-g",
+      "-package-name",
+      "ckadmin",
+      "-driver-use-frontend-path",
+      "/Library/Developer/CommandLineTools/usr/bin/swiftc"
+    ],
+    "CKAdminPackageTests" : [
+      "/Library/Developer/CommandLineTools/usr/bin/swiftc",
+      "-module-name",
+      "CKAdminPackageTests",
+      "-package-name",
+      "ckadmin",
+      "-c",
+      "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdminPackageTests.derived/runner.swift",
+      "-I",
+      "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/Modules",
+      "-target",
+      "arm64-apple-macosx10.13",
+      "-incremental",
+      "-enable-batch-mode",
+      "-serialize-diagnostics",
+      "-index-store-path",
+      "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/index/store",
+      "-Onone",
+      "-enable-testing",
+      "-Xfrontend",
+      "-enable-cross-import-overlays",
+      "-j14",
+      "-DSWIFT_PACKAGE",
+      "-DDEBUG",
+      "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+      "-module-cache-path",
+      "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/ModuleCache",
+      "-parseable-output",
+      "-parse-as-library",
+      "-emit-objc-header",
+      "-emit-objc-header-path",
+      "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdminPackageTests.build/include/CKAdminPackageTests-Swift.h",
+      "-I",
+      "/Library/Developer/CommandLineTools/Library/Developer/Frameworks",
+      "-L",
+      "/Library/Developer/CommandLineTools/Library/Developer/Frameworks",
+      "-plugin-path",
+      "/Library/Developer/CommandLineTools/usr/lib/swift/host/plugins/testing",
+      "-sdk",
+      "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk",
+      "-g",
+      "-Xcc",
+      "-isysroot",
+      "-Xcc",
+      "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk",
+      "-Xcc",
+      "-fPIC",
+      "-Xcc",
+      "-g",
+      "-package-name",
+      "ckadmin",
+      "-driver-use-frontend-path",
+      "/Library/Developer/CommandLineTools/usr/bin/swiftc"
+    ],
+    "CKAdminTests" : [
+      "/Library/Developer/CommandLineTools/usr/bin/swiftc",
+      "-module-name",
+      "CKAdminTests",
+      "-package-name",
+      "ckadmin",
+      "-c",
+      "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdminTests/CKAdminTests.swift",
+      "-I",
+      "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/Modules",
+      "-target",
+      "arm64-apple-macosx10.13",
+      "-incremental",
+      "-enable-batch-mode",
+      "-serialize-diagnostics",
+      "-index-store-path",
+      "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/index/store",
+      "-Onone",
+      "-enable-testing",
+      "-Xfrontend",
+      "-enable-cross-import-overlays",
+      "-j14",
+      "-DSWIFT_PACKAGE",
+      "-DDEBUG",
+      "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+      "-module-cache-path",
+      "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/ModuleCache",
+      "-parseable-output",
+      "-parse-as-library",
+      "-swift-version",
+      "5",
+      "-I",
+      "/Library/Developer/CommandLineTools/Library/Developer/Frameworks",
+      "-L",
+      "/Library/Developer/CommandLineTools/Library/Developer/Frameworks",
+      "-plugin-path",
+      "/Library/Developer/CommandLineTools/usr/lib/swift/host/plugins/testing",
+      "-sdk",
+      "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk",
+      "-g",
+      "-Xcc",
+      "-isysroot",
+      "-Xcc",
+      "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk",
+      "-Xcc",
+      "-fPIC",
+      "-Xcc",
+      "-g",
+      "-package-name",
+      "ckadmin",
+      "-driver-use-frontend-path",
+      "/Library/Developer/CommandLineTools/usr/bin/swiftc"
+    ]
+  },
+  "targetDependencyMap" : {
+    "CKAdmin" : [
+
+    ],
+    "CKAdminPackageTests" : [
+      "CKAdminTests",
+      "CKAdmin"
+    ],
+    "CKAdminTests" : [
+      "CKAdmin"
+    ]
+  },
+  "testDiscoveryCommands" : {
+
+  },
+  "testEntryPointCommands" : {
+    "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdminPackageTests.derived/runner.swift" : {
+      "inputs" : [
+
+      ],
+      "outputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdminPackageTests.derived/runner.swift"
+        }
+      ]
+    }
+  },
+  "traitConfiguration" : {
+    "default" : {
+
+    }
+  },
+  "writeCommands" : {
+    "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/sources" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<sources-file-list>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/CKAdminApp.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Models/CustomerDetail.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Models/CustomerResponse.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Models/DashboardResponse.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Models/InvoiceResponse.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Models/ServiceDetail.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Models/ServiceResponse.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Models/TicketDetail.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Models/TicketResponse.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Services/APIClient.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Services/AuthManager.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Views/Auth/LoginView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Views/ContentView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Views/Customers/CustomerDetailView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Views/Customers/CustomerFormView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Views/Customers/CustomerListView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Views/Customers/CustomerListViewModel.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Views/Dashboard/DashboardView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Views/Dashboard/DashboardViewModel.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Views/Invoices/InvoiceCreateView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Views/Invoices/InvoiceListView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Views/Invoices/InvoiceListViewModel.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Views/Services/ServiceDetailView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Views/Services/ServiceFormView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Views/Services/ServiceListView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Views/Services/ServiceListViewModel.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Views/Tickets/TicketCreateView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Views/Tickets/TicketDetailView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Views/Tickets/TicketDetailViewModel.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Views/Tickets/TicketListView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdmin/Views/Tickets/TicketListViewModel.swift"
+        }
+      ],
+      "outputFilePath" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/sources"
+    },
+    "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdminPackageTests.build/sources" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<sources-file-list>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdminPackageTests.derived/runner.swift"
+        }
+      ],
+      "outputFilePath" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdminPackageTests.build/sources"
+    },
+    "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdminPackageTests.product/Objects.LinkFileList" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<link-file-list>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/APIClient.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/AuthManager.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/CKAdminApp.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/ContentView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/CustomerDetail.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/CustomerDetailView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/CustomerFormView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/CustomerListView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/CustomerListViewModel.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/CustomerResponse.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/DashboardResponse.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/DashboardView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/DashboardViewModel.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/InvoiceCreateView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/InvoiceListView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/InvoiceListViewModel.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/InvoiceResponse.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/LoginView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/ServiceDetail.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/ServiceDetailView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/ServiceFormView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/ServiceListView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/ServiceListViewModel.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/ServiceResponse.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/TicketCreateView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/TicketDetail.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/TicketDetailView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/TicketDetailViewModel.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/TicketListView.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/TicketListViewModel.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdmin.build/TicketResponse.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdminPackageTests.build/runner.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdminTests.build/CKAdminTests.swift.o"
+        }
+      ],
+      "outputFilePath" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdminPackageTests.product/Objects.LinkFileList"
+    },
+    "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdminTests.build/sources" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<sources-file-list>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/CKAdminTests/CKAdminTests.swift"
+        }
+      ],
+      "outputFilePath" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/CKAdminTests.build/sources"
+    },
+    "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/swift-version--1AB21518FC5DEDBE.txt" : {
+      "alwaysOutOfDate" : true,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<swift-get-version>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Library/Developer/CommandLineTools/usr/bin/swiftc"
+        }
+      ],
+      "outputFilePath" : "/Applications/XAMPP/xamppfiles/htdocs/CRM_CK/ck-crm/ios/CKAdmin/.build/arm64-apple-macosx/debug/swift-version--1AB21518FC5DEDBE.txt"
+    }
+  }
+}

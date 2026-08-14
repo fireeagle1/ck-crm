@@ -61,4 +61,17 @@ return [
         'username' => env('WHM_USERNAME'),
         'token' => env('WHM_API_TOKEN'),
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Apple Push Notification Service (APNs)
+    |--------------------------------------------------------------------------
+    */
+    'apn' => [
+        'key_id' => env('APN_KEY_ID'),
+        'team_id' => env('APN_TEAM_ID'),
+        'bundle_id' => env('APN_BUNDLE_ID'),
+        'key_path' => env('APN_KEY_PATH'),
+        'sandbox' => env('APN_SANDBOX', false),
+    ],
 ];

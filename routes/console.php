@@ -22,3 +22,6 @@ Schedule::call(function () {
 
 // Ticket daily digest — 8am, only sends if there are open tickets
 Schedule::command('tickets:daily-digest')->dailyAt('08:00');
+
+// Overdue invoice push notifications — daily at 7am, checks for invoices that became overdue yesterday
+Schedule::command('invoices:notify-overdue')->dailyAt('07:00');

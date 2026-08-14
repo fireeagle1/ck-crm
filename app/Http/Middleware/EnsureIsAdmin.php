@@ -22,13 +22,26 @@ class EnsureIsAdmin
 
             // Invalid impersonation session — clear it and deny access
             session()->forget('impersonating_from');
-            abort(403, 'Unauthorized');
+            return $this->denyAccess($request);
         }
 
         if (! $request->user()?->isAdmin()) {
-            abort(403, 'Unauthorized');
+            return $this->denyAccess($request);
         }
 
         return $next($request);
+    }
+
+    /**
+     * Deny access with appropriate response format.
+     * Returns JSON for API requests, aborts with 403 for web requests.
+     */
+    protected function denyAccess(Request $request): Response
+    {
+        if ($request->expectsJson() || $request->is('api/*')) {
+            return response()->json(['message' => 'Insufficient permissions.'], 403);
+        }
+
+        abort(403, 'Unauthorized');
     }
 }
