@@ -7,9 +7,9 @@ import Security
 /// Base URL for the CRM API. Update this for production deployment.
 enum APIConfig {
     #if DEBUG
-    static let baseURL = URL(string: "https://crm.ckenterprises.co.uk")!
+    static let baseURL = URL(string: "https://app.ckenterprises.co.uk")!
     #else
-    static let baseURL = URL(string: "https://crm.ckenterprises.co.uk")!
+    static let baseURL = URL(string: "https://app.ckenterprises.co.uk")!
     #endif
 }
 
