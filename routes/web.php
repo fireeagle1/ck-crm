@@ -199,3 +199,16 @@ Route::middleware('auth')->group(function () {
 });
 
 require __DIR__ . '/auth.php';
+
+/*
+|--------------------------------------------------------------------------
+| Temporary deployment helper — DELETE AFTER USE
+|--------------------------------------------------------------------------
+*/
+Route::get('/deploy-fix', function () {
+    Artisan::call('config:clear');
+    Artisan::call('cache:clear');
+    Artisan::call('route:clear');
+    Artisan::call('package:discover');
+    return 'Done: config cleared, packages discovered. DELETE THIS ROUTE NOW.';
+});
