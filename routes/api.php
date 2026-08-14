@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\Admin\AssetController;
 use App\Http\Controllers\Api\Admin\AuthController;
 use App\Http\Controllers\Api\Admin\CustomerController;
 use App\Http\Controllers\Api\Admin\DashboardController;
@@ -23,17 +24,23 @@ Route::prefix('admin')->group(function () {
         // Dashboard
         Route::get('/dashboard', [DashboardController::class, 'index']);
 
-        // Customers CRUD
+        // Customer context — must be BEFORE the resource route
+        Route::get('/ticket-context', [TicketController::class, 'customerContext']);
+
+        // Customers
         Route::apiResource('customers', CustomerController::class);
 
-        // Services CRUD
-        Route::apiResource('services', ServiceController::class);
+        // Services (read-only)
+        Route::apiResource('services', ServiceController::class)->only(['index', 'show']);
 
-        // Tickets CRUD (no destroy) + replies
+        // Tickets — full CRUD + replies
         Route::apiResource('tickets', TicketController::class)->except(['destroy']);
         Route::post('/tickets/{ticket}/replies', [TicketController::class, 'reply']);
 
-        // Invoices
+        // Assets (CMDB) — full CRUD
+        Route::apiResource('assets', AssetController::class);
+
+        // Invoices (read-only + remind)
         Route::get('/invoices', [InvoiceController::class, 'index']);
         Route::post('/invoices', [InvoiceController::class, 'store']);
         Route::post('/invoices/{invoice}/remind', [InvoiceController::class, 'remind']);

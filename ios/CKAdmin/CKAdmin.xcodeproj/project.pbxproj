@@ -11,8 +11,11 @@
 		14E1399DB0A019DC80ADCBD7 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 807E14E89910931B525638EC /* LoginView.swift */; };
 		14FE5D418971AEF30FD1953A /* CustomerListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA77B08BC22B3673DC440742 /* CustomerListViewModel.swift */; };
 		1B169C960FE4400EA563A518 /* TicketListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1C0BBD0BC09F7D833D737AA /* TicketListViewModel.swift */; };
+		1B54B94AC6BBDB1EC08C52E1 /* AssetFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61B1F736DBB34E17E58C6281 /* AssetFormView.swift */; };
 		1C99A919803D2AD7F77C981D /* InvoiceListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24AD9BD749F1221BE3EDE69E /* InvoiceListView.swift */; };
+		28B5755D66AA39B9A1A1E5A9 /* TicketContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DE28DEA887E2C5E7B029251 /* TicketContext.swift */; };
 		2C17E2E44BBADA6A5C4D9318 /* TicketCreateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CD9502BE1C8387F087021C4 /* TicketCreateView.swift */; };
+		335F3E875405CDE1F6D94AC7 /* AssetDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CDF82C5029A0EBE1E03A371 /* AssetDetailView.swift */; };
 		35CF6D1EA36F4C1EC0E8BF9C /* ServiceDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39F59AD886DF928F0C32F63B /* ServiceDetailView.swift */; };
 		480D42C091D7F61019359B5E /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB89E66C6B4134C7742FEEED /* APIClient.swift */; };
 		48450C10A1DB8AE4BE88B81E /* ServiceDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 226B2E5BEA5C95BF72BB343B /* ServiceDetail.swift */; };
@@ -20,12 +23,14 @@
 		5712D97A203C86ABA43A2943 /* CustomerListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 677A826635A502C7D2D015E0 /* CustomerListView.swift */; };
 		59A9387B56A2CA913B29A2F5 /* InvoiceCreateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE73754B73D3F098FCCBAE2A /* InvoiceCreateView.swift */; };
 		5A1D3B56AFE3B05198FA0093 /* DashboardResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC45D1662C192E8B5C7959C9 /* DashboardResponse.swift */; };
+		5EDAC3870D7EEF91A6E68F65 /* AssetListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91BB697592F02205D36ACDFF /* AssetListView.swift */; };
 		68BAB74F81014018A37D55EE /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D92F3AF6768F930772097B63 /* DashboardView.swift */; };
 		6A0AFADF40C3A8B1B2E328E1 /* InvoiceResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4358862BD2EF5211D35C7078 /* InvoiceResponse.swift */; };
 		6B37368CEA1517E4E7D270F3 /* ServiceListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 113DD5D2382211D68F5A755F /* ServiceListViewModel.swift */; };
 		991DD876B6065B2D760951AC /* TicketResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7527D20DE3813F841EBA5713 /* TicketResponse.swift */; };
 		9977A9825B8A81C67FF17077 /* ServiceFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E86955765E1B230E60EA368C /* ServiceFormView.swift */; };
 		9A0F6A2BE6F8EEAAAC0D31F2 /* TicketDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A280546BE4B44A59DC5475C2 /* TicketDetailViewModel.swift */; };
+		9B81EA4FC66B4B54FC59A00F /* AssetResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C3C6364C22E59C55791EE4E /* AssetResponse.swift */; };
 		A4BCDF1F17E018723D35B814 /* TicketListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD0348E8A698D4AACFFAFDAC /* TicketListView.swift */; };
 		A4C49A66143A135D607B8F7C /* CKAdminApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12782C4C4D61AD5EF04DBB5E /* CKAdminApp.swift */; };
 		AF2ADCFA1141966F4A14C9AA /* ServiceListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59ABC73A242F50D6989CF2A9 /* ServiceListView.swift */; };
@@ -44,22 +49,27 @@
 /* Begin PBXFileReference section */
 		113DD5D2382211D68F5A755F /* ServiceListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceListViewModel.swift; sourceTree = "<group>"; };
 		12782C4C4D61AD5EF04DBB5E /* CKAdminApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CKAdminApp.swift; sourceTree = "<group>"; };
+		1C3C6364C22E59C55791EE4E /* AssetResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssetResponse.swift; sourceTree = "<group>"; };
 		1EFEE472EF3C05CEFABFC009 /* CustomerDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomerDetail.swift; sourceTree = "<group>"; };
 		21D62D3294A64F463D19BAAD /* AuthManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthManager.swift; sourceTree = "<group>"; };
 		226B2E5BEA5C95BF72BB343B /* ServiceDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceDetail.swift; sourceTree = "<group>"; };
 		24AD9BD749F1221BE3EDE69E /* InvoiceListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InvoiceListView.swift; sourceTree = "<group>"; };
 		2C38D5640E9F75A5108F437B /* PushManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PushManager.swift; sourceTree = "<group>"; };
 		39F59AD886DF928F0C32F63B /* ServiceDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceDetailView.swift; sourceTree = "<group>"; };
+		3CDF82C5029A0EBE1E03A371 /* AssetDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssetDetailView.swift; sourceTree = "<group>"; };
 		4358862BD2EF5211D35C7078 /* InvoiceResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InvoiceResponse.swift; sourceTree = "<group>"; };
 		59ABC73A242F50D6989CF2A9 /* ServiceListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceListView.swift; sourceTree = "<group>"; };
 		5CD9502BE1C8387F087021C4 /* TicketCreateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TicketCreateView.swift; sourceTree = "<group>"; };
+		61B1F736DBB34E17E58C6281 /* AssetFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssetFormView.swift; sourceTree = "<group>"; };
 		677A826635A502C7D2D015E0 /* CustomerListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomerListView.swift; sourceTree = "<group>"; };
 		69FC499F866ECF5C71FE1C5B /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		7527D20DE3813F841EBA5713 /* TicketResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TicketResponse.swift; sourceTree = "<group>"; };
 		754B159DF93EC16C57B27778 /* CustomerFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomerFormView.swift; sourceTree = "<group>"; };
 		7784F24F45F2B71554AF5F8C /* CustomerResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomerResponse.swift; sourceTree = "<group>"; };
+		7DE28DEA887E2C5E7B029251 /* TicketContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TicketContext.swift; sourceTree = "<group>"; };
 		807E14E89910931B525638EC /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
 		86AC0DCDA0A68C1C6262C7A8 /* ServiceResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceResponse.swift; sourceTree = "<group>"; };
+		91BB697592F02205D36ACDFF /* AssetListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssetListView.swift; sourceTree = "<group>"; };
 		99123428085D3EF5E245B516 /* TicketDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TicketDetail.swift; sourceTree = "<group>"; };
 		A280546BE4B44A59DC5475C2 /* TicketDetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TicketDetailViewModel.swift; sourceTree = "<group>"; };
 		AC6C1F8FF9AA3E9740EDA8D1 /* DashboardViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardViewModel.swift; sourceTree = "<group>"; };
@@ -69,7 +79,7 @@
 		CB89E66C6B4134C7742FEEED /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
 		D92F3AF6768F930772097B63 /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
 		DE73754B73D3F098FCCBAE2A /* InvoiceCreateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InvoiceCreateView.swift; sourceTree = "<group>"; };
-		E24AC03279050EFF5E408FBF /* CKAdmin.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CKAdmin.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		E24AC03279050EFF5E408FBF /* CKAdmin.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = CKAdmin.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E86955765E1B230E60EA368C /* ServiceFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceFormView.swift; sourceTree = "<group>"; };
 		EC45D1662C192E8B5C7959C9 /* DashboardResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardResponse.swift; sourceTree = "<group>"; };
 		F1C0BBD0BC09F7D833D737AA /* TicketListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TicketListViewModel.swift; sourceTree = "<group>"; };
@@ -81,12 +91,14 @@
 		12B4435E829633294965DAA2 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				1C3C6364C22E59C55791EE4E /* AssetResponse.swift */,
 				1EFEE472EF3C05CEFABFC009 /* CustomerDetail.swift */,
 				7784F24F45F2B71554AF5F8C /* CustomerResponse.swift */,
 				EC45D1662C192E8B5C7959C9 /* DashboardResponse.swift */,
 				4358862BD2EF5211D35C7078 /* InvoiceResponse.swift */,
 				226B2E5BEA5C95BF72BB343B /* ServiceDetail.swift */,
 				86AC0DCDA0A68C1C6262C7A8 /* ServiceResponse.swift */,
+				7DE28DEA887E2C5E7B029251 /* TicketContext.swift */,
 				99123428085D3EF5E245B516 /* TicketDetail.swift */,
 				7527D20DE3813F841EBA5713 /* TicketResponse.swift */,
 			);
@@ -113,6 +125,16 @@
 				BA77B08BC22B3673DC440742 /* CustomerListViewModel.swift */,
 			);
 			path = Customers;
+			sourceTree = "<group>";
+		};
+		41630DB3511F103BEDC1AE6C /* Assets */ = {
+			isa = PBXGroup;
+			children = (
+				3CDF82C5029A0EBE1E03A371 /* AssetDetailView.swift */,
+				61B1F736DBB34E17E58C6281 /* AssetFormView.swift */,
+				91BB697592F02205D36ACDFF /* AssetListView.swift */,
+			);
+			path = Assets;
 			sourceTree = "<group>";
 		};
 		4F824F4FEEA3D26DB8513943 /* Products */ = {
@@ -177,6 +199,7 @@
 			isa = PBXGroup;
 			children = (
 				69FC499F866ECF5C71FE1C5B /* ContentView.swift */,
+				41630DB3511F103BEDC1AE6C /* Assets */,
 				DDB968DAEBC40037412F5C36 /* Auth */,
 				35DDBBF7FA5F844F3D6D8B61 /* Customers */,
 				CD44FC1D3F99AF36621D0280 /* Dashboard */,
@@ -264,6 +287,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				480D42C091D7F61019359B5E /* APIClient.swift in Sources */,
+				335F3E875405CDE1F6D94AC7 /* AssetDetailView.swift in Sources */,
+				1B54B94AC6BBDB1EC08C52E1 /* AssetFormView.swift in Sources */,
+				5EDAC3870D7EEF91A6E68F65 /* AssetListView.swift in Sources */,
+				9B81EA4FC66B4B54FC59A00F /* AssetResponse.swift in Sources */,
 				0320671C7C32109F096E896F /* AuthManager.swift in Sources */,
 				A4C49A66143A135D607B8F7C /* CKAdminApp.swift in Sources */,
 				D4373CFAE273B5CD119FECF3 /* ContentView.swift in Sources */,
@@ -288,6 +315,7 @@
 				AF2ADCFA1141966F4A14C9AA /* ServiceListView.swift in Sources */,
 				6B37368CEA1517E4E7D270F3 /* ServiceListViewModel.swift in Sources */,
 				CD53DC9BC598FC02DF104D72 /* ServiceResponse.swift in Sources */,
+				28B5755D66AA39B9A1A1E5A9 /* TicketContext.swift in Sources */,
 				2C17E2E44BBADA6A5C4D9318 /* TicketCreateView.swift in Sources */,
 				F8B18CE5B8D32723914E8076 /* TicketDetail.swift in Sources */,
 				BA4962C2D40AF6C6748F3112 /* TicketDetailView.swift in Sources */,
@@ -427,7 +455,6 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 8ZPKDN48HL;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "CK Admin";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -455,7 +482,6 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 8ZPKDN48HL;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "CK Admin";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
