@@ -76,6 +76,16 @@ Route::middleware(['auth', 'verified'])->prefix('portal')->name('portal.')->grou
     // Billing
     Route::post('/billing/portal', [Portal\BillingController::class, 'portal'])->name('billing.portal');
     Route::get('/invoices', [Portal\BillingController::class, 'invoices'])->name('invoices.index');
+
+    // Shop
+    Route::get('/shop', [Portal\ShopController::class, 'index'])->name('shop.index');
+    Route::get('/shop/{product}', [Portal\ShopController::class, 'show'])->name('shop.show');
+    Route::get('/cart', [Portal\CartController::class, 'index'])->name('cart.index');
+    Route::post('/cart/checkout', [Portal\CartController::class, 'checkout'])->name('cart.checkout');
+    Route::post('/cart/{product}', [Portal\CartController::class, 'add'])->name('cart.add');
+    Route::delete('/cart/{index}', [Portal\CartController::class, 'remove'])->name('cart.remove');
+    Route::get('/orders', [Portal\OrderController::class, 'index'])->name('orders.index');
+    Route::get('/orders/{order}', [Portal\OrderController::class, 'show'])->name('orders.show');
 });
 
 /*
@@ -185,6 +195,16 @@ Route::middleware(['auth', 'verified', EnsureIsAdmin::class])->prefix('admin')->
 
     // Canned Responses
     Route::resource('canned-responses', Admin\CannedResponseController::class)->except(['show']);
+
+    // Shop Management
+    Route::resource('shop/products', Admin\ShopProductController::class)->except(['show', 'destroy']);
+    Route::post('shop/products/{product}/archive', [Admin\ShopProductController::class, 'archive'])->name('shop.products.archive');
+    Route::post('shop/products/{product}/restore', [Admin\ShopProductController::class, 'restore'])->name('shop.products.restore');
+    Route::get('shop/orders', [Admin\ShopOrderController::class, 'index'])->name('shop.orders.index');
+    Route::get('shop/orders/{order}', [Admin\ShopOrderController::class, 'show'])->name('shop.orders.show');
+    Route::post('shop/orders/{order}/fulfil', [Admin\ShopOrderController::class, 'fulfil'])->name('shop.orders.fulfil');
+    Route::post('shop/orders/{order}/note', [Admin\ShopOrderController::class, 'addNote'])->name('shop.orders.note');
+    Route::resource('shop/tiers', Admin\CustomerTierController::class)->except(['show', 'edit', 'create']);
 });
 
 /*
@@ -199,6 +219,15 @@ Route::middleware('auth')->group(function () {
 });
 
 require __DIR__ . '/auth.php';
+
+/*
+|--------------------------------------------------------------------------
+| Stripe Webhook (no auth, signature-verified)
+|--------------------------------------------------------------------------
+*/
+Route::post('/stripe/webhook', [\App\Http\Controllers\StripeWebhookController::class, 'handle'])
+    ->name('stripe.webhook')
+    ->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
 
 /*
 |--------------------------------------------------------------------------

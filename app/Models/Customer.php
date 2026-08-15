@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Customer extends Model
@@ -64,5 +65,21 @@ class Customer extends Model
     public function projects(): HasMany
     {
         return $this->hasMany(Project::class, 'company_id', 'company_id');
+    }
+
+    public function tiers(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            CustomerTier::class,
+            'customer_tier_assignments',
+            'company_id',
+            'customer_tier_id',
+            'company_id'
+        );
+    }
+
+    public function orders(): HasMany
+    {
+        return $this->hasMany(Order::class, 'company_id', 'company_id');
     }
 }

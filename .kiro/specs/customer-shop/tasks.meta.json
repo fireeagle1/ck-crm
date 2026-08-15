@@ -11,6 +11,11 @@
         "executionId": "cc824f51-3c45-4e4b-b899-a6d58eb8fa4d",
         "chatSessionId": "sess_fbc9d6ce-c70b-4029-971e-4898cd933730",
         "timestamp": 1786742252124
+      },
+      {
+        "executionId": "b8957f46-f31a-469e-82e5-18544707d1d3",
+        "chatSessionId": "sess_fc8f2f17-81c0-42f2-bd70-d840969eceba",
+        "timestamp": 1786777850418
       }
     ],
     "1.2 Create migration for products table": [
@@ -23,6 +28,11 @@
         "executionId": "cc824f51-3c45-4e4b-b899-a6d58eb8fa4d",
         "chatSessionId": "sess_fbc9d6ce-c70b-4029-971e-4898cd933730",
         "timestamp": 1786742252927
+      },
+      {
+        "executionId": "b8957f46-f31a-469e-82e5-18544707d1d3",
+        "chatSessionId": "sess_fc8f2f17-81c0-42f2-bd70-d840969eceba",
+        "timestamp": 1786777851260
       }
     ],
     "1.3 Create migrations for product_visibilities, product_visibility_customers, and product_visibility_tiers tables": [
@@ -35,6 +45,11 @@
         "executionId": "cc824f51-3c45-4e4b-b899-a6d58eb8fa4d",
         "chatSessionId": "sess_fbc9d6ce-c70b-4029-971e-4898cd933730",
         "timestamp": 1786742253809
+      },
+      {
+        "executionId": "b8957f46-f31a-469e-82e5-18544707d1d3",
+        "chatSessionId": "sess_fc8f2f17-81c0-42f2-bd70-d840969eceba",
+        "timestamp": 1786777852076
       }
     ],
     "1.4 Create migrations for orders and order_items tables": [
@@ -47,6 +62,11 @@
         "executionId": "cc824f51-3c45-4e4b-b899-a6d58eb8fa4d",
         "chatSessionId": "sess_fbc9d6ce-c70b-4029-971e-4898cd933730",
         "timestamp": 1786742254775
+      },
+      {
+        "executionId": "b8957f46-f31a-469e-82e5-18544707d1d3",
+        "chatSessionId": "sess_fc8f2f17-81c0-42f2-bd70-d840969eceba",
+        "timestamp": 1786777852830
       }
     ],
     "1.5 Create Eloquent models: Product, ProductVisibility, CustomerTier, Order, OrderItem": [
@@ -54,6 +74,16 @@
         "executionId": "cc824f51-3c45-4e4b-b899-a6d58eb8fa4d",
         "chatSessionId": "sess_fbc9d6ce-c70b-4029-971e-4898cd933730",
         "timestamp": 1786742243346
+      },
+      {
+        "executionId": "b8957f46-f31a-469e-82e5-18544707d1d3",
+        "chatSessionId": "sess_fc8f2f17-81c0-42f2-bd70-d840969eceba",
+        "timestamp": 1786777857033
+      },
+      {
+        "executionId": "b8957f46-f31a-469e-82e5-18544707d1d3",
+        "chatSessionId": "sess_fc8f2f17-81c0-42f2-bd70-d840969eceba",
+        "timestamp": 1786778000407
       }
     ],
     "2. Checkpoint - Run migrations and verify models": [
@@ -61,6 +91,11 @@
         "executionId": "cc824f51-3c45-4e4b-b899-a6d58eb8fa4d",
         "chatSessionId": "sess_fbc9d6ce-c70b-4029-971e-4898cd933730",
         "timestamp": 1786742243368
+      },
+      {
+        "executionId": "b8957f46-f31a-469e-82e5-18544707d1d3",
+        "chatSessionId": "sess_fc8f2f17-81c0-42f2-bd70-d840969eceba",
+        "timestamp": 1786778005165
       }
     ],
     "3.1 Implement CartService": [
@@ -68,6 +103,16 @@
         "executionId": "cc824f51-3c45-4e4b-b899-a6d58eb8fa4d",
         "chatSessionId": "sess_fbc9d6ce-c70b-4029-971e-4898cd933730",
         "timestamp": 1786742243400
+      },
+      {
+        "executionId": "b8957f46-f31a-469e-82e5-18544707d1d3",
+        "chatSessionId": "sess_fc8f2f17-81c0-42f2-bd70-d840969eceba",
+        "timestamp": 1786778005969
+      },
+      {
+        "executionId": "b8957f46-f31a-469e-82e5-18544707d1d3",
+        "chatSessionId": "sess_fc8f2f17-81c0-42f2-bd70-d840969eceba",
+        "timestamp": 1786778122087
       }
     ],
     "3.2 Implement StripeService": [
@@ -75,6 +120,16 @@
         "executionId": "cc824f51-3c45-4e4b-b899-a6d58eb8fa4d",
         "chatSessionId": "sess_fbc9d6ce-c70b-4029-971e-4898cd933730",
         "timestamp": 1786742243420
+      },
+      {
+        "executionId": "b8957f46-f31a-469e-82e5-18544707d1d3",
+        "chatSessionId": "sess_fc8f2f17-81c0-42f2-bd70-d840969eceba",
+        "timestamp": 1786778006747
+      },
+      {
+        "executionId": "b8957f46-f31a-469e-82e5-18544707d1d3",
+        "chatSessionId": "sess_fc8f2f17-81c0-42f2-bd70-d840969eceba",
+        "timestamp": 1786778122880
       }
     ],
     "3.3 Implement CheckoutService": [
@@ -82,6 +137,16 @@
         "executionId": "cc824f51-3c45-4e4b-b899-a6d58eb8fa4d",
         "chatSessionId": "sess_fbc9d6ce-c70b-4029-971e-4898cd933730",
         "timestamp": 1786742243438
+      },
+      {
+        "executionId": "b8957f46-f31a-469e-82e5-18544707d1d3",
+        "chatSessionId": "sess_fc8f2f17-81c0-42f2-bd70-d840969eceba",
+        "timestamp": 1786778128079
+      },
+      {
+        "executionId": "b8957f46-f31a-469e-82e5-18544707d1d3",
+        "chatSessionId": "sess_fc8f2f17-81c0-42f2-bd70-d840969eceba",
+        "timestamp": 1786778248395
       }
     ],
     "3.4 Implement FulfilmentService": [
@@ -89,6 +154,16 @@
         "executionId": "cc824f51-3c45-4e4b-b899-a6d58eb8fa4d",
         "chatSessionId": "sess_fbc9d6ce-c70b-4029-971e-4898cd933730",
         "timestamp": 1786742243458
+      },
+      {
+        "executionId": "b8957f46-f31a-469e-82e5-18544707d1d3",
+        "chatSessionId": "sess_fc8f2f17-81c0-42f2-bd70-d840969eceba",
+        "timestamp": 1786778128759
+      },
+      {
+        "executionId": "b8957f46-f31a-469e-82e5-18544707d1d3",
+        "chatSessionId": "sess_fc8f2f17-81c0-42f2-bd70-d840969eceba",
+        "timestamp": 1786778249067
       }
     ],
     "3.5 Create CheckoutResult value object": [
@@ -96,6 +171,16 @@
         "executionId": "cc824f51-3c45-4e4b-b899-a6d58eb8fa4d",
         "chatSessionId": "sess_fbc9d6ce-c70b-4029-971e-4898cd933730",
         "timestamp": 1786742243477
+      },
+      {
+        "executionId": "b8957f46-f31a-469e-82e5-18544707d1d3",
+        "chatSessionId": "sess_fc8f2f17-81c0-42f2-bd70-d840969eceba",
+        "timestamp": 1786778007531
+      },
+      {
+        "executionId": "b8957f46-f31a-469e-82e5-18544707d1d3",
+        "chatSessionId": "sess_fc8f2f17-81c0-42f2-bd70-d840969eceba",
+        "timestamp": 1786778123677
       }
     ],
     "4.1 Implement Admin\\ShopProductController": [
@@ -103,6 +188,16 @@
         "executionId": "cc824f51-3c45-4e4b-b899-a6d58eb8fa4d",
         "chatSessionId": "sess_fbc9d6ce-c70b-4029-971e-4898cd933730",
         "timestamp": 1786742243501
+      },
+      {
+        "executionId": "b8957f46-f31a-469e-82e5-18544707d1d3",
+        "chatSessionId": "sess_fc8f2f17-81c0-42f2-bd70-d840969eceba",
+        "timestamp": 1786778851727
+      },
+      {
+        "executionId": "b8957f46-f31a-469e-82e5-18544707d1d3",
+        "chatSessionId": "sess_fc8f2f17-81c0-42f2-bd70-d840969eceba",
+        "timestamp": 1786779077621
       }
     ],
     "4.2 Create admin product Blade views": [
@@ -110,6 +205,16 @@
         "executionId": "cc824f51-3c45-4e4b-b899-a6d58eb8fa4d",
         "chatSessionId": "sess_fbc9d6ce-c70b-4029-971e-4898cd933730",
         "timestamp": 1786742243525
+      },
+      {
+        "executionId": "b8957f46-f31a-469e-82e5-18544707d1d3",
+        "chatSessionId": "sess_fc8f2f17-81c0-42f2-bd70-d840969eceba",
+        "timestamp": 1786779087929
+      },
+      {
+        "executionId": "b8957f46-f31a-469e-82e5-18544707d1d3",
+        "chatSessionId": "sess_fc8f2f17-81c0-42f2-bd70-d840969eceba",
+        "timestamp": 1786779507786
       }
     ],
     "5.1 Implement Admin\\CustomerTierController": [
@@ -117,6 +222,16 @@
         "executionId": "cc824f51-3c45-4e4b-b899-a6d58eb8fa4d",
         "chatSessionId": "sess_fbc9d6ce-c70b-4029-971e-4898cd933730",
         "timestamp": 1786742243544
+      },
+      {
+        "executionId": "b8957f46-f31a-469e-82e5-18544707d1d3",
+        "chatSessionId": "sess_fc8f2f17-81c0-42f2-bd70-d840969eceba",
+        "timestamp": 1786778852517
+      },
+      {
+        "executionId": "b8957f46-f31a-469e-82e5-18544707d1d3",
+        "chatSessionId": "sess_fc8f2f17-81c0-42f2-bd70-d840969eceba",
+        "timestamp": 1786779076876
       }
     ],
     "5.2 Create admin tier Blade view": [
@@ -124,6 +239,16 @@
         "executionId": "cc824f51-3c45-4e4b-b899-a6d58eb8fa4d",
         "chatSessionId": "sess_fbc9d6ce-c70b-4029-971e-4898cd933730",
         "timestamp": 1786742243566
+      },
+      {
+        "executionId": "b8957f46-f31a-469e-82e5-18544707d1d3",
+        "chatSessionId": "sess_fc8f2f17-81c0-42f2-bd70-d840969eceba",
+        "timestamp": 1786779088668
+      },
+      {
+        "executionId": "b8957f46-f31a-469e-82e5-18544707d1d3",
+        "chatSessionId": "sess_fc8f2f17-81c0-42f2-bd70-d840969eceba",
+        "timestamp": 1786779508473
       }
     ],
     "6.1 Implement Portal\\ShopController": [
@@ -131,6 +256,11 @@
         "executionId": "cc824f51-3c45-4e4b-b899-a6d58eb8fa4d",
         "chatSessionId": "sess_fbc9d6ce-c70b-4029-971e-4898cd933730",
         "timestamp": 1786742243590
+      },
+      {
+        "executionId": "b8957f46-f31a-469e-82e5-18544707d1d3",
+        "chatSessionId": "sess_fc8f2f17-81c0-42f2-bd70-d840969eceba",
+        "timestamp": 1786778853303
       }
     ],
     "6.2 Create portal shop Blade views": [
@@ -138,6 +268,16 @@
         "executionId": "cc824f51-3c45-4e4b-b899-a6d58eb8fa4d",
         "chatSessionId": "sess_fbc9d6ce-c70b-4029-971e-4898cd933730",
         "timestamp": 1786742243610
+      },
+      {
+        "executionId": "b8957f46-f31a-469e-82e5-18544707d1d3",
+        "chatSessionId": "sess_fc8f2f17-81c0-42f2-bd70-d840969eceba",
+        "timestamp": 1786779089510
+      },
+      {
+        "executionId": "b8957f46-f31a-469e-82e5-18544707d1d3",
+        "chatSessionId": "sess_fc8f2f17-81c0-42f2-bd70-d840969eceba",
+        "timestamp": 1786779509259
       }
     ],
     "7.1 Implement Portal\\CartController": [
@@ -145,6 +285,16 @@
         "executionId": "cc824f51-3c45-4e4b-b899-a6d58eb8fa4d",
         "chatSessionId": "sess_fbc9d6ce-c70b-4029-971e-4898cd933730",
         "timestamp": 1786742243629
+      },
+      {
+        "executionId": "b8957f46-f31a-469e-82e5-18544707d1d3",
+        "chatSessionId": "sess_fc8f2f17-81c0-42f2-bd70-d840969eceba",
+        "timestamp": 1786779520222
+      },
+      {
+        "executionId": "b8957f46-f31a-469e-82e5-18544707d1d3",
+        "chatSessionId": "sess_fc8f2f17-81c0-42f2-bd70-d840969eceba",
+        "timestamp": 1786779707542
       }
     ],
     "7.2 Create portal cart Blade view": [
@@ -152,6 +302,16 @@
         "executionId": "cc824f51-3c45-4e4b-b899-a6d58eb8fa4d",
         "chatSessionId": "sess_fbc9d6ce-c70b-4029-971e-4898cd933730",
         "timestamp": 1786742243649
+      },
+      {
+        "executionId": "b8957f46-f31a-469e-82e5-18544707d1d3",
+        "chatSessionId": "sess_fc8f2f17-81c0-42f2-bd70-d840969eceba",
+        "timestamp": 1786779714875
+      },
+      {
+        "executionId": "b8957f46-f31a-469e-82e5-18544707d1d3",
+        "chatSessionId": "sess_fc8f2f17-81c0-42f2-bd70-d840969eceba",
+        "timestamp": 1786780106311
       }
     ],
     "8. Checkpoint - Verify admin and portal flows work end-to-end": [
@@ -159,6 +319,16 @@
         "executionId": "cc824f51-3c45-4e4b-b899-a6d58eb8fa4d",
         "chatSessionId": "sess_fbc9d6ce-c70b-4029-971e-4898cd933730",
         "timestamp": 1786742243668
+      },
+      {
+        "executionId": "b8957f46-f31a-469e-82e5-18544707d1d3",
+        "chatSessionId": "sess_fc8f2f17-81c0-42f2-bd70-d840969eceba",
+        "timestamp": 1786780369129
+      },
+      {
+        "executionId": "b8957f46-f31a-469e-82e5-18544707d1d3",
+        "chatSessionId": "sess_fc8f2f17-81c0-42f2-bd70-d840969eceba",
+        "timestamp": 1786780472591
       }
     ],
     "9.1 Implement StripeWebhookController": [
@@ -166,6 +336,16 @@
         "executionId": "cc824f51-3c45-4e4b-b899-a6d58eb8fa4d",
         "chatSessionId": "sess_fbc9d6ce-c70b-4029-971e-4898cd933730",
         "timestamp": 1786742243687
+      },
+      {
+        "executionId": "b8957f46-f31a-469e-82e5-18544707d1d3",
+        "chatSessionId": "sess_fc8f2f17-81c0-42f2-bd70-d840969eceba",
+        "timestamp": 1786779520959
+      },
+      {
+        "executionId": "b8957f46-f31a-469e-82e5-18544707d1d3",
+        "chatSessionId": "sess_fc8f2f17-81c0-42f2-bd70-d840969eceba",
+        "timestamp": 1786779708340
       }
     ],
     "10.1 Implement Admin\\ShopOrderController": [
@@ -173,6 +353,11 @@
         "executionId": "cc824f51-3c45-4e4b-b899-a6d58eb8fa4d",
         "chatSessionId": "sess_fbc9d6ce-c70b-4029-971e-4898cd933730",
         "timestamp": 1786742243710
+      },
+      {
+        "executionId": "b8957f46-f31a-469e-82e5-18544707d1d3",
+        "chatSessionId": "sess_fc8f2f17-81c0-42f2-bd70-d840969eceba",
+        "timestamp": 1786779717547
       }
     ],
     "10.2 Create admin order Blade views": [
@@ -180,6 +365,16 @@
         "executionId": "cc824f51-3c45-4e4b-b899-a6d58eb8fa4d",
         "chatSessionId": "sess_fbc9d6ce-c70b-4029-971e-4898cd933730",
         "timestamp": 1786742243728
+      },
+      {
+        "executionId": "b8957f46-f31a-469e-82e5-18544707d1d3",
+        "chatSessionId": "sess_fc8f2f17-81c0-42f2-bd70-d840969eceba",
+        "timestamp": 1786780114108
+      },
+      {
+        "executionId": "b8957f46-f31a-469e-82e5-18544707d1d3",
+        "chatSessionId": "sess_fc8f2f17-81c0-42f2-bd70-d840969eceba",
+        "timestamp": 1786780358552
       }
     ],
     "11.1 Implement Portal\\OrderController": [
@@ -187,6 +382,16 @@
         "executionId": "cc824f51-3c45-4e4b-b899-a6d58eb8fa4d",
         "chatSessionId": "sess_fbc9d6ce-c70b-4029-971e-4898cd933730",
         "timestamp": 1786742243750
+      },
+      {
+        "executionId": "b8957f46-f31a-469e-82e5-18544707d1d3",
+        "chatSessionId": "sess_fc8f2f17-81c0-42f2-bd70-d840969eceba",
+        "timestamp": 1786779718363
+      },
+      {
+        "executionId": "b8957f46-f31a-469e-82e5-18544707d1d3",
+        "chatSessionId": "sess_fc8f2f17-81c0-42f2-bd70-d840969eceba",
+        "timestamp": 1786780109564
       }
     ],
     "11.2 Create portal order Blade views": [
@@ -194,6 +399,16 @@
         "executionId": "cc824f51-3c45-4e4b-b899-a6d58eb8fa4d",
         "chatSessionId": "sess_fbc9d6ce-c70b-4029-971e-4898cd933730",
         "timestamp": 1786742243772
+      },
+      {
+        "executionId": "b8957f46-f31a-469e-82e5-18544707d1d3",
+        "chatSessionId": "sess_fc8f2f17-81c0-42f2-bd70-d840969eceba",
+        "timestamp": 1786780114906
+      },
+      {
+        "executionId": "b8957f46-f31a-469e-82e5-18544707d1d3",
+        "chatSessionId": "sess_fc8f2f17-81c0-42f2-bd70-d840969eceba",
+        "timestamp": 1786780359342
       }
     ],
     "12.1 Register all routes in web.php": [
@@ -201,6 +416,16 @@
         "executionId": "cc824f51-3c45-4e4b-b899-a6d58eb8fa4d",
         "chatSessionId": "sess_fbc9d6ce-c70b-4029-971e-4898cd933730",
         "timestamp": 1786742243792
+      },
+      {
+        "executionId": "b8957f46-f31a-469e-82e5-18544707d1d3",
+        "chatSessionId": "sess_fc8f2f17-81c0-42f2-bd70-d840969eceba",
+        "timestamp": 1786778854104
+      },
+      {
+        "executionId": "b8957f46-f31a-469e-82e5-18544707d1d3",
+        "chatSessionId": "sess_fc8f2f17-81c0-42f2-bd70-d840969eceba",
+        "timestamp": 1786779078572
       }
     ],
     "12.2 Register service providers and bind services": [
@@ -208,6 +433,16 @@
         "executionId": "cc824f51-3c45-4e4b-b899-a6d58eb8fa4d",
         "chatSessionId": "sess_fbc9d6ce-c70b-4029-971e-4898cd933730",
         "timestamp": 1786742243812
+      },
+      {
+        "executionId": "b8957f46-f31a-469e-82e5-18544707d1d3",
+        "chatSessionId": "sess_fc8f2f17-81c0-42f2-bd70-d840969eceba",
+        "timestamp": 1786778854952
+      },
+      {
+        "executionId": "b8957f46-f31a-469e-82e5-18544707d1d3",
+        "chatSessionId": "sess_fc8f2f17-81c0-42f2-bd70-d840969eceba",
+        "timestamp": 1786779075253
       }
     ],
     "13. Final checkpoint - Full integration verification": [
@@ -215,6 +450,182 @@
         "executionId": "cc824f51-3c45-4e4b-b899-a6d58eb8fa4d",
         "chatSessionId": "sess_fbc9d6ce-c70b-4029-971e-4898cd933730",
         "timestamp": 1786742243839
+      },
+      {
+        "executionId": "b8957f46-f31a-469e-82e5-18544707d1d3",
+        "chatSessionId": "sess_fc8f2f17-81c0-42f2-bd70-d840969eceba",
+        "timestamp": 1786780477076
+      },
+      {
+        "executionId": "b8957f46-f31a-469e-82e5-18544707d1d3",
+        "chatSessionId": "sess_fc8f2f17-81c0-42f2-bd70-d840969eceba",
+        "timestamp": 1786780596555
+      }
+    ],
+    "1. Database migrations and model foundations": [
+      {
+        "executionId": "b8957f46-f31a-469e-82e5-18544707d1d3",
+        "chatSessionId": "sess_fc8f2f17-81c0-42f2-bd70-d840969eceba",
+        "timestamp": 1786778000435
+      }
+    ],
+    "3. Service layer implementation": [
+      {
+        "executionId": "b8957f46-f31a-469e-82e5-18544707d1d3",
+        "chatSessionId": "sess_fc8f2f17-81c0-42f2-bd70-d840969eceba",
+        "timestamp": 1786778249093
+      }
+    ],
+    "3.6 Write unit tests for CartService": [
+      {
+        "executionId": "b8957f46-f31a-469e-82e5-18544707d1d3",
+        "chatSessionId": "sess_fc8f2f17-81c0-42f2-bd70-d840969eceba",
+        "timestamp": 1786778272618
+      },
+      {
+        "executionId": "b8957f46-f31a-469e-82e5-18544707d1d3",
+        "chatSessionId": "sess_fc8f2f17-81c0-42f2-bd70-d840969eceba",
+        "timestamp": 1786778846464
+      }
+    ],
+    "3.7 Write unit tests for CheckoutService item partitioning": [
+      {
+        "executionId": "b8957f46-f31a-469e-82e5-18544707d1d3",
+        "chatSessionId": "sess_fc8f2f17-81c0-42f2-bd70-d840969eceba",
+        "timestamp": 1786778273475
+      },
+      {
+        "executionId": "b8957f46-f31a-469e-82e5-18544707d1d3",
+        "chatSessionId": "sess_fc8f2f17-81c0-42f2-bd70-d840969eceba",
+        "timestamp": 1786778847210
+      }
+    ],
+    "12. Routes and integration wiring": [
+      {
+        "executionId": "b8957f46-f31a-469e-82e5-18544707d1d3",
+        "chatSessionId": "sess_fc8f2f17-81c0-42f2-bd70-d840969eceba",
+        "timestamp": 1786779078611
+      }
+    ],
+    "4.3 Write feature tests for product validation": [
+      {
+        "executionId": "b8957f46-f31a-469e-82e5-18544707d1d3",
+        "chatSessionId": "sess_fc8f2f17-81c0-42f2-bd70-d840969eceba",
+        "timestamp": 1786779090521
+      },
+      {
+        "executionId": "b8957f46-f31a-469e-82e5-18544707d1d3",
+        "chatSessionId": "sess_fc8f2f17-81c0-42f2-bd70-d840969eceba",
+        "timestamp": 1786779510253
+      }
+    ],
+    "6.3 Write feature tests for product visibility": [
+      {
+        "executionId": "b8957f46-f31a-469e-82e5-18544707d1d3",
+        "chatSessionId": "sess_fc8f2f17-81c0-42f2-bd70-d840969eceba",
+        "timestamp": 1786779091461
+      },
+      {
+        "executionId": "b8957f46-f31a-469e-82e5-18544707d1d3",
+        "chatSessionId": "sess_fc8f2f17-81c0-42f2-bd70-d840969eceba",
+        "timestamp": 1786779511103
+      }
+    ],
+    "6.4 Write feature tests for shop filtering and search": [
+      {
+        "executionId": "b8957f46-f31a-469e-82e5-18544707d1d3",
+        "chatSessionId": "sess_fc8f2f17-81c0-42f2-bd70-d840969eceba",
+        "timestamp": 1786779096608
+      },
+      {
+        "executionId": "b8957f46-f31a-469e-82e5-18544707d1d3",
+        "chatSessionId": "sess_fc8f2f17-81c0-42f2-bd70-d840969eceba",
+        "timestamp": 1786779515231
+      }
+    ],
+    "4. Admin controllers and views - Product management": [
+      {
+        "executionId": "b8957f46-f31a-469e-82e5-18544707d1d3",
+        "chatSessionId": "sess_fc8f2f17-81c0-42f2-bd70-d840969eceba",
+        "timestamp": 1786779507833
+      }
+    ],
+    "5. Admin controllers and views - Customer tiers": [
+      {
+        "executionId": "b8957f46-f31a-469e-82e5-18544707d1d3",
+        "chatSessionId": "sess_fc8f2f17-81c0-42f2-bd70-d840969eceba",
+        "timestamp": 1786779508504
+      }
+    ],
+    "6. Portal controllers and views - Shop browsing": [
+      {
+        "executionId": "b8957f46-f31a-469e-82e5-18544707d1d3",
+        "chatSessionId": "sess_fc8f2f17-81c0-42f2-bd70-d840969eceba",
+        "timestamp": 1786779509288
+      }
+    ],
+    "9. Stripe webhook handling": [
+      {
+        "executionId": "b8957f46-f31a-469e-82e5-18544707d1d3",
+        "chatSessionId": "sess_fc8f2f17-81c0-42f2-bd70-d840969eceba",
+        "timestamp": 1786779708371
+      }
+    ],
+    "7.3 Write feature tests for checkout flow": [
+      {
+        "executionId": "b8957f46-f31a-469e-82e5-18544707d1d3",
+        "chatSessionId": "sess_fc8f2f17-81c0-42f2-bd70-d840969eceba",
+        "timestamp": 1786779715898
+      },
+      {
+        "executionId": "b8957f46-f31a-469e-82e5-18544707d1d3",
+        "chatSessionId": "sess_fc8f2f17-81c0-42f2-bd70-d840969eceba",
+        "timestamp": 1786780107067
+      }
+    ],
+    "9.2 Write feature tests for webhook handling": [
+      {
+        "executionId": "b8957f46-f31a-469e-82e5-18544707d1d3",
+        "chatSessionId": "sess_fc8f2f17-81c0-42f2-bd70-d840969eceba",
+        "timestamp": 1786779716729
+      },
+      {
+        "executionId": "b8957f46-f31a-469e-82e5-18544707d1d3",
+        "chatSessionId": "sess_fc8f2f17-81c0-42f2-bd70-d840969eceba",
+        "timestamp": 1786780107879
+      }
+    ],
+    "7. Portal controllers and views - Cart and checkout": [
+      {
+        "executionId": "b8957f46-f31a-469e-82e5-18544707d1d3",
+        "chatSessionId": "sess_fc8f2f17-81c0-42f2-bd70-d840969eceba",
+        "timestamp": 1786780106344
+      }
+    ],
+    "10.3 Write feature tests for fulfilment": [
+      {
+        "executionId": "b8957f46-f31a-469e-82e5-18544707d1d3",
+        "chatSessionId": "sess_fc8f2f17-81c0-42f2-bd70-d840969eceba",
+        "timestamp": 1786780115830
+      },
+      {
+        "executionId": "b8957f46-f31a-469e-82e5-18544707d1d3",
+        "chatSessionId": "sess_fc8f2f17-81c0-42f2-bd70-d840969eceba",
+        "timestamp": 1786780360325
+      }
+    ],
+    "10. Fulfilment workflows": [
+      {
+        "executionId": "b8957f46-f31a-469e-82e5-18544707d1d3",
+        "chatSessionId": "sess_fc8f2f17-81c0-42f2-bd70-d840969eceba",
+        "timestamp": 1786780358596
+      }
+    ],
+    "11. Portal order history": [
+      {
+        "executionId": "b8957f46-f31a-469e-82e5-18544707d1d3",
+        "chatSessionId": "sess_fc8f2f17-81c0-42f2-bd70-d840969eceba",
+        "timestamp": 1786780359369
       }
     ]
   }
