@@ -74,6 +74,25 @@
                     </button>
                 @endif
 
+                {{-- Added to cart prompt --}}
+                @if (session('added_to_cart'))
+                    <div class="mt-4 rounded-lg bg-green-50 border border-green-200 p-5 text-center" x-data x-init="$el.scrollIntoView({ behavior: 'smooth', block: 'center' })">
+                        <svg class="mx-auto w-8 h-8 text-green-500 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <p class="text-sm font-semibold text-green-800 mb-1">'{{ session('added_to_cart') }}' added to your cart</p>
+                        <p class="text-xs text-green-700 mb-4">What would you like to do next?</p>
+                        <div class="flex flex-col sm:flex-row gap-2">
+                            <a href="{{ route('portal.cart.index') }}" class="flex-1 px-4 py-2.5 bg-blue-600 text-white rounded-md text-sm font-semibold hover:bg-blue-700 transition text-center">
+                                Checkout Now
+                            </a>
+                            <a href="{{ route('portal.shop.index') }}" class="flex-1 px-4 py-2.5 bg-white text-gray-700 border border-gray-300 rounded-md text-sm font-semibold hover:bg-gray-50 transition text-center">
+                                Continue Shopping
+                            </a>
+                        </div>
+                    </div>
+                @endif
+
                 {{-- Success message --}}
                 @if (session('success'))
                     <div class="mt-4 rounded-lg bg-green-50 border border-green-200 p-3 text-center">

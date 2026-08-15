@@ -44,7 +44,7 @@ class CartController extends Controller
             $this->cartService->addItem($product);
 
             return redirect()->route('portal.shop.show', $product)
-                ->with('success', "'{$product->name}' added to cart.");
+                ->with('added_to_cart', $product->name);
         } catch (\InvalidArgumentException $e) {
             return redirect()->back()->with('error', $e->getMessage());
         }
