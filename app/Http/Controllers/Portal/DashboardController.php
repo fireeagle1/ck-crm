@@ -80,6 +80,7 @@ class DashboardController extends Controller
         // Overdue invoices
         $overdueInvoices = Invoice::where('company_id', $companyId)
             ->where('invoice_status', 'Unpaid')
+            ->whereNotIn('invoice_status', Invoice::EXCLUDED_STATUSES)
             ->whereDate('due_date', '<', now())
             ->get();
 

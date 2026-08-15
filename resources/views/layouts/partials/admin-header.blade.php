@@ -15,6 +15,11 @@
         ['route' => 'admin.communications.index', 'label' => 'Communications'],
         ['route' => 'admin.canned-responses.index', 'label' => 'Canned Responses'],
     ];
+    $adminNavShop = [
+        ['route' => 'admin.shop.products.index', 'label' => 'Products'],
+        ['route' => 'admin.shop.tiers.index', 'label' => 'Customer Tiers'],
+        ['route' => 'admin.shop.orders.index', 'label' => 'Orders'],
+    ];
     $adminNavTools = [
         ['route' => 'admin.services.cpanel-mapping', 'label' => 'cPanel Mapping'],
         ['route' => 'admin.services.stripe-mapping', 'label' => 'Stripe Mapping'],
@@ -79,6 +84,24 @@
                 </button>
                 <div x-show="open" x-transition class="absolute left-0 mt-1 w-48 bg-white rounded-lg shadow-xl border py-1" style="z-index: 99999;">
                     @foreach ($adminNavCustomers as $item)
+                        <a href="{{ route($item['route']) }}"
+                           class="block px-4 py-2 text-sm {{ request()->routeIs($item['route'] . '*') ? 'bg-blue-50 text-blue-700 font-medium' : 'text-gray-700 hover:bg-gray-50' }}">
+                            {{ $item['label'] }}
+                        </a>
+                    @endforeach
+                </div>
+            </div>
+
+            {{-- Shop dropdown --}}
+            <div class="relative" x-data="{ open: false }">
+                <button @click="open = !open" @click.away="open = false"
+                        class="px-3 py-2 text-sm font-semibold whitespace-nowrap border-b-2 transition flex items-center gap-1
+                               {{ collect($adminNavShop)->contains(fn($i) => request()->routeIs($i['route'] . '*')) ? 'border-blue-400 text-white' : 'border-transparent text-gray-300 hover:text-white hover:border-gray-500' }}">
+                    Shop
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+                </button>
+                <div x-show="open" x-transition class="absolute left-0 mt-1 w-48 bg-white rounded-lg shadow-xl border py-1" style="z-index: 99999;">
+                    @foreach ($adminNavShop as $item)
                         <a href="{{ route($item['route']) }}"
                            class="block px-4 py-2 text-sm {{ request()->routeIs($item['route'] . '*') ? 'bg-blue-50 text-blue-700 font-medium' : 'text-gray-700 hover:bg-gray-50' }}">
                             {{ $item['label'] }}

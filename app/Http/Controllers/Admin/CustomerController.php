@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Customer;
+use App\Models\Invoice;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -77,6 +78,7 @@ class CustomerController extends Controller
 
         $overdueInvoices = $customer->invoices()
             ->where('invoice_status', 'Unpaid')
+            ->whereNotIn('invoice_status', Invoice::EXCLUDED_STATUSES)
             ->whereDate('due_date', '<', now())
             ->count();
 

@@ -16,7 +16,7 @@ class Invoice extends Model
     /**
      * Statuses that should be excluded from financial calculations.
      */
-    public const EXCLUDED_STATUSES = ['Void', 'Uncollectible'];
+    public const EXCLUDED_STATUSES = ['Void', 'Uncollectible', 'Deleted'];
 
     protected $fillable = [
         'company_id',

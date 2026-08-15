@@ -56,7 +56,7 @@
             </thead>
             <tbody class="divide-y">
                 @forelse ($invoices as $invoice)
-                    @php $overdue = $invoice->invoice_status === 'Unpaid' && $invoice->due_date?->isPast(); @endphp
+                    @php $overdue = $invoice->invoice_status === 'Unpaid' && !in_array($invoice->invoice_status, \App\Models\Invoice::EXCLUDED_STATUSES) && $invoice->due_date?->isPast(); @endphp
                     <tr class="hover:bg-gray-50 {{ $overdue ? 'bg-red-50' : '' }}">
                         <td class="px-4 py-3 font-mono text-xs">
                             {{ $invoice->stripe_invoice_id ? Str::limit($invoice->stripe_invoice_id, 20) : '#' . $invoice->invoice_id }}

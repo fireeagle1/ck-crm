@@ -34,8 +34,11 @@ class InvoiceController extends Controller
 
         $invoices = $query->orderByDesc('invoice_date')->paginate(20);
 
-        $totalUnpaid = Invoice::where('invoice_status', 'Unpaid')->sum('invoice_amount');
+        $totalUnpaid = Invoice::where('invoice_status', 'Unpaid')
+            ->whereNotIn('invoice_status', Invoice::EXCLUDED_STATUSES)
+            ->sum('invoice_amount');
         $overdueCount = Invoice::where('invoice_status', 'Unpaid')
+            ->whereNotIn('invoice_status', Invoice::EXCLUDED_STATUSES)
             ->whereDate('due_date', '<', now())->count();
         $totalPaidThisMonth = Invoice::where('invoice_status', 'Paid')
             ->whereMonth('paid_date', now()->month)

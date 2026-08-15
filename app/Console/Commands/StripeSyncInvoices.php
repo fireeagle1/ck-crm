@@ -101,6 +101,7 @@ class StripeSyncInvoices extends Command
                     'open' => 'Unpaid',
                     'void' => 'Void',
                     'uncollectible' => 'Uncollectible',
+                    'deleted' => 'Deleted',
                     default => 'Draft',
                 };
 
