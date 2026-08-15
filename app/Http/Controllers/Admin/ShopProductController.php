@@ -79,7 +79,7 @@ class ShopProductController extends Controller
 
         $this->syncVisibility($product, $validated);
 
-        return redirect()->route('admin.products.index')
+        return redirect()->route('admin.shop.products.index')
             ->with('success', 'Product created successfully.');
     }
 
@@ -133,7 +133,7 @@ class ShopProductController extends Controller
 
         $this->syncVisibility($product, $validated);
 
-        return redirect()->route('admin.products.index')
+        return redirect()->route('admin.shop.products.index')
             ->with('success', 'Product updated successfully.');
     }
 
@@ -141,7 +141,7 @@ class ShopProductController extends Controller
     {
         $product->update(['is_archived' => true]);
 
-        return redirect()->route('admin.products.index')
+        return redirect()->route('admin.shop.products.index')
             ->with('success', "Product '{$product->name}' archived.");
     }
 
@@ -149,7 +149,7 @@ class ShopProductController extends Controller
     {
         $product->update(['is_archived' => false]);
 
-        return redirect()->route('admin.products.index')
+        return redirect()->route('admin.shop.products.index')
             ->with('success', "Product '{$product->name}' restored.");
     }
 

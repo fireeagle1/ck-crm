@@ -28,7 +28,7 @@ class ShopProductControllerTest extends TestCase
 
     public function test_valid_one_off_product_can_be_created(): void
     {
-        $response = $this->actingAs($this->admin)->post(route('admin.products.store'), [
+        $response = $this->actingAs($this->admin)->post(route('admin.shop.products.store'), [
             'name' => 'Test Product',
             'description' => 'A valid one-off product',
             'product_type' => 'one_off',
@@ -38,7 +38,7 @@ class ShopProductControllerTest extends TestCase
             'visibility_type' => 'all',
         ]);
 
-        $response->assertRedirect(route('admin.products.index'));
+        $response->assertRedirect(route('admin.shop.products.index'));
         $response->assertSessionHasNoErrors();
 
         $this->assertDatabaseHas('products', [
@@ -50,7 +50,7 @@ class ShopProductControllerTest extends TestCase
 
     public function test_valid_hosting_product_can_be_created(): void
     {
-        $response = $this->actingAs($this->admin)->post(route('admin.products.store'), [
+        $response = $this->actingAs($this->admin)->post(route('admin.shop.products.store'), [
             'name' => 'Hosting Plan',
             'description' => 'A valid hosting product',
             'product_type' => 'hosting',
@@ -59,7 +59,7 @@ class ShopProductControllerTest extends TestCase
             'visibility_type' => 'all',
         ]);
 
-        $response->assertRedirect(route('admin.products.index'));
+        $response->assertRedirect(route('admin.shop.products.index'));
         $response->assertSessionHasNoErrors();
 
         $this->assertDatabaseHas('products', [
@@ -71,7 +71,7 @@ class ShopProductControllerTest extends TestCase
 
     public function test_valid_equipment_rental_product_can_be_created(): void
     {
-        $response = $this->actingAs($this->admin)->post(route('admin.products.store'), [
+        $response = $this->actingAs($this->admin)->post(route('admin.shop.products.store'), [
             'name' => 'Equipment Rental',
             'description' => 'A valid equipment rental product',
             'product_type' => 'equipment_rental',
@@ -81,7 +81,7 @@ class ShopProductControllerTest extends TestCase
             'visibility_type' => 'all',
         ]);
 
-        $response->assertRedirect(route('admin.products.index'));
+        $response->assertRedirect(route('admin.shop.products.index'));
         $response->assertSessionHasNoErrors();
 
         $this->assertDatabaseHas('products', [
@@ -105,7 +105,7 @@ class ShopProductControllerTest extends TestCase
      */
     public function test_property_product_validation_rejects_missing_name(): void
     {
-        $response = $this->actingAs($this->admin)->post(route('admin.products.store'), [
+        $response = $this->actingAs($this->admin)->post(route('admin.shop.products.store'), [
             // name is missing
             'description' => 'Some description',
             'product_type' => 'one_off',
@@ -118,7 +118,7 @@ class ShopProductControllerTest extends TestCase
 
     public function test_property_product_validation_rejects_missing_description(): void
     {
-        $response = $this->actingAs($this->admin)->post(route('admin.products.store'), [
+        $response = $this->actingAs($this->admin)->post(route('admin.shop.products.store'), [
             'name' => 'Test Product',
             // description is missing
             'product_type' => 'one_off',
@@ -131,7 +131,7 @@ class ShopProductControllerTest extends TestCase
 
     public function test_property_product_validation_rejects_missing_product_type(): void
     {
-        $response = $this->actingAs($this->admin)->post(route('admin.products.store'), [
+        $response = $this->actingAs($this->admin)->post(route('admin.shop.products.store'), [
             'name' => 'Test Product',
             'description' => 'Some description',
             // product_type is missing
@@ -144,7 +144,7 @@ class ShopProductControllerTest extends TestCase
 
     public function test_property_product_validation_rejects_missing_price(): void
     {
-        $response = $this->actingAs($this->admin)->post(route('admin.products.store'), [
+        $response = $this->actingAs($this->admin)->post(route('admin.shop.products.store'), [
             'name' => 'Test Product',
             'description' => 'Some description',
             'product_type' => 'one_off',
@@ -157,7 +157,7 @@ class ShopProductControllerTest extends TestCase
 
     public function test_property_product_validation_rejects_invalid_product_type(): void
     {
-        $response = $this->actingAs($this->admin)->post(route('admin.products.store'), [
+        $response = $this->actingAs($this->admin)->post(route('admin.shop.products.store'), [
             'name' => 'Test Product',
             'description' => 'Some description',
             'product_type' => 'invalid_type',
@@ -170,7 +170,7 @@ class ShopProductControllerTest extends TestCase
 
     public function test_property_product_validation_rejects_zero_price(): void
     {
-        $response = $this->actingAs($this->admin)->post(route('admin.products.store'), [
+        $response = $this->actingAs($this->admin)->post(route('admin.shop.products.store'), [
             'name' => 'Test Product',
             'description' => 'Some description',
             'product_type' => 'one_off',
@@ -213,7 +213,7 @@ class ShopProductControllerTest extends TestCase
 
             $response = $this->actingAs($this->admin)
                 ->from('/admin/shop/products/create')
-                ->post(route('admin.products.store'), $payload);
+                ->post(route('admin.shop.products.store'), $payload);
 
             // Should redirect back (validation failure) rather than to index (success)
             $response->assertRedirect('/admin/shop/products/create');
@@ -242,7 +242,7 @@ class ShopProductControllerTest extends TestCase
      */
     public function test_property_hosting_product_requires_billing_frequency(): void
     {
-        $response = $this->actingAs($this->admin)->post(route('admin.products.store'), [
+        $response = $this->actingAs($this->admin)->post(route('admin.shop.products.store'), [
             'name' => 'Hosting Product',
             'description' => 'A hosting product without billing frequency',
             'product_type' => 'hosting',
@@ -256,7 +256,7 @@ class ShopProductControllerTest extends TestCase
 
     public function test_property_equipment_rental_requires_billing_frequency(): void
     {
-        $response = $this->actingAs($this->admin)->post(route('admin.products.store'), [
+        $response = $this->actingAs($this->admin)->post(route('admin.shop.products.store'), [
             'name' => 'Equipment Rental',
             'description' => 'An equipment rental without billing frequency',
             'product_type' => 'equipment_rental',
@@ -270,7 +270,7 @@ class ShopProductControllerTest extends TestCase
 
     public function test_property_one_off_product_does_not_require_billing_frequency(): void
     {
-        $response = $this->actingAs($this->admin)->post(route('admin.products.store'), [
+        $response = $this->actingAs($this->admin)->post(route('admin.shop.products.store'), [
             'name' => 'One-Off Product',
             'description' => 'A one-off product without billing frequency',
             'product_type' => 'one_off',
@@ -280,7 +280,7 @@ class ShopProductControllerTest extends TestCase
         ]);
 
         $response->assertSessionDoesntHaveErrors('billing_frequency');
-        $response->assertRedirect(route('admin.products.index'));
+        $response->assertRedirect(route('admin.shop.products.index'));
     }
 
     /**
@@ -299,7 +299,7 @@ class ShopProductControllerTest extends TestCase
 
             $response = $this->actingAs($this->admin)
                 ->from('/admin/shop/products/create')
-                ->post(route('admin.products.store'), [
+                ->post(route('admin.shop.products.store'), [
                     'name' => 'Recurring Product ' . $i,
                     'description' => 'A recurring product without billing frequency',
                     'product_type' => $type,
@@ -335,7 +335,7 @@ class ShopProductControllerTest extends TestCase
         ];
 
         foreach ($testCases as $index => $case) {
-            $response = $this->actingAs($this->admin)->post(route('admin.products.store'), [
+            $response = $this->actingAs($this->admin)->post(route('admin.shop.products.store'), [
                 'name' => "Recurring Product {$index}",
                 'description' => 'Valid recurring product',
                 'product_type' => $case['product_type'],
@@ -345,7 +345,7 @@ class ShopProductControllerTest extends TestCase
             ]);
 
             $response->assertSessionDoesntHaveErrors('billing_frequency');
-            $response->assertRedirect(route('admin.products.index'));
+            $response->assertRedirect(route('admin.shop.products.index'));
         }
     }
 }

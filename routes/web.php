@@ -197,14 +197,14 @@ Route::middleware(['auth', 'verified', EnsureIsAdmin::class])->prefix('admin')->
     Route::resource('canned-responses', Admin\CannedResponseController::class)->except(['show']);
 
     // Shop Management
-    Route::resource('shop/products', Admin\ShopProductController::class)->except(['show', 'destroy']);
+    Route::resource('shop/products', Admin\ShopProductController::class)->except(['show', 'destroy'])->names('shop.products');
     Route::post('shop/products/{product}/archive', [Admin\ShopProductController::class, 'archive'])->name('shop.products.archive');
     Route::post('shop/products/{product}/restore', [Admin\ShopProductController::class, 'restore'])->name('shop.products.restore');
     Route::get('shop/orders', [Admin\ShopOrderController::class, 'index'])->name('shop.orders.index');
     Route::get('shop/orders/{order}', [Admin\ShopOrderController::class, 'show'])->name('shop.orders.show');
     Route::post('shop/orders/{order}/fulfil', [Admin\ShopOrderController::class, 'fulfil'])->name('shop.orders.fulfil');
     Route::post('shop/orders/{order}/note', [Admin\ShopOrderController::class, 'addNote'])->name('shop.orders.note');
-    Route::resource('shop/tiers', Admin\CustomerTierController::class)->except(['show', 'edit', 'create']);
+    Route::resource('shop/tiers', Admin\CustomerTierController::class)->except(['show', 'edit', 'create'])->names('shop.tiers');
 });
 
 /*
