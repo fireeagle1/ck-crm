@@ -16,8 +16,8 @@
         ['route' => 'admin.canned-responses.index', 'label' => 'Canned Responses'],
     ];
     $adminNavShop = [
-        ['route' => 'admin.shop.products.index', 'label' => 'Products'],
-        ['route' => 'admin.shop.tiers.index', 'label' => 'Customer Tiers'],
+        ['route' => 'admin.products.index', 'label' => 'Products'],
+        ['route' => 'admin.tiers.index', 'label' => 'Customer Tiers'],
         ['route' => 'admin.shop.orders.index', 'label' => 'Orders'],
     ];
     $adminNavTools = [
