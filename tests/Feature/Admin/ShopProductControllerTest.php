@@ -286,8 +286,8 @@ class ShopProductControllerTest extends TestCase
     /**
      * **Validates: Requirements 1.3**
      *
-     * Property test variant: generate many random recurring product payloads
-     * (hosting or equipment_rental) without billing_frequency, all should fail.
+     * Property test variant: generate many random hosting product payloads
+     * (hosting) without billing_frequency, all should fail.
      */
     public function test_property_random_recurring_products_without_billing_frequency_rejected(): void
     {
