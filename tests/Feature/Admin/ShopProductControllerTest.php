@@ -254,18 +254,18 @@ class ShopProductControllerTest extends TestCase
         $response->assertSessionHasErrors('billing_frequency');
     }
 
-    public function test_property_equipment_rental_requires_billing_frequency(): void
+    public function test_property_equipment_rental_does_not_require_billing_frequency(): void
     {
         $response = $this->actingAs($this->admin)->post(route('admin.shop.products.store'), [
             'name' => 'Equipment Rental',
-            'description' => 'An equipment rental without billing frequency',
+            'description' => 'An equipment rental priced per day',
             'product_type' => 'equipment_rental',
             'price' => 25.00,
-            // billing_frequency is missing
+            // billing_frequency is NOT required for equipment_rental (per-day pricing)
             'visibility_type' => 'all',
         ]);
 
-        $response->assertSessionHasErrors('billing_frequency');
+        $response->assertSessionDoesntHaveErrors('billing_frequency');
     }
 
     public function test_property_one_off_product_does_not_require_billing_frequency(): void
@@ -291,7 +291,7 @@ class ShopProductControllerTest extends TestCase
      */
     public function test_property_random_recurring_products_without_billing_frequency_rejected(): void
     {
-        $recurringTypes = ['hosting', 'equipment_rental'];
+        $recurringTypes = ['hosting'];
         $iterations = 20;
 
         for ($i = 0; $i < $iterations; $i++) {

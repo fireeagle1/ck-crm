@@ -92,7 +92,9 @@
                         <div class="flex items-center justify-between mt-auto">
                             <p class="font-bold text-gray-900">
                                 &pound;{{ number_format($product->price, 2) }}
-                                @if ($product->billing_frequency)
+                                @if ($product->isEquipmentRental())
+                                    <span class="text-xs font-normal text-gray-500">/day</span>
+                                @elseif ($product->billing_frequency)
                                     <span class="text-xs font-normal text-gray-500">/{{ $product->billing_frequency }}</span>
                                 @endif
                             </p>

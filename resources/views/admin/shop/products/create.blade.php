@@ -43,7 +43,7 @@
                         @error('product_type') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
                     </div>
                     <div>
-                        <label for="price" class="block text-sm font-semibold text-gray-700">Price (&pound;) <span class="text-red-500">*</span></label>
+                        <label for="price" class="block text-sm font-semibold text-gray-700">Price (&pound;) <span x-show="productType === 'equipment_rental'" class="text-xs font-normal text-gray-500">per day</span> <span class="text-red-500">*</span></label>
                         <input type="number" name="price" id="price" value="{{ old('price') }}" required step="0.01" min="0.01"
                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"
                                placeholder="0.00">
@@ -51,11 +51,11 @@
                     </div>
                 </div>
 
-                {{-- Billing Frequency (shown for equipment_rental and hosting) --}}
-                <div x-show="productType === 'equipment_rental' || productType === 'hosting'" x-transition>
+                {{-- Billing Frequency (shown for hosting only — rental uses per-day pricing) --}}
+                <div x-show="productType === 'hosting'" x-transition>
                     <label for="billing_frequency" class="block text-sm font-semibold text-gray-700">Billing Frequency <span class="text-red-500">*</span></label>
                     <select name="billing_frequency" id="billing_frequency"
-                            :required="productType === 'equipment_rental' || productType === 'hosting'"
+                            :required="productType === 'hosting'"
                             class="mt-1 block w-full max-w-xs rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
                         <option value="">Select frequency...</option>
                         <option value="monthly" {{ old('billing_frequency') === 'monthly' ? 'selected' : '' }}>Monthly</option>

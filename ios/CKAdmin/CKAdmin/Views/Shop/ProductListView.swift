@@ -123,7 +123,7 @@ struct ProductListView: View {
                 if let stock = product.stockQuantity {
                     Label("\(stock) in stock", systemImage: "archivebox")
                         .font(.caption)
-                        .foregroundStyle(stock > 0 ? .secondary : .red)
+                        .foregroundStyle(stock > 0 ? Color.secondary : Color.red)
                 } else {
                     Label("Unlimited stock", systemImage: "infinity")
                         .font(.caption)
