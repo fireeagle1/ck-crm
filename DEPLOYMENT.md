@@ -63,6 +63,8 @@ Since you can't run `php artisan storage:link`, create it manually:
 - Create a symbolic link named `storage` pointing to `../storage/app/public`
 - OR: create a `public/storage/` folder and upload files there directly
 
+**Note:** As of 2024, the `public` disk in `config/filesystems.php` has `'serve' => true`, which means Laravel serves storage files through a PHP route automatically. You do NOT need the symlink at all — product images and uploaded files will work without it. If you've previously created a symlink and it's broken, just delete it.
+
 ### 3. Run migrations
 Use cPanel's **Cron Jobs** to run a one-off migration:
 ```
@@ -117,5 +119,5 @@ Required PHP extensions: `pdo_mysql`, `mbstring`, `openssl`, `tokenizer`, `xml`,
 
 - **500 error**: Check `storage/logs/laravel.log` — most likely a permissions issue
 - **CSS/JS not loading**: Ensure `public/build/` was uploaded and `APP_URL` is correct
-- **Storage links**: If uploads don't show, verify the `public/storage` symlink
+- **Storage links**: If uploads don't show, verify that `storage/app/public/` exists and is writable (775). The `serve => true` config handles serving — no symlink needed. Make sure to clear config cache after deployment: `php artisan config:clear`
 - **Artisan commands**: Use cPanel's Terminal (if available) or cron jobs
