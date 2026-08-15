@@ -57,9 +57,9 @@
             @foreach ($products as $product)
                 <div class="bg-white rounded-lg border overflow-hidden flex flex-col hover:shadow-md transition">
                     {{-- Product image --}}
-                    <div class="h-48 bg-gray-100 relative">
+                    <div class="aspect-[4/3] bg-gray-100 relative overflow-hidden">
                         @if ($product->image_path)
-                            <img src="{{ asset('storage/' . $product->image_path) }}" alt="{{ $product->name }}" class="w-full h-full object-cover">
+                            <img src="{{ asset('storage/' . $product->image_path) }}" alt="{{ $product->name }}" class="w-full h-full object-contain p-2">
                         @else
                             <div class="w-full h-full flex items-center justify-center">
                                 <svg class="w-16 h-16 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
