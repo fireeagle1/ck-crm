@@ -5,11 +5,17 @@ namespace App\Http\Controllers\Portal;
 use App\Http\Controllers\Controller;
 use App\Models\Customer;
 use App\Models\Product;
+use App\Services\BookingService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class ShopController extends Controller
 {
+    public function __construct(
+        private BookingService $bookingService
+    ) {}
+
     /**
      * Display the shop product listing with optional type filter and search.
      */
@@ -40,6 +46,10 @@ class ShopController extends Controller
 
     /**
      * Display a single product's detail page.
+     *
+     * For equipment_rental products, passes unavailable dates for the next 90 days,
+     * minimum rental days, rental agreement text, and delivery instructions.
+     * For hosting products, indicates domain name input is needed.
      */
     public function show(Product $product): View
     {
@@ -49,6 +59,30 @@ class ShopController extends Controller
         $visible = Product::visible($customer)->where('products.id', $product->id)->exists();
         abort_unless($visible, 404);
 
-        return view('portal.shop.show', compact('product'));
+        $viewData = ['product' => $product];
+
+        // For equipment_rental products, pass rental-specific data
+        if ($product->isEquipmentRental()) {
+            $rangeStart = Carbon::today();
+            $rangeEnd = Carbon::today()->addDays(90);
+
+            $unavailableDates = $this->bookingService
+                ->getUnavailableDates($product, $rangeStart, $rangeEnd)
+                ->map(fn (Carbon $date) => $date->format('Y-m-d'))
+                ->values()
+                ->toArray();
+
+            $viewData['unavailableDates'] = json_encode($unavailableDates);
+            $viewData['minRentalDays'] = $product->min_rental_days;
+            $viewData['rentalAgreementText'] = $product->rental_agreement_text;
+            $viewData['deliveryInstructions'] = $product->delivery_instructions;
+        }
+
+        // For one_off products, pass delivery instructions if available
+        if ($product->isOneOff()) {
+            $viewData['deliveryInstructions'] = $product->delivery_instructions;
+        }
+
+        return view('portal.shop.show', $viewData);
     }
 }

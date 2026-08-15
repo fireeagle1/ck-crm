@@ -2,11 +2,13 @@
 
 namespace Tests\Feature;
 
+use App\Models\Booking;
 use App\Models\Customer;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\Service;
+use App\Services\BookingService;
 use App\Services\FulfilmentService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use RuntimeException;
@@ -15,24 +17,24 @@ use Tests\TestCase;
 /**
  * Feature tests for FulfilmentService.
  *
- * **Validates: Requirements 5.4, 6.1, 6.2, 7.2, 7.4**
+ * **Validates: Requirements 3.1, 5.4, 6.4, 10.1, 10.2, 10.3**
  *
  * Property 13: Stock Decrements by Exactly One Per Stockable Item Ordered
  * For any Order created containing a stockable Product (one_off or equipment_rental),
  * the Product's stock_quantity SHALL decrease by exactly one per OrderItem referencing
  * that Product.
  *
- * Property 14: Hosting Service Auto-Provisioned With Correct Fields
- * For any Hosting Product subscription successfully created, the resulting Service record
- * SHALL have service_type equal to the Product name, status "active", stripe_subscription_id
- * matching the Stripe response, start_date equal to the current date, service_monthly_charge
- * equal to the Product price, and service_payment_frequency equal to the selected billing frequency.
+ * Property 14: Hosting Service Created With Pending Status and Domain Name
+ * For any Hosting Product payment completed, the resulting Service record SHALL have
+ * status "pending", domain_name from the OrderItem, and correct subscription fields.
  *
- * Property 15: Equipment Rental Creates Pending Service
- * For any Equipment Rental Product subscription successfully created, the resulting Service
- * record SHALL have status "pending" and the stripe_subscription_id from the Stripe response.
- * After admin fulfilment, the Service status SHALL change to "active" and the Order
- * fulfilment_status SHALL change to "completed".
+ * Property 15: Equipment Rental Creates Booking via BookingService
+ * For any Equipment Rental Product payment completed, a Booking record SHALL be created
+ * with status "active", linked to the OrderItem, with correct dates and quantity.
+ *
+ * Property 6: Transactional Atomicity
+ * For any fulfilment operation, if any sub-step fails, then NO records from that
+ * transaction SHALL persist in the database.
  */
 class FulfilmentServiceTest extends TestCase
 {
@@ -45,7 +47,7 @@ class FulfilmentServiceTest extends TestCase
     {
         parent::setUp();
 
-        $this->service = new FulfilmentService();
+        $this->service = app(FulfilmentService::class);
 
         $this->customer = Customer::factory()->create();
     }
@@ -115,6 +117,9 @@ class FulfilmentServiceTest extends TestCase
             'price' => $product->price,
             'billing_frequency' => $product->billing_frequency,
             'stripe_subscription_id' => 'sub_equip_test',
+            'rental_start_date' => now()->addDay()->toDateString(),
+            'rental_end_date' => now()->addDays(7)->toDateString(),
+            'quantity' => 1,
         ]);
 
         $this->service->handleEquipmentRentalPurchase($item, $this->customer);
@@ -238,11 +243,11 @@ class FulfilmentServiceTest extends TestCase
     // ──────────────────────────────────────────────────────────────────
 
     /**
-     * **Validates: Requirements 6.1, 6.2**
+     * **Validates: Requirements 3.1, 10.1**
      *
-     * Property 14: Hosting purchase creates a Service with status 'Active'.
+     * Property 14: Hosting purchase creates a Service with status 'pending' and domain_name.
      */
-    public function test_property_hosting_purchase_creates_active_service(): void
+    public function test_property_hosting_purchase_creates_pending_service_with_domain(): void
     {
         $product = Product::factory()->hosting()->create([
             'price' => 29.99,
@@ -256,15 +261,17 @@ class FulfilmentServiceTest extends TestCase
             'price' => $product->price,
             'billing_frequency' => $product->billing_frequency,
             'stripe_subscription_id' => 'sub_hosting_active_test',
+            'domain_name' => 'example.com',
         ]);
 
         $service = $this->service->handleHostingPurchase($item, $this->customer);
 
-        $this->assertEquals('Active', $service->status);
+        $this->assertEquals('pending', $service->status);
+        $this->assertEquals('example.com', $service->domain_name);
     }
 
     /**
-     * **Validates: Requirements 6.1, 6.2**
+     * **Validates: Requirements 3.1**
      *
      * Property 14: Hosting service has service_short equal to product_name from order item.
      */
@@ -282,6 +289,7 @@ class FulfilmentServiceTest extends TestCase
             'price' => $product->price,
             'billing_frequency' => 'monthly',
             'stripe_subscription_id' => 'sub_hosting_name_test',
+            'domain_name' => 'premium-hosting.com',
         ]);
 
         $service = $this->service->handleHostingPurchase($item, $this->customer);
@@ -290,7 +298,7 @@ class FulfilmentServiceTest extends TestCase
     }
 
     /**
-     * **Validates: Requirements 6.1, 6.2**
+     * **Validates: Requirements 3.1**
      *
      * Property 14: Hosting service has start_date set to today.
      */
@@ -305,6 +313,7 @@ class FulfilmentServiceTest extends TestCase
             'price' => $product->price,
             'billing_frequency' => $product->billing_frequency,
             'stripe_subscription_id' => 'sub_hosting_date_test',
+            'domain_name' => 'datetest.com',
         ]);
 
         $service = $this->service->handleHostingPurchase($item, $this->customer);
@@ -313,7 +322,7 @@ class FulfilmentServiceTest extends TestCase
     }
 
     /**
-     * **Validates: Requirements 6.1, 6.2**
+     * **Validates: Requirements 3.1**
      *
      * Property 14: Hosting service has correct monthly charge and payment frequency.
      */
@@ -331,6 +340,7 @@ class FulfilmentServiceTest extends TestCase
             'price' => 49.99,
             'billing_frequency' => 'quarterly',
             'stripe_subscription_id' => 'sub_hosting_charge_test',
+            'domain_name' => 'chargetest.com',
         ]);
 
         $service = $this->service->handleHostingPurchase($item, $this->customer);
@@ -340,7 +350,7 @@ class FulfilmentServiceTest extends TestCase
     }
 
     /**
-     * **Validates: Requirements 6.1, 6.2**
+     * **Validates: Requirements 3.1**
      *
      * Property 14: Hosting service has correct stripe_subscription_id.
      */
@@ -355,6 +365,7 @@ class FulfilmentServiceTest extends TestCase
             'price' => $product->price,
             'billing_frequency' => $product->billing_frequency,
             'stripe_subscription_id' => 'sub_hosting_stripe_id_789',
+            'domain_name' => 'stripetest.com',
         ]);
 
         $service = $this->service->handleHostingPurchase($item, $this->customer);
@@ -363,11 +374,11 @@ class FulfilmentServiceTest extends TestCase
     }
 
     /**
-     * **Validates: Requirements 6.1, 6.2**
+     * **Validates: Requirements 3.1, 10.1**
      *
-     * Property 14: Hosting purchase sets order fulfilment_status to 'completed'.
+     * Property 14: Hosting purchase sets order fulfilment_status to 'awaiting_fulfilment'.
      */
-    public function test_property_hosting_purchase_sets_order_fulfilment_completed(): void
+    public function test_property_hosting_purchase_sets_order_awaiting_fulfilment(): void
     {
         $product = Product::factory()->hosting()->create();
 
@@ -378,16 +389,17 @@ class FulfilmentServiceTest extends TestCase
             'price' => $product->price,
             'billing_frequency' => $product->billing_frequency,
             'stripe_subscription_id' => 'sub_hosting_order_status',
+            'domain_name' => 'ordertest.com',
         ]);
 
         $this->service->handleHostingPurchase($item, $this->customer);
 
         $item->order->refresh();
-        $this->assertEquals('completed', $item->order->fulfilment_status);
+        $this->assertEquals('awaiting_fulfilment', $item->order->fulfilment_status);
     }
 
     /**
-     * **Validates: Requirements 6.1, 6.2**
+     * **Validates: Requirements 3.1**
      *
      * Property 14: Hosting purchase links service_id on the OrderItem.
      */
@@ -402,6 +414,7 @@ class FulfilmentServiceTest extends TestCase
             'price' => $product->price,
             'billing_frequency' => $product->billing_frequency,
             'stripe_subscription_id' => 'sub_hosting_link_test',
+            'domain_name' => 'linktest.com',
         ]);
 
         $service = $this->service->handleHostingPurchase($item, $this->customer);
@@ -411,17 +424,17 @@ class FulfilmentServiceTest extends TestCase
     }
 
     /**
-     * **Validates: Requirements 6.1, 6.2**
+     * **Validates: Requirements 3.1, 10.1**
      *
      * Property 14 (property-based): For various hosting product configurations,
-     * all service fields are correctly provisioned.
+     * all service fields are correctly provisioned with pending status and domain.
      */
     public function test_property_hosting_auto_provision_correct_fields_for_various_configs(): void
     {
         $configs = [
-            ['name' => 'Basic Hosting', 'price' => 9.99, 'billing_frequency' => 'monthly', 'sub_id' => 'sub_basic_123'],
-            ['name' => 'Pro Hosting', 'price' => 29.99, 'billing_frequency' => 'quarterly', 'sub_id' => 'sub_pro_456'],
-            ['name' => 'Enterprise Hosting', 'price' => 199.99, 'billing_frequency' => 'annually', 'sub_id' => 'sub_ent_789'],
+            ['name' => 'Basic Hosting', 'price' => 9.99, 'billing_frequency' => 'monthly', 'sub_id' => 'sub_basic_123', 'domain' => 'basic.com'],
+            ['name' => 'Pro Hosting', 'price' => 29.99, 'billing_frequency' => 'quarterly', 'sub_id' => 'sub_pro_456', 'domain' => 'pro-site.co.uk'],
+            ['name' => 'Enterprise Hosting', 'price' => 199.99, 'billing_frequency' => 'annually', 'sub_id' => 'sub_ent_789', 'domain' => 'enterprise.org'],
         ];
 
         foreach ($configs as $config) {
@@ -438,21 +451,23 @@ class FulfilmentServiceTest extends TestCase
                 'price' => $config['price'],
                 'billing_frequency' => $config['billing_frequency'],
                 'stripe_subscription_id' => $config['sub_id'],
+                'domain_name' => $config['domain'],
             ]);
 
             $service = $this->service->handleHostingPurchase($item, $this->customer);
 
-            // Verify all fields per Property 14
-            $this->assertEquals('Active', $service->status, "Service status should be Active for {$config['name']}");
+            // Verify all fields per Property 14 (updated for pending flow)
+            $this->assertEquals('pending', $service->status, "Service status should be pending for {$config['name']}");
+            $this->assertEquals($config['domain'], $service->domain_name, "domain_name mismatch for {$config['name']}");
             $this->assertEquals($config['name'], $service->service_short, "service_short mismatch for {$config['name']}");
             $this->assertTrue($service->start_date->isToday(), "start_date should be today for {$config['name']}");
             $this->assertEquals(number_format($config['price'], 2, '.', ''), $service->service_monthly_charge, "service_monthly_charge mismatch for {$config['name']}");
             $this->assertEquals($config['billing_frequency'], $service->service_payment_frequency, "service_payment_frequency mismatch for {$config['name']}");
             $this->assertEquals($config['sub_id'], $service->stripe_subscription_id, "stripe_subscription_id mismatch for {$config['name']}");
 
-            // Verify order is completed
+            // Verify order is awaiting_fulfilment (admin will approve via WHM later)
             $item->order->refresh();
-            $this->assertEquals('completed', $item->order->fulfilment_status, "Order should be completed for {$config['name']}");
+            $this->assertEquals('awaiting_fulfilment', $item->order->fulfilment_status, "Order should be awaiting_fulfilment for {$config['name']}");
 
             // Verify item is linked
             $item->refresh();
@@ -461,15 +476,15 @@ class FulfilmentServiceTest extends TestCase
     }
 
     // ──────────────────────────────────────────────────────────────────
-    // Property 15: Equipment Rental Creates Pending Service
+    // Property 15: Equipment Rental Creates Booking via BookingService
     // ──────────────────────────────────────────────────────────────────
 
     /**
-     * **Validates: Requirements 7.2**
+     * **Validates: Requirements 6.4, 10.1**
      *
-     * Property 15: Equipment rental creates a Service with status 'pending'.
+     * Property 15: Equipment rental creates a Booking with status 'active'.
      */
-    public function test_property_equipment_rental_creates_pending_service(): void
+    public function test_property_equipment_rental_creates_active_booking(): void
     {
         $product = Product::factory()->equipmentRental()->create([
             'stock_quantity' => 5,
@@ -481,49 +496,53 @@ class FulfilmentServiceTest extends TestCase
             'product_type' => 'equipment_rental',
             'price' => $product->price,
             'billing_frequency' => $product->billing_frequency,
-            'stripe_subscription_id' => 'sub_equip_pending_test',
+            'rental_start_date' => now()->addDays(1)->toDateString(),
+            'rental_end_date' => now()->addDays(5)->toDateString(),
+            'quantity' => 1,
         ]);
 
-        $service = $this->service->handleEquipmentRentalPurchase($item, $this->customer);
+        $booking = $this->service->handleEquipmentRentalPurchase($item, $this->customer);
 
-        $this->assertEquals('pending', $service->status);
+        $this->assertInstanceOf(Booking::class, $booking);
+        $this->assertEquals('active', $booking->status);
     }
 
     /**
-     * **Validates: Requirements 7.2**
+     * **Validates: Requirements 6.4**
      *
-     * Property 15: Equipment rental service has same field mapping as hosting
-     * (service_short, start_date, charge, frequency, stripe_subscription_id).
+     * Property 15: Equipment rental booking has correct dates and quantity.
      */
-    public function test_property_equipment_rental_service_has_correct_fields(): void
+    public function test_property_equipment_rental_booking_has_correct_fields(): void
     {
         $product = Product::factory()->equipmentRental()->create([
             'name' => 'Router Rental',
             'price' => 15.00,
-            'billing_frequency' => 'monthly',
             'stock_quantity' => 10,
         ]);
+
+        $startDate = now()->addDays(2)->toDateString();
+        $endDate = now()->addDays(7)->toDateString();
 
         $item = $this->createOrderWithItem([
             'product_id' => $product->id,
             'product_name' => 'Router Rental',
             'product_type' => 'equipment_rental',
             'price' => 15.00,
-            'billing_frequency' => 'monthly',
-            'stripe_subscription_id' => 'sub_router_rental_001',
+            'rental_start_date' => $startDate,
+            'rental_end_date' => $endDate,
+            'quantity' => 2,
         ]);
 
-        $service = $this->service->handleEquipmentRentalPurchase($item, $this->customer);
+        $booking = $this->service->handleEquipmentRentalPurchase($item, $this->customer);
 
-        $this->assertEquals('Router Rental', $service->service_short);
-        $this->assertTrue($service->start_date->isToday());
-        $this->assertEquals('15.00', $service->service_monthly_charge);
-        $this->assertEquals('monthly', $service->service_payment_frequency);
-        $this->assertEquals('sub_router_rental_001', $service->stripe_subscription_id);
+        $this->assertEquals($startDate, $booking->start_date->toDateString());
+        $this->assertEquals($endDate, $booking->end_date->toDateString());
+        $this->assertEquals(2, $booking->quantity);
+        $this->assertEquals($product->id, $booking->product_id);
     }
 
     /**
-     * **Validates: Requirements 7.2**
+     * **Validates: Requirements 6.4, 10.1**
      *
      * Property 15: Equipment rental sets order fulfilment_status to 'awaiting_fulfilment'.
      */
@@ -538,8 +557,9 @@ class FulfilmentServiceTest extends TestCase
             'product_name' => $product->name,
             'product_type' => 'equipment_rental',
             'price' => $product->price,
-            'billing_frequency' => $product->billing_frequency,
-            'stripe_subscription_id' => 'sub_equip_awaiting_test',
+            'rental_start_date' => now()->addDays(1)->toDateString(),
+            'rental_end_date' => now()->addDays(5)->toDateString(),
+            'quantity' => 1,
         ]);
 
         $this->service->handleEquipmentRentalPurchase($item, $this->customer);
@@ -549,7 +569,7 @@ class FulfilmentServiceTest extends TestCase
     }
 
     /**
-     * **Validates: Requirements 7.2, 5.4**
+     * **Validates: Requirements 6.4, 5.4**
      *
      * Property 15: Equipment rental decrements stock.
      */
@@ -564,8 +584,9 @@ class FulfilmentServiceTest extends TestCase
             'product_name' => $product->name,
             'product_type' => 'equipment_rental',
             'price' => $product->price,
-            'billing_frequency' => $product->billing_frequency,
-            'stripe_subscription_id' => 'sub_equip_stock_test',
+            'rental_start_date' => now()->addDays(1)->toDateString(),
+            'rental_end_date' => now()->addDays(5)->toDateString(),
+            'quantity' => 1,
         ]);
 
         $this->service->handleEquipmentRentalPurchase($item, $this->customer);
@@ -575,28 +596,26 @@ class FulfilmentServiceTest extends TestCase
     }
 
     /**
-     * **Validates: Requirements 7.4**
+     * **Validates: Requirements 10.1, 10.2, 10.3**
      *
-     * Property 15: After admin fulfilment, service status changes to 'Active'
-     * and order fulfilment_status changes to 'completed'.
+     * Property 6: fulfilOrder wraps in transaction — activates pending services and bookings.
      */
     public function test_property_fulfil_order_activates_pending_service_and_completes_order(): void
     {
-        $product = Product::factory()->equipmentRental()->create([
-            'stock_quantity' => 5,
-        ]);
+        $product = Product::factory()->hosting()->create();
 
         $item = $this->createOrderWithItem([
             'product_id' => $product->id,
             'product_name' => $product->name,
-            'product_type' => 'equipment_rental',
+            'product_type' => 'hosting',
             'price' => $product->price,
             'billing_frequency' => $product->billing_frequency,
-            'stripe_subscription_id' => 'sub_equip_fulfil_test',
+            'stripe_subscription_id' => 'sub_hosting_fulfil_test',
+            'domain_name' => 'fulfiltest.com',
         ]);
 
-        // First, create the equipment rental (pending service)
-        $service = $this->service->handleEquipmentRentalPurchase($item, $this->customer);
+        // First, create the hosting purchase (pending service)
+        $service = $this->service->handleHostingPurchase($item, $this->customer);
 
         $this->assertEquals('pending', $service->status);
         $this->assertEquals('awaiting_fulfilment', $item->order->fresh()->fulfilment_status);
@@ -615,72 +634,73 @@ class FulfilmentServiceTest extends TestCase
     }
 
     /**
-     * **Validates: Requirements 7.4**
+     * **Validates: Requirements 10.1, 10.2, 10.3**
      *
-     * Property 15 (property-based): For various equipment rental configurations,
-     * the full lifecycle (create pending -> fulfil -> active) works correctly.
+     * Property 6: fulfilOrder activates confirmed bookings within a transaction.
      */
-    public function test_property_equipment_rental_full_lifecycle_various_configs(): void
-    {
-        $configs = [
-            ['name' => 'Router Rental', 'price' => 15.00, 'billing_frequency' => 'monthly', 'stock' => 10, 'sub_id' => 'sub_router_lc'],
-            ['name' => 'Switch Rental', 'price' => 25.00, 'billing_frequency' => 'quarterly', 'stock' => 3, 'sub_id' => 'sub_switch_lc'],
-            ['name' => 'Server Rental', 'price' => 99.99, 'billing_frequency' => 'annually', 'stock' => 1, 'sub_id' => 'sub_server_lc'],
-        ];
-
-        foreach ($configs as $config) {
-            $product = Product::factory()->equipmentRental()->create([
-                'name' => $config['name'],
-                'price' => $config['price'],
-                'billing_frequency' => $config['billing_frequency'],
-                'stock_quantity' => $config['stock'],
-            ]);
-
-            $item = $this->createOrderWithItem([
-                'product_id' => $product->id,
-                'product_name' => $config['name'],
-                'product_type' => 'equipment_rental',
-                'price' => $config['price'],
-                'billing_frequency' => $config['billing_frequency'],
-                'stripe_subscription_id' => $config['sub_id'],
-            ]);
-
-            // Step 1: Create equipment rental purchase
-            $service = $this->service->handleEquipmentRentalPurchase($item, $this->customer);
-
-            // Verify initial state: pending service, awaiting_fulfilment order, stock decremented
-            $this->assertEquals('pending', $service->status, "Service should be pending for {$config['name']}");
-            $this->assertEquals($config['name'], $service->service_short, "service_short mismatch for {$config['name']}");
-            $this->assertEquals($config['sub_id'], $service->stripe_subscription_id, "stripe_subscription_id mismatch for {$config['name']}");
-
-            $item->order->refresh();
-            $this->assertEquals('awaiting_fulfilment', $item->order->fulfilment_status, "Order should be awaiting_fulfilment for {$config['name']}");
-
-            $product->refresh();
-            $this->assertEquals($config['stock'] - 1, $product->stock_quantity, "Stock should decrement for {$config['name']}");
-
-            // Step 2: Admin fulfils the order
-            $this->service->fulfilOrder($item->order);
-
-            // Verify final state: active service, completed order
-            $service->refresh();
-            $this->assertEquals('Active', $service->status, "Service should be Active after fulfilment for {$config['name']}");
-
-            $item->order->refresh();
-            $this->assertEquals('completed', $item->order->fulfilment_status, "Order should be completed after fulfilment for {$config['name']}");
-            $this->assertNotNull($item->order->fulfilled_at, "fulfilled_at should be set for {$config['name']}");
-        }
-    }
-
-    /**
-     * **Validates: Requirements 7.4**
-     *
-     * Property 15: fulfilOrder sets fulfilled_at timestamp.
-     */
-    public function test_property_fulfil_order_sets_fulfilled_at_timestamp(): void
+    public function test_property_fulfil_order_activates_confirmed_bookings(): void
     {
         $product = Product::factory()->equipmentRental()->create([
             'stock_quantity' => 5,
+        ]);
+
+        $startDate = now()->addDays(1)->toDateString();
+        $endDate = now()->addDays(5)->toDateString();
+
+        $order = Order::create([
+            'company_id' => $this->customer->company_id,
+            'payment_status' => 'paid',
+            'fulfilment_status' => 'pending',
+            'total_amount' => 100.00,
+        ]);
+
+        $item = OrderItem::create([
+            'order_id' => $order->id,
+            'product_id' => $product->id,
+            'product_name' => $product->name,
+            'product_type' => 'equipment_rental',
+            'price' => 20.00,
+            'rental_start_date' => $startDate,
+            'rental_end_date' => $endDate,
+            'quantity' => 1,
+        ]);
+
+        // Create a confirmed booking manually
+        $booking = Booking::create([
+            'order_item_id' => $item->id,
+            'product_id' => $product->id,
+            'company_id' => $this->customer->company_id,
+            'start_date' => $startDate,
+            'end_date' => $endDate,
+            'quantity' => 1,
+            'total_price' => 100.00,
+            'status' => 'confirmed',
+        ]);
+
+        $item->update(['booking_id' => $booking->id]);
+
+        // Fulfil the order
+        $this->service->fulfilOrder($order);
+
+        // Verify booking is now active
+        $booking->refresh();
+        $this->assertEquals('active', $booking->status);
+
+        // Verify order is completed
+        $order->refresh();
+        $this->assertEquals('completed', $order->fulfilment_status);
+        $this->assertNotNull($order->fulfilled_at);
+    }
+
+    /**
+     * **Validates: Requirements 10.1, 10.2, 10.3**
+     *
+     * Property 6: Transactional atomicity — on failure, no records persist.
+     */
+    public function test_property_transactional_rollback_on_failure(): void
+    {
+        $product = Product::factory()->equipmentRental()->create([
+            'stock_quantity' => 0, // Will cause RuntimeException on stock decrement
         ]);
 
         $item = $this->createOrderWithItem([
@@ -688,21 +708,25 @@ class FulfilmentServiceTest extends TestCase
             'product_name' => $product->name,
             'product_type' => 'equipment_rental',
             'price' => $product->price,
-            'billing_frequency' => $product->billing_frequency,
-            'stripe_subscription_id' => 'sub_equip_timestamp_test',
+            'rental_start_date' => now()->addDays(1)->toDateString(),
+            'rental_end_date' => now()->addDays(5)->toDateString(),
+            'quantity' => 1,
         ]);
 
-        $this->service->handleEquipmentRentalPurchase($item, $this->customer);
+        $bookingCountBefore = Booking::count();
 
-        // Verify fulfilled_at is null before fulfilment
-        $this->assertNull($item->order->fresh()->fulfilled_at);
+        try {
+            $this->service->handleEquipmentRentalPurchase($item, $this->customer);
+            $this->fail('Expected RuntimeException was not thrown');
+        } catch (RuntimeException $e) {
+            // Expected — stock is zero
+        }
 
-        // Fulfil the order
-        $this->service->fulfilOrder($item->order);
+        // Verify no booking was created (transaction rolled back)
+        $this->assertEquals($bookingCountBefore, Booking::count());
 
-        // Verify fulfilled_at is set
+        // Verify order fulfilment_status unchanged
         $item->order->refresh();
-        $this->assertNotNull($item->order->fulfilled_at);
-        $this->assertTrue($item->order->fulfilled_at->isToday());
+        $this->assertEquals('pending', $item->order->fulfilment_status);
     }
 }

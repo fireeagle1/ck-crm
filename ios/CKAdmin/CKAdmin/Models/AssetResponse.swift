@@ -39,6 +39,7 @@ struct AssetTicket: Decodable, Identifiable {
     let subject: String
     let status: String
     let priority: String
+    let ticketType: String?
     let createdAt: String?
 
     var id: Int { ticketId }

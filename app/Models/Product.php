@@ -21,12 +21,22 @@ class Product extends Model
         'stock_quantity',
         'image_path',
         'is_archived',
+        'min_rental_days',
+        'cooldown_days',
+        'rental_agreement_text',
+        'delivery_instructions',
+        'low_stock_threshold',
+        'low_stock_notified',
     ];
 
     protected $casts = [
         'price' => 'decimal:2',
         'stock_quantity' => 'integer',
         'is_archived' => 'boolean',
+        'min_rental_days' => 'integer',
+        'cooldown_days' => 'integer',
+        'low_stock_threshold' => 'integer',
+        'low_stock_notified' => 'boolean',
     ];
 
     public function visibilityRule(): HasOne
@@ -37,6 +47,43 @@ class Product extends Model
     public function orderItems(): HasMany
     {
         return $this->hasMany(OrderItem::class);
+    }
+
+    public function bookings(): HasMany
+    {
+        return $this->hasMany(Booking::class, 'product_id');
+    }
+
+    /**
+     * Check if the product is an equipment rental type.
+     */
+    public function isEquipmentRental(): bool
+    {
+        return $this->product_type === 'equipment_rental';
+    }
+
+    /**
+     * Check if the product is a hosting type.
+     */
+    public function isHosting(): bool
+    {
+        return $this->product_type === 'hosting';
+    }
+
+    /**
+     * Check if the product is a one-off type.
+     */
+    public function isOneOff(): bool
+    {
+        return $this->product_type === 'one_off';
+    }
+
+    /**
+     * Check if the product has a rental agreement configured.
+     */
+    public function hasRentalAgreement(): bool
+    {
+        return !empty($this->rental_agreement_text);
     }
 
     /**

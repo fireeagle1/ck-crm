@@ -11,9 +11,18 @@ struct TicketDetailView: View {
 
     var body: some View {
         Group {
-            if viewModel.isLoading && viewModel.ticket == nil { ProgressView("Loading...").frame(maxWidth: .infinity, maxHeight: .infinity) }
-            else if let err = viewModel.errorMessage, viewModel.ticket == nil { errorView(err) }
-            else if let ticket = viewModel.ticket { ticketContent(ticket) }
+            if viewModel.isLoading && viewModel.ticket == nil {
+                ProgressView("Loading...").frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else if let err = viewModel.errorMessage, viewModel.ticket == nil {
+                errorView(err)
+            } else if let ticket = viewModel.ticket {
+                ticketContent(ticket)
+            } else {
+                // Fallback: trigger reload if we ended up in an unexpected state
+                ProgressView("Loading...")
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .task { await viewModel.loadTicket() }
+            }
         }
         .navigationTitle(viewModel.ticket.map { "INC\($0.ticketId)" } ?? "Ticket")
         .navigationBarTitleDisplayMode(.inline)

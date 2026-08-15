@@ -1,0 +1,986 @@
+{
+  "pbtResults": {},
+  "executionHistory": {
+    "1.1 Create `bookings` table migration": [
+      {
+        "executionId": "5a15fa03-9c2e-49e4-82f3-3634bafe4812",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786784226288
+      },
+      {
+        "executionId": "5a15fa03-9c2e-49e4-82f3-3634bafe4812",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786784236424
+      },
+      {
+        "executionId": "5a15fa03-9c2e-49e4-82f3-3634bafe4812",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786784350526
+      }
+    ],
+    "1.2 Create `processed_webhook_events` table migration": [
+      {
+        "executionId": "5a15fa03-9c2e-49e4-82f3-3634bafe4812",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786784226324
+      },
+      {
+        "executionId": "5a15fa03-9c2e-49e4-82f3-3634bafe4812",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786784237306
+      },
+      {
+        "executionId": "5a15fa03-9c2e-49e4-82f3-3634bafe4812",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786784351172
+      }
+    ],
+    "1.3 Create migration to add columns to `products` table": [
+      {
+        "executionId": "5a15fa03-9c2e-49e4-82f3-3634bafe4812",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786784226355
+      },
+      {
+        "executionId": "5a15fa03-9c2e-49e4-82f3-3634bafe4812",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786784238147
+      },
+      {
+        "executionId": "5a15fa03-9c2e-49e4-82f3-3634bafe4812",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786784352058
+      }
+    ],
+    "1.4 Create migration to add columns to `orders` table": [
+      {
+        "executionId": "5a15fa03-9c2e-49e4-82f3-3634bafe4812",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786784226380
+      },
+      {
+        "executionId": "5a15fa03-9c2e-49e4-82f3-3634bafe4812",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786784238945
+      },
+      {
+        "executionId": "5a15fa03-9c2e-49e4-82f3-3634bafe4812",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786784352946
+      }
+    ],
+    "1.5 Create migration to add columns to `order_items` table": [
+      {
+        "executionId": "5a15fa03-9c2e-49e4-82f3-3634bafe4812",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786784226406
+      },
+      {
+        "executionId": "5a15fa03-9c2e-49e4-82f3-3634bafe4812",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786784239820
+      },
+      {
+        "executionId": "5a15fa03-9c2e-49e4-82f3-3634bafe4812",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786784353812
+      }
+    ],
+    "1.6 Create migration to add columns to `services` table": [
+      {
+        "executionId": "5a15fa03-9c2e-49e4-82f3-3634bafe4812",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786784226429
+      },
+      {
+        "executionId": "5a15fa03-9c2e-49e4-82f3-3634bafe4812",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786784354707
+      },
+      {
+        "executionId": "5a15fa03-9c2e-49e4-82f3-3634bafe4812",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786784393709
+      }
+    ],
+    "1.7 Create `Booking` model with relationships and fillable attributes": [
+      {
+        "executionId": "5a15fa03-9c2e-49e4-82f3-3634bafe4812",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786784226459
+      },
+      {
+        "executionId": "5a15fa03-9c2e-49e4-82f3-3634bafe4812",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786784397779
+      },
+      {
+        "executionId": "5a15fa03-9c2e-49e4-82f3-3634bafe4812",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786784502110
+      }
+    ],
+    "1.8 Create `ProcessedWebhookEvent` model": [
+      {
+        "executionId": "5a15fa03-9c2e-49e4-82f3-3634bafe4812",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786784226487
+      },
+      {
+        "executionId": "5a15fa03-9c2e-49e4-82f3-3634bafe4812",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786784398573
+      },
+      {
+        "executionId": "5a15fa03-9c2e-49e4-82f3-3634bafe4812",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786784502891
+      }
+    ],
+    "1.9 Update `Product` model with new fillable attributes and casts": [
+      {
+        "executionId": "5a15fa03-9c2e-49e4-82f3-3634bafe4812",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786784226513
+      },
+      {
+        "executionId": "5a15fa03-9c2e-49e4-82f3-3634bafe4812",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786784399448
+      },
+      {
+        "executionId": "5a15fa03-9c2e-49e4-82f3-3634bafe4812",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786784503861
+      }
+    ],
+    "1.10 Update `Order`, `OrderItem`, `Service` models with new attributes": [
+      {
+        "executionId": "5a15fa03-9c2e-49e4-82f3-3634bafe4812",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786784226541
+      },
+      {
+        "executionId": "5a15fa03-9c2e-49e4-82f3-3634bafe4812",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786784400322
+      },
+      {
+        "executionId": "5a15fa03-9c2e-49e4-82f3-3634bafe4812",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786784504922
+      }
+    ],
+    "2.1 Implement `AvailabilityService`": [
+      {
+        "executionId": "5a15fa03-9c2e-49e4-82f3-3634bafe4812",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786784226577
+      },
+      {
+        "executionId": "5a15fa03-9c2e-49e4-82f3-3634bafe4812",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786784509596
+      },
+      {
+        "executionId": "5a15fa03-9c2e-49e4-82f3-3634bafe4812",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786784751025
+      }
+    ],
+    "2.3 Implement `BookingService`": [
+      {
+        "executionId": "5a15fa03-9c2e-49e4-82f3-3634bafe4812",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786784226604
+      },
+      {
+        "executionId": "5a15fa03-9c2e-49e4-82f3-3634bafe4812",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786784758269
+      },
+      {
+        "executionId": "5a15fa03-9c2e-49e4-82f3-3634bafe4812",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786785095306
+      }
+    ],
+    "3. Checkpoint - Ensure migrations run and core service tests pass": [
+      {
+        "executionId": "5a15fa03-9c2e-49e4-82f3-3634bafe4812",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786784226628
+      },
+      {
+        "executionId": "5a15fa03-9c2e-49e4-82f3-3634bafe4812",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786785134231
+      },
+      {
+        "executionId": "a748f5bd-ef33-4b88-b2bb-0ffe42880057",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786786697372
+      }
+    ],
+    "4.1 Implement `WhmService`": [
+      {
+        "executionId": "5a15fa03-9c2e-49e4-82f3-3634bafe4812",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786784226653
+      },
+      {
+        "executionId": "5a15fa03-9c2e-49e4-82f3-3634bafe4812",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786784510424
+      },
+      {
+        "executionId": "5a15fa03-9c2e-49e4-82f3-3634bafe4812",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786784751749
+      }
+    ],
+    "4.2 Create `Admin\\WhmConfigController`": [
+      {
+        "executionId": "5a15fa03-9c2e-49e4-82f3-3634bafe4812",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786784226676
+      },
+      {
+        "executionId": "5a15fa03-9c2e-49e4-82f3-3634bafe4812",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786784784065
+      },
+      {
+        "executionId": "5a15fa03-9c2e-49e4-82f3-3634bafe4812",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786785095990
+      }
+    ],
+    "4.4 Create `Admin\\HostingProvisionController`": [
+      {
+        "executionId": "5a15fa03-9c2e-49e4-82f3-3634bafe4812",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786784226705
+      },
+      {
+        "executionId": "5a15fa03-9c2e-49e4-82f3-3634bafe4812",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786785135104
+      },
+      {
+        "executionId": "a748f5bd-ef33-4b88-b2bb-0ffe42880057",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786786695365
+      }
+    ],
+    "5.1 Enhance `StripeService` with customer sync and one-time payments": [
+      {
+        "executionId": "5a15fa03-9c2e-49e4-82f3-3634bafe4812",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786784226730
+      },
+      {
+        "executionId": "5a15fa03-9c2e-49e4-82f3-3634bafe4812",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786784511277
+      },
+      {
+        "executionId": "5a15fa03-9c2e-49e4-82f3-3634bafe4812",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786784752862
+      }
+    ],
+    "5.3 Implement webhook idempotency in `StripeWebhookController`": [
+      {
+        "executionId": "5a15fa03-9c2e-49e4-82f3-3634bafe4812",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786784226760
+      },
+      {
+        "executionId": "5a15fa03-9c2e-49e4-82f3-3634bafe4812",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786784759834
+      },
+      {
+        "executionId": "5a15fa03-9c2e-49e4-82f3-3634bafe4812",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786785096980
+      }
+    ],
+    "5.5 Enhance `FulfilmentService` with transactional wrapping": [
+      {
+        "executionId": "5a15fa03-9c2e-49e4-82f3-3634bafe4812",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786784226785
+      },
+      {
+        "executionId": "5a15fa03-9c2e-49e4-82f3-3634bafe4812",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786785135940
+      },
+      {
+        "executionId": "a748f5bd-ef33-4b88-b2bb-0ffe42880057",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786786694580
+      }
+    ],
+    "6. Checkpoint - Ensure webhook and Stripe service tests pass": [
+      {
+        "executionId": "5a15fa03-9c2e-49e4-82f3-3634bafe4812",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786784226811
+      },
+      {
+        "executionId": "a748f5bd-ef33-4b88-b2bb-0ffe42880057",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786786725090
+      }
+    ],
+    "7.1 Implement `NotificationService`": [
+      {
+        "executionId": "5a15fa03-9c2e-49e4-82f3-3634bafe4812",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786784226835
+      },
+      {
+        "executionId": "5a15fa03-9c2e-49e4-82f3-3634bafe4812",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786785136831
+      },
+      {
+        "executionId": "a748f5bd-ef33-4b88-b2bb-0ffe42880057",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786786696222
+      }
+    ],
+    "7.2 Create email Mailable/Notification classes and Blade templates": [
+      {
+        "executionId": "5a15fa03-9c2e-49e4-82f3-3634bafe4812",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786784226861
+      },
+      {
+        "executionId": "a748f5bd-ef33-4b88-b2bb-0ffe42880057",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786786729715
+      },
+      {
+        "executionId": "a748f5bd-ef33-4b88-b2bb-0ffe42880057",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786787097469
+      }
+    ],
+    "7.3 Implement `PdfInvoiceService`": [
+      {
+        "executionId": "5a15fa03-9c2e-49e4-82f3-3634bafe4812",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786784226901
+      },
+      {
+        "executionId": "a748f5bd-ef33-4b88-b2bb-0ffe42880057",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786786730572
+      },
+      {
+        "executionId": "a748f5bd-ef33-4b88-b2bb-0ffe42880057",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786787098315
+      }
+    ],
+    "7.5 Create `ProductObserver` for low-stock notifications": [
+      {
+        "executionId": "5a15fa03-9c2e-49e4-82f3-3634bafe4812",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786784226927
+      },
+      {
+        "executionId": "a748f5bd-ef33-4b88-b2bb-0ffe42880057",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786786731446
+      },
+      {
+        "executionId": "a748f5bd-ef33-4b88-b2bb-0ffe42880057",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786787099456
+      }
+    ],
+    "7.7 Create `OrderObserver` for PDF generation trigger": [
+      {
+        "executionId": "5a15fa03-9c2e-49e4-82f3-3634bafe4812",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786784226954
+      },
+      {
+        "executionId": "a748f5bd-ef33-4b88-b2bb-0ffe42880057",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786786732273
+      },
+      {
+        "executionId": "a748f5bd-ef33-4b88-b2bb-0ffe42880057",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786787100510
+      }
+    ],
+    "8.1 Create `app:purge-webhook-events` Artisan command": [
+      {
+        "executionId": "5a15fa03-9c2e-49e4-82f3-3634bafe4812",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786784226978
+      },
+      {
+        "executionId": "a748f5bd-ef33-4b88-b2bb-0ffe42880057",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786786733187
+      },
+      {
+        "executionId": "a748f5bd-ef33-4b88-b2bb-0ffe42880057",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786787101511
+      }
+    ],
+    "8.2 Create `app:notify-rental-ended` Artisan command": [
+      {
+        "executionId": "5a15fa03-9c2e-49e4-82f3-3634bafe4812",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786784227005
+      },
+      {
+        "executionId": "a748f5bd-ef33-4b88-b2bb-0ffe42880057",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786787110896
+      },
+      {
+        "executionId": "a748f5bd-ef33-4b88-b2bb-0ffe42880057",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786787237829
+      }
+    ],
+    "8.3 Create `app:reset-low-stock-flags` Artisan command": [
+      {
+        "executionId": "5a15fa03-9c2e-49e4-82f3-3634bafe4812",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786784227031
+      },
+      {
+        "executionId": "a748f5bd-ef33-4b88-b2bb-0ffe42880057",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786787111888
+      },
+      {
+        "executionId": "a748f5bd-ef33-4b88-b2bb-0ffe42880057",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786787238640
+      }
+    ],
+    "9.1 Enhance `CartService` for rental and hosting item data": [
+      {
+        "executionId": "5a15fa03-9c2e-49e4-82f3-3634bafe4812",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786784227059
+      },
+      {
+        "executionId": "a748f5bd-ef33-4b88-b2bb-0ffe42880057",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786787252250
+      },
+      {
+        "executionId": "a748f5bd-ef33-4b88-b2bb-0ffe42880057",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786787512531
+      }
+    ],
+    "9.3 Enhance `CheckoutService` for full checkout flow": [
+      {
+        "executionId": "5a15fa03-9c2e-49e4-82f3-3634bafe4812",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786784227088
+      },
+      {
+        "executionId": "a748f5bd-ef33-4b88-b2bb-0ffe42880057",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786787516627
+      },
+      {
+        "executionId": "a748f5bd-ef33-4b88-b2bb-0ffe42880057",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786788019621
+      }
+    ],
+    "10. Checkpoint - Ensure checkout flow and cart tests pass": [
+      {
+        "executionId": "5a15fa03-9c2e-49e4-82f3-3634bafe4812",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786784227113
+      },
+      {
+        "executionId": "a748f5bd-ef33-4b88-b2bb-0ffe42880057",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786788024908
+      }
+    ],
+    "11.1 Enhance `Portal\\ShopController` for rental dates and hosting domain": [
+      {
+        "executionId": "5a15fa03-9c2e-49e4-82f3-3634bafe4812",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786784227143
+      },
+      {
+        "executionId": "a748f5bd-ef33-4b88-b2bb-0ffe42880057",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786788025737
+      },
+      {
+        "executionId": "a748f5bd-ef33-4b88-b2bb-0ffe42880057",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786788311690
+      }
+    ],
+    "11.2 Create `Portal\\BookingController` availability endpoint": [
+      {
+        "executionId": "5a15fa03-9c2e-49e4-82f3-3634bafe4812",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786784227170
+      },
+      {
+        "executionId": "a748f5bd-ef33-4b88-b2bb-0ffe42880057",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786788026604
+      },
+      {
+        "executionId": "a748f5bd-ef33-4b88-b2bb-0ffe42880057",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786788312523
+      }
+    ],
+    "11.3 Enhance `Portal\\CartController` checkout view and processing": [
+      {
+        "executionId": "5a15fa03-9c2e-49e4-82f3-3634bafe4812",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786784227193
+      },
+      {
+        "executionId": "a748f5bd-ef33-4b88-b2bb-0ffe42880057",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786788321537
+      },
+      {
+        "executionId": "a748f5bd-ef33-4b88-b2bb-0ffe42880057",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786788698326
+      }
+    ],
+    "11.4 Enhance `Portal\\OrderController` with rental details, signature, PDF download": [
+      {
+        "executionId": "5a15fa03-9c2e-49e4-82f3-3634bafe4812",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786784227221
+      },
+      {
+        "executionId": "a748f5bd-ef33-4b88-b2bb-0ffe42880057",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786788706714
+      },
+      {
+        "executionId": "a748f5bd-ef33-4b88-b2bb-0ffe42880057",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786788939618
+      }
+    ],
+    "11.5 Enhance `Portal\\DashboardController` with rental summary": [
+      {
+        "executionId": "5a15fa03-9c2e-49e4-82f3-3634bafe4812",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786784227252
+      },
+      {
+        "executionId": "a748f5bd-ef33-4b88-b2bb-0ffe42880057",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786788322296
+      },
+      {
+        "executionId": "a748f5bd-ef33-4b88-b2bb-0ffe42880057",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786788701383
+      }
+    ],
+    "12.1 Enhance `Admin\\ShopProductController` with rental and delivery fields": [
+      {
+        "executionId": "5a15fa03-9c2e-49e4-82f3-3634bafe4812",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786784227287
+      },
+      {
+        "executionId": "a748f5bd-ef33-4b88-b2bb-0ffe42880057",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786788027401
+      },
+      {
+        "executionId": "a748f5bd-ef33-4b88-b2bb-0ffe42880057",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786788313527
+      }
+    ],
+    "12.2 Create `Admin\\BookingController` for booking management and manual creation": [
+      {
+        "executionId": "5a15fa03-9c2e-49e4-82f3-3634bafe4812",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786784227313
+      },
+      {
+        "executionId": "a748f5bd-ef33-4b88-b2bb-0ffe42880057",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786788323165
+      },
+      {
+        "executionId": "a748f5bd-ef33-4b88-b2bb-0ffe42880057",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786788699345
+      }
+    ],
+    "12.4 Enhance `Admin\\ShopOrderController` with signature, delivery, and PDF": [
+      {
+        "executionId": "5a15fa03-9c2e-49e4-82f3-3634bafe4812",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786784227338
+      },
+      {
+        "executionId": "a748f5bd-ef33-4b88-b2bb-0ffe42880057",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786788324015
+      },
+      {
+        "executionId": "a748f5bd-ef33-4b88-b2bb-0ffe42880057",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786788700477
+      }
+    ],
+    "12.5 Create WHM config and hosting provisioning admin views": [
+      {
+        "executionId": "5a15fa03-9c2e-49e4-82f3-3634bafe4812",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786784227361
+      },
+      {
+        "executionId": "a748f5bd-ef33-4b88-b2bb-0ffe42880057",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786788324920
+      },
+      {
+        "executionId": "a748f5bd-ef33-4b88-b2bb-0ffe42880057",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786788697133
+      }
+    ],
+    "13.1 Implement View Composer for portal navigation visibility": [
+      {
+        "executionId": "5a15fa03-9c2e-49e4-82f3-3634bafe4812",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786784227386
+      },
+      {
+        "executionId": "a748f5bd-ef33-4b88-b2bb-0ffe42880057",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786788028289
+      },
+      {
+        "executionId": "a748f5bd-ef33-4b88-b2bb-0ffe42880057",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786788314531
+      }
+    ],
+    "14.1 Install and configure frontend dependencies": [
+      {
+        "executionId": "5a15fa03-9c2e-49e4-82f3-3634bafe4812",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786784227410
+      },
+      {
+        "executionId": "5a15fa03-9c2e-49e4-82f3-3634bafe4812",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786784512111
+      },
+      {
+        "executionId": "5a15fa03-9c2e-49e4-82f3-3634bafe4812",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786784753962
+      }
+    ],
+    "14.2 Implement signature pad JavaScript component": [
+      {
+        "executionId": "5a15fa03-9c2e-49e4-82f3-3634bafe4812",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786784227437
+      },
+      {
+        "executionId": "a748f5bd-ef33-4b88-b2bb-0ffe42880057",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786788707544
+      },
+      {
+        "executionId": "a748f5bd-ef33-4b88-b2bb-0ffe42880057",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786788938526
+      }
+    ],
+    "14.3 Implement rental date picker with availability calendar": [
+      {
+        "executionId": "5a15fa03-9c2e-49e4-82f3-3634bafe4812",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786784227461
+      },
+      {
+        "executionId": "a748f5bd-ef33-4b88-b2bb-0ffe42880057",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786788708429
+      },
+      {
+        "executionId": "a748f5bd-ef33-4b88-b2bb-0ffe42880057",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786788940706
+      }
+    ],
+    "15.1 Register all new routes": [
+      {
+        "executionId": "5a15fa03-9c2e-49e4-82f3-3634bafe4812",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786784227487
+      },
+      {
+        "executionId": "a748f5bd-ef33-4b88-b2bb-0ffe42880057",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786788945644
+      },
+      {
+        "executionId": "a748f5bd-ef33-4b88-b2bb-0ffe42880057",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786789102040
+      }
+    ],
+    "15.2 Register observers and service providers": [
+      {
+        "executionId": "5a15fa03-9c2e-49e4-82f3-3634bafe4812",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786784227518
+      },
+      {
+        "executionId": "a748f5bd-ef33-4b88-b2bb-0ffe42880057",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786788946453
+      },
+      {
+        "executionId": "a748f5bd-ef33-4b88-b2bb-0ffe42880057",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786789102736
+      }
+    ],
+    "15.3 Wire notification triggers into existing flows": [
+      {
+        "executionId": "5a15fa03-9c2e-49e4-82f3-3634bafe4812",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786784227542
+      },
+      {
+        "executionId": "a748f5bd-ef33-4b88-b2bb-0ffe42880057",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786789109188
+      },
+      {
+        "executionId": "a748f5bd-ef33-4b88-b2bb-0ffe42880057",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786789365106
+      }
+    ],
+    "16. Final Checkpoint - Full integration verification": [
+      {
+        "executionId": "5a15fa03-9c2e-49e4-82f3-3634bafe4812",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786784227571
+      },
+      {
+        "executionId": "a748f5bd-ef33-4b88-b2bb-0ffe42880057",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786789372518
+      },
+      {
+        "executionId": "a748f5bd-ef33-4b88-b2bb-0ffe42880057",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786789639908
+      }
+    ],
+    "1. Database migrations and model foundations": [
+      {
+        "executionId": "5a15fa03-9c2e-49e4-82f3-3634bafe4812",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786784504955
+      }
+    ],
+    "2. Availability and Booking Service": [
+      {
+        "executionId": "5a15fa03-9c2e-49e4-82f3-3634bafe4812",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786785095365
+      }
+    ],
+    "5. Stripe and Webhook Enhancements": [
+      {
+        "executionId": "a748f5bd-ef33-4b88-b2bb-0ffe42880057",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786786694632
+      }
+    ],
+    "4. WHM Service and Hosting Provisioning": [
+      {
+        "executionId": "a748f5bd-ef33-4b88-b2bb-0ffe42880057",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786786695398
+      }
+    ],
+    "2.2 Write property tests for AvailabilityService": [
+      {
+        "executionId": "a748f5bd-ef33-4b88-b2bb-0ffe42880057",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786786715750
+      }
+    ],
+    "2.4 Write property tests for BookingService": [
+      {
+        "executionId": "a748f5bd-ef33-4b88-b2bb-0ffe42880057",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786786716533
+      }
+    ],
+    "4.3 Write property test for WHM credential encryption": [
+      {
+        "executionId": "a748f5bd-ef33-4b88-b2bb-0ffe42880057",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786786717341
+      }
+    ],
+    "4.5 Write unit tests for WhmService and HostingProvisionController": [
+      {
+        "executionId": "a748f5bd-ef33-4b88-b2bb-0ffe42880057",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786786718180
+      }
+    ],
+    "5.2 Write property test for Stripe customer resilience": [
+      {
+        "executionId": "a748f5bd-ef33-4b88-b2bb-0ffe42880057",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786786719054
+      }
+    ],
+    "5.4 Write property tests for webhook idempotency and transactional atomicity": [
+      {
+        "executionId": "a748f5bd-ef33-4b88-b2bb-0ffe42880057",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786786719949
+      }
+    ],
+    "7. Notification and PDF Services": [
+      {
+        "executionId": "a748f5bd-ef33-4b88-b2bb-0ffe42880057",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786787100553
+      }
+    ],
+    "7.4 Write property test for PDF invoice content completeness": [
+      {
+        "executionId": "a748f5bd-ef33-4b88-b2bb-0ffe42880057",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786787109098
+      }
+    ],
+    "7.6 Write property test for low-stock notification lifecycle": [
+      {
+        "executionId": "a748f5bd-ef33-4b88-b2bb-0ffe42880057",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786787110013
+      }
+    ],
+    "8. Scheduled Commands": [
+      {
+        "executionId": "a748f5bd-ef33-4b88-b2bb-0ffe42880057",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786787238673
+      }
+    ],
+    "9.2 Write property tests for cart validation rules": [
+      {
+        "executionId": "a748f5bd-ef33-4b88-b2bb-0ffe42880057",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786787247217
+      }
+    ],
+    "9.4 Write property tests for address form visibility and validation": [
+      {
+        "executionId": "a748f5bd-ef33-4b88-b2bb-0ffe42880057",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786787248283
+      }
+    ],
+    "11.6 Write property test for booking status classification": [
+      {
+        "executionId": "a748f5bd-ef33-4b88-b2bb-0ffe42880057",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786787249366
+      }
+    ],
+    "12.3 Write property test for admin/portal availability consistency": [
+      {
+        "executionId": "a748f5bd-ef33-4b88-b2bb-0ffe42880057",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786787250448
+      }
+    ],
+    "13.2 Write property test for navigation visibility": [
+      {
+        "executionId": "a748f5bd-ef33-4b88-b2bb-0ffe42880057",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786787251300
+      }
+    ],
+    "9. Checkout and Cart Enhancements": [
+      {
+        "executionId": "a748f5bd-ef33-4b88-b2bb-0ffe42880057",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786788019670
+      }
+    ],
+    "13. Dynamic Portal Navigation": [
+      {
+        "executionId": "a748f5bd-ef33-4b88-b2bb-0ffe42880057",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786788314563
+      }
+    ],
+    "12. Admin Controllers and Views": [
+      {
+        "executionId": "a748f5bd-ef33-4b88-b2bb-0ffe42880057",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786788700514
+      }
+    ],
+    "11. Portal Controllers and Views (Customer-Facing)": [
+      {
+        "executionId": "a748f5bd-ef33-4b88-b2bb-0ffe42880057",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786788939652
+      }
+    ],
+    "14. Frontend Assets and Integration": [
+      {
+        "executionId": "a748f5bd-ef33-4b88-b2bb-0ffe42880057",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786788940747
+      }
+    ],
+    "15. Routing and Wiring": [
+      {
+        "executionId": "a748f5bd-ef33-4b88-b2bb-0ffe42880057",
+        "chatSessionId": "sess_e0e01159-25cf-4226-97bc-c12db4a8eb0a",
+        "timestamp": 1786789365157
+      }
+    ]
+  }
+}

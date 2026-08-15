@@ -203,7 +203,7 @@ class ShopVisibilityTest extends TestCase
         ]);
 
         $cartService = app(\App\Services\CartService::class);
-        $cartService->addItem($product);
+        $cartService->addItem($product, ['domain_name' => 'example.com']);
 
         $items = $cartService->getItems();
         $this->assertCount(1, $items);

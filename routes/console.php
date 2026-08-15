@@ -25,3 +25,15 @@ Schedule::command('tickets:daily-digest')->dailyAt('08:00');
 
 // Overdue invoice push notifications — daily at 7am, checks for invoices that became overdue yesterday
 Schedule::command('invoices:notify-overdue')->dailyAt('07:00');
+
+// Purge processed webhook events older than 7 days — daily at 2am
+Schedule::command('app:purge-webhook-events')->dailyAt('02:00');
+
+// Notify admin about rental bookings that have ended — daily at 8am
+Schedule::command('app:notify-rental-ended')->dailyAt('08:00');
+
+// Reset low-stock notification flags for restocked products — hourly
+Schedule::command('app:reset-low-stock-flags')->hourly();
+
+// Process queued jobs (emails, notifications) — runs every minute via cron
+Schedule::command('queue:work --stop-when-empty --tries=3')->everyMinute()->withoutOverlapping();

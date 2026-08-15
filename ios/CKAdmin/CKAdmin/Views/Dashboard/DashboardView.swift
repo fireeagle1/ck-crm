@@ -7,8 +7,15 @@ import SwiftUI
 /// and displays loading/error states.
 struct DashboardView: View {
     @State private var viewModel: DashboardViewModel
+    @State private var showingCreateTicket = false
+    @State private var showingCreateInvoice = false
+    @Binding var selectedTab: Int
 
-    init(apiClient: APIClient) {
+    private let apiClient: APIClient
+
+    init(apiClient: APIClient, selectedTab: Binding<Int> = .constant(0)) {
+        self.apiClient = apiClient
+        self._selectedTab = selectedTab
         _viewModel = State(initialValue: DashboardViewModel(apiClient: apiClient))
     }
 
@@ -25,6 +32,16 @@ struct DashboardView: View {
             }
         }
         .navigationTitle("Dashboard")
+        .sheet(isPresented: $showingCreateTicket) {
+            TicketCreateView(apiClient: apiClient) {
+                await viewModel.loadMetrics()
+            }
+        }
+        .sheet(isPresented: $showingCreateInvoice) {
+            InvoiceCreateView(apiClient: apiClient, onSave: {
+                await viewModel.loadMetrics()
+            })
+        }
         .task {
             await viewModel.loadMetrics()
         }
@@ -80,6 +97,55 @@ struct DashboardView: View {
 
     private func dashboardContent(_ dashboard: DashboardResponse) -> some View {
         List {
+            // Hero image header
+            Section {
+                ZStack(alignment: .bottomLeading) {
+                    Image("HeroImage")
+                        .resizable()
+                        .scaledToFill()
+                        .frame(height: 160)
+                        .clipped()
+                        .overlay(
+                            LinearGradient(
+                                colors: [.clear, .black.opacity(0.6)],
+                                startPoint: .top,
+                                endPoint: .bottom
+                            )
+                        )
+
+                    VStack(alignment: .leading, spacing: 4) {
+                        Image("Logo")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(height: 24)
+                        Text("Admin Dashboard")
+                            .font(.subheadline)
+                            .foregroundStyle(.white.opacity(0.8))
+                    }
+                    .padding()
+                }
+                .listRowInsets(EdgeInsets())
+            }
+
+            // Quick Actions
+            Section("Quick Actions") {
+                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
+                    actionButton(title: "New Ticket", icon: "ticket", color: .blue) {
+                        showingCreateTicket = true
+                    }
+                    actionButton(title: "New Invoice", icon: "doc.text", color: .green) {
+                        showingCreateInvoice = true
+                    }
+                    actionButton(title: "Customers", icon: "person.2", color: .purple) {
+                        selectedTab = 2
+                    }
+                    actionButton(title: "CMDB", icon: "desktopcomputer", color: .orange) {
+                        selectedTab = 3
+                    }
+                }
+                .padding(.vertical, 4)
+            }
+
             ticketStatsSection(dashboard.tickets)
             financialSection(dashboard.financials)
             expiringDomainsSection(dashboard.expiringDomains)
@@ -92,6 +158,27 @@ struct DashboardView: View {
         }
     }
 
+    // MARK: - Action Button
+
+    private func actionButton(title: String, icon: String, color: Color, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            VStack(spacing: 8) {
+                Image(systemName: icon)
+                    .font(.title2)
+                    .foregroundStyle(color)
+                Text(title)
+                    .font(.caption)
+                    .fontWeight(.medium)
+                    .foregroundStyle(.primary)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 12)
+            .background(color.opacity(0.1))
+            .clipShape(RoundedRectangle(cornerRadius: 10))
+        }
+        .buttonStyle(.plain)
+    }
+
     // MARK: - Ticket Statistics Section
 
     private func ticketStatsSection(_ stats: TicketStats) -> some View {
@@ -100,7 +187,7 @@ struct DashboardView: View {
             metricRow(label: "Critical", value: "\(stats.criticalCount)", icon: "exclamationmark.circle", color: .red)
             metricRow(label: "High Priority", value: "\(stats.highCount)", icon: "arrow.up.circle", color: .orange)
             metricRow(label: "Overdue", value: "\(stats.overdueCount)", icon: "clock.badge.exclamationmark", color: .purple)
-            metricRow(label: "Avg Response", value: formatResponseTime(stats.avgResponseTimeMinutes), icon: "timer", color: .green)
+            metricRow(label: "Avg Response", value: formatResponseTime(stats.avgResponseTimeMinutes ?? 0), icon: "timer", color: .green)
         } header: {
             Label("Ticket Statistics", systemImage: "ticket")
         }

@@ -1,12 +1,12 @@
 import SwiftUI
 
 /// Full-featured ticket creation form matching the web app.
-/// Supports customer selection, asset/service linking, email notification toggle, etc.
+/// Supports customer selection via searchable picker, asset/service linking, email notification toggle, etc.
 struct TicketCreateView: View {
     @Environment(\.dismiss) private var dismiss
 
     // MARK: - Form Fields
-    @State private var companyId: String = ""
+    @State private var selectedCustomerId: Int?
     @State private var subject: String = ""
     @State private var description: String = ""
     @State private var ticketType: String = "Incident"
@@ -16,6 +16,11 @@ struct TicketCreateView: View {
     @State private var selectedServiceId: Int?
     @State private var selectedUserId: Int?
     @State private var notifyCustomer: Bool = true
+
+    // MARK: - Customer List
+    @State private var customers: [CustomerListItem] = []
+    @State private var isLoadingCustomers = false
+    @State private var customerSearchText: String = ""
 
     // MARK: - Context Data (loaded when customer is selected)
     @State private var contextAssets: [ContextAsset] = []
@@ -37,7 +42,7 @@ struct TicketCreateView: View {
         self.prefilledCustomerId = prefilledCustomerId
         self.onCreated = onCreated
         if let id = prefilledCustomerId {
-            _companyId = State(initialValue: String(id))
+            _selectedCustomerId = State(initialValue: id)
         }
     }
 
@@ -57,16 +62,33 @@ struct TicketCreateView: View {
 
                 // Customer
                 Section("Customer") {
-                    formField(label: "Company ID", text: $companyId, fieldKey: "company_id", isRequired: true, keyboardType: .numberPad)
-                        .onChange(of: companyId) { _, newValue in
-                            if let id = Int(newValue), id > 0 {
-                                loadCustomerContext(customerId: id)
+                    NavigationLink {
+                        CustomerPickerView(
+                            customers: customers,
+                            selectedId: $selectedCustomerId,
+                            apiClient: apiClient
+                        )
+                    } label: {
+                        HStack {
+                            Text("Customer")
+                                .foregroundStyle(.primary)
+                            Spacer()
+                            if let id = selectedCustomerId,
+                               let customer = customers.first(where: { $0.companyId == id }) {
+                                Text(customer.companyName)
+                                    .foregroundStyle(.secondary)
+                            } else if selectedCustomerId != nil {
+                                Text("Loading...")
+                                    .foregroundStyle(.secondary)
                             } else {
-                                contextAssets = []
-                                contextServices = []
-                                contextUsers = []
+                                Text("Select *")
+                                    .foregroundStyle(.tertiary)
                             }
                         }
+                    }
+                    if let errors = fieldErrors["company_id"], !errors.isEmpty {
+                        ForEach(errors, id: \.self) { Text($0).font(.caption).foregroundStyle(.red) }
+                    }
 
                     if isLoadingContext {
                         HStack {
@@ -105,7 +127,14 @@ struct TicketCreateView: View {
                         ForEach(priorities, id: \.self) { Text($0) }
                     }
 
-                    formField(label: "Category", text: $requestCategory, fieldKey: "request_category")
+                    if ticketType == "Service Request" {
+                        Picker("Category", selection: $requestCategory) {
+                            Text("None").tag("")
+                            ForEach(["Website Change", "Email Setup", "New Feature", "Hardware", "Software", "Network", "Other"], id: \.self) {
+                                Text($0).tag($0)
+                            }
+                        }
+                    }
                 }
 
                 // Linked Items (only show if context loaded)
@@ -115,7 +144,7 @@ struct TicketCreateView: View {
                             Picker("Asset", selection: $selectedAssetId) {
                                 Text("None").tag(nil as Int?)
                                 ForEach(contextAssets) { asset in
-                                    Text(asset.deviceName).tag(asset.deviceId as Int?)
+                                    Text("\(asset.deviceName)\(asset.deviceType.map { " (\($0))" } ?? "")").tag(asset.deviceId as Int?)
                                 }
                             }
                         }
@@ -131,9 +160,9 @@ struct TicketCreateView: View {
 
                         if !contextUsers.isEmpty {
                             Picker("Assign To", selection: $selectedUserId) {
-                                Text("Unassigned").tag(nil as Int?)
+                                Text("Auto (primary contact)").tag(nil as Int?)
                                 ForEach(contextUsers) { user in
-                                    Text(user.name).tag(user.id as Int?)
+                                    Text("\(user.name) (\(user.email))").tag(user.id as Int?)
                                 }
                             }
                         }
@@ -168,7 +197,20 @@ struct TicketCreateView: View {
                 }
             }
             .interactiveDismissDisabled(isSaving)
-            .onAppear {
+            .onChange(of: selectedCustomerId) { _, newValue in
+                if let id = newValue {
+                    loadCustomerContext(customerId: id)
+                } else {
+                    contextAssets = []
+                    contextServices = []
+                    contextUsers = []
+                    selectedAssetId = nil
+                    selectedServiceId = nil
+                    selectedUserId = nil
+                }
+            }
+            .task {
+                await loadCustomers()
                 if let id = prefilledCustomerId {
                     loadCustomerContext(customerId: id)
                 }
@@ -177,21 +219,34 @@ struct TicketCreateView: View {
     }
 
     private var isFormValid: Bool {
-        !companyId.trimmingCharacters(in: .whitespaces).isEmpty
+        selectedCustomerId != nil
             && !subject.trimmingCharacters(in: .whitespaces).isEmpty
             && !description.trimmingCharacters(in: .whitespaces).isEmpty
     }
 
-    private func formField(label: String, text: Binding<String>, fieldKey: String, isRequired: Bool = false, keyboardType: UIKeyboardType = .default) -> some View {
+    private func formField(label: String, text: Binding<String>, fieldKey: String, isRequired: Bool = false) -> some View {
         VStack(alignment: .leading, spacing: 4) {
             TextField(isRequired ? "\(label) *" : label, text: text)
-                .keyboardType(keyboardType)
-                .autocorrectionDisabled(fieldKey == "company_id")
                 .onChange(of: text.wrappedValue) { _, _ in fieldErrors[fieldKey] = nil }
             if let errors = fieldErrors[fieldKey], !errors.isEmpty {
                 ForEach(errors, id: \.self) { Text($0).font(.caption).foregroundStyle(.red) }
             }
         }
+    }
+
+    // MARK: - Load Customers
+
+    @MainActor
+    private func loadCustomers() async {
+        isLoadingCustomers = true
+        do {
+            let endpoint = Endpoint(path: "/admin/customers", queryItems: ["per_page": "100"])
+            let response: PaginatedResponse<CustomerListItem> = try await apiClient.request(endpoint)
+            customers = response.data
+        } catch {
+            // Non-fatal
+        }
+        isLoadingCustomers = false
     }
 
     // MARK: - Load Customer Context
@@ -228,7 +283,7 @@ struct TicketCreateView: View {
         fieldErrors = [:]
 
         let payload = TicketCreatePayload(
-            companyId: Int(companyId) ?? 0,
+            companyId: selectedCustomerId ?? 0,
             subject: subject.trimmingCharacters(in: .whitespaces),
             description: description.trimmingCharacters(in: .whitespaces),
             ticketType: ticketType,
@@ -259,6 +314,100 @@ struct TicketCreateView: View {
         }
 
         isSaving = false
+    }
+}
+
+// MARK: - Customer Picker View
+
+/// A searchable list for selecting a customer.
+struct CustomerPickerView: View {
+    let customers: [CustomerListItem]
+    @Binding var selectedId: Int?
+    let apiClient: APIClient
+
+    @Environment(\.dismiss) private var dismiss
+    @State private var searchText = ""
+    @State private var searchResults: [CustomerListItem] = []
+    @State private var isSearching = false
+
+    private var displayedCustomers: [CustomerListItem] {
+        if searchText.isEmpty {
+            return customers
+        }
+        // Filter locally first
+        let local = customers.filter {
+            $0.companyName.localizedCaseInsensitiveContains(searchText) ||
+            $0.customerName.localizedCaseInsensitiveContains(searchText)
+        }
+        // If we have remote results, merge them
+        if !searchResults.isEmpty {
+            let localIds = Set(local.map(\.companyId))
+            let extra = searchResults.filter { !localIds.contains($0.companyId) }
+            return local + extra
+        }
+        return local
+    }
+
+    var body: some View {
+        List {
+            ForEach(displayedCustomers) { customer in
+                Button {
+                    selectedId = customer.companyId
+                    dismiss()
+                } label: {
+                    HStack {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(customer.companyName)
+                                .font(.body)
+                                .foregroundStyle(.primary)
+                            if !customer.customerName.isEmpty {
+                                Text(customer.customerName)
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                        Spacer()
+                        if selectedId == customer.companyId {
+                            Image(systemName: "checkmark")
+                                .foregroundStyle(.blue)
+                                .fontWeight(.semibold)
+                        }
+                    }
+                }
+            }
+
+            if displayedCustomers.isEmpty && !searchText.isEmpty && !isSearching {
+                ContentUnavailableView.search(text: searchText)
+            }
+        }
+        .navigationTitle("Select Customer")
+        .navigationBarTitleDisplayMode(.inline)
+        .searchable(text: $searchText, prompt: "Search customers")
+        .onChange(of: searchText) { _, newValue in
+            guard !newValue.isEmpty else {
+                searchResults = []
+                return
+            }
+            // Debounce remote search
+            Task { @MainActor in
+                try? await Task.sleep(for: .milliseconds(300))
+                guard !Task.isCancelled, searchText == newValue else { return }
+                await searchRemote(query: newValue)
+            }
+        }
+    }
+
+    @MainActor
+    private func searchRemote(query: String) async {
+        isSearching = true
+        do {
+            let endpoint = Endpoint(path: "/admin/customers", queryItems: ["search": query, "per_page": "20"])
+            let response: PaginatedResponse<CustomerListItem> = try await apiClient.request(endpoint)
+            searchResults = response.data
+        } catch {
+            // Non-fatal
+        }
+        isSearching = false
     }
 }
 

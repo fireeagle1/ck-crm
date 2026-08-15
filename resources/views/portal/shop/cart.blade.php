@@ -87,12 +87,9 @@
                 <span class="text-2xl font-bold text-gray-900">&pound;{{ number_format($total, 2) }}</span>
             </div>
 
-            <form method="POST" action="{{ route('portal.cart.checkout') }}">
-                @csrf
-                <button type="submit" class="w-full px-5 py-3 bg-blue-600 text-white rounded-md text-sm font-semibold hover:bg-blue-700 transition">
-                    Proceed to Checkout
-                </button>
-            </form>
+            <a href="{{ route('portal.cart.showCheckout') }}" class="block w-full px-5 py-3 bg-blue-600 text-white rounded-md text-sm font-semibold hover:bg-blue-700 transition text-center">
+                Proceed to Checkout
+            </a>
 
             <div class="mt-3 text-center">
                 <a href="{{ route('portal.shop.index') }}" class="text-sm text-gray-500 hover:text-gray-700 transition">

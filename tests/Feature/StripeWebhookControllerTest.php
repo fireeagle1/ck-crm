@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Customer;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\ProcessedWebhookEvent;
 use App\Models\Product;
 use App\Models\Service;
 use App\Services\StripeService;
@@ -18,14 +19,14 @@ class StripeWebhookControllerTest extends TestCase
 {
     use RefreshDatabase;
 
-    private function mockStripeEvent(string $type, array $objectData): void
+    private function mockStripeEvent(string $type, array $objectData, ?string $eventId = null): void
     {
         $eventObject = StripeObject::constructFrom($objectData);
 
         $eventData = StripeObject::constructFrom(['object' => $eventObject]);
 
         $event = Event::constructFrom([
-            'id' => 'evt_test_' . uniqid(),
+            'id' => $eventId ?? 'evt_test_' . uniqid(),
             'type' => $type,
             'data' => ['object' => $objectData],
         ]);
@@ -244,5 +245,146 @@ class StripeWebhookControllerTest extends TestCase
         ]);
 
         $response->assertStatus(200);
+    }
+
+    // ──────────────────────────────────────────────────────────────────
+    // Requirement 9.1, 9.2: Webhook idempotency
+    // ──────────────────────────────────────────────────────────────────
+
+    public function test_webhook_stores_event_id_in_processed_events_table(): void
+    {
+        $this->mockStripeEvent('checkout.session.completed', ['id' => 'cs_nonexistent'], 'evt_idempotency_001');
+
+        $response = $this->postJson('/stripe/webhook', [], [
+            'HTTP_STRIPE_SIGNATURE' => 'valid_sig',
+        ]);
+
+        $response->assertStatus(200);
+        $this->assertDatabaseHas('processed_webhook_events', [
+            'stripe_event_id' => 'evt_idempotency_001',
+            'event_type' => 'checkout.session.completed',
+        ]);
+    }
+
+    public function test_duplicate_event_returns_200_without_reprocessing(): void
+    {
+        $customer = Customer::factory()->create();
+        $product = Product::factory()->oneOff()->create(['stock_quantity' => 10]);
+
+        $order = Order::create([
+            'company_id' => $customer->company_id,
+            'payment_status' => 'pending',
+            'fulfilment_status' => 'pending',
+            'stripe_checkout_session_id' => 'cs_dup_test',
+            'total_amount' => 29.99,
+        ]);
+
+        OrderItem::create([
+            'order_id' => $order->id,
+            'product_id' => $product->id,
+            'product_name' => $product->name,
+            'product_type' => 'one_off',
+            'price' => 29.99,
+        ]);
+
+        // Set up mock that can be called twice (for both webhook calls)
+        $eventObject = StripeObject::constructFrom(['id' => 'cs_dup_test']);
+        $event = Event::constructFrom([
+            'id' => 'evt_dup_001',
+            'type' => 'checkout.session.completed',
+            'data' => ['object' => ['id' => 'cs_dup_test']],
+        ]);
+        $event->data->object = $eventObject;
+
+        $stripeService = Mockery::mock(StripeService::class);
+        $stripeService->shouldReceive('verifyWebhookSignature')
+            ->twice()
+            ->andReturn($event);
+
+        $this->app->instance(StripeService::class, $stripeService);
+
+        // First processing
+        $response = $this->postJson('/stripe/webhook', [], [
+            'HTTP_STRIPE_SIGNATURE' => 'valid_sig',
+        ]);
+        $response->assertStatus(200);
+
+        // Stock decremented once
+        $this->assertDatabaseHas('products', [
+            'id' => $product->id,
+            'stock_quantity' => 9,
+        ]);
+
+        // Second processing with same event_id — should be skipped
+        $response = $this->postJson('/stripe/webhook', [], [
+            'HTTP_STRIPE_SIGNATURE' => 'valid_sig',
+        ]);
+        $response->assertStatus(200);
+
+        // Stock should NOT be decremented again
+        $this->assertDatabaseHas('products', [
+            'id' => $product->id,
+            'stock_quantity' => 9,
+        ]);
+    }
+
+    public function test_previously_processed_event_returns_200_immediately(): void
+    {
+        // Pre-insert a processed event record
+        ProcessedWebhookEvent::create([
+            'stripe_event_id' => 'evt_already_processed',
+            'event_type' => 'checkout.session.completed',
+            'processed_at' => now(),
+        ]);
+
+        $this->mockStripeEvent('checkout.session.completed', ['id' => 'cs_already'], 'evt_already_processed');
+
+        $response = $this->postJson('/stripe/webhook', [], [
+            'HTTP_STRIPE_SIGNATURE' => 'valid_sig',
+        ]);
+
+        $response->assertStatus(200);
+    }
+
+    // ──────────────────────────────────────────────────────────────────
+    // Requirement 10.2, 10.3: Transaction failure removes event_id
+    // ──────────────────────────────────────────────────────────────────
+
+    public function test_transaction_failure_removes_event_id_for_retry(): void
+    {
+        $customer = Customer::factory()->create();
+
+        // Create a product with zero stock to trigger a RuntimeException in fulfilment
+        $product = Product::factory()->oneOff()->create(['stock_quantity' => 0]);
+
+        $order = Order::create([
+            'company_id' => $customer->company_id,
+            'payment_status' => 'pending',
+            'fulfilment_status' => 'pending',
+            'stripe_checkout_session_id' => 'cs_fail_test',
+            'total_amount' => 29.99,
+        ]);
+
+        OrderItem::create([
+            'order_id' => $order->id,
+            'product_id' => $product->id,
+            'product_name' => $product->name,
+            'product_type' => 'one_off',
+            'price' => 29.99,
+        ]);
+
+        $this->mockStripeEvent('checkout.session.completed', ['id' => 'cs_fail_test'], 'evt_fail_001');
+
+        // The exception should propagate (Stripe expects non-200 for retry)
+        $response = $this->postJson('/stripe/webhook', [], [
+            'HTTP_STRIPE_SIGNATURE' => 'valid_sig',
+        ]);
+
+        $response->assertStatus(500);
+
+        // Event ID should have been removed to allow Stripe to retry
+        $this->assertDatabaseMissing('processed_webhook_events', [
+            'stripe_event_id' => 'evt_fail_001',
+        ]);
     }
 }

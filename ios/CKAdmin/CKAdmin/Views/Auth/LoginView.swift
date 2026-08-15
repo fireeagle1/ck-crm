@@ -18,16 +18,15 @@ struct LoginView: View {
                 VStack(spacing: 32) {
                     // App branding
                     VStack(spacing: 12) {
-                        Image(systemName: "server.rack")
-                            .font(.system(size: 56))
-                            .foregroundStyle(.blue)
+                        Image("Logo")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(height: 50)
+                            .accessibilityHidden(true)
 
-                        Text("CK Admin")
-                            .font(.largeTitle)
-                            .fontWeight(.bold)
-
-                        Text("Sign in to manage your CRM")
-                            .font(.subheadline)
+                        Text("Admin Portal")
+                            .font(.title3)
+                            .fontWeight(.medium)
                             .foregroundStyle(.secondary)
                     }
                     .padding(.top, 40)

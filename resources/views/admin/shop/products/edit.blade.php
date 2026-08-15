@@ -79,6 +79,63 @@
                     @error('stock_quantity') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
                 </div>
 
+                {{-- Low Stock Threshold (shown for equipment_rental and one_off) --}}
+                <div x-show="productType === 'equipment_rental' || productType === 'one_off'" x-transition>
+                    <label for="low_stock_threshold" class="block text-sm font-semibold text-gray-700">Low Stock Threshold</label>
+                    <input type="number" name="low_stock_threshold" id="low_stock_threshold" value="{{ old('low_stock_threshold', $product->low_stock_threshold) }}" min="1"
+                           class="mt-1 block w-full max-w-xs rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                           placeholder="e.g. 5">
+                    <p class="text-xs text-gray-400 mt-1">Receive an alert when stock falls to or below this level.</p>
+                    @error('low_stock_threshold') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
+                </div>
+
+                {{-- Rental-specific fields (shown only for equipment_rental) --}}
+                <div x-show="productType === 'equipment_rental'" x-transition class="border-t pt-5 space-y-5">
+                    <h3 class="text-sm font-semibold text-gray-700">Rental Settings</h3>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        {{-- Minimum Rental Days --}}
+                        <div>
+                            <label for="min_rental_days" class="block text-sm font-semibold text-gray-700">Minimum Rental Days</label>
+                            <input type="number" name="min_rental_days" id="min_rental_days" value="{{ old('min_rental_days', $product->min_rental_days) }}" min="1"
+                                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                   placeholder="e.g. 1">
+                            <p class="text-xs text-gray-400 mt-1">Minimum number of days a customer must rent.</p>
+                            @error('min_rental_days') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
+                        </div>
+
+                        {{-- Cooldown Days --}}
+                        <div>
+                            <label for="cooldown_days" class="block text-sm font-semibold text-gray-700">Cooldown Days</label>
+                            <input type="number" name="cooldown_days" id="cooldown_days" value="{{ old('cooldown_days', $product->cooldown_days) }}" min="0"
+                                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                   placeholder="e.g. 0">
+                            <p class="text-xs text-gray-400 mt-1">Days required between consecutive bookings.</p>
+                            @error('cooldown_days') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
+                        </div>
+                    </div>
+
+                    {{-- Rental Agreement Text --}}
+                    <div>
+                        <label for="rental_agreement_text" class="block text-sm font-semibold text-gray-700">Rental Agreement Text</label>
+                        <textarea name="rental_agreement_text" id="rental_agreement_text" rows="6"
+                                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                  placeholder="Enter the rental agreement terms customers must accept...">{{ old('rental_agreement_text', $product->rental_agreement_text) }}</textarea>
+                        <p class="text-xs text-gray-400 mt-1">If provided, customers must accept these terms before completing a rental booking.</p>
+                        @error('rental_agreement_text') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
+                    </div>
+                </div>
+
+                {{-- Delivery Instructions (shown for equipment_rental and one_off, hidden for hosting) --}}
+                <div x-show="productType === 'equipment_rental' || productType === 'one_off'" x-transition>
+                    <label for="delivery_instructions" class="block text-sm font-semibold text-gray-700">Delivery / Collection Instructions</label>
+                    <textarea name="delivery_instructions" id="delivery_instructions" rows="3"
+                              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                              placeholder="Enter delivery or collection instructions for this product...">{{ old('delivery_instructions', $product->delivery_instructions) }}</textarea>
+                    <p class="text-xs text-gray-400 mt-1">Plain-text instructions shown to customers and staff for physical item handling.</p>
+                    @error('delivery_instructions') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
+                </div>
+
                 {{-- Image Upload --}}
                 <div>
                     <label for="image" class="block text-sm font-semibold text-gray-700">Product Image</label>

@@ -59,6 +59,11 @@ class ShopProductController extends Controller
             'visibility_customers.*' => 'exists:customers,company_id',
             'visibility_tiers' => 'nullable|array',
             'visibility_tiers.*' => 'exists:customer_tiers,id',
+            'min_rental_days' => 'nullable|integer|min:1',
+            'cooldown_days' => 'nullable|integer|min:0',
+            'rental_agreement_text' => 'nullable|string',
+            'delivery_instructions' => 'nullable|string',
+            'low_stock_threshold' => 'nullable|integer|min:1',
         ]);
 
         $imagePath = null;
@@ -75,6 +80,11 @@ class ShopProductController extends Controller
             'stock_quantity' => $validated['stock_quantity'] ?? null,
             'image_path' => $imagePath,
             'is_archived' => false,
+            'min_rental_days' => $validated['min_rental_days'] ?? null,
+            'cooldown_days' => $validated['cooldown_days'] ?? null,
+            'rental_agreement_text' => $validated['rental_agreement_text'] ?? null,
+            'delivery_instructions' => $validated['delivery_instructions'] ?? null,
+            'low_stock_threshold' => $validated['low_stock_threshold'] ?? null,
         ]);
 
         $this->syncVisibility($product, $validated);
@@ -110,6 +120,11 @@ class ShopProductController extends Controller
             'visibility_customers.*' => 'exists:customers,company_id',
             'visibility_tiers' => 'nullable|array',
             'visibility_tiers.*' => 'exists:customer_tiers,id',
+            'min_rental_days' => 'nullable|integer|min:1',
+            'cooldown_days' => 'nullable|integer|min:0',
+            'rental_agreement_text' => 'nullable|string',
+            'delivery_instructions' => 'nullable|string',
+            'low_stock_threshold' => 'nullable|integer|min:1',
         ]);
 
         $imagePath = $product->image_path;
@@ -129,6 +144,11 @@ class ShopProductController extends Controller
             'billing_frequency' => $validated['billing_frequency'] ?? null,
             'stock_quantity' => $validated['stock_quantity'] ?? null,
             'image_path' => $imagePath,
+            'min_rental_days' => $validated['min_rental_days'] ?? null,
+            'cooldown_days' => $validated['cooldown_days'] ?? null,
+            'rental_agreement_text' => $validated['rental_agreement_text'] ?? null,
+            'delivery_instructions' => $validated['delivery_instructions'] ?? null,
+            'low_stock_threshold' => $validated['low_stock_threshold'] ?? null,
         ]);
 
         $this->syncVisibility($product, $validated);

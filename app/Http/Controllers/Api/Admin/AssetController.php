@@ -94,7 +94,7 @@ class AssetController extends Controller
      */
     public function show(Asset $asset): JsonResponse
     {
-        $asset->load(['customer', 'tickets' => fn ($q) => $q->orderByDesc('created_at')->limit(10)]);
+        $asset->load(['customer', 'tickets' => fn ($q) => $q->orderByDesc('created_at')]);
 
         return response()->json(['data' => [
             'device_id' => $asset->device_id,
@@ -113,7 +113,8 @@ class AssetController extends Controller
                 'subject' => $t->subject,
                 'status' => $t->status,
                 'priority' => $t->priority,
-                'created_at' => $t->created_at,
+                'ticket_type' => $t->ticket_type,
+                'created_at' => $t->created_at?->format('Y-m-d'),
             ]),
         ]]);
     }

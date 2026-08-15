@@ -13,6 +13,7 @@ struct CustomerDetailView: View {
     @State private var showingDeleteConfirmation = false
     @State private var isDeleting = false
     @State private var showingEditForm = false
+    @State private var showingCreateTicket = false
 
     private let companyId: Int
     private let apiClient: APIClient
@@ -41,10 +42,19 @@ struct CustomerDetailView: View {
         .toolbar {
             if customer != nil {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        showingEditForm = true
+                    Menu {
+                        Button {
+                            showingCreateTicket = true
+                        } label: {
+                            Label("New Ticket", systemImage: "ticket")
+                        }
+                        Button {
+                            showingEditForm = true
+                        } label: {
+                            Label("Edit", systemImage: "pencil")
+                        }
                     } label: {
-                        Label("Edit", systemImage: "pencil")
+                        Label("Actions", systemImage: "ellipsis.circle")
                     }
                 }
             }
@@ -76,6 +86,11 @@ struct CustomerDetailView: View {
                 }
             }
         }
+        .sheet(isPresented: $showingCreateTicket) {
+            TicketCreateView(apiClient: apiClient, prefilledCustomerId: companyId) {
+                await loadCustomer()
+            }
+        }
         .task {
             await loadCustomer()
         }
@@ -91,6 +106,15 @@ struct CustomerDetailView: View {
                 countRow(label: "Tickets", count: customer.ticketsCount, icon: "ticket")
                 countRow(label: "Invoices", count: customer.invoicesCount, icon: "doc.text")
                 countRow(label: "Domains", count: customer.domainsCount, icon: "globe")
+            }
+
+            // Quick Actions
+            Section("Actions") {
+                Button {
+                    showingCreateTicket = true
+                } label: {
+                    Label("Log Ticket / Service Request", systemImage: "plus.circle")
+                }
             }
 
             // Contact Information

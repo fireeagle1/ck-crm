@@ -2,101 +2,183 @@
 
 namespace App\Services;
 
+use App\Models\Booking;
 use App\Models\Customer;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\Service;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use RuntimeException;
 
 class FulfilmentService
 {
+    public function __construct(
+        protected BookingService $bookingService
+    ) {}
+
     /**
-     * Handle hosting purchase: create an active Service record and mark order fulfilled.
+     * Handle hosting purchase: create a pending Service record with domain_name and service_type 'hosting'.
+     * The admin will later approve and provision via WHM.
      *
-     * Requirements: 6.1, 6.2, 6.3
+     * Requirements: 3.1, 10.1, 10.2, 10.3
      */
     public function handleHostingPurchase(OrderItem $item, Customer $customer): Service
     {
-        $service = Service::create([
-            'company_id' => $customer->company_id,
-            'service_short' => $item->product_name,
-            'status' => 'Active',
-            'start_date' => now(),
-            'service_monthly_charge' => $item->price,
-            'service_payment_frequency' => $item->billing_frequency,
-            'stripe_subscription_id' => $item->stripe_subscription_id,
-        ]);
+        try {
+            return DB::transaction(function () use ($item, $customer) {
+                $service = Service::create([
+                    'company_id' => $customer->company_id,
+                    'service_short' => $item->product_name,
+                    'service_type' => 'hosting',
+                    'status' => 'pending',
+                    'domain_name' => $item->domain_name,
+                    'start_date' => now(),
+                    'service_monthly_charge' => $item->price,
+                    'service_payment_frequency' => $item->billing_frequency,
+                    'stripe_subscription_id' => $item->stripe_subscription_id,
+                ]);
 
-        $item->update(['service_id' => $service->service_id]);
+                $item->update(['service_id' => $service->service_id]);
 
-        $item->order->update(['fulfilment_status' => 'completed']);
+                $item->order->update(['fulfilment_status' => 'awaiting_fulfilment']);
 
-        return $service;
+                return $service;
+            });
+        } catch (\Throwable $e) {
+            Log::error('FulfilmentService: handleHostingPurchase transaction failed — full rollback', [
+                'order_id' => $item->order_id,
+                'order_item_id' => $item->id,
+                'company_id' => $customer->company_id,
+                'domain_name' => $item->domain_name,
+                'product_name' => $item->product_name,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            throw $e;
+        }
     }
 
     /**
-     * Handle equipment rental purchase: create a pending Service and mark order awaiting fulfilment.
+     * Handle equipment rental purchase: create a Booking via BookingService and set status 'active'.
      *
-     * Requirements: 7.1, 7.2, 7.5
+     * Requirements: 6.4, 10.1, 10.2, 10.3
      */
-    public function handleEquipmentRentalPurchase(OrderItem $item, Customer $customer): Service
+    public function handleEquipmentRentalPurchase(OrderItem $item, Customer $customer): Booking
     {
-        $service = Service::create([
-            'company_id' => $customer->company_id,
-            'service_short' => $item->product_name,
-            'status' => 'pending',
-            'start_date' => now(),
-            'service_monthly_charge' => $item->price,
-            'service_payment_frequency' => $item->billing_frequency,
-            'stripe_subscription_id' => $item->stripe_subscription_id,
-        ]);
+        try {
+            return DB::transaction(function () use ($item, $customer) {
+                $product = $item->product;
 
-        $item->update(['service_id' => $service->service_id]);
+                if (!$product) {
+                    throw new RuntimeException(
+                        "Product not found for order item \"{$item->product_name}\"."
+                    );
+                }
 
-        $item->order->update(['fulfilment_status' => 'awaiting_fulfilment']);
+                $startDate = $item->rental_start_date;
+                $endDate = $item->rental_end_date;
+                $quantity = $item->quantity ?? 1;
 
-        // Decrement stock for equipment rental items
-        if ($item->product) {
-            $this->decrementStock($item->product);
+                // Create booking via BookingService with pessimistic locking
+                $booking = $this->bookingService->createBooking(
+                    $item,
+                    $product,
+                    $startDate,
+                    $endDate,
+                    $quantity,
+                    null, // signature data handled at checkout level
+                    null  // agreement text handled at checkout level
+                );
+
+                // Set booking status to 'active' since payment is confirmed
+                $booking->update(['status' => 'active']);
+
+                $item->order->update(['fulfilment_status' => 'awaiting_fulfilment']);
+
+                // Decrement stock for equipment rental items
+                $this->decrementStock($product);
+
+                return $booking;
+            });
+        } catch (\Throwable $e) {
+            Log::error('FulfilmentService: handleEquipmentRentalPurchase transaction failed — full rollback', [
+                'order_id' => $item->order_id,
+                'order_item_id' => $item->id,
+                'company_id' => $customer->company_id,
+                'product_name' => $item->product_name,
+                'rental_start_date' => $item->rental_start_date,
+                'rental_end_date' => $item->rental_end_date,
+                'quantity' => $item->quantity,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            throw $e;
         }
-
-        return $service;
     }
 
     /**
      * Handle one-off purchase: decrement stock. The order's fulfilment_status stays "pending".
      *
-     * Requirements: 5.1, 5.4
+     * Requirements: 5.1, 5.4, 10.1
      */
     public function handleOneOffPurchase(OrderItem $item): void
     {
-        if ($item->product) {
-            $this->decrementStock($item->product);
-        }
+        DB::transaction(function () use ($item) {
+            if ($item->product) {
+                $this->decrementStock($item->product);
+            }
+        });
     }
 
     /**
      * Mark an order as fulfilled: set fulfilment_status to "completed", record timestamp,
      * and activate any associated pending services.
      *
-     * Requirements: 5.1
+     * Wrapped in DB::transaction for atomicity. On failure, full rollback occurs
+     * and details are logged with event context.
+     *
+     * Requirements: 5.1, 10.1, 10.2, 10.3
      */
     public function fulfilOrder(Order $order): void
     {
-        $order->update([
-            'fulfilment_status' => 'completed',
-            'fulfilled_at' => now(),
-        ]);
+        try {
+            DB::transaction(function () use ($order) {
+                $order->update([
+                    'fulfilment_status' => 'completed',
+                    'fulfilled_at' => now(),
+                ]);
 
-        // Activate any pending services associated with this order's items
-        $order->items()->whereNotNull('service_id')->each(function (OrderItem $item) {
-            $service = $item->service;
-            if ($service && $service->status === 'pending') {
-                $service->update(['status' => 'Active']);
-            }
-        });
+                // Activate any pending services associated with this order's items
+                $order->items()->whereNotNull('service_id')->each(function (OrderItem $item) {
+                    $service = $item->service;
+                    if ($service && $service->status === 'pending') {
+                        $service->update(['status' => 'Active']);
+                    }
+                });
+
+                // Activate any confirmed bookings associated with this order's items
+                $order->items()->whereNotNull('booking_id')->each(function (OrderItem $item) {
+                    $booking = $item->booking;
+                    if ($booking && $booking->status === 'confirmed') {
+                        $booking->update(['status' => 'active']);
+                    }
+                });
+            });
+        } catch (\Throwable $e) {
+            Log::error('FulfilmentService: fulfilOrder transaction failed — full rollback', [
+                'order_id' => $order->id,
+                'company_id' => $order->company_id,
+                'fulfilment_status' => $order->fulfilment_status,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            throw $e;
+        }
     }
 
     /**

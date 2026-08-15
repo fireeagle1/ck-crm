@@ -48,6 +48,8 @@
                         <p class="text-sm text-gray-500 mt-1">
                             Billed {{ $product->billing_frequency }}
                         </p>
+                    @elseif ($product->isEquipmentRental())
+                        <p class="text-sm text-gray-500 mt-1">per day</p>
                     @endif
                 </div>
 
@@ -56,10 +58,91 @@
                     {!! nl2br(e($product->description)) !!}
                 </div>
 
+                {{-- Delivery instructions --}}
+                @if (!empty($deliveryInstructions ?? null))
+                    <div class="mb-4 rounded-md bg-gray-50 border border-gray-200 p-3">
+                        <p class="text-xs font-semibold text-gray-700 mb-1">Delivery / Collection</p>
+                        <p class="text-sm text-gray-600">{{ $deliveryInstructions }}</p>
+                    </div>
+                @endif
+
+                {{-- Error message --}}
+                @if (session('error'))
+                    <div class="mb-4 rounded-lg bg-red-50 border border-red-200 p-3">
+                        <p class="text-sm text-red-700">{{ session('error') }}</p>
+                    </div>
+                @endif
+
                 {{-- Availability and Add to Cart --}}
                 @if ($product->isAvailable())
-                    <form method="POST" action="{{ route('portal.cart.add', $product) }}">
+                    <form method="POST" action="{{ route('portal.cart.add', $product) }}" id="add-to-cart-form">
                         @csrf
+
+                        {{-- Equipment Rental: Date picker and quantity --}}
+                        @if ($product->isEquipmentRental())
+                            <div class="space-y-4 mb-4">
+                                {{-- Date range picker --}}
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Rental Period</label>
+                                    <div class="grid grid-cols-2 gap-3">
+                                        <div>
+                                            <input type="text" name="rental_start_date" id="rental_start_date"
+                                                   value="{{ old('rental_start_date') }}"
+                                                   placeholder="Start date"
+                                                   class="w-full rounded-md border-gray-300 shadow-sm text-sm focus:border-blue-500 focus:ring-blue-500"
+                                                   required readonly>
+                                        </div>
+                                        <div>
+                                            <input type="text" name="rental_end_date" id="rental_end_date"
+                                                   value="{{ old('rental_end_date') }}"
+                                                   placeholder="End date"
+                                                   class="w-full rounded-md border-gray-300 shadow-sm text-sm focus:border-blue-500 focus:ring-blue-500"
+                                                   required readonly>
+                                        </div>
+                                    </div>
+                                    @if (!empty($minRentalDays))
+                                        <p class="text-xs text-gray-500 mt-1">Minimum rental period: {{ $minRentalDays }} {{ Str::plural('day', $minRentalDays) }}</p>
+                                    @endif
+                                </div>
+
+                                {{-- Quantity --}}
+                                <div>
+                                    <label for="quantity" class="block text-sm font-medium text-gray-700 mb-1">Quantity</label>
+                                    <input type="number" name="quantity" id="quantity" min="1" value="{{ old('quantity', 1) }}"
+                                           class="w-24 rounded-md border-gray-300 shadow-sm text-sm focus:border-blue-500 focus:ring-blue-500">
+                                </div>
+
+                                {{-- Calculated total display --}}
+                                <div id="rental-total-display" class="hidden rounded-md bg-blue-50 border border-blue-200 p-3">
+                                    <p class="text-sm text-blue-700">
+                                        Estimated total: <span id="rental-total-amount" class="font-semibold">&pound;0.00</span>
+                                        <span id="rental-total-breakdown" class="text-xs text-blue-600 block mt-0.5"></span>
+                                    </p>
+                                </div>
+                            </div>
+
+                            {{-- Rental agreement notice --}}
+                            @if (!empty($rentalAgreementText))
+                                <div class="mb-4 rounded-md bg-amber-50 border border-amber-200 p-3">
+                                    <p class="text-xs font-semibold text-amber-700 mb-1">Rental Agreement</p>
+                                    <p class="text-xs text-amber-600">A rental agreement must be accepted at checkout before completing this booking.</p>
+                                </div>
+                            @endif
+                        @endif
+
+                        {{-- Hosting: Domain name input --}}
+                        @if ($product->isHosting())
+                            <div class="mb-4">
+                                <label for="domain_name" class="block text-sm font-medium text-gray-700 mb-1">Domain Name</label>
+                                <input type="text" name="domain_name" id="domain_name"
+                                       value="{{ old('domain_name') }}"
+                                       placeholder="e.g. example.com"
+                                       class="w-full rounded-md border-gray-300 shadow-sm text-sm focus:border-blue-500 focus:ring-blue-500"
+                                       required>
+                                <p class="text-xs text-gray-500 mt-1">Enter the domain name for your hosting account.</p>
+                            </div>
+                        @endif
+
                         <button type="submit" class="w-full px-5 py-3 bg-blue-600 text-white rounded-md text-sm font-semibold hover:bg-blue-700 transition">
                             Add to Cart
                         </button>
@@ -102,4 +185,81 @@
             </div>
         </div>
     </div>
+
+    {{-- Flatpickr for rental date picking --}}
+    @if ($product->isEquipmentRental())
+        @push('styles')
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+        @endpush
+
+        @push('scripts')
+            <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    const unavailableDates = @json(json_decode($unavailableDates ?? '[]'));
+                    const minRentalDays = {{ $minRentalDays ?? 1 }};
+                    const pricePerDay = {{ $product->price }};
+
+                    const startInput = document.getElementById('rental_start_date');
+                    const endInput = document.getElementById('rental_end_date');
+                    const quantityInput = document.getElementById('quantity');
+                    const totalDisplay = document.getElementById('rental-total-display');
+                    const totalAmount = document.getElementById('rental-total-amount');
+                    const totalBreakdown = document.getElementById('rental-total-breakdown');
+
+                    function isDateUnavailable(date) {
+                        const dateStr = date.toISOString().split('T')[0];
+                        return unavailableDates.includes(dateStr);
+                    }
+
+                    function calculateTotal() {
+                        const start = startInput.value;
+                        const end = endInput.value;
+                        const qty = parseInt(quantityInput.value) || 1;
+
+                        if (start && end) {
+                            const startDate = new Date(start);
+                            const endDate = new Date(end);
+                            const days = Math.round((endDate - startDate) / (1000 * 60 * 60 * 24));
+
+                            if (days > 0) {
+                                const total = (pricePerDay * days * qty).toFixed(2);
+                                totalAmount.innerHTML = '&pound;' + total;
+                                totalBreakdown.textContent = `£${pricePerDay.toFixed(2)} × ${days} day${days > 1 ? 's' : ''} × ${qty} unit${qty > 1 ? 's' : ''}`;
+                                totalDisplay.classList.remove('hidden');
+                                return;
+                            }
+                        }
+                        totalDisplay.classList.add('hidden');
+                    }
+
+                    const startPicker = flatpickr(startInput, {
+                        dateFormat: 'Y-m-d',
+                        minDate: 'today',
+                        disable: [isDateUnavailable],
+                        onChange: function (selectedDates) {
+                            if (selectedDates.length > 0) {
+                                // Set end picker's min date to start + minRentalDays
+                                const minEnd = new Date(selectedDates[0]);
+                                minEnd.setDate(minEnd.getDate() + minRentalDays);
+                                endPicker.set('minDate', minEnd);
+                            }
+                            calculateTotal();
+                        }
+                    });
+
+                    const endPicker = flatpickr(endInput, {
+                        dateFormat: 'Y-m-d',
+                        minDate: 'today',
+                        disable: [isDateUnavailable],
+                        onChange: function () {
+                            calculateTotal();
+                        }
+                    });
+
+                    quantityInput.addEventListener('input', calculateTotal);
+                });
+            </script>
+        @endpush
+    @endif
 </x-portal-layout>

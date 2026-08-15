@@ -4,7 +4,9 @@ namespace Tests\Unit\Services;
 
 use App\Models\Customer;
 use App\Models\Product;
+use App\Services\BookingService;
 use App\Services\CheckoutService;
+use App\Services\NotificationService;
 use App\Services\StripeService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Mockery;
@@ -28,6 +30,8 @@ class CheckoutServiceTest extends TestCase
     use RefreshDatabase;
 
     private MockInterface $stripeService;
+    private MockInterface $bookingService;
+    private MockInterface $notificationService;
     private CheckoutService $checkoutService;
     private Customer $customer;
 
@@ -41,7 +45,13 @@ class CheckoutServiceTest extends TestCase
         $this->app['router']->getRoutes()->refreshNameLookups();
 
         $this->stripeService = Mockery::mock(StripeService::class);
-        $this->checkoutService = new CheckoutService($this->stripeService);
+        $this->bookingService = Mockery::mock(BookingService::class);
+        $this->notificationService = Mockery::mock(NotificationService::class);
+        $this->checkoutService = new CheckoutService(
+            $this->stripeService,
+            $this->bookingService,
+            $this->notificationService,
+        );
 
         // Create a customer with a stripe_customer_id
         $this->customer = Customer::factory()->create([
@@ -145,7 +155,7 @@ class CheckoutServiceTest extends TestCase
         $this->stripeService
             ->shouldNotReceive('createSubscription');
 
-        $result = $this->checkoutService->processCheckout($this->customer, $cartItems);
+        $result = $this->checkoutService->processCheckoutFromArray($this->customer, $cartItems);
 
         $this->assertTrue($result->success, 'Checkout failed: ' . ($result->errorMessage ?? 'unknown'));
         $this->assertEquals('https://checkout.stripe.com/test', $result->checkoutSessionUrl);
@@ -184,7 +194,7 @@ class CheckoutServiceTest extends TestCase
                 $this->makeFakeStripeSubscription('sub_rental_1'),
             );
 
-        $result = $this->checkoutService->processCheckout($this->customer, $cartItems);
+        $result = $this->checkoutService->processCheckoutFromArray($this->customer, $cartItems);
 
         $this->assertTrue($result->success, 'Checkout failed: ' . ($result->errorMessage ?? 'unknown'));
         $this->assertNull($result->checkoutSessionUrl);
@@ -234,7 +244,7 @@ class CheckoutServiceTest extends TestCase
                 $this->makeFakeStripeSubscription('sub_rental_mixed'),
             );
 
-        $result = $this->checkoutService->processCheckout($this->customer, $cartItems);
+        $result = $this->checkoutService->processCheckoutFromArray($this->customer, $cartItems);
 
         $this->assertTrue($result->success, 'Checkout failed: ' . ($result->errorMessage ?? 'unknown'));
         $this->assertNotNull($result->checkoutSessionUrl);
@@ -262,7 +272,7 @@ class CheckoutServiceTest extends TestCase
         $this->stripeService
             ->shouldNotReceive('createSubscription');
 
-        $result = $this->checkoutService->processCheckout($this->customer, $cartItems);
+        $result = $this->checkoutService->processCheckoutFromArray($this->customer, $cartItems);
 
         $this->assertTrue($result->success, 'Checkout failed: ' . ($result->errorMessage ?? 'unknown'));
         $this->assertNull($result->checkoutSessionUrl);
@@ -312,7 +322,9 @@ class CheckoutServiceTest extends TestCase
 
             // Reset mock expectations for each iteration
             $stripeService = Mockery::mock(StripeService::class);
-            $checkoutService = new CheckoutService($stripeService);
+            $bookingService = Mockery::mock(BookingService::class);
+            $notificationService = Mockery::mock(NotificationService::class);
+            $checkoutService = new CheckoutService($stripeService, $bookingService, $notificationService);
 
             $stripeService
                 ->shouldReceive('ensureCustomer')
@@ -350,7 +362,7 @@ class CheckoutServiceTest extends TestCase
                     ->shouldNotReceive('createSubscription');
             }
 
-            $result = $checkoutService->processCheckout($this->customer, $cartItems);
+            $result = $checkoutService->processCheckoutFromArray($this->customer, $cartItems);
 
             $description = "Composition: one_off={$oneOffCount}, hosting={$hostingCount}, rental={$rentalCount}";
             $this->assertTrue($result->success, "Checkout should succeed for {$description}. Error: " . ($result->errorMessage ?? 'none'));
@@ -410,7 +422,7 @@ class CheckoutServiceTest extends TestCase
         $this->stripeService
             ->shouldNotReceive('createSubscription');
 
-        $result = $this->checkoutService->processCheckout($this->customer, $cartItems);
+        $result = $this->checkoutService->processCheckoutFromArray($this->customer, $cartItems);
 
         $this->assertTrue($result->success, 'Checkout failed: ' . ($result->errorMessage ?? 'unknown'));
 
@@ -467,7 +479,7 @@ class CheckoutServiceTest extends TestCase
                 $this->makeFakeStripeSubscription('sub_2'),
             );
 
-        $result = $this->checkoutService->processCheckout($this->customer, $cartItems);
+        $result = $this->checkoutService->processCheckoutFromArray($this->customer, $cartItems);
 
         $this->assertTrue($result->success, 'Checkout failed: ' . ($result->errorMessage ?? 'unknown'));
 
@@ -504,7 +516,7 @@ class CheckoutServiceTest extends TestCase
             ->once()
             ->andReturn($this->makeFakeStripeSubscription('sub_hosting'));
 
-        $result = $this->checkoutService->processCheckout($this->customer, $cartItems);
+        $result = $this->checkoutService->processCheckoutFromArray($this->customer, $cartItems);
 
         $this->assertTrue($result->success, 'Checkout failed: ' . ($result->errorMessage ?? 'unknown'));
         $this->assertNull($result->checkoutSessionUrl);
@@ -528,7 +540,7 @@ class CheckoutServiceTest extends TestCase
             ->once()
             ->andReturn($this->makeFakeStripeSubscription('sub_rental'));
 
-        $result = $this->checkoutService->processCheckout($this->customer, $cartItems);
+        $result = $this->checkoutService->processCheckoutFromArray($this->customer, $cartItems);
 
         $this->assertTrue($result->success, 'Checkout failed: ' . ($result->errorMessage ?? 'unknown'));
         $this->assertNull($result->checkoutSessionUrl);

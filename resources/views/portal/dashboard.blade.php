@@ -53,6 +53,80 @@
         </a>
     </div>
 
+    {{-- Rental Bookings Summary --}}
+    @if ($activeBookings->isNotEmpty() || $upcomingBookings->isNotEmpty())
+        <div class="bg-white rounded-lg border mb-8">
+            <div class="px-5 py-4 border-b flex items-center justify-between">
+                <h2 class="font-bold">Rental Bookings</h2>
+                <span class="text-xs text-gray-400">{{ $activeBookings->count() + $upcomingBookings->count() }} booking{{ ($activeBookings->count() + $upcomingBookings->count()) > 1 ? 's' : '' }}</span>
+            </div>
+            <div class="divide-y">
+                @foreach ($activeBookings as $booking)
+                    @php
+                        $isOverdue = $booking->end_date->lt(now()->startOfDay());
+                        $daysRemaining = $isOverdue ? 0 : (int) now()->startOfDay()->diffInDays($booking->end_date, false);
+                    @endphp
+                    <a href="{{ route('portal.orders.show', $booking->orderItem?->order) }}" class="block px-5 py-3 hover:bg-gray-50 transition {{ $isOverdue ? 'bg-red-50' : '' }}">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <span class="text-sm font-semibold text-gray-900">{{ $booking->product?->name ?? 'Unknown Product' }}</span>
+                                @if ($booking->quantity > 1)
+                                    <span class="text-xs text-gray-500">&times;{{ $booking->quantity }}</span>
+                                @endif
+                            </div>
+                            <div class="flex items-center gap-2">
+                                @if ($isOverdue)
+                                    <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium bg-red-100 text-red-700">
+                                        Return Overdue
+                                    </span>
+                                @else
+                                    <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium bg-green-100 text-green-700">
+                                        Active
+                                    </span>
+                                @endif
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between mt-1">
+                            <p class="text-xs text-gray-500">
+                                {{ $booking->start_date->format('M j, Y') }} &mdash; {{ $booking->end_date->format('M j, Y') }}
+                            </p>
+                            @if ($isOverdue)
+                                <p class="text-xs font-medium text-red-600">Please arrange return</p>
+                            @else
+                                <p class="text-xs text-gray-400">{{ $daysRemaining }} day{{ $daysRemaining !== 1 ? 's' : '' }} remaining</p>
+                            @endif
+                        </div>
+                    </a>
+                @endforeach
+
+                @foreach ($upcomingBookings as $booking)
+                    @php
+                        $daysUntilStart = (int) now()->startOfDay()->diffInDays($booking->start_date, false);
+                    @endphp
+                    <a href="{{ route('portal.orders.show', $booking->orderItem?->order) }}" class="block px-5 py-3 hover:bg-gray-50 transition">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <span class="text-sm font-semibold text-gray-900">{{ $booking->product?->name ?? 'Unknown Product' }}</span>
+                                @if ($booking->quantity > 1)
+                                    <span class="text-xs text-gray-500">&times;{{ $booking->quantity }}</span>
+                                @endif
+                            </div>
+                            <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium bg-blue-100 text-blue-700">
+                                Upcoming
+                            </span>
+                        </div>
+                        <div class="flex items-center justify-between mt-1">
+                            <p class="text-xs text-gray-500">
+                                {{ $booking->start_date->format('M j, Y') }} &mdash; {{ $booking->end_date->format('M j, Y') }}
+                            </p>
+                            <p class="text-xs text-gray-400">Starts in {{ $daysUntilStart }} day{{ $daysUntilStart !== 1 ? 's' : '' }}</p>
+                        </div>
+                    </a>
+                @endforeach
+            </div>
+        </div>
+    @endif
+
     {{-- Two-column: Tickets + Invoices --}}
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         {{-- Recent Tickets --}}

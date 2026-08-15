@@ -34,7 +34,7 @@ class InvoiceController extends Controller
             'data' => $invoices->map(fn (Invoice $invoice) => [
                 'invoice_id' => $invoice->invoice_id,
                 'invoice_status' => $invoice->invoice_status,
-                'invoice_amount' => $invoice->invoice_amount,
+                'invoice_amount' => (float) $invoice->invoice_amount,
                 'invoice_date' => $invoice->invoice_date?->toDateString(),
                 'due_date' => $invoice->due_date?->toDateString(),
                 'paid_date' => $invoice->paid_date?->toDateString(),

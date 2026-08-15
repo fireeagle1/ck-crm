@@ -8,7 +8,9 @@ use Stripe\Checkout\Session;
 use Stripe\Customer as StripeCustomer;
 use Stripe\Event;
 use Stripe\Exception\ApiErrorException;
+use Stripe\Exception\InvalidRequestException;
 use Stripe\Exception\SignatureVerificationException;
+use Stripe\PaymentIntent;
 use Stripe\Stripe;
 use Stripe\Subscription;
 use Stripe\Webhook;
@@ -23,30 +25,35 @@ class StripeService
 
     /**
      * Ensure a Stripe customer exists for the given customer.
-     * If the customer already has a stripe_customer_id, return it.
-     * Otherwise, create a new Stripe customer and persist the ID.
+     * If the customer has a stripe_customer_id, verify it exists on Stripe.
+     * If Stripe returns "customer not found", recreate the customer and update the record.
+     * If no stripe_customer_id exists, create a new Stripe customer.
      */
     public function ensureCustomer(Customer $customer): string
     {
         if ($customer->stripe_customer_id) {
-            return $customer->stripe_customer_id;
+            try {
+                StripeCustomer::retrieve($customer->stripe_customer_id);
+                return $customer->stripe_customer_id;
+            } catch (InvalidRequestException $e) {
+                if (str_contains($e->getMessage(), 'No such customer')) {
+                    Log::warning('Stripe customer not found, recreating', [
+                        'company_id' => $customer->company_id,
+                        'old_stripe_customer_id' => $customer->stripe_customer_id,
+                    ]);
+                    // Fall through to creation below
+                } else {
+                    throw $e;
+                }
+            }
         }
 
         try {
-            $params = [
+            $stripeCustomer = StripeCustomer::create([
                 'name' => $customer->company_name,
-                'metadata' => [
-                    'company_id' => $customer->company_id,
-                ],
-            ];
-
-            // Use the first user's email if available
-            $firstUser = $customer->users()->first();
-            if ($firstUser && $firstUser->email) {
-                $params['email'] = $firstUser->email;
-            }
-
-            $stripeCustomer = StripeCustomer::create($params);
+                'email' => $customer->users()->first()?->email,
+                'metadata' => ['company_id' => $customer->company_id],
+            ]);
 
             $customer->update(['stripe_customer_id' => $stripeCustomer->id]);
 
@@ -58,6 +65,37 @@ class StripeService
             ]);
 
             throw new HttpException(502, 'Unable to create Stripe customer: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Create a one-time Stripe PaymentIntent for rental bookings.
+     *
+     * @param int $amount Amount in the smallest currency unit (e.g., pence for GBP)
+     * @param string $customerId Stripe customer ID
+     * @param array $metadata Additional metadata to attach to the PaymentIntent
+     * @return PaymentIntent
+     */
+    public function createOneTimePayment(int $amount, string $customerId, array $metadata = []): PaymentIntent
+    {
+        try {
+            return PaymentIntent::create([
+                'amount' => $amount,
+                'currency' => config('services.stripe.currency', 'gbp'),
+                'customer' => $customerId,
+                'metadata' => $metadata,
+                'automatic_payment_methods' => [
+                    'enabled' => true,
+                ],
+            ]);
+        } catch (ApiErrorException $e) {
+            Log::error('Stripe: Failed to create one-time payment', [
+                'customer' => $customerId,
+                'amount' => $amount,
+                'error' => $e->getMessage(),
+            ]);
+
+            throw new HttpException(502, 'Unable to create payment: ' . $e->getMessage());
         }
     }
 

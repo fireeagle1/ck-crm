@@ -19,7 +19,7 @@ struct TicketStats: Decodable {
     let criticalCount: Int
     let highCount: Int
     let overdueCount: Int
-    let avgResponseTimeMinutes: Double
+    let avgResponseTimeMinutes: Double?
 }
 
 // MARK: - Financial Statistics

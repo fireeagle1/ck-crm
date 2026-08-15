@@ -7,6 +7,7 @@ struct AssetDetailView: View {
     @State private var errorMessage: String?
     @State private var showingEditForm = false
     @State private var showingDeleteConfirmation = false
+    @State private var showingCreateTicket = false
     @State private var isDeleting = false
 
     private let deviceId: Int
@@ -39,6 +40,13 @@ struct AssetDetailView: View {
                 AssetFormView(mode: .edit(asset), apiClient: apiClient) { _ in await loadAsset() }
             }
         }
+        .sheet(isPresented: $showingCreateTicket) {
+            if let asset {
+                TicketCreateView(apiClient: apiClient, prefilledCustomerId: asset.customerId) {
+                    await loadAsset()
+                }
+            }
+        }
         .task { await loadAsset() }
     }
 
@@ -55,17 +63,63 @@ struct AssetDetailView: View {
             if let notes = asset.notes, !notes.isEmpty {
                 Section("Notes") { Text(notes) }
             }
-            if let tickets = asset.tickets, !tickets.isEmpty {
-                Section("Related Tickets (\(tickets.count))") {
+            Section {
+                if let tickets = asset.tickets, !tickets.isEmpty {
                     ForEach(tickets) { t in
-                        HStack {
-                            VStack(alignment: .leading) {
-                                Text("INC\(t.ticketId): \(t.subject)").font(.subheadline).lineLimit(1)
-                                Text(t.status).font(.caption).foregroundStyle(.secondary)
+                        NavigationLink(destination: TicketDetailView(ticketId: t.ticketId, apiClient: apiClient)) {
+                            HStack {
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text("INC\(t.ticketId): \(t.subject)")
+                                        .font(.subheadline)
+                                        .fontWeight(.medium)
+                                        .lineLimit(2)
+                                    HStack(spacing: 6) {
+                                        Text(t.status)
+                                            .font(.caption2)
+                                            .fontWeight(.medium)
+                                            .padding(.horizontal, 6)
+                                            .padding(.vertical, 2)
+                                            .background(statusColor(t.status).opacity(0.15))
+                                            .foregroundStyle(statusColor(t.status))
+                                            .clipShape(Capsule())
+                                        Text(t.ticketType ?? "Incident")
+                                            .font(.caption2)
+                                            .foregroundStyle(.secondary)
+                                        if let date = t.createdAt {
+                                            Spacer()
+                                            Text(date)
+                                                .font(.caption2)
+                                                .foregroundStyle(.tertiary)
+                                        }
+                                    }
+                                }
+                                Spacer()
+                                Text(t.priority)
+                                    .font(.caption2)
+                                    .fontWeight(.medium)
+                                    .padding(.horizontal, 6)
+                                    .padding(.vertical, 2)
+                                    .background(priorityColor(t.priority).opacity(0.15))
+                                    .foregroundStyle(priorityColor(t.priority))
+                                    .clipShape(Capsule())
                             }
-                            Spacer()
-                            Text(t.priority).font(.caption2).padding(.horizontal, 6).padding(.vertical, 2)
-                                .background(priorityColor(t.priority).opacity(0.15)).foregroundStyle(priorityColor(t.priority)).clipShape(Capsule())
+                        }
+                    }
+                } else {
+                    Text("No tickets logged against this asset.")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
+            } header: {
+                HStack {
+                    Text("Linked Incidents (\(asset.tickets?.count ?? 0))")
+                    Spacer()
+                    if asset.customerId != nil {
+                        Button {
+                            showingCreateTicket = true
+                        } label: {
+                            Label("Log Ticket", systemImage: "plus.circle")
+                                .font(.caption)
                         }
                     }
                 }
@@ -84,6 +138,10 @@ struct AssetDetailView: View {
 
     private func priorityColor(_ p: String) -> Color {
         switch p.lowercased() { case "critical": return .red; case "high": return .orange; case "normal": return .blue; default: return .gray }
+    }
+
+    private func statusColor(_ s: String) -> Color {
+        switch s.lowercased() { case "open": return .blue; case "pending": return .orange; case "in progress": return .purple; case "closed": return .green; default: return .gray }
     }
 
     @MainActor private func loadAsset() async {

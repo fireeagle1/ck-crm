@@ -27,8 +27,11 @@ final class TicketDetailViewModel {
         do {
             let response: TicketDetailResponse = try await apiClient.request(Endpoint(path: "/admin/tickets/\(ticketId)"))
             ticket = response.data
-        } catch let error as APIError { errorMessage = error.errorDescription }
-        catch { errorMessage = "An unexpected error occurred." }
+        } catch let error as APIError {
+            errorMessage = error.errorDescription
+        } catch {
+            errorMessage = "Failed to load ticket: \(error.localizedDescription)"
+        }
         isLoading = false
     }
 

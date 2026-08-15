@@ -18,7 +18,7 @@ class CartServiceTest extends TestCase
     }
 
     // ──────────────────────────────────────────────────────────────────
-    // addItem
+    // addItem — basic (one_off products, no options)
     // ──────────────────────────────────────────────────────────────────
 
     public function test_can_add_available_product_to_cart(): void
@@ -71,9 +71,239 @@ class CartServiceTest extends TestCase
             'billing_frequency' => 'monthly',
         ]);
 
-        $this->cartService->addItem($product);
+        $this->cartService->addItem($product, ['domain_name' => 'example.com']);
 
         $this->assertCount(1, $this->cartService->getItems());
+    }
+
+    // ──────────────────────────────────────────────────────────────────
+    // addItem — rental items
+    // ──────────────────────────────────────────────────────────────────
+
+    public function test_can_add_rental_product_with_dates_and_quantity(): void
+    {
+        $product = $this->makeAvailableProduct([
+            'product_type' => 'equipment_rental',
+            'price' => 50.00,
+        ]);
+
+        $this->cartService->addItem($product, [
+            'rental_start_date' => '2025-08-01',
+            'rental_end_date' => '2025-08-04',
+            'quantity' => 2,
+        ]);
+
+        $items = $this->cartService->getItems();
+        $this->assertCount(1, $items);
+        $this->assertEquals('2025-08-01', $items[0]['rental_start_date']);
+        $this->assertEquals('2025-08-04', $items[0]['rental_end_date']);
+        $this->assertEquals(2, $items[0]['quantity']);
+        // total_price = 50 × 3 days × 2 quantity = 300
+        $this->assertEquals(300.00, $items[0]['total_price']);
+    }
+
+    public function test_rental_product_requires_start_date(): void
+    {
+        $product = $this->makeAvailableProduct(['product_type' => 'equipment_rental']);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Rental start date and end date are required');
+
+        $this->cartService->addItem($product, [
+            'rental_end_date' => '2025-08-04',
+        ]);
+    }
+
+    public function test_rental_product_requires_end_date(): void
+    {
+        $product = $this->makeAvailableProduct(['product_type' => 'equipment_rental']);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Rental start date and end date are required');
+
+        $this->cartService->addItem($product, [
+            'rental_start_date' => '2025-08-01',
+        ]);
+    }
+
+    public function test_rental_end_date_must_be_after_start_date(): void
+    {
+        $product = $this->makeAvailableProduct(['product_type' => 'equipment_rental']);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Rental end date must be after the start date');
+
+        $this->cartService->addItem($product, [
+            'rental_start_date' => '2025-08-05',
+            'rental_end_date' => '2025-08-03',
+        ]);
+    }
+
+    public function test_rental_enforces_minimum_rental_days(): void
+    {
+        $product = $this->makeAvailableProduct([
+            'product_type' => 'equipment_rental',
+            'min_rental_days' => 5,
+        ]);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Minimum rental period is 5 days');
+
+        $this->cartService->addItem($product, [
+            'rental_start_date' => '2025-08-01',
+            'rental_end_date' => '2025-08-03', // 2 days < 5 minimum
+        ]);
+    }
+
+    public function test_rental_allows_dates_meeting_minimum(): void
+    {
+        $product = $this->makeAvailableProduct([
+            'product_type' => 'equipment_rental',
+            'min_rental_days' => 3,
+            'price' => 10.00,
+        ]);
+
+        $this->cartService->addItem($product, [
+            'rental_start_date' => '2025-08-01',
+            'rental_end_date' => '2025-08-04', // 3 days = minimum
+        ]);
+
+        $this->assertCount(1, $this->cartService->getItems());
+    }
+
+    public function test_rental_quantity_must_be_at_least_1(): void
+    {
+        $product = $this->makeAvailableProduct(['product_type' => 'equipment_rental']);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Quantity must be at least 1');
+
+        $this->cartService->addItem($product, [
+            'rental_start_date' => '2025-08-01',
+            'rental_end_date' => '2025-08-04',
+            'quantity' => 0,
+        ]);
+    }
+
+    // ──────────────────────────────────────────────────────────────────
+    // addItem — hosting items
+    // ──────────────────────────────────────────────────────────────────
+
+    public function test_hosting_product_requires_domain_name(): void
+    {
+        $product = $this->makeAvailableProduct([
+            'product_type' => 'hosting',
+            'stock_quantity' => null,
+        ]);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('A domain name is required for hosting products');
+
+        $this->cartService->addItem($product);
+    }
+
+    public function test_hosting_product_validates_domain_format(): void
+    {
+        $product = $this->makeAvailableProduct([
+            'product_type' => 'hosting',
+            'stock_quantity' => null,
+        ]);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Please provide a valid domain name');
+
+        $this->cartService->addItem($product, ['domain_name' => 'not a domain']);
+    }
+
+    public function test_hosting_product_stores_domain_name(): void
+    {
+        $product = $this->makeAvailableProduct([
+            'product_type' => 'hosting',
+            'stock_quantity' => null,
+            'billing_frequency' => 'monthly',
+        ]);
+
+        $this->cartService->addItem($product, ['domain_name' => 'mywebsite.co.uk']);
+
+        $items = $this->cartService->getItems();
+        $this->assertCount(1, $items);
+        $this->assertEquals('mywebsite.co.uk', $items[0]['domain_name']);
+    }
+
+    // ──────────────────────────────────────────────────────────────────
+    // addItem — one_off items (no extra validation)
+    // ──────────────────────────────────────────────────────────────────
+
+    public function test_one_off_product_needs_no_extra_options(): void
+    {
+        $product = $this->makeAvailableProduct(['product_type' => 'one_off']);
+
+        $this->cartService->addItem($product);
+
+        $items = $this->cartService->getItems();
+        $this->assertCount(1, $items);
+        $this->assertNull($items[0]['rental_start_date']);
+        $this->assertNull($items[0]['rental_end_date']);
+        $this->assertNull($items[0]['domain_name']);
+        $this->assertEquals(1, $items[0]['quantity']);
+    }
+
+    // ──────────────────────────────────────────────────────────────────
+    // Domain validation
+    // ──────────────────────────────────────────────────────────────────
+
+    public function test_valid_domain_names(): void
+    {
+        $validDomains = [
+            'example.com',
+            'my-site.co.uk',
+            'sub.domain.org',
+            'test123.io',
+            'a.bc',
+        ];
+
+        foreach ($validDomains as $domain) {
+            $this->assertTrue(
+                $this->cartService->isValidDomain($domain),
+                "Expected '{$domain}' to be valid"
+            );
+        }
+    }
+
+    public function test_invalid_domain_names(): void
+    {
+        $invalidDomains = [
+            'no spaces.com',
+            'nodot',
+            '',
+            '.starts-with-dot.com',
+            '-starts-with-dash.com',
+        ];
+
+        foreach ($invalidDomains as $domain) {
+            $this->assertFalse(
+                $this->cartService->isValidDomain($domain),
+                "Expected '{$domain}' to be invalid"
+            );
+        }
+    }
+
+    // ──────────────────────────────────────────────────────────────────
+    // Rental total calculation
+    // ──────────────────────────────────────────────────────────────────
+
+    public function test_calculate_rental_total(): void
+    {
+        // price=25, 4 days (Aug 1-5), quantity=3 → 25 × 4 × 3 = 300
+        $total = $this->cartService->calculateRentalTotal(25.00, '2025-08-01', '2025-08-05', 3);
+        $this->assertEquals(300.00, $total);
+    }
+
+    public function test_calculate_rental_total_single_day(): void
+    {
+        // price=100, 1 day (Aug 1-2), quantity=1 → 100 × 1 × 1 = 100
+        $total = $this->cartService->calculateRentalTotal(100.00, '2025-08-01', '2025-08-02', 1);
+        $this->assertEquals(100.00, $total);
     }
 
     // ──────────────────────────────────────────────────────────────────
@@ -112,13 +342,32 @@ class CartServiceTest extends TestCase
     // getTotal
     // ──────────────────────────────────────────────────────────────────
 
-    public function test_get_total_returns_sum_of_all_item_prices(): void
+    public function test_get_total_returns_sum_of_all_item_total_prices(): void
     {
         $this->cartService->addItem($this->makeAvailableProduct(['price' => 10.50]));
         $this->cartService->addItem($this->makeAvailableProduct(['price' => 20.75]));
         $this->cartService->addItem($this->makeAvailableProduct(['price' => 5.25]));
 
         $this->assertEquals(36.50, $this->cartService->getTotal());
+    }
+
+    public function test_get_total_includes_rental_total_price(): void
+    {
+        // Rental: price=10 × 3 days × 2 qty = 60
+        $rentalProduct = $this->makeAvailableProduct([
+            'product_type' => 'equipment_rental',
+            'price' => 10.00,
+        ]);
+        $this->cartService->addItem($rentalProduct, [
+            'rental_start_date' => '2025-08-01',
+            'rental_end_date' => '2025-08-04',
+            'quantity' => 2,
+        ]);
+
+        // One-off: price=20
+        $this->cartService->addItem($this->makeAvailableProduct(['price' => 20.00]));
+
+        $this->assertEquals(80.00, $this->cartService->getTotal());
     }
 
     public function test_get_total_returns_zero_for_empty_cart(): void
@@ -158,6 +407,42 @@ class CartServiceTest extends TestCase
     }
 
     // ──────────────────────────────────────────────────────────────────
+    // hasOnlyHostingItems / hasPhysicalItems
+    // ──────────────────────────────────────────────────────────────────
+
+    public function test_has_only_hosting_items_returns_true_for_hosting_only_cart(): void
+    {
+        $product = $this->makeAvailableProduct([
+            'product_type' => 'hosting',
+            'stock_quantity' => null,
+        ]);
+        $this->cartService->addItem($product, ['domain_name' => 'test.com']);
+
+        $this->assertTrue($this->cartService->hasOnlyHostingItems());
+        $this->assertFalse($this->cartService->hasPhysicalItems());
+    }
+
+    public function test_has_only_hosting_items_returns_false_for_mixed_cart(): void
+    {
+        $hosting = $this->makeAvailableProduct([
+            'product_type' => 'hosting',
+            'stock_quantity' => null,
+        ]);
+        $oneOff = $this->makeAvailableProduct(['product_type' => 'one_off']);
+
+        $this->cartService->addItem($hosting, ['domain_name' => 'test.com']);
+        $this->cartService->addItem($oneOff);
+
+        $this->assertFalse($this->cartService->hasOnlyHostingItems());
+        $this->assertTrue($this->cartService->hasPhysicalItems());
+    }
+
+    public function test_has_only_hosting_items_returns_false_for_empty_cart(): void
+    {
+        $this->assertFalse($this->cartService->hasOnlyHostingItems());
+    }
+
+    // ──────────────────────────────────────────────────────────────────
     // getOneOffItems
     // ──────────────────────────────────────────────────────────────────
 
@@ -170,11 +455,16 @@ class CartServiceTest extends TestCase
         $this->cartService->addItem($this->makeAvailableProduct([
             'product_type' => 'hosting',
             'billing_frequency' => 'monthly',
-        ]));
+            'stock_quantity' => null,
+        ]), ['domain_name' => 'test.com']);
         $this->cartService->addItem($this->makeAvailableProduct([
             'product_type' => 'equipment_rental',
             'billing_frequency' => 'quarterly',
-        ]));
+        ]), [
+            'rental_start_date' => '2025-08-01',
+            'rental_end_date' => '2025-08-05',
+            'quantity' => 1,
+        ]);
         $this->cartService->addItem($this->makeAvailableProduct([
             'product_type' => 'one_off',
             'billing_frequency' => null,
@@ -201,11 +491,16 @@ class CartServiceTest extends TestCase
         $this->cartService->addItem($this->makeAvailableProduct([
             'product_type' => 'hosting',
             'billing_frequency' => 'monthly',
-        ]));
+            'stock_quantity' => null,
+        ]), ['domain_name' => 'test.com']);
         $this->cartService->addItem($this->makeAvailableProduct([
             'product_type' => 'equipment_rental',
             'billing_frequency' => 'annually',
-        ]));
+        ]), [
+            'rental_start_date' => '2025-08-01',
+            'rental_end_date' => '2025-08-10',
+            'quantity' => 1,
+        ]);
 
         $recurringItems = $this->cartService->getRecurringItems();
 
@@ -223,10 +518,10 @@ class CartServiceTest extends TestCase
      * **Validates: Requirements 4.2**
      *
      * Property 8: For any Cart containing one or more items, the displayed
-     * total amount SHALL equal the arithmetic sum of all individual item prices.
+     * total amount SHALL equal the arithmetic sum of all individual item total_prices.
      *
      * This test generates random combinations of products and verifies the
-     * cart total always equals the sum of individual prices.
+     * cart total always equals the sum of individual total prices.
      */
     public function test_property_cart_total_equals_sum_of_item_prices(): void
     {
@@ -279,6 +574,8 @@ class CartServiceTest extends TestCase
             'stock_quantity' => 10,
             'image_path' => null,
             'is_archived' => false,
+            'min_rental_days' => null,
+            'cooldown_days' => 0,
         ];
 
         $attributes = array_merge($defaults, $overrides);
@@ -306,6 +603,8 @@ class CartServiceTest extends TestCase
             'stock_quantity' => 10,
             'image_path' => null,
             'is_archived' => false,
+            'min_rental_days' => null,
+            'cooldown_days' => 0,
         ];
 
         $product = new Product();

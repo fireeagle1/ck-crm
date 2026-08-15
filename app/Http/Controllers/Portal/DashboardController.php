@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Portal;
 
 use App\Http\Controllers\Controller;
+use App\Models\Booking;
 use App\Models\Domain;
 use App\Models\Invoice;
 use App\Models\Service;
@@ -84,6 +85,23 @@ class DashboardController extends Controller
             ->whereDate('due_date', '<', now())
             ->get();
 
+        // Active rental bookings (start_date <= today, end_date >= today, status confirmed or active)
+        $activeBookings = Booking::where('company_id', $companyId)
+            ->whereIn('status', ['confirmed', 'active'])
+            ->whereDate('start_date', '<=', now())
+            ->whereDate('end_date', '>=', now())
+            ->with('product', 'orderItem.order')
+            ->orderBy('end_date')
+            ->get();
+
+        // Upcoming rental bookings (start_date > today, status confirmed or active)
+        $upcomingBookings = Booking::where('company_id', $companyId)
+            ->whereIn('status', ['confirmed', 'active'])
+            ->whereDate('start_date', '>', now())
+            ->with('product', 'orderItem.order')
+            ->orderBy('start_date')
+            ->get();
+
         return view('portal.dashboard', compact(
             'activeServices',
             'openTickets',
@@ -96,6 +114,8 @@ class DashboardController extends Controller
             'websites',
             'customerDomains',
             'overdueInvoices',
+            'activeBookings',
+            'upcomingBookings',
         ));
     }
 }

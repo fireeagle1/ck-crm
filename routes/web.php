@@ -81,11 +81,17 @@ Route::middleware(['auth', 'verified'])->prefix('portal')->name('portal.')->grou
     Route::get('/shop', [Portal\ShopController::class, 'index'])->name('shop.index');
     Route::get('/shop/{product}', [Portal\ShopController::class, 'show'])->name('shop.show');
     Route::get('/cart', [Portal\CartController::class, 'index'])->name('cart.index');
+    Route::get('/cart/checkout', [Portal\CartController::class, 'showCheckout'])->name('cart.showCheckout');
     Route::post('/cart/checkout', [Portal\CartController::class, 'checkout'])->name('cart.checkout');
     Route::post('/cart/{product}', [Portal\CartController::class, 'add'])->name('cart.add');
     Route::delete('/cart/{index}', [Portal\CartController::class, 'remove'])->name('cart.remove');
     Route::get('/orders', [Portal\OrderController::class, 'index'])->name('orders.index');
     Route::get('/orders/{order}', [Portal\OrderController::class, 'show'])->name('orders.show');
+    Route::get('/orders/{order}/download-invoice', [Portal\OrderController::class, 'downloadInvoice'])->name('orders.downloadInvoice');
+
+    // Bookings (AJAX availability endpoints)
+    Route::post('/bookings/check-availability', [Portal\BookingController::class, 'checkAvailability'])->name('bookings.checkAvailability');
+    Route::get('/bookings/unavailable-dates', [Portal\BookingController::class, 'getUnavailableDates'])->name('bookings.unavailableDates');
 });
 
 /*
@@ -192,6 +198,12 @@ Route::middleware(['auth', 'verified', EnsureIsAdmin::class])->prefix('admin')->
     Route::get('/settings/import', [Admin\SettingsController::class, 'import'])->name('settings.import');
     Route::get('/settings/scheduled-tasks', [Admin\SettingsController::class, 'scheduledTasks'])->name('settings.tasks');
     Route::post('/settings/scheduled-tasks/run', [Admin\SettingsController::class, 'runTask'])->name('settings.tasks.run');
+    Route::get('/settings/whm', [Admin\WhmConfigController::class, 'edit'])->name('settings.whm');
+    Route::post('/settings/whm', [Admin\WhmConfigController::class, 'update'])->name('settings.whm.update');
+
+    // Hosting Provisioning
+    Route::get('/hosting/provisioning', [Admin\HostingProvisionController::class, 'index'])->name('hosting.provision.index');
+    Route::post('/hosting/provisioning/{service}/provision', [Admin\HostingProvisionController::class, 'provision'])->name('hosting.provision.provision');
 
     // Canned Responses
     Route::resource('canned-responses', Admin\CannedResponseController::class)->except(['show']);
@@ -204,6 +216,16 @@ Route::middleware(['auth', 'verified', EnsureIsAdmin::class])->prefix('admin')->
     Route::get('shop/orders/{order}', [Admin\ShopOrderController::class, 'show'])->name('shop.orders.show');
     Route::post('shop/orders/{order}/fulfil', [Admin\ShopOrderController::class, 'fulfil'])->name('shop.orders.fulfil');
     Route::post('shop/orders/{order}/note', [Admin\ShopOrderController::class, 'addNote'])->name('shop.orders.note');
+    Route::get('shop/orders/{order}/download-pdf', [Admin\ShopOrderController::class, 'downloadPdf'])->name('shop.orders.download-pdf');
+    Route::post('shop/orders/{order}/mark-paid-offline', [Admin\ShopOrderController::class, 'markPaidOffline'])->name('shop.orders.mark-paid-offline');
+
+    // Bookings Management
+    Route::get('shop/bookings', [Admin\BookingController::class, 'index'])->name('shop.bookings.index');
+    Route::get('shop/bookings/create', [Admin\BookingController::class, 'create'])->name('shop.bookings.create');
+    Route::post('shop/bookings', [Admin\BookingController::class, 'store'])->name('shop.bookings.store');
+    Route::get('shop/bookings/{booking}', [Admin\BookingController::class, 'show'])->name('shop.bookings.show');
+    Route::patch('shop/bookings/{booking}/returned', [Admin\BookingController::class, 'markReturned'])->name('shop.bookings.markReturned');
+
     Route::resource('shop/tiers', Admin\CustomerTierController::class)->except(['show', 'edit', 'create'])->names('shop.tiers');
 });
 

@@ -121,7 +121,35 @@ final class APIClient {
         self.encoder = JSONEncoder()
         self.decoder = JSONDecoder()
         self.decoder.keyDecodingStrategy = .convertFromSnakeCase
-        self.decoder.dateDecodingStrategy = .iso8601
+        self.decoder.dateDecodingStrategy = .custom { decoder in
+            let container = try decoder.singleValueContainer()
+            let dateString = try container.decode(String.self)
+
+            // Try ISO 8601 with fractional seconds (Laravel format: 2024-01-15T10:30:00.000000Z)
+            let isoWithFraction = ISO8601DateFormatter()
+            isoWithFraction.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+            if let date = isoWithFraction.date(from: dateString) {
+                return date
+            }
+
+            // Try standard ISO 8601 without fractional seconds
+            let isoStandard = ISO8601DateFormatter()
+            isoStandard.formatOptions = [.withInternetDateTime]
+            if let date = isoStandard.date(from: dateString) {
+                return date
+            }
+
+            // Try MySQL/Laravel format without T separator (e.g., "2024-01-15 10:30:00")
+            let mysqlFormatter = DateFormatter()
+            mysqlFormatter.locale = Locale(identifier: "en_US_POSIX")
+            mysqlFormatter.timeZone = TimeZone(identifier: "UTC")
+            mysqlFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+            if let date = mysqlFormatter.date(from: dateString) {
+                return date
+            }
+
+            throw DecodingError.dataCorruptedError(in: container, debugDescription: "Cannot decode date: \(dateString)")
+        }
     }
 
     // MARK: - Public Methods

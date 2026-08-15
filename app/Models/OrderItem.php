@@ -19,10 +19,17 @@ class OrderItem extends Model
         'price',
         'billing_frequency',
         'stripe_subscription_id',
+        'domain_name',
+        'quantity',
+        'rental_start_date',
+        'rental_end_date',
+        'booking_id',
     ];
 
     protected $casts = [
         'price' => 'decimal:2',
+        'rental_start_date' => 'date',
+        'rental_end_date' => 'date',
     ];
 
     public function order(): BelongsTo
@@ -38,5 +45,10 @@ class OrderItem extends Model
     public function service(): BelongsTo
     {
         return $this->belongsTo(Service::class, 'service_id', 'service_id');
+    }
+
+    public function booking(): BelongsTo
+    {
+        return $this->belongsTo(Booking::class);
     }
 }

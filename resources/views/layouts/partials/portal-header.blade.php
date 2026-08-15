@@ -1,21 +1,43 @@
 @php
+    // Always-visible navigation items
     $nav = [
         ['route' => 'portal.dashboard', 'label' => 'Dashboard'],
-        ['route' => 'portal.services.index', 'label' => 'Services'],
-        ['route' => 'portal.tickets.index', 'label' => 'Support'],
-        ['route' => 'portal.invoices.index', 'label' => 'Invoices'],
-        ['route' => 'portal.domains.index', 'label' => 'Domains'],
-        ['route' => 'portal.shop.index', 'label' => 'Shop'],
-        ['route' => 'portal.knowledgebase.index', 'label' => 'Help'],
     ];
 
+    // Conditionally show Services link based on customer having services or hosting products
+    if (!empty($showServices)) {
+        $nav[] = ['route' => 'portal.services.index', 'label' => 'Services'];
+    }
+
+    // Always show Support
+    $nav[] = ['route' => 'portal.tickets.index', 'label' => 'Support'];
+
+    // Conditionally show Invoices link based on customer having invoices
+    if (!empty($showInvoices)) {
+        $nav[] = ['route' => 'portal.invoices.index', 'label' => 'Invoices'];
+    }
+
+    // Conditionally show Domains link based on customer having domains
+    if (!empty($showDomains)) {
+        $nav[] = ['route' => 'portal.domains.index', 'label' => 'Domains'];
+    }
+
+    // Always show Shop (if products are visible to customer)
+    if (!isset($showShop) || $showShop) {
+        $nav[] = ['route' => 'portal.shop.index', 'label' => 'Shop'];
+    }
+
+    // Conditionally show Projects if customer has active projects
     $hasActiveProjects = \App\Models\Project::where('company_id', auth()->user()->company_id)
         ->where('status', '!=', 'Completed')
         ->exists();
 
     if ($hasActiveProjects) {
-        array_splice($nav, 5, 0, [['route' => 'portal.projects.index', 'label' => 'Projects']]);
+        $nav[] = ['route' => 'portal.projects.index', 'label' => 'Projects'];
     }
+
+    // Always show Help
+    $nav[] = ['route' => 'portal.knowledgebase.index', 'label' => 'Help'];
 @endphp
 
 <header class="bg-slate-950 sticky top-0 z-40">

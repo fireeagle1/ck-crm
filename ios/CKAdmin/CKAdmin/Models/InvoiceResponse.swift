@@ -3,7 +3,7 @@ import Foundation
 // MARK: - Invoice List Item
 
 /// An invoice record as returned in the paginated list endpoint.
-struct InvoiceListItem: Decodable, Identifiable {
+struct InvoiceListItem: Identifiable {
     let invoiceId: Int
     let invoiceStatus: String
     let invoiceAmount: Double
@@ -27,6 +27,32 @@ struct InvoiceListItem: Decodable, Identifiable {
         formatter.locale = Locale(identifier: "en_US_POSIX")
         return formatter
     }()
+}
+
+extension InvoiceListItem: Decodable {
+    enum CodingKeys: String, CodingKey {
+        case invoiceId, invoiceStatus, invoiceAmount, invoiceDate, dueDate, paidDate, customerName
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        invoiceId = try container.decode(Int.self, forKey: .invoiceId)
+        invoiceStatus = try container.decode(String.self, forKey: .invoiceStatus)
+        invoiceDate = try container.decode(String.self, forKey: .invoiceDate)
+        dueDate = try container.decode(String.self, forKey: .dueDate)
+        paidDate = try container.decodeIfPresent(String.self, forKey: .paidDate)
+        customerName = try container.decodeIfPresent(String.self, forKey: .customerName)
+
+        // Handle invoice_amount as either a number or a string (Laravel decimal cast returns string)
+        if let amount = try? container.decode(Double.self, forKey: .invoiceAmount) {
+            invoiceAmount = amount
+        } else if let amountString = try? container.decode(String.self, forKey: .invoiceAmount),
+                  let amount = Double(amountString) {
+            invoiceAmount = amount
+        } else {
+            invoiceAmount = 0
+        }
+    }
 }
 
 // MARK: - Invoice Status Filter

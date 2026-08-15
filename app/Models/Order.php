@@ -20,6 +20,13 @@ class Order extends Model
         'total_amount',
         'admin_notes',
         'fulfilled_at',
+        'delivery_address_line1',
+        'delivery_address_line2',
+        'delivery_city',
+        'delivery_state',
+        'delivery_postal_code',
+        'delivery_country',
+        'invoice_pdf_path',
     ];
 
     protected $casts = [
