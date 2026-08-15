@@ -46,6 +46,12 @@ struct ContentView: View {
             }
             .tabItem { Label("Invoices", systemImage: "doc.text") }
             .tag(4)
+
+            NavigationStack {
+                ShopHubView(apiClient: apiClient)
+            }
+            .tabItem { Label("Shop", systemImage: "bag") }
+            .tag(5)
         }
         .confirmationDialog(
             "Are you sure you want to log out?",

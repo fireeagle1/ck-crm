@@ -2,11 +2,14 @@
 
 use App\Http\Controllers\Api\Admin\AssetController;
 use App\Http\Controllers\Api\Admin\AuthController;
+use App\Http\Controllers\Api\Admin\BookingController;
 use App\Http\Controllers\Api\Admin\CustomerController;
 use App\Http\Controllers\Api\Admin\DashboardController;
 use App\Http\Controllers\Api\Admin\DeviceTokenController;
 use App\Http\Controllers\Api\Admin\InvoiceController;
 use App\Http\Controllers\Api\Admin\ServiceController;
+use App\Http\Controllers\Api\Admin\ShopOrderController;
+use App\Http\Controllers\Api\Admin\ShopProductController;
 use App\Http\Controllers\Api\Admin\TicketController;
 use App\Http\Middleware\EnsureIsAdmin;
 use Illuminate\Support\Facades\Route;
@@ -44,6 +47,16 @@ Route::prefix('admin')->group(function () {
         Route::get('/invoices', [InvoiceController::class, 'index']);
         Route::post('/invoices', [InvoiceController::class, 'store']);
         Route::post('/invoices/{invoice}/remind', [InvoiceController::class, 'remind']);
+
+        // Shop — Orders (read-only)
+        Route::get('/shop/orders', [ShopOrderController::class, 'index']);
+        Route::get('/shop/orders/{order}', [ShopOrderController::class, 'show']);
+
+        // Shop — Products (read-only)
+        Route::get('/shop/products', [ShopProductController::class, 'index']);
+
+        // Shop — Rentals/Bookings (read-only)
+        Route::get('/shop/rentals', [BookingController::class, 'index']);
 
         // Device tokens (push notifications)
         Route::post('/device-tokens', [DeviceTokenController::class, 'store']);
