@@ -64,11 +64,11 @@
 
             {{-- Cart icon --}}
             <a href="{{ route('portal.cart.index') }}" class="relative p-2 text-gray-300 hover:text-white transition" title="View Cart">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z"/>
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z"/>
                 </svg>
                 @if ($cartItemCount > 0)
-                    <span class="absolute -top-0.5 -right-0.5 inline-flex items-center justify-center h-5 min-w-[1.25rem] px-1 rounded-full bg-blue-600 text-white text-xs font-bold">
+                    <span class="absolute top-0 right-0 inline-flex items-center justify-center h-4 min-w-[1rem] px-1 rounded-full bg-red-500 text-white text-[10px] font-bold leading-none ring-2 ring-slate-950">
                         {{ $cartItemCount }}
                     </span>
                 @endif
@@ -108,11 +108,11 @@
             <div class="md:hidden flex items-center gap-2" x-data="{ mobileOpen: false }">
                 {{-- Mobile cart icon --}}
                 <a href="{{ route('portal.cart.index') }}" class="relative p-2 text-gray-300 hover:text-white transition" title="View Cart">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z"/>
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z"/>
                     </svg>
                     @if ($cartItemCount > 0)
-                        <span class="absolute -top-0.5 -right-0.5 inline-flex items-center justify-center h-4 min-w-[1rem] px-0.5 rounded-full bg-blue-600 text-white text-[10px] font-bold">
+                        <span class="absolute top-0 right-0 inline-flex items-center justify-center h-4 min-w-[1rem] px-0.5 rounded-full bg-red-500 text-white text-[10px] font-bold leading-none ring-2 ring-slate-950">
                             {{ $cartItemCount }}
                         </span>
                     @endif
