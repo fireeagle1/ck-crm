@@ -219,6 +219,7 @@ Route::middleware(['auth', 'verified', EnsureIsAdmin::class])->prefix('admin')->
     Route::get('shop/orders/{order}/download-pdf', [Admin\ShopOrderController::class, 'downloadPdf'])->name('shop.orders.download-pdf');
     Route::post('shop/orders/{order}/mark-paid-offline', [Admin\ShopOrderController::class, 'markPaidOffline'])->name('shop.orders.mark-paid-offline');
     Route::post('shop/orders/{order}/cancel', [Admin\ShopOrderController::class, 'cancel'])->name('shop.orders.cancel');
+    Route::post('shop/orders/{order}/refund', [Admin\ShopOrderController::class, 'refund'])->name('shop.orders.refund');
 
     // Bookings Management
     Route::get('shop/bookings', [Admin\BookingController::class, 'index'])->name('shop.bookings.index');
@@ -230,6 +231,9 @@ Route::middleware(['auth', 'verified', EnsureIsAdmin::class])->prefix('admin')->
     Route::patch('shop/bookings/{booking}/returned', [Admin\BookingController::class, 'markReturned'])->name('shop.bookings.markReturned');
 
     Route::resource('shop/tiers', Admin\CustomerTierController::class)->except(['show', 'edit', 'create'])->names('shop.tiers');
+
+    // Discount Codes Management
+    Route::resource('shop/discount-codes', Admin\DiscountCodeController::class)->except(['show'])->names('shop.discount-codes');
 });
 
 /*
