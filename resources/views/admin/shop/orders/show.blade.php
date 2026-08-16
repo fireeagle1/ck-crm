@@ -82,6 +82,34 @@
                             <span class="text-gray-500 font-medium">Stripe Payment Intent</span>
                             <span><code class="text-xs bg-gray-100 px-1.5 py-0.5 rounded text-gray-700">{{ $order->stripe_payment_intent_id }}</code></span>
                         @endif
+
+                        @if ($order->delivery_method)
+                            <span class="text-gray-500 font-medium">Delivery Method</span>
+                            <span class="text-gray-900 capitalize">{{ $order->delivery_method }}</span>
+                        @endif
+
+                        @if ($order->delivery_charge > 0)
+                            <span class="text-gray-500 font-medium">Delivery Charge</span>
+                            <span class="text-gray-900">&pound;{{ number_format($order->delivery_charge, 2) }}</span>
+                        @endif
+
+                        @if ($order->discount_code)
+                            <span class="text-gray-500 font-medium">Discount Code</span>
+                            <span>
+                                <code class="text-xs bg-purple-100 px-1.5 py-0.5 rounded text-purple-700">{{ $order->discount_code }}</code>
+                                <span class="text-green-700 text-xs font-medium ml-1">-&pound;{{ number_format($order->discount_amount, 2) }}</span>
+                            </span>
+                        @endif
+
+                        @if ($order->refund_amount > 0)
+                            <span class="text-gray-500 font-medium">Refunded</span>
+                            <span>
+                                <span class="text-red-700 font-semibold">&pound;{{ number_format($order->refund_amount, 2) }}</span>
+                                <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ml-1 {{ $order->refund_status === 'full' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700' }}">
+                                    {{ ucfirst($order->refund_status) }}
+                                </span>
+                            </span>
+                        @endif
                     </div>
                 </div>
             </div>
