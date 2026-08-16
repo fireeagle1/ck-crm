@@ -32,6 +32,9 @@ Schedule::command('app:purge-webhook-events')->dailyAt('02:00');
 // Notify admin about rental bookings that have ended — daily at 8am
 Schedule::command('app:notify-rental-ended')->dailyAt('08:00');
 
+// Remind customers whose rental ends tomorrow — daily at 9am
+Schedule::command('app:notify-rental-ending-soon')->dailyAt('09:00');
+
 // Reset low-stock notification flags for restocked products — hourly
 Schedule::command('app:reset-low-stock-flags')->hourly();
 

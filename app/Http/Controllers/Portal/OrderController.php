@@ -51,4 +51,27 @@ class OrderController extends Controller
             'invoice-order-' . $order->id . '.pdf'
         );
     }
+
+    /**
+     * Download the booking confirmation PDF.
+     * Only allows download if the booking belongs to the authenticated customer.
+     */
+    public function downloadBookingConfirmation(Request $request, \App\Models\Booking $booking): StreamedResponse|RedirectResponse
+    {
+        abort_unless($booking->company_id === $request->user()->company_id, 404);
+
+        // Generate on-the-fly if not already generated
+        if (!$booking->confirmation_pdf_path || !Storage::disk('local')->exists($booking->confirmation_pdf_path)) {
+            $path = app(\App\Services\BookingConfirmationPdfService::class)->generate($booking);
+            if (!$path) {
+                return redirect()->back()->with('error', 'Unable to generate booking confirmation.');
+            }
+            $booking->refresh();
+        }
+
+        return Storage::disk('local')->download(
+            $booking->confirmation_pdf_path,
+            'booking-confirmation-' . $booking->id . '.pdf'
+        );
+    }
 }

@@ -140,6 +140,14 @@ class CheckoutService
             // Notify admin of new order (outside transaction so order is persisted)
             $this->notificationService->notifyAdminNewOrder($order);
 
+            // Send booking confirmed emails for any rental items (outside transaction)
+            $order->loadMissing('items.booking');
+            foreach ($order->items as $item) {
+                if ($item->booking) {
+                    $this->notificationService->notifyCustomerBookingConfirmed($item->booking);
+                }
+            }
+
             // Clear cart on successful checkout
             $cart->clear();
 

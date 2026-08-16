@@ -229,6 +229,25 @@ class BookingController extends Controller
     }
 
     /**
+     * Download the booking confirmation PDF.
+     */
+    public function downloadConfirmation(Booking $booking): \Symfony\Component\HttpFoundation\StreamedResponse|\Illuminate\Http\RedirectResponse
+    {
+        // Generate on-the-fly if not already generated
+        if (!$booking->confirmation_pdf_path || !\Illuminate\Support\Facades\Storage::disk('local')->exists($booking->confirmation_pdf_path)) {
+            $path = app(\App\Services\BookingConfirmationPdfService::class)->generate($booking);
+            if (!$path) {
+                return redirect()->back()->with('error', 'Unable to generate booking confirmation PDF.');
+            }
+        }
+
+        return \Illuminate\Support\Facades\Storage::disk('local')->download(
+            $booking->confirmation_pdf_path,
+            'booking-confirmation-' . $booking->id . '.pdf'
+        );
+    }
+
+    /**
      * Display the calendar/grid view of rental bookings.
      */
     public function calendar(Request $request): View

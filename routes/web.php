@@ -89,6 +89,7 @@ Route::middleware(['auth', 'verified'])->prefix('portal')->name('portal.')->grou
     Route::get('/orders', [Portal\OrderController::class, 'index'])->name('orders.index');
     Route::get('/orders/{order}', [Portal\OrderController::class, 'show'])->name('orders.show');
     Route::get('/orders/{order}/download-invoice', [Portal\OrderController::class, 'downloadInvoice'])->name('orders.downloadInvoice');
+    Route::get('/orders/booking/{booking}/download-confirmation', [Portal\OrderController::class, 'downloadBookingConfirmation'])->name('orders.downloadBookingConfirmation');
 
     // Bookings (AJAX availability endpoints)
     Route::post('/bookings/check-availability', [Portal\BookingController::class, 'checkAvailability'])->name('bookings.checkAvailability');
@@ -238,6 +239,7 @@ Route::middleware(['auth', 'verified', EnsureIsAdmin::class])->prefix('admin')->
     Route::delete('shop/bookings/{booking}/block', [Admin\BookingController::class, 'deleteBlock'])->name('shop.bookings.deleteBlock');
     Route::get('shop/bookings/{booking}', [Admin\BookingController::class, 'show'])->name('shop.bookings.show');
     Route::patch('shop/bookings/{booking}/returned', [Admin\BookingController::class, 'markReturned'])->name('shop.bookings.markReturned');
+    Route::get('shop/bookings/{booking}/download-confirmation', [Admin\BookingController::class, 'downloadConfirmation'])->name('shop.bookings.downloadConfirmation');
 
     Route::resource('shop/tiers', Admin\CustomerTierController::class)->except(['show', 'edit', 'create'])->names('shop.tiers');
 

@@ -202,17 +202,38 @@ struct QRCameraPreview: UIViewControllerRepresentable {
 class QRCameraViewController: UIViewController, AVCaptureMetadataOutputObjectsDelegate {
     var onCodeScanned: ((String) -> Void)?
     private var captureSession: AVCaptureSession?
+    private var previewLayer: AVCaptureVideoPreviewLayer?
     private var hasScanned = false
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupCamera()
+        view.backgroundColor = .black
+
+        // Check camera permission
+        switch AVCaptureDevice.authorizationStatus(for: .video) {
+        case .authorized:
+            setupCamera()
+        case .notDetermined:
+            AVCaptureDevice.requestAccess(for: .video) { [weak self] granted in
+                if granted {
+                    DispatchQueue.main.async { self?.setupCamera() }
+                }
+            }
+        default:
+            break
+        }
+    }
+
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        previewLayer?.frame = view.bounds
     }
 
     private func setupCamera() {
         let session = AVCaptureSession()
+        session.sessionPreset = .high
 
-        guard let device = AVCaptureDevice.default(for: .video),
+        guard let device = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back),
               let input = try? AVCaptureDeviceInput(device: device) else {
             return
         }
@@ -228,10 +249,11 @@ class QRCameraViewController: UIViewController, AVCaptureMetadataOutputObjectsDe
             output.metadataObjectTypes = [.qr]
         }
 
-        let previewLayer = AVCaptureVideoPreviewLayer(session: session)
-        previewLayer.frame = view.bounds
-        previewLayer.videoGravity = .resizeAspectFill
-        view.layer.addSublayer(previewLayer)
+        let layer = AVCaptureVideoPreviewLayer(session: session)
+        layer.frame = view.bounds
+        layer.videoGravity = .resizeAspectFill
+        view.layer.addSublayer(layer)
+        previewLayer = layer
 
         captureSession = session
 
@@ -247,7 +269,6 @@ class QRCameraViewController: UIViewController, AVCaptureMetadataOutputObjectsDe
 
         hasScanned = true
 
-        // Haptic feedback
         let generator = UIImpactFeedbackGenerator(style: .medium)
         generator.impactOccurred()
 

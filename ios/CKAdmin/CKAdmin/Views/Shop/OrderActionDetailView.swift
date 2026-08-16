@@ -12,6 +12,8 @@ struct OrderActionDetailView: View {
     @State private var noteText = ""
     @State private var showInspectionSheet = false
     @State private var inspectionBookingId: Int?
+    @State private var showPackingScanSheet = false
+    @State private var packingBookingId: Int?
 
     private let apiClient: APIClient
     private let orderId: Int
@@ -40,6 +42,14 @@ struct OrderActionDetailView: View {
             if let bookingId = inspectionBookingId {
                 InspectionUploadView(apiClient: apiClient, orderId: orderId, bookingId: bookingId) {
                     showInspectionSheet = false
+                    Task { await loadOrder() }
+                }
+            }
+        }
+        .sheet(isPresented: $showPackingScanSheet) {
+            if let bookingId = packingBookingId {
+                PackingScanView(apiClient: apiClient, orderId: orderId, bookingId: bookingId) {
+                    showPackingScanSheet = false
                     Task { await loadOrder() }
                 }
             }
@@ -205,6 +215,22 @@ struct OrderActionDetailView: View {
                     } label: {
                         Label("Return Inspection (Photos)", systemImage: "camera")
                     }
+                } else if ["packing", "ready"].contains(nextStage) {
+                    // Packing stage — show scan-to-pack button
+                    Button {
+                        packingBookingId = booking.id
+                        showPackingScanSheet = true
+                    } label: {
+                        Label("Scan Items to Pack", systemImage: "qrcode.viewfinder")
+                    }
+
+                    Button {
+                        Task { await advanceStage(orderId: orderId, bookingId: booking.id) }
+                    } label: {
+                        Label("Advance to \(nextStage.replacingOccurrences(of: "_", with: " ").capitalized)",
+                              systemImage: "arrow.right.circle")
+                    }
+                    .disabled(isPerformingAction)
                 } else {
                     Button {
                         Task { await advanceStage(orderId: orderId, bookingId: booking.id) }

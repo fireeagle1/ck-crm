@@ -81,6 +81,60 @@ class NotificationService
     }
 
     /**
+     * Send booking confirmed email to customer with PDF attached.
+     *
+     * Sent immediately after a rental booking is created via checkout.
+     */
+    public function notifyCustomerBookingConfirmed(Booking $booking): void
+    {
+        $booking->loadMissing(['customer', 'product', 'orderItem.order']);
+        $customerEmail = $booking->customer?->users()->first()?->email;
+
+        if (!$customerEmail) {
+            Log::warning('NotificationService: No customer email for booking confirmed', [
+                'booking_id' => $booking->id,
+            ]);
+            return;
+        }
+
+        try {
+            Mail::to($customerEmail)->queue(new \App\Mail\BookingConfirmed($booking));
+        } catch (\Exception $e) {
+            Log::error('NotificationService: Failed to dispatch booking confirmed email', [
+                'booking_id' => $booking->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    /**
+     * Send "rental ending tomorrow" reminder to customer.
+     *
+     * Dispatched by the scheduled command for bookings ending the next day.
+     */
+    public function notifyCustomerRentalEndingSoon(Booking $booking): void
+    {
+        $booking->loadMissing(['customer', 'product', 'orderItem.order']);
+        $customerEmail = $booking->customer?->users()->first()?->email;
+
+        if (!$customerEmail) {
+            Log::warning('NotificationService: No customer email for rental ending soon', [
+                'booking_id' => $booking->id,
+            ]);
+            return;
+        }
+
+        try {
+            Mail::to($customerEmail)->queue(new \App\Mail\RentalEndingSoon($booking));
+        } catch (\Exception $e) {
+            Log::error('NotificationService: Failed to dispatch rental ending soon email', [
+                'booking_id' => $booking->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    /**
      * Send return confirmation to customer.
      *
      * Dispatches a queued email to the customer confirming the rental
@@ -254,7 +308,7 @@ class NotificationService
      *
      * Dispatches a queued email to the customer with line items,
      * delivery instructions for applicable items, and attaches
-     * the PDF invoice if one has been generated.
+     * the PDF invoice and any booking confirmation PDFs.
      *
      * Requirements 18.3, 21.1, 21.2
      */
@@ -279,6 +333,18 @@ class NotificationService
                     'as' => 'invoice-' . $order->id . '.pdf',
                     'mime' => 'application/pdf',
                 ]);
+            }
+
+            // Attach booking confirmation PDFs for any rental items
+            $order->loadMissing('items.booking');
+            foreach ($order->items as $item) {
+                if ($item->booking && $item->booking->confirmation_pdf_path
+                    && file_exists(storage_path('app/' . $item->booking->confirmation_pdf_path))) {
+                    $mailable->attach(storage_path('app/' . $item->booking->confirmation_pdf_path), [
+                        'as' => 'booking-confirmation-' . $item->booking->id . '.pdf',
+                        'mime' => 'application/pdf',
+                    ]);
+                }
             }
 
             Mail::to($customerEmail)->queue($mailable);
