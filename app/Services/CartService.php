@@ -150,9 +150,16 @@ class CartService
             );
         }
 
-        $maxAvailable = $product->track_individual_assets
-            ? $product->assets()->whereIn('asset_status', ['Available', 'Reserved', 'Rented Out'])->count()
-            : $product->stock_quantity;
+        $maxAvailable = null;
+        $linkedAssetCount = $product->assets()->count();
+        if ($linkedAssetCount > 0) {
+            // Product has CMDB assets — use rentable asset count as limit
+            $maxAvailable = $product->assets()
+                ->whereIn('asset_status', ['Available', 'Reserved', 'Rented Out'])
+                ->count();
+        } else {
+            $maxAvailable = $product->stock_quantity;
+        }
 
         if ($maxAvailable !== null && $quantity > $maxAvailable) {
             throw new InvalidArgumentException(

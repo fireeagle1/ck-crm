@@ -77,10 +77,16 @@ class ShopController extends Controller
             $viewData['rentalAgreementText'] = $product->rental_agreement_text;
             $viewData['deliveryInstructions'] = $product->delivery_instructions;
 
-            // Max quantity = available assets (tracked) or stock_quantity (manual)
-            $maxQuantity = $product->track_individual_assets
-                ? $product->assets()->whereIn('asset_status', ['Available', 'Reserved', 'Rented Out'])->count()
-                : ($product->stock_quantity ?? 99);
+            // Max quantity = count of linked assets if any exist, otherwise stock_quantity
+            $linkedAssetCount = $product->assets()->count();
+            if ($linkedAssetCount > 0) {
+                // Product has CMDB assets linked — use total rentable assets as the cap
+                $maxQuantity = $product->assets()
+                    ->whereIn('asset_status', ['Available', 'Reserved', 'Rented Out'])
+                    ->count();
+            } else {
+                $maxQuantity = $product->stock_quantity ?? 99;
+            }
             $viewData['maxQuantity'] = max(1, (int) $maxQuantity);
         }
 

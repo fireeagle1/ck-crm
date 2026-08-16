@@ -18,6 +18,7 @@
     $adminNavShop = [
         ['route' => 'admin.shop.products.index', 'label' => 'Products'],
         ['route' => 'admin.shop.tiers.index', 'label' => 'Customer Tiers'],
+        ['route' => 'admin.shop.discount-codes.index', 'label' => 'Discount Codes'],
         ['route' => 'admin.shop.orders.index', 'label' => 'Orders'],
         ['route' => 'admin.shop.bookings.index', 'label' => 'Bookings'],
         ['route' => 'admin.fulfilment.index', 'label' => 'Fulfilment Queue'],

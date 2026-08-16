@@ -50,11 +50,16 @@ class BookingService
      */
     public function getUnavailableDates(Product $product, Carbon $rangeStart, Carbon $rangeEnd): Collection
     {
-        $stockQuantity = $product->track_individual_assets
-            ? $product->assets()->whereIn('asset_status', ['Available', 'Reserved', 'Rented Out'])->count()
-            : $product->stock_quantity;
+        $linkedAssetCount = $product->assets()->count();
+        if ($linkedAssetCount > 0) {
+            $stockQuantity = $product->assets()
+                ->whereIn('asset_status', ['Available', 'Reserved', 'Rented Out'])
+                ->count();
+        } else {
+            $stockQuantity = $product->stock_quantity;
+        }
 
-        // If stock is unlimited (null), no dates are unavailable
+        // If stock is unlimited (null and no linked assets), no dates are unavailable
         if ($stockQuantity === null) {
             return collect();
         }

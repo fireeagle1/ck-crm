@@ -105,13 +105,15 @@ class AvailabilityService
     /**
      * Get the effective stock quantity for a product.
      *
-     * For tracked products: count of all linked assets that are in a rentable state
+     * If the product has linked CMDB assets, uses the count of rentable assets
      * (Available, Reserved, Rented Out — i.e. not Decommissioned or In Repair).
-     * For non-tracked products: use the manual stock_quantity field.
+     * If no assets are linked, falls back to the manual stock_quantity field.
      */
     private function getEffectiveStock(Product $product): ?int
     {
-        if ($product->track_individual_assets) {
+        $linkedAssetCount = $product->assets()->count();
+
+        if ($linkedAssetCount > 0) {
             return $product->assets()
                 ->whereIn('asset_status', ['Available', 'Reserved', 'Rented Out'])
                 ->count();

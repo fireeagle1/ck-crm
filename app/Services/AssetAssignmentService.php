@@ -24,7 +24,12 @@ class AssetAssignmentService
         $booking->loadMissing('product');
         $product = $booking->product;
 
-        if (!$product || !$product->track_individual_assets) {
+        if (!$product) {
+            return 0;
+        }
+
+        // Only auto-assign if this product has linked assets in the CMDB
+        if ($product->assets()->count() === 0) {
             return 0;
         }
 
