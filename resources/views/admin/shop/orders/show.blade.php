@@ -237,29 +237,33 @@
                             </div>
                         </div>
 
-                        {{-- Asset Assignment (ordered/packing stages) --}}
+                        {{-- Asset Assignment (ordered/packing stages — override/add more) --}}
                         @if (in_array($booking->fulfilment_stage, ['ordered', 'packing']))
                             @if ($availableAssets->isNotEmpty())
-                                <div class="border rounded-lg p-4 bg-blue-50">
-                                    <h3 class="text-sm font-semibold text-blue-800 mb-2">Assign Assets</h3>
-                                    <form method="POST" action="{{ route('admin.shop.orders.assign-assets', [$order, $booking]) }}">
-                                        @csrf
-                                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-40 overflow-y-auto mb-3">
-                                            @foreach ($availableAssets as $asset)
-                                                <label class="flex items-center gap-2 text-sm bg-white p-2 rounded border cursor-pointer hover:border-blue-400">
-                                                    <input type="checkbox" name="asset_ids[]" value="{{ $asset->device_id }}" class="rounded border-gray-300 text-blue-600">
-                                                    <span class="font-medium">{{ $asset->device_name }}</span>
-                                                    @if ($asset->serial_number)
-                                                        <span class="text-xs text-gray-500">({{ $asset->serial_number }})</span>
-                                                    @endif
-                                                </label>
-                                            @endforeach
-                                        </div>
-                                        <button type="submit" class="inline-flex items-center px-3 py-1.5 bg-blue-600 text-white rounded text-sm font-medium hover:bg-blue-700">
-                                            Assign Selected
-                                        </button>
-                                    </form>
-                                </div>
+                                <details class="border rounded-lg bg-blue-50" {{ $booking->assignedAssets->isEmpty() ? 'open' : '' }}>
+                                    <summary class="px-4 py-2 cursor-pointer text-sm font-semibold text-blue-800 hover:bg-blue-100">
+                                        {{ $booking->assignedAssets->isEmpty() ? 'Assign Assets' : 'Assign Additional Assets' }}
+                                    </summary>
+                                    <div class="p-4 pt-2">
+                                        <form method="POST" action="{{ route('admin.shop.orders.assign-assets', [$order, $booking]) }}">
+                                            @csrf
+                                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-40 overflow-y-auto mb-3">
+                                                @foreach ($availableAssets as $asset)
+                                                    <label class="flex items-center gap-2 text-sm bg-white p-2 rounded border cursor-pointer hover:border-blue-400">
+                                                        <input type="checkbox" name="asset_ids[]" value="{{ $asset->device_id }}" class="rounded border-gray-300 text-blue-600">
+                                                        <span class="font-medium">{{ $asset->device_name }}</span>
+                                                        @if ($asset->serial_number)
+                                                            <span class="text-xs text-gray-500">({{ $asset->serial_number }})</span>
+                                                        @endif
+                                                    </label>
+                                                @endforeach
+                                            </div>
+                                            <button type="submit" class="inline-flex items-center px-3 py-1.5 bg-blue-600 text-white rounded text-sm font-medium hover:bg-blue-700">
+                                                Assign Selected
+                                            </button>
+                                        </form>
+                                    </div>
+                                </details>
                             @elseif ($booking->assignedAssets->isEmpty())
                                 <div class="border rounded-lg p-3 bg-yellow-50 text-sm text-yellow-700">
                                     No available assets linked to this product. <a href="{{ route('admin.assets.create') }}" class="underline">Create one</a> or link existing assets from the product page.

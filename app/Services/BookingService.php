@@ -41,13 +41,18 @@ class BookingService
 
     /**
      * Get unavailable dates for a product within a date range.
-     * A date is unavailable when booked_units >= stock_quantity OR falls in cooldown.
+     * A date is unavailable when booked_units >= effective stock OR falls in cooldown.
+     *
+     * For tracked products, effective stock = count of non-decommissioned/non-repair assets.
+     * For non-tracked products, uses stock_quantity.
      *
      * @return Collection<int, Carbon> dates that are fully booked or in cooldown
      */
     public function getUnavailableDates(Product $product, Carbon $rangeStart, Carbon $rangeEnd): Collection
     {
-        $stockQuantity = $product->stock_quantity;
+        $stockQuantity = $product->track_individual_assets
+            ? $product->assets()->whereIn('asset_status', ['Available', 'Reserved', 'Rented Out'])->count()
+            : $product->stock_quantity;
 
         // If stock is unlimited (null), no dates are unavailable
         if ($stockQuantity === null) {

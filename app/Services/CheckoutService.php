@@ -19,6 +19,7 @@ class CheckoutService
         private StripeService $stripe,
         private BookingService $bookingService,
         private NotificationService $notificationService,
+        private AssetAssignmentService $assetAssignmentService,
     ) {}
 
     /**
@@ -421,6 +422,9 @@ class CheckoutService
                 $signatureData,
                 $agreementText
             );
+
+            // Auto-assign assets from CMDB pool if product tracks individual assets
+            $this->assetAssignmentService->autoAssign($booking);
 
             $orderItem->update(['booking_id' => $booking->id]);
         }

@@ -68,11 +68,16 @@ class AvailabilityService
 
     /**
      * Determine if the requested quantity is available for every day in the range.
-     * A date is available if (stock_quantity - booked_units_on_that_date) >= requested quantity.
+     * A date is available if (total_units - booked_units_on_that_date) >= requested quantity.
+     *
+     * For products with track_individual_assets=true, total_units is derived from
+     * the count of linked CMDB assets with status 'Available' or 'Reserved'/'Rented Out'
+     * (i.e. total linked non-decommissioned/non-repair assets).
+     * For other products, uses the manual stock_quantity field.
      */
     public function isAvailable(Product $product, Carbon $startDate, Carbon $endDate, int $quantity): bool
     {
-        $stockQuantity = $product->stock_quantity;
+        $stockQuantity = $this->getEffectiveStock($product);
 
         // If stock is null (unlimited), always available
         if ($stockQuantity === null) {
@@ -95,5 +100,23 @@ class AvailabilityService
         }
 
         return true;
+    }
+
+    /**
+     * Get the effective stock quantity for a product.
+     *
+     * For tracked products: count of all linked assets that are in a rentable state
+     * (Available, Reserved, Rented Out — i.e. not Decommissioned or In Repair).
+     * For non-tracked products: use the manual stock_quantity field.
+     */
+    private function getEffectiveStock(Product $product): ?int
+    {
+        if ($product->track_individual_assets) {
+            return $product->assets()
+                ->whereIn('asset_status', ['Available', 'Reserved', 'Rented Out'])
+                ->count();
+        }
+
+        return $product->stock_quantity;
     }
 }
