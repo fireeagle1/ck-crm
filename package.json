@@ -18,6 +18,7 @@
     },
     "dependencies": {
         "flatpickr": "^4.6.13",
+        "quill": "^2.0.3",
         "signature_pad": "^5.1.4"
     }
 }

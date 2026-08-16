@@ -54,8 +54,8 @@
                 </div>
 
                 {{-- Description --}}
-                <div class="text-sm text-gray-600 leading-relaxed mb-6 flex-1">
-                    {!! nl2br(e($product->description)) !!}
+                <div class="text-sm text-gray-600 leading-relaxed mb-6 flex-1 prose prose-sm max-w-none">
+                    {!! $product->description !!}
                 </div>
 
                 {{-- Delivery instructions --}}

@@ -88,7 +88,7 @@
                                 {{ str_replace('_', ' ', ucfirst($product->product_type)) }}
                             </span>
                         </div>
-                        <p class="text-sm text-gray-500 mb-3 line-clamp-2 flex-1">{{ Str::limit($product->description, 100) }}</p>
+                        <p class="text-sm text-gray-500 mb-3 line-clamp-2 flex-1">{{ Str::limit(strip_tags($product->description), 100) }}</p>
                         <div class="flex items-center justify-between mt-auto">
                             <p class="font-bold text-gray-900">
                                 &pound;{{ number_format($product->price, 2) }}

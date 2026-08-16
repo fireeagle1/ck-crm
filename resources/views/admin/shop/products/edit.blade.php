@@ -28,9 +28,8 @@
 
                 {{-- Description --}}
                 <div>
-                    <label for="description" class="block text-sm font-semibold text-gray-700">Description <span class="text-red-500">*</span></label>
-                    <textarea name="description" id="description" rows="4" required
-                              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">{{ old('description', $product->description) }}</textarea>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Description <span class="text-red-500">*</span></label>
+                    <x-rich-text-editor name="description" :value="old('description', $product->description)" placeholder="Describe the product..." :required="true" />
                     @error('description') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
                 </div>
 
@@ -117,10 +116,8 @@
 
                     {{-- Rental Agreement Text --}}
                     <div>
-                        <label for="rental_agreement_text" class="block text-sm font-semibold text-gray-700">Rental Agreement Text</label>
-                        <textarea name="rental_agreement_text" id="rental_agreement_text" rows="6"
-                                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                                  placeholder="Enter the rental agreement terms customers must accept...">{{ old('rental_agreement_text', $product->rental_agreement_text) }}</textarea>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Rental Agreement Text</label>
+                        <x-rich-text-editor name="rental_agreement_text" :value="old('rental_agreement_text', $product->rental_agreement_text)" placeholder="Enter the rental agreement terms customers must accept..." />
                         <p class="text-xs text-gray-400 mt-1">If provided, customers must accept these terms before completing a rental booking.</p>
                         @error('rental_agreement_text') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
                     </div>

@@ -9,6 +9,7 @@ use App\Models\OrderItem;
 use App\Services\FulfilmentService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -151,5 +152,36 @@ class ShopOrderController extends Controller
 
         return redirect()->route('admin.shop.orders.show', $order)
             ->with('success', 'Order marked as paid offline. Invoice PDF will be generated.');
+    }
+
+    /**
+     * Cancel an order. Sets fulfilment_status to 'cancelled', cancels any
+     * associated bookings and pending services. Does NOT handle Stripe refunds.
+     */
+    public function cancel(Order $order): RedirectResponse
+    {
+        if ($order->fulfilment_status === 'cancelled') {
+            return redirect()->route('admin.shop.orders.show', $order)
+                ->with('error', 'This order is already cancelled.');
+        }
+
+        DB::transaction(function () use ($order) {
+            $order->update(['fulfilment_status' => 'cancelled']);
+
+            foreach ($order->items as $item) {
+                // Cancel associated bookings
+                if ($item->booking && in_array($item->booking->status, ['confirmed', 'active'])) {
+                    $item->booking->update(['status' => 'cancelled']);
+                }
+
+                // Cancel pending services
+                if ($item->service && $item->service->status === 'pending') {
+                    $item->service->update(['status' => 'cancelled']);
+                }
+            }
+        });
+
+        return redirect()->route('admin.shop.orders.show', $order)
+            ->with('success', 'Order cancelled. Refunds must be processed manually via Stripe dashboard.');
     }
 }

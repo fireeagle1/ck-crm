@@ -143,43 +143,153 @@ class BookingController extends Controller
         $paymentStatus = $request->boolean('paid_offline') ? 'paid_offline' : 'pending';
         $totalPrice = $this->bookingService->calculateTotal($product, $startDate, $endDate, $quantity);
 
-        // Create Order, OrderItem, and Booking within a single transaction (Req 16.7)
-        DB::transaction(function () use ($validated, $product, $startDate, $endDate, $quantity, $paymentStatus, $totalPrice) {
-            $order = Order::create([
-                'company_id' => $validated['company_id'],
-                'payment_status' => $paymentStatus,
-                'fulfilment_status' => 'completed',
-                'total_amount' => $totalPrice,
-            ]);
+        // Create Order, OrderItem, and Booking within a single transaction with pessimistic lock
+        try {
+            DB::transaction(function () use ($validated, $product, $startDate, $endDate, $quantity, $paymentStatus, $totalPrice) {
+                // Pessimistic lock: prevent concurrent overbookings
+                Booking::forProduct($product->id)
+                    ->where(function ($q) {
+                        $q->where('status', 'confirmed')
+                          ->orWhere('status', 'active');
+                    })
+                    ->overlapping($startDate, $endDate)
+                    ->lockForUpdate()
+                    ->get();
 
-            $orderItem = OrderItem::create([
-                'order_id' => $order->id,
-                'product_id' => $product->id,
-                'product_name' => $product->name,
-                'product_type' => $product->product_type,
-                'price' => $totalPrice,
-                'billing_frequency' => null,
-                'quantity' => $quantity,
-                'rental_start_date' => $startDate,
-                'rental_end_date' => $endDate,
-            ]);
+                // Re-check availability inside the lock
+                if (!$this->availabilityService->isAvailable($product, $startDate, $endDate, $quantity)) {
+                    throw new \InvalidArgumentException('The selected dates are no longer available for the requested quantity.');
+                }
 
-            $booking = Booking::create([
-                'order_item_id' => $orderItem->id,
-                'product_id' => $product->id,
-                'company_id' => $validated['company_id'],
-                'start_date' => $startDate,
-                'end_date' => $endDate,
-                'quantity' => $quantity,
-                'total_price' => $totalPrice,
-                'status' => 'confirmed',
-            ]);
+                $order = Order::create([
+                    'company_id' => $validated['company_id'],
+                    'payment_status' => $paymentStatus,
+                    'fulfilment_status' => 'completed',
+                    'total_amount' => $totalPrice,
+                ]);
 
-            // Link booking to order item
-            $orderItem->update(['booking_id' => $booking->id]);
-        });
+                $orderItem = OrderItem::create([
+                    'order_id' => $order->id,
+                    'product_id' => $product->id,
+                    'product_name' => $product->name,
+                    'product_type' => $product->product_type,
+                    'price' => $totalPrice,
+                    'billing_frequency' => null,
+                    'quantity' => $quantity,
+                    'rental_start_date' => $startDate,
+                    'rental_end_date' => $endDate,
+                ]);
+
+                $booking = Booking::create([
+                    'order_item_id' => $orderItem->id,
+                    'product_id' => $product->id,
+                    'company_id' => $validated['company_id'],
+                    'start_date' => $startDate,
+                    'end_date' => $endDate,
+                    'quantity' => $quantity,
+                    'total_price' => $totalPrice,
+                    'status' => 'confirmed',
+                ]);
+
+                // Link booking to order item
+                $orderItem->update(['booking_id' => $booking->id]);
+            });
+        } catch (\InvalidArgumentException $e) {
+            return redirect()->back()->withInput()->withErrors([
+                'start_date' => $e->getMessage(),
+            ]);
+        }
 
         return redirect()->route('admin.shop.bookings.index')
             ->with('success', 'Booking created successfully.');
+    }
+
+    /**
+     * Display the calendar/grid view of rental bookings.
+     */
+    public function calendar(Request $request): View
+    {
+        $month = $request->input('month', now()->month);
+        $year = $request->input('year', now()->year);
+
+        $startOfMonth = Carbon::createFromDate($year, $month, 1)->startOfMonth();
+        $endOfMonth = $startOfMonth->copy()->endOfMonth();
+
+        $products = Product::where('product_type', 'equipment_rental')
+            ->where('is_archived', false)
+            ->orderBy('name')
+            ->get();
+
+        $bookings = Booking::with('customer')
+            ->whereIn('product_id', $products->pluck('id'))
+            ->where('start_date', '<=', $endOfMonth)
+            ->where('end_date', '>=', $startOfMonth)
+            ->get();
+
+        // Group bookings by product_id
+        $bookingsByProduct = $bookings->groupBy('product_id');
+
+        $daysInMonth = $startOfMonth->daysInMonth;
+
+        return view('admin.shop.bookings.calendar', compact(
+            'products',
+            'bookingsByProduct',
+            'startOfMonth',
+            'endOfMonth',
+            'daysInMonth',
+            'month',
+            'year'
+        ));
+    }
+
+    /**
+     * Block dates for a product (mark as unavailable).
+     */
+    public function blockDates(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'product_id' => 'required|exists:products,id',
+            'start_date' => 'required|date|after_or_equal:today',
+            'end_date' => 'required|date|after_or_equal:start_date',
+            'reason' => 'nullable|string|max:255',
+        ]);
+
+        $product = Product::findOrFail($validated['product_id']);
+        $startDate = Carbon::parse($validated['start_date']);
+        $endDate = Carbon::parse($validated['end_date']);
+
+        // Check for conflicts before blocking
+        $conflicts = Booking::forProduct($product->id)
+            ->where(function ($q) {
+                $q->where('status', 'confirmed')
+                  ->orWhere('status', 'active');
+            })
+            ->overlapping($startDate, $endDate)
+            ->where('company_id', '!=', null) // exclude other blocks
+            ->exists();
+
+        if ($conflicts) {
+            return redirect()->back()->withErrors([
+                'start_date' => 'There are existing bookings in this date range. Cannot block these dates.',
+            ]);
+        }
+
+        DB::transaction(function () use ($product, $startDate, $endDate, $validated) {
+            Booking::create([
+                'order_item_id' => null,
+                'product_id' => $product->id,
+                'company_id' => null,
+                'start_date' => $startDate,
+                'end_date' => $endDate,
+                'quantity' => $product->stock_quantity ?? 1,
+                'total_price' => 0,
+                'status' => 'confirmed',
+            ]);
+        });
+
+        return redirect()->route('admin.shop.bookings.calendar', [
+            'month' => $startDate->month,
+            'year' => $startDate->year,
+        ])->with('success', 'Dates blocked successfully.' . ($validated['reason'] ? ' Reason: ' . $validated['reason'] : ''));
     }
 }

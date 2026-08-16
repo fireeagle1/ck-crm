@@ -11,6 +11,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
+use Mews\Purifier\Facades\Purifier;
 
 class ShopProductController extends Controller
 {
@@ -73,7 +74,7 @@ class ShopProductController extends Controller
 
         $product = Product::create([
             'name' => $validated['name'],
-            'description' => $validated['description'],
+            'description' => Purifier::clean($validated['description']),
             'product_type' => $validated['product_type'],
             'price' => $validated['price'],
             'billing_frequency' => $validated['billing_frequency'] ?? null,
@@ -82,7 +83,7 @@ class ShopProductController extends Controller
             'is_archived' => false,
             'min_rental_days' => $validated['min_rental_days'] ?? null,
             'cooldown_days' => $validated['cooldown_days'] ?? null,
-            'rental_agreement_text' => $validated['rental_agreement_text'] ?? null,
+            'rental_agreement_text' => isset($validated['rental_agreement_text']) ? Purifier::clean($validated['rental_agreement_text']) : null,
             'delivery_instructions' => $validated['delivery_instructions'] ?? null,
             'low_stock_threshold' => $validated['low_stock_threshold'] ?? null,
         ]);
@@ -138,7 +139,7 @@ class ShopProductController extends Controller
 
         $product->update([
             'name' => $validated['name'],
-            'description' => $validated['description'],
+            'description' => Purifier::clean($validated['description']),
             'product_type' => $validated['product_type'],
             'price' => $validated['price'],
             'billing_frequency' => $validated['billing_frequency'] ?? null,
@@ -146,7 +147,7 @@ class ShopProductController extends Controller
             'image_path' => $imagePath,
             'min_rental_days' => $validated['min_rental_days'] ?? null,
             'cooldown_days' => $validated['cooldown_days'] ?? null,
-            'rental_agreement_text' => $validated['rental_agreement_text'] ?? null,
+            'rental_agreement_text' => isset($validated['rental_agreement_text']) ? Purifier::clean($validated['rental_agreement_text']) : null,
             'delivery_instructions' => $validated['delivery_instructions'] ?? null,
             'low_stock_threshold' => $validated['low_stock_threshold'] ?? null,
         ]);

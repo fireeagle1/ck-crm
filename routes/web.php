@@ -218,11 +218,14 @@ Route::middleware(['auth', 'verified', EnsureIsAdmin::class])->prefix('admin')->
     Route::post('shop/orders/{order}/note', [Admin\ShopOrderController::class, 'addNote'])->name('shop.orders.note');
     Route::get('shop/orders/{order}/download-pdf', [Admin\ShopOrderController::class, 'downloadPdf'])->name('shop.orders.download-pdf');
     Route::post('shop/orders/{order}/mark-paid-offline', [Admin\ShopOrderController::class, 'markPaidOffline'])->name('shop.orders.mark-paid-offline');
+    Route::post('shop/orders/{order}/cancel', [Admin\ShopOrderController::class, 'cancel'])->name('shop.orders.cancel');
 
     // Bookings Management
     Route::get('shop/bookings', [Admin\BookingController::class, 'index'])->name('shop.bookings.index');
+    Route::get('shop/bookings/calendar', [Admin\BookingController::class, 'calendar'])->name('shop.bookings.calendar');
     Route::get('shop/bookings/create', [Admin\BookingController::class, 'create'])->name('shop.bookings.create');
     Route::post('shop/bookings', [Admin\BookingController::class, 'store'])->name('shop.bookings.store');
+    Route::post('shop/bookings/block-dates', [Admin\BookingController::class, 'blockDates'])->name('shop.bookings.blockDates');
     Route::get('shop/bookings/{booking}', [Admin\BookingController::class, 'show'])->name('shop.bookings.show');
     Route::patch('shop/bookings/{booking}/returned', [Admin\BookingController::class, 'markReturned'])->name('shop.bookings.markReturned');
 

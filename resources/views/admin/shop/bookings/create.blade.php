@@ -52,7 +52,7 @@
                         <option value="{{ $product->id }}"
                                 data-min-days="{{ $product->min_rental_days }}"
                                 data-price="{{ $product->price }}"
-                                {{ old('product_id') == $product->id ? 'selected' : '' }}>
+                                {{ old('product_id', request('product_id')) == $product->id ? 'selected' : '' }}>
                             {{ $product->name }} (&pound;{{ number_format($product->price, 2) }}/day)
                         </option>
                     @endforeach
@@ -67,7 +67,7 @@
                 <div>
                     <label for="start_date" class="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
                     <input type="date" name="start_date" id="start_date" required
-                           value="{{ old('start_date') }}"
+                           value="{{ old('start_date', request('start_date')) }}"
                            min="{{ now()->format('Y-m-d') }}"
                            class="w-full rounded-md border-gray-300 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500 @error('start_date') border-red-300 @enderror">
                     @error('start_date')

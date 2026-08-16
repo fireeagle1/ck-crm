@@ -1,6 +1,6 @@
 {
   "resources/css/app.css": {
-    "file": "assets/app-B46E5obt.css",
+    "file": "assets/app-DytVNQEZ.css",
     "name": "app",
     "names": [
       "app.css"
@@ -9,9 +9,27 @@
     "isEntry": true
   },
   "resources/js/app.js": {
-    "file": "assets/app-tUMsq8Mz.js",
+    "file": "assets/app-Jo6wGgbq.js",
     "name": "app",
     "src": "resources/js/app.js",
+    "isEntry": true,
+    "css": [
+      "assets/app-DVB7LGv8.css"
+    ]
+  },
+  "resources/js/flatpickr.js": {
+    "file": "assets/flatpickr-BPRRmV0X.js",
+    "name": "flatpickr",
+    "src": "resources/js/flatpickr.js",
+    "isEntry": true,
+    "css": [
+      "assets/flatpickr-CveviJq_.css"
+    ]
+  },
+  "resources/js/signature-pad.js": {
+    "file": "assets/signature-pad-DJa60nUK.js",
+    "name": "signature-pad",
+    "src": "resources/js/signature-pad.js",
     "isEntry": true
   }
 }

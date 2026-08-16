@@ -25,12 +25,14 @@ class Product extends Model
         'cooldown_days',
         'rental_agreement_text',
         'delivery_instructions',
+        'delivery_charge',
         'low_stock_threshold',
         'low_stock_notified',
     ];
 
     protected $casts = [
         'price' => 'decimal:2',
+        'delivery_charge' => 'decimal:2',
         'stock_quantity' => 'integer',
         'is_archived' => 'boolean',
         'min_rental_days' => 'integer',
@@ -84,6 +86,14 @@ class Product extends Model
     public function hasRentalAgreement(): bool
     {
         return !empty($this->rental_agreement_text);
+    }
+
+    /**
+     * Check if the product has a delivery charge configured.
+     */
+    public function hasDeliveryCharge(): bool
+    {
+        return $this->delivery_charge !== null && (float) $this->delivery_charge > 0;
     }
 
     /**

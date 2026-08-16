@@ -26,11 +26,21 @@ class Order extends Model
         'delivery_state',
         'delivery_postal_code',
         'delivery_country',
+        'delivery_method',
+        'delivery_charge',
+        'discount_code',
+        'discount_amount',
+        'refund_amount',
+        'refund_status',
+        'stripe_refund_id',
         'invoice_pdf_path',
     ];
 
     protected $casts = [
         'total_amount' => 'decimal:2',
+        'delivery_charge' => 'decimal:2',
+        'discount_amount' => 'decimal:2',
+        'refund_amount' => 'decimal:2',
         'fulfilled_at' => 'datetime',
     ];
 
