@@ -324,7 +324,7 @@
             <strong>Payment Reference:</strong> {{ $paymentReference }}
         </div>
         <div style="margin-top: 10px; text-align: right;">
-            <img src="https://chart.googleapis.com/chart?chs=80x80&cht=qr&chl={{ urlencode('ORD-' . $order->id) }}&choe=UTF-8" width="80" height="80" alt="QR">
+            <img src="https://quickchart.io/qr?text={{ urlencode('ORD-' . $order->id) }}&size=80" width="80" height="80" alt="QR">
             <div style="font-size: 9px; color: #9ca3af; margin-top: 2px;">ORD-{{ $order->id }}</div>
         </div>
     </div>

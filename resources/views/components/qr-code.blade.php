@@ -1,8 +1,8 @@
 @props(['value', 'size' => 150, 'label' => null])
 
-{{-- QR Code component using Google Charts API (zero dependencies) --}}
+{{-- QR Code component using QuickChart.io API (free, no dependencies, no API key) --}}
 <div class="inline-flex flex-col items-center gap-1">
-    <img src="https://chart.googleapis.com/chart?chs={{ $size }}x{{ $size }}&cht=qr&chl={{ urlencode($value) }}&choe=UTF-8"
+    <img src="https://quickchart.io/qr?text={{ urlencode($value) }}&size={{ $size }}"
          alt="QR: {{ $value }}"
          width="{{ $size }}"
          height="{{ $size }}"

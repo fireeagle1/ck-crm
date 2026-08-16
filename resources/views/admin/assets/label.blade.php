@@ -72,7 +72,7 @@
 </head>
 <body>
     <div class="label">
-        <img src="https://chart.googleapis.com/chart?chs=100x100&cht=qr&chl={{ urlencode('CMDB-' . $asset->device_id) }}&choe=UTF-8"
+        <img src="https://quickchart.io/qr?text={{ urlencode('CMDB-' . $asset->device_id) }}&size=100"
              width="100" height="100" alt="QR: CMDB-{{ $asset->device_id }}">
         <div class="label-info">
             <div class="label-id">CMDB-{{ $asset->device_id }}</div>
