@@ -146,11 +146,12 @@ struct InspectionUploadView: View {
                     }
                 }
             }
-            .fullScreenCover(isPresented: $showCamera) {
+            .sheet(isPresented: $showCamera) {
                 CameraView { image in
                     if let image, selectedPhotos.count < 10 {
                         selectedPhotos.append(image)
                     }
+                    showCamera = false
                 }
             }
             .onChange(of: photoPickerItems) { _, newItems in
@@ -257,8 +258,13 @@ struct CameraView: UIViewControllerRepresentable {
 
     func makeUIViewController(context: Context) -> UIImagePickerController {
         let picker = UIImagePickerController()
-        picker.sourceType = .camera
-        picker.cameraCaptureMode = .photo
+        // Use camera if available, otherwise fall back to photo library
+        if UIImagePickerController.isSourceTypeAvailable(.camera) {
+            picker.sourceType = .camera
+            picker.cameraCaptureMode = .photo
+        } else {
+            picker.sourceType = .photoLibrary
+        }
         picker.delegate = context.coordinator
         picker.allowsEditing = false
         return picker
