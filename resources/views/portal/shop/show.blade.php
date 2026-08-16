@@ -100,6 +100,10 @@
                                                    required readonly>
                                         </div>
                                     </div>
+                                    <p class="text-xs text-gray-500 mt-1">
+                                        <span class="inline-block w-2 h-2 rounded-sm bg-red-200 border border-red-300 mr-0.5"></span>
+                                        Red dates are unavailable (already booked).
+                                    </p>
                                     @if (!empty($minRentalDays))
                                         <p class="text-xs text-gray-500 mt-1">Minimum rental period: {{ $minRentalDays }} {{ Str::plural('day', $minRentalDays) }}</p>
                                     @endif
@@ -201,6 +205,16 @@
     @if ($product->isEquipmentRental())
         @push('styles')
             <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+            <style>
+                .flatpickr-day.flatpickr-disabled,
+                .flatpickr-day.flatpickr-disabled:hover {
+                    background: #fee2e2 !important;
+                    color: #dc2626 !important;
+                    text-decoration: line-through;
+                    border-color: #fecaca !important;
+                    opacity: 1 !important;
+                }
+            </style>
         @endpush
 
         @push('scripts')

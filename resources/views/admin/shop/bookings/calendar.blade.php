@@ -60,7 +60,7 @@
         <span class="inline-flex items-center gap-1"><span class="w-3 h-3 rounded bg-blue-500 inline-block"></span> Active</span>
         <span class="inline-flex items-center gap-1"><span class="w-3 h-3 rounded bg-gray-400 inline-block"></span> Returned</span>
         <span class="inline-flex items-center gap-1"><span class="w-3 h-3 rounded bg-red-500 inline-block"></span> Cancelled</span>
-        <span class="inline-flex items-center gap-1"><span class="w-3 h-3 rounded bg-yellow-600 inline-block"></span> Blocked</span>
+        <span class="inline-flex items-center gap-1"><span class="w-3 h-3 rounded inline-block" style="background: repeating-linear-gradient(45deg, #dc2626, #dc2626 2px, #fca5a5 2px, #fca5a5 4px);"></span> Blocked</span>
     </div>
 
     {{-- Calendar Grid --}}
@@ -118,13 +118,16 @@
                                             'returned' => 'bg-gray-400',
                                             'cancelled' => 'bg-red-500',
                                         ];
-                                        $color = $isBlocked ? 'bg-yellow-600' : ($statusColors[$booking->status] ?? 'bg-gray-400');
+                                        $color = $isBlocked ? '' : ($statusColors[$booking->status] ?? 'bg-gray-400');
                                         $customerName = $isBlocked ? 'BLOCKED' : ($booking->customer?->company_name ?? 'N/A');
                                         $roundStart = $isStart ? 'rounded-l' : '';
                                         $isEnd = $booking->end_date->eq($date);
                                         $roundEnd = $isEnd ? 'rounded-r' : '';
                                     @endphp
                                     <div class="h-5 {{ $color }} {{ $roundStart }} {{ $roundEnd }} opacity-90 hover:opacity-100 transition-opacity"
+                                         @if($isBlocked)
+                                             style="background: repeating-linear-gradient(45deg, #dc2626, #dc2626 2px, #fca5a5 2px, #fca5a5 4px);"
+                                         @endif
                                          title="{{ $customerName }} | {{ $booking->start_date->format('d M') }} - {{ $booking->end_date->format('d M') }} ({{ ucfirst($booking->status) }})"
                                          @if(!$isBlocked)
                                              onclick="window.location.href='{{ route('admin.shop.bookings.show', $booking) }}'"
