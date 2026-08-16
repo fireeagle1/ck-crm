@@ -117,6 +117,9 @@ class ShopProductController extends Controller
             $availableAssetCount = $product->getAvailableAssetCount();
         }
 
+        // Fetch Stripe prices for hosting products
+        $stripePrices = $this->fetchStripePrices();
+
         return view('admin.shop.products.edit', compact(
             'product',
             'customers',
@@ -125,7 +128,8 @@ class ShopProductController extends Controller
             'selectedTierIds',
             'linkedAssets',
             'availableAssetCount',
-            'totalAssetCount'
+            'totalAssetCount',
+            'stripePrices'
         ));
     }
 
@@ -150,6 +154,8 @@ class ShopProductController extends Controller
             'delivery_instructions' => 'nullable|string',
             'delivery_charge' => 'nullable|numeric|min:0',
             'low_stock_threshold' => 'nullable|integer|min:1',
+            'stripe_price_id' => 'nullable|string|max:255',
+            'whm_package' => 'nullable|string|max:255',
         ]);
 
         $imagePath = $product->image_path;
@@ -175,6 +181,8 @@ class ShopProductController extends Controller
             'delivery_instructions' => $validated['delivery_instructions'] ?? null,
             'delivery_charge' => $validated['delivery_charge'] ?? null,
             'low_stock_threshold' => $validated['low_stock_threshold'] ?? null,
+            'stripe_price_id' => $validated['stripe_price_id'] ?? null,
+            'whm_package' => $validated['whm_package'] ?? null,
         ]);
 
         $this->syncVisibility($product, $validated);
@@ -267,5 +275,55 @@ class ShopProductController extends Controller
         } else {
             $visibility->tiers()->detach();
         }
+    }
+
+    /**
+     * Fetch active recurring prices from Stripe for the product form dropdown.
+     */
+    private function fetchStripePrices(): array
+    {
+        $stripePrices = [];
+
+        if (!config('services.stripe.secret')) {
+            return $stripePrices;
+        }
+
+        try {
+            $result = \Stripe\Price::all([
+                'active' => true,
+                'limit' => 100,
+                'expand' => ['data.product'],
+            ]);
+
+            foreach ($result->data as $price) {
+                if (empty($price->recurring)) {
+                    continue;
+                }
+
+                $product = $price->product;
+                $productName = is_object($product) ? ($product->name ?? $price->id) : $price->id;
+                $amount = number_format($price->unit_amount / 100, 2);
+                $interval = $price->recurring->interval;
+                $intervalCount = $price->recurring->interval_count;
+
+                $frequency = match (true) {
+                    $interval === 'month' && $intervalCount === 1 => 'Monthly',
+                    $interval === 'month' && $intervalCount === 3 => 'Quarterly',
+                    $interval === 'year' && $intervalCount === 1 => 'Annually',
+                    default => ucfirst($interval) . 'ly',
+                };
+
+                $stripePrices[] = [
+                    'id' => $price->id,
+                    'label' => "{$productName} — £{$amount}/{$frequency}",
+                ];
+            }
+
+            usort($stripePrices, fn($a, $b) => strcasecmp($a['label'], $b['label']));
+        } catch (\Exception $e) {
+            // Stripe not available — form will show manual input fallback
+        }
+
+        return $stripePrices;
     }
 }

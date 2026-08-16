@@ -541,7 +541,7 @@ class CheckoutService
                 continue;
             }
 
-            $priceId = $item['stripe_price_id'] ?? 'price_hosting_' . $item['product_id'];
+            $priceId = $item['stripe_price_id'] ?? Product::find($item['product_id'])?->stripe_price_id ?? 'price_hosting_' . $item['product_id'];
 
             $metadata = [
                 'product_id' => $item['product_id'],

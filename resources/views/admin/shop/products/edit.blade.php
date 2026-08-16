@@ -68,6 +68,50 @@
                     @error('billing_frequency') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
                 </div>
 
+                {{-- Hosting Integration (Stripe + WHM — shown for hosting only) --}}
+                <div x-show="productType === 'hosting'" x-transition class="border border-blue-200 rounded-md p-4 bg-blue-50 space-y-4">
+                    <h3 class="text-sm font-semibold text-blue-900">Hosting Integration</h3>
+
+                    {{-- Stripe Price --}}
+                    <div>
+                        <label for="stripe_price_id" class="block text-sm font-medium text-gray-700">Stripe Subscription Price</label>
+                        @if (!empty($stripePrices))
+                            <select name="stripe_price_id" id="stripe_price_id"
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                                <option value="">Select a Stripe price...</option>
+                                @foreach ($stripePrices as $price)
+                                    <option value="{{ $price['id'] }}" {{ old('stripe_price_id', $product->stripe_price_id) === $price['id'] ? 'selected' : '' }}>
+                                        {{ $price['label'] }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        @else
+                            <input type="text" name="stripe_price_id" id="stripe_price_id"
+                                   value="{{ old('stripe_price_id', $product->stripe_price_id) }}"
+                                   placeholder="price_xxxxx"
+                                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                        @endif
+                        <p class="text-xs text-gray-400 mt-1">The Stripe recurring price used when a customer subscribes to this product.</p>
+                        @error('stripe_price_id') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
+                    </div>
+
+                    {{-- WHM Package --}}
+                    <div>
+                        <label for="whm_package" class="block text-sm font-medium text-gray-700">WHM Package</label>
+                        <select name="whm_package" id="whm_package"
+                                class="mt-1 block w-full max-w-xs rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                            <option value="">No auto-provisioning</option>
+                            <option value="ckhostco_Basic" {{ old('whm_package', $product->whm_package) === 'ckhostco_Basic' ? 'selected' : '' }}>Basic</option>
+                            <option value="ckhostco_Personal" {{ old('whm_package', $product->whm_package) === 'ckhostco_Personal' ? 'selected' : '' }}>Personal</option>
+                            <option value="ckhostco_Personal Plus" {{ old('whm_package', $product->whm_package) === 'ckhostco_Personal Plus' ? 'selected' : '' }}>Personal Plus</option>
+                            <option value="ckhostco_Business Plus" {{ old('whm_package', $product->whm_package) === 'ckhostco_Business Plus' ? 'selected' : '' }}>Business Plus</option>
+                            <option value="ckhostco_Unlimited" {{ old('whm_package', $product->whm_package) === 'ckhostco_Unlimited' ? 'selected' : '' }}>Unlimited</option>
+                        </select>
+                        <p class="text-xs text-gray-400 mt-1">If set, the system will auto-provision a cPanel account using this WHM package when the hosting is activated.</p>
+                        @error('whm_package') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
+                    </div>
+                </div>
+
                 {{-- Stock Quantity (shown for equipment_rental and one_off) --}}
                 <div x-show="productType === 'equipment_rental' || productType === 'one_off'" x-transition>
                     <label for="stock_quantity" class="block text-sm font-semibold text-gray-700">Stock Quantity</label>

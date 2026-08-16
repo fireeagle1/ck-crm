@@ -18,6 +18,8 @@ class Product extends Model
         'product_type',
         'price',
         'billing_frequency',
+        'stripe_price_id',
+        'whm_package',
         'stock_quantity',
         'image_path',
         'is_archived',
