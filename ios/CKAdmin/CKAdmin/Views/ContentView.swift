@@ -6,7 +6,10 @@ struct ContentView: View {
     @State private var showingLogoutConfirmation = false
     @State private var showingScanner = false
     @State private var selectedTab = 0
-    @State private var scanNavigationTarget: ScanResult?
+
+    // Deep-link navigation paths (per tab)
+    @State private var assetNavPath = NavigationPath()
+    @State private var shopNavPath = NavigationPath()
 
     let apiClient: APIClient
 
@@ -38,8 +41,11 @@ struct ContentView: View {
                 .tabItem { Label("Customers", systemImage: "person.2") }
                 .tag(2)
 
-                NavigationStack {
+                NavigationStack(path: $assetNavPath) {
                     AssetListView(apiClient: apiClient)
+                        .navigationDestination(for: ScanDeepLink.self) { link in
+                            AssetDetailView(deviceId: link.id, apiClient: apiClient)
+                        }
                 }
                 .tabItem { Label("CMDB", systemImage: "desktopcomputer") }
                 .tag(3)
@@ -50,8 +56,11 @@ struct ContentView: View {
                 .tabItem { Label("Invoices", systemImage: "doc.text") }
                 .tag(4)
 
-                NavigationStack {
+                NavigationStack(path: $shopNavPath) {
                     ShopHubView(apiClient: apiClient)
+                        .navigationDestination(for: ScanDeepLink.self) { link in
+                            OrderActionDetailView(apiClient: apiClient, orderId: link.id)
+                        }
                 }
                 .tabItem { Label("Shop", systemImage: "bag") }
                 .tag(5)
@@ -70,7 +79,7 @@ struct ContentView: View {
                     .shadow(color: .black.opacity(0.25), radius: 8, y: 4)
             }
             .padding(.trailing, 20)
-            .padding(.bottom, 90) // Above tab bar
+            .padding(.bottom, 90)
             .accessibilityLabel("Scan QR Code")
         }
         .confirmationDialog(
@@ -91,20 +100,39 @@ struct ContentView: View {
     // MARK: - Scan Result Navigation
 
     private func handleScanResult(_ result: ScanResult) {
-        switch result.type {
-        case "asset":
-            selectedTab = 3 // CMDB tab
-        case "order":
-            selectedTab = 5 // Shop tab
-        case "booking":
-            selectedTab = 5 // Shop tab
-        default:
-            break
-        }
+        // Small delay to allow the scanner sheet to dismiss before navigating
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            switch result.type {
+            case "asset":
+                selectedTab = 3
+                assetNavPath = NavigationPath()
+                assetNavPath.append(ScanDeepLink(type: "asset", id: result.id))
 
-        // Store for navigation (views will pick this up)
-        scanNavigationTarget = result
+            case "order":
+                selectedTab = 5
+                shopNavPath = NavigationPath()
+                shopNavPath.append(ScanDeepLink(type: "order", id: result.id))
+
+            case "booking":
+                // For bookings, navigate to the parent order page
+                selectedTab = 5
+                shopNavPath = NavigationPath()
+                let navId = result.orderId ?? result.id
+                shopNavPath.append(ScanDeepLink(type: "order", id: navId))
+
+            default:
+                break
+            }
+        }
     }
+}
+
+// MARK: - Deep Link Value
+
+/// Hashable value type for programmatic navigation from QR scan results.
+struct ScanDeepLink: Hashable {
+    let type: String
+    let id: Int
 }
 
 #Preview {

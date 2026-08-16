@@ -127,9 +127,9 @@
                                     <div class="h-5 {{ $color }} {{ $roundStart }} {{ $roundEnd }} opacity-90 hover:opacity-100 transition-opacity"
                                          @if($isBlocked)
                                              style="background: repeating-linear-gradient(45deg, #dc2626, #dc2626 2px, #fca5a5 2px, #fca5a5 4px); cursor: pointer;"
-                                             onclick="openEditBlock({{ $booking->id }}, '{{ $booking->product->name ?? 'Product' }}', '{{ $booking->start_date->format('Y-m-d') }}', '{{ $booking->end_date->format('Y-m-d') }}')"
+                                             onclick="openEditBlock({{ $booking->id }}, '{{ $booking->product->name ?? 'Product' }}', '{{ $booking->start_date->format('Y-m-d') }}', '{{ $booking->end_date->format('Y-m-d') }}', '{{ addslashes($booking->block_reason ?? '') }}')"
                                          @endif
-                                         title="{{ $customerName }} | {{ $booking->start_date->format('d M') }} - {{ $booking->end_date->format('d M') }} ({{ ucfirst($booking->status) }})"
+                                         title="{{ $customerName }}{{ $isBlocked && $booking->block_reason ? ' — ' . $booking->block_reason : '' }} | {{ $booking->start_date->format('d M') }} - {{ $booking->end_date->format('d M') }} ({{ ucfirst($booking->status) }})"
                                          @if(!$isBlocked)
                                              onclick="window.location.href='{{ route('admin.shop.bookings.show', $booking) }}'"
                                              style="cursor: pointer;"
@@ -214,10 +214,11 @@
             window.location.href = url.toString();
         }
 
-        function openEditBlock(bookingId, productName, startDate, endDate) {
+        function openEditBlock(bookingId, productName, startDate, endDate, reason) {
             document.getElementById('edit_block_product_name').textContent = productName;
             document.getElementById('edit_block_start_date').value = startDate;
             document.getElementById('edit_block_end_date').value = endDate;
+            document.getElementById('edit_block_reason').value = reason || '';
 
             // Set form actions
             const updateForm = document.getElementById('editBlockForm');
@@ -253,6 +254,11 @@
                             <input type="date" name="end_date" id="edit_block_end_date" required
                                    class="w-full rounded-md border-gray-300 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500">
                         </div>
+                    </div>
+                    <div>
+                        <label for="edit_block_reason" class="block text-sm font-medium text-gray-700 mb-1">Reason (optional)</label>
+                        <input type="text" name="reason" id="edit_block_reason" placeholder="e.g. Maintenance, Reserved"
+                               class="w-full rounded-md border-gray-300 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500">
                     </div>
                     <div class="flex justify-end gap-3 pt-4 border-t">
                         <button type="button" onclick="document.getElementById('editBlockModal').classList.add('hidden')"

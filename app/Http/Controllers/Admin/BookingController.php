@@ -308,6 +308,7 @@ class BookingController extends Controller
                 'quantity' => $product->stock_quantity ?? 1,
                 'total_price' => 0,
                 'status' => 'confirmed',
+                'block_reason' => $validated['reason'] ?? null,
             ]);
         });
 
@@ -330,6 +331,7 @@ class BookingController extends Controller
         $validated = $request->validate([
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
+            'reason' => 'nullable|string|max:255',
         ]);
 
         $startDate = Carbon::parse($validated['start_date']);
@@ -355,6 +357,7 @@ class BookingController extends Controller
         $booking->update([
             'start_date' => $startDate,
             'end_date' => $endDate,
+            'block_reason' => $validated['reason'] ?? $booking->block_reason,
         ]);
 
         return redirect()->route('admin.shop.bookings.calendar', [

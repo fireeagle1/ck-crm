@@ -91,7 +91,7 @@ class ScanController extends Controller
 
     private function resolveBooking(int $id): JsonResponse
     {
-        $booking = Booking::with('product', 'customer')->find($id);
+        $booking = Booking::with('product', 'customer', 'orderItem.order')->find($id);
 
         if (!$booking) {
             return response()->json([
@@ -104,6 +104,7 @@ class ScanController extends Controller
             'resolved' => true,
             'type' => 'booking',
             'id' => $booking->id,
+            'order_id' => $booking->orderItem?->order_id,
             'summary' => [
                 'title' => $booking->product?->name ?? 'Unknown product',
                 'subtitle' => $booking->customer?->company_name ?? 'Unknown customer',

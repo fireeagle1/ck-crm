@@ -136,6 +136,7 @@ struct QRScannerView: View {
                 resolvedResult = ScanResult(
                     type: response.type ?? "unknown",
                     id: response.id ?? 0,
+                    orderId: response.orderId,
                     summary: response.summary ?? ScanSummary(title: "Unknown", subtitle: "", status: "")
                 )
             } else {
@@ -166,6 +167,7 @@ struct ScanResolveResponse: Decodable {
     let resolved: Bool
     let type: String?
     let id: Int?
+    let orderId: Int?
     let summary: ScanSummary?
     let message: String?
 }
@@ -179,6 +181,7 @@ struct ScanSummary: Decodable {
 struct ScanResult {
     let type: String
     let id: Int
+    let orderId: Int?
     let summary: ScanSummary
 }
 

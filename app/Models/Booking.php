@@ -22,11 +22,13 @@ class Booking extends Model
         'quantity',
         'total_price',
         'status',
+        'block_reason',
         'fulfilment_stage',
         'returned_at',
         'signature_data',
         'agreement_accepted_at',
         'agreement_text_snapshot',
+        'confirmation_pdf_path',
     ];
 
     protected $casts = [
