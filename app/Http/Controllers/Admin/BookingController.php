@@ -65,15 +65,20 @@ class BookingController extends Controller
     }
 
     /**
-     * Show booking detail with signature, agreement, and return action.
-     *
-     * Requirements: 15.2, 16.1
+     * Show booking detail — redirects to the unified order page.
      */
-    public function show(Booking $booking): View
+    public function show(Booking $booking): RedirectResponse
     {
+        $booking->loadMissing('orderItem.order');
+
+        if ($booking->orderItem?->order) {
+            return redirect()->route('admin.shop.orders.show', $booking->orderItem->order);
+        }
+
+        // Fallback: if no linked order, show the legacy view
         $booking->load('product', 'customer', 'orderItem.order');
 
-        return view('admin.shop.bookings.show', compact('booking'));
+        return redirect()->route('admin.shop.bookings.index');
     }
 
     /**

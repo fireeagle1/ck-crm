@@ -3,16 +3,21 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Booking;
 use App\Models\Customer;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Services\AssetAssignmentService;
+use App\Services\BookingInspectionService;
 use App\Services\FulfilmentService;
+use App\Services\FulfilmentStageService;
 use App\Services\StripeService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
+use InvalidArgumentException;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ShopOrderController extends Controller
@@ -20,6 +25,9 @@ class ShopOrderController extends Controller
     public function __construct(
         private FulfilmentService $fulfilmentService,
         private StripeService $stripeService,
+        private FulfilmentStageService $fulfilmentStageService,
+        private AssetAssignmentService $assetAssignmentService,
+        private BookingInspectionService $bookingInspectionService,
     ) {
     }
 
@@ -73,16 +81,47 @@ class ShopOrderController extends Controller
     }
 
     /**
-     * Display order detail with customer, products, payment/fulfilment status, and Stripe references.
-     * Includes delivery address, rental booking details (dates, status, signature), and PDF link.
-     *
-     * Requirements: 10.4, 15.2, 18.1, 21.4, 22.1, 22.3
+     * Display unified order detail with all fulfilment data embedded.
+     * Consolidates order details, booking info, asset assignment, and inspections into one view.
      */
     public function show(Order $order): View
     {
-        $order->load('customer', 'items.product', 'items.service', 'items.booking');
+        $order->load([
+            'customer',
+            'items.product',
+            'items.service',
+            'items.booking.assignedAssets.asset',
+            'items.booking.inspections.inspector',
+            'items.booking.checkoutInspection',
+            'items.booking.returnInspection',
+        ]);
 
-        return view('admin.shop.orders.show', compact('order'));
+        // For each rental booking, gather fulfilment context
+        $bookingContext = [];
+        foreach ($order->items as $item) {
+            if ($item->booking) {
+                $booking = $item->booking;
+
+                // Available assets for assignment (only during ordered/packing)
+                $availableAssets = collect();
+                if ($booking->product && in_array($booking->fulfilment_stage, ['ordered', 'packing'])) {
+                    $availableAssets = $booking->product->getAvailableAssets()->get();
+                }
+
+                $nextStage = $this->fulfilmentStageService->getNextStage($booking);
+                $preConditions = $nextStage
+                    ? $this->fulfilmentStageService->checkPreConditions($booking, $nextStage)
+                    : [];
+
+                $bookingContext[$booking->id] = [
+                    'availableAssets' => $availableAssets,
+                    'nextStage' => $nextStage,
+                    'preConditions' => $preConditions,
+                ];
+            }
+        }
+
+        return view('admin.shop.orders.show', compact('order', 'bookingContext'));
     }
 
     /**
@@ -248,6 +287,114 @@ class ShopOrderController extends Controller
         } catch (\Throwable $e) {
             return redirect()->route('admin.shop.orders.show', $order)
                 ->with('error', 'Refund failed: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Assign assets to a booking from the unified order page.
+     */
+    public function assignAssets(Request $request, Order $order, Booking $booking): RedirectResponse
+    {
+        // Verify the booking belongs to this order
+        abort_unless($booking->orderItem?->order_id === $order->id, 404);
+
+        $validated = $request->validate([
+            'asset_ids' => 'required|array|min:1',
+            'asset_ids.*' => 'required|integer|exists:cmdb,device_id',
+        ]);
+
+        try {
+            $this->assetAssignmentService->assignAssets($booking, $validated['asset_ids']);
+
+            // Auto-advance to packing if still at ordered stage
+            if ($booking->fulfilment_stage === 'ordered') {
+                $this->fulfilmentStageService->advance($booking, 'packing');
+            }
+
+            return redirect()->route('admin.shop.orders.show', $order)
+                ->with('success', 'Assets assigned successfully.');
+        } catch (InvalidArgumentException $e) {
+            return redirect()->route('admin.shop.orders.show', $order)
+                ->with('error', $e->getMessage());
+        }
+    }
+
+    /**
+     * Advance a booking's fulfilment stage from the unified order page.
+     */
+    public function advanceStage(Request $request, Order $order, Booking $booking): RedirectResponse
+    {
+        abort_unless($booking->orderItem?->order_id === $order->id, 404);
+
+        $nextStage = $this->fulfilmentStageService->getNextStage($booking);
+
+        if (!$nextStage) {
+            return redirect()->route('admin.shop.orders.show', $order)
+                ->with('error', 'This booking is already at the final stage.');
+        }
+
+        try {
+            $this->fulfilmentStageService->advance($booking, $nextStage);
+
+            return redirect()->route('admin.shop.orders.show', $order)
+                ->with('success', 'Booking advanced to "' . str_replace('_', ' ', $nextStage) . '".');
+        } catch (InvalidArgumentException $e) {
+            return redirect()->route('admin.shop.orders.show', $order)
+                ->with('error', $e->getMessage());
+        }
+    }
+
+    /**
+     * Store an inspection (checkout or return) for a booking from the unified order page.
+     */
+    public function inspect(Request $request, Order $order, Booking $booking): RedirectResponse
+    {
+        abort_unless($booking->orderItem?->order_id === $order->id, 404);
+
+        $validated = $request->validate([
+            'photos' => 'required|array|min:1|max:10',
+            'photos.*' => 'required|image|mimes:jpeg,png,jpg|max:10240',
+            'condition_notes' => 'nullable|string|max:2000',
+            'damage_flagged' => 'nullable|boolean',
+        ]);
+
+        $photos = $request->file('photos');
+        $notes = $validated['condition_notes'] ?? null;
+        $damageFlagged = (bool) ($validated['damage_flagged'] ?? false);
+        $adminId = $request->user()->id;
+
+        // Determine inspection type from current stage
+        $isReturnInspection = in_array($booking->fulfilment_stage, ['checked_out', 'returned']);
+
+        try {
+            if ($isReturnInspection) {
+                $this->bookingInspectionService->createReturnInspection(
+                    $booking, $photos, $notes, $damageFlagged, $adminId
+                );
+
+                if ($booking->fulfilment_stage === 'checked_out') {
+                    $this->fulfilmentStageService->advance($booking, 'returned');
+                    $booking->refresh();
+                }
+                $this->fulfilmentStageService->advance($booking, 'inspected');
+
+                return redirect()->route('admin.shop.orders.show', $order)
+                    ->with('success', 'Return inspection recorded and booking marked as inspected.');
+            } else {
+                $this->bookingInspectionService->createCheckoutInspection(
+                    $booking, $photos, $notes, $adminId
+                );
+
+                if ($booking->fulfilment_stage === 'ready') {
+                    $this->fulfilmentStageService->advance($booking, 'checked_out');
+                }
+
+                return redirect()->route('admin.shop.orders.show', $order)
+                    ->with('success', 'Checkout inspection recorded.');
+            }
+        } catch (InvalidArgumentException $e) {
+            return redirect()->route('admin.shop.orders.show', $order)
+                ->with('error', $e->getMessage());
         }
     }
 }

@@ -223,6 +223,9 @@ Route::middleware(['auth', 'verified', EnsureIsAdmin::class])->prefix('admin')->
     Route::post('shop/orders/{order}/mark-paid-offline', [Admin\ShopOrderController::class, 'markPaidOffline'])->name('shop.orders.mark-paid-offline');
     Route::post('shop/orders/{order}/cancel', [Admin\ShopOrderController::class, 'cancel'])->name('shop.orders.cancel');
     Route::post('shop/orders/{order}/refund', [Admin\ShopOrderController::class, 'refund'])->name('shop.orders.refund');
+    Route::post('shop/orders/{order}/bookings/{booking}/assign-assets', [Admin\ShopOrderController::class, 'assignAssets'])->name('shop.orders.assign-assets');
+    Route::post('shop/orders/{order}/bookings/{booking}/advance-stage', [Admin\ShopOrderController::class, 'advanceStage'])->name('shop.orders.advance-stage');
+    Route::post('shop/orders/{order}/bookings/{booking}/inspect', [Admin\ShopOrderController::class, 'inspect'])->name('shop.orders.inspect');
 
     // Bookings Management
     Route::get('shop/bookings', [Admin\BookingController::class, 'index'])->name('shop.bookings.index');

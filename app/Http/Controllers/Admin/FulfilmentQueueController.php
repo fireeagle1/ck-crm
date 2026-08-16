@@ -68,39 +68,18 @@ class FulfilmentQueueController extends Controller
     }
 
     /**
-     * Display booking detail with inspections, assets, timeline, and available assets for assignment.
-     *
-     * Requirements: 3.3, 3.4, 4.4, 4.5
+     * Display booking detail — redirects to the unified order page.
+     * The fulfilment pipeline is now embedded in the order show view.
      */
-    public function show(Booking $booking): View
+    public function show(Booking $booking): RedirectResponse
     {
-        $booking->load([
-            'assignedAssets.asset',
-            'inspections',
-            'checkoutInspection',
-            'returnInspection',
-            'product',
-            'customer',
-            'orderItem.order',
-        ]);
+        $booking->loadMissing('orderItem.order');
 
-        // Get available assets for assignment (only relevant during packing/ordered stages)
-        $availableAssets = collect();
-        if ($booking->product && in_array($booking->fulfilment_stage, ['ordered', 'packing'])) {
-            $availableAssets = $booking->product->getAvailableAssets()->get();
+        if ($booking->orderItem?->order) {
+            return redirect()->route('admin.shop.orders.show', $booking->orderItem->order);
         }
 
-        $nextStage = $this->fulfilmentStageService->getNextStage($booking);
-        $preConditions = $nextStage
-            ? $this->fulfilmentStageService->checkPreConditions($booking, $nextStage)
-            : [];
-
-        return view('admin.fulfilment.show', compact(
-            'booking',
-            'availableAssets',
-            'nextStage',
-            'preConditions',
-        ));
+        return redirect()->route('admin.fulfilment.index');
     }
 
     /**
