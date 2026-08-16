@@ -109,10 +109,12 @@
         </div>
     @endif
 
-    {{-- QR Code --}}
-    <div class="qr-section">
-        <img src="https://quickchart.io/qr?text={{ urlencode('BKG-' . $booking->id) }}&size=80" width="80" height="80" alt="QR">
-        <div class="qr-label">BKG-{{ $booking->id }}</div>
+    {{-- QR Code Reference --}}
+    <div style="text-align: right; margin-top: 15px;">
+        <div style="border: 1px solid #e5e7eb; display: inline-block; padding: 8px 12px; border-radius: 4px;">
+            <div style="font-size: 10px; color: #6b7280; text-transform: uppercase; font-weight: bold;">Booking Ref</div>
+            <div style="font-size: 16px; font-weight: bold; color: #1f2937; font-family: monospace;">BKG-{{ $booking->id }}</div>
+        </div>
     </div>
 
     {{-- Footer --}}

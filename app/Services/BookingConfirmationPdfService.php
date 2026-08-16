@@ -18,20 +18,20 @@ class BookingConfirmationPdfService
      */
     public function generate(Booking $booking): ?string
     {
+        $booking->loadMissing(['product', 'customer', 'orderItem.order']);
+
+        $data = [
+            'booking' => $booking,
+            'customer' => $booking->customer,
+            'order' => $booking->orderItem?->order,
+            'companyName' => Setting::get('company_name', config('app.name', 'Company')),
+            'companyAddress' => Setting::get('company_address', ''),
+            'companyPhone' => Setting::get('company_phone', ''),
+            'companyEmail' => Setting::get('company_email', ''),
+            'deliveryInstructions' => $booking->product?->delivery_instructions,
+        ];
+
         try {
-            $booking->loadMissing(['product', 'customer', 'orderItem.order']);
-
-            $data = [
-                'booking' => $booking,
-                'customer' => $booking->customer,
-                'order' => $booking->orderItem?->order,
-                'companyName' => Setting::get('company_name', config('app.name', 'Company')),
-                'companyAddress' => Setting::get('company_address', ''),
-                'companyPhone' => Setting::get('company_phone', ''),
-                'companyEmail' => Setting::get('company_email', ''),
-                'deliveryInstructions' => $booking->product?->delivery_instructions,
-            ];
-
             $pdf = Pdf::loadView('pdf.booking-confirmation', $data);
             $pdf->setPaper('A4', 'portrait');
 
@@ -45,7 +45,7 @@ class BookingConfirmationPdfService
 
             $pdf->save($fullPath);
 
-            // Store the path on the booking (use updateQuietly to avoid observer loops)
+            // Store the path on the booking
             $booking->updateQuietly(['confirmation_pdf_path' => $relativePath]);
 
             return $relativePath;
@@ -53,6 +53,7 @@ class BookingConfirmationPdfService
             Log::error('BookingConfirmationPdfService: Failed to generate PDF', [
                 'booking_id' => $booking->id,
                 'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
             ]);
 
             return null;

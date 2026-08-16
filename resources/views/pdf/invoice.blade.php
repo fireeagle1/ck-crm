@@ -324,8 +324,10 @@
             <strong>Payment Reference:</strong> {{ $paymentReference }}
         </div>
         <div style="margin-top: 10px; text-align: right;">
-            <img src="https://quickchart.io/qr?text={{ urlencode('ORD-' . $order->id) }}&size=80" width="80" height="80" alt="QR">
-            <div style="font-size: 9px; color: #9ca3af; margin-top: 2px;">ORD-{{ $order->id }}</div>
+            <div style="border: 1px solid #e5e7eb; display: inline-block; padding: 6px 10px; border-radius: 4px;">
+                <span style="font-size: 9px; color: #6b7280; text-transform: uppercase; font-weight: bold;">Ref: </span>
+                <span style="font-size: 12px; font-weight: bold; font-family: monospace; color: #1f2937;">ORD-{{ $order->id }}</span>
+            </div>
         </div>
     </div>
 

@@ -236,9 +236,14 @@ class BookingController extends Controller
     {
         // Generate on-the-fly if not already generated
         if (!$booking->confirmation_pdf_path || !\Illuminate\Support\Facades\Storage::disk('local')->exists($booking->confirmation_pdf_path)) {
-            $path = app(\App\Services\BookingConfirmationPdfService::class)->generate($booking);
-            if (!$path) {
-                return redirect()->back()->with('error', 'Unable to generate booking confirmation PDF.');
+            try {
+                $path = app(\App\Services\BookingConfirmationPdfService::class)->generate($booking);
+                if (!$path) {
+                    return redirect()->back()->with('error', 'Unable to generate booking confirmation PDF. Check the server logs for details.');
+                }
+                $booking->refresh();
+            } catch (\Exception $e) {
+                return redirect()->back()->with('error', 'PDF generation failed: ' . $e->getMessage());
             }
         }
 
