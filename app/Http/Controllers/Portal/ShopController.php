@@ -76,6 +76,12 @@ class ShopController extends Controller
             $viewData['minRentalDays'] = $product->min_rental_days;
             $viewData['rentalAgreementText'] = $product->rental_agreement_text;
             $viewData['deliveryInstructions'] = $product->delivery_instructions;
+
+            // Max quantity = available assets (tracked) or stock_quantity (manual)
+            $maxQuantity = $product->track_individual_assets
+                ? $product->assets()->whereIn('asset_status', ['Available', 'Reserved', 'Rented Out'])->count()
+                : ($product->stock_quantity ?? 99);
+            $viewData['maxQuantity'] = max(1, (int) $maxQuantity);
         }
 
         // For one_off products, pass delivery instructions and max quantity

@@ -142,11 +142,21 @@ class CartService
             );
         }
 
-        // Validate quantity
-        $quantity = $options['quantity'] ?? 1;
-        if ((int) $quantity < 1) {
+        // Validate quantity against available stock
+        $quantity = (int) ($options['quantity'] ?? 1);
+        if ($quantity < 1) {
             throw new InvalidArgumentException(
                 'Quantity must be at least 1.'
+            );
+        }
+
+        $maxAvailable = $product->track_individual_assets
+            ? $product->assets()->whereIn('asset_status', ['Available', 'Reserved', 'Rented Out'])->count()
+            : $product->stock_quantity;
+
+        if ($maxAvailable !== null && $quantity > $maxAvailable) {
+            throw new InvalidArgumentException(
+                "Only {$maxAvailable} units available for \"{$product->name}\". You requested {$quantity}."
             );
         }
     }

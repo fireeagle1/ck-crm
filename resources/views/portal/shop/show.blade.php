@@ -108,8 +108,9 @@
                                 {{-- Quantity --}}
                                 <div>
                                     <label for="quantity" class="block text-sm font-medium text-gray-700 mb-1">Quantity</label>
-                                    <input type="number" name="quantity" id="quantity" min="1" value="{{ old('quantity', 1) }}"
+                                    <input type="number" name="quantity" id="quantity" min="1" max="{{ $maxQuantity ?? 99 }}" value="{{ old('quantity', 1) }}"
                                            class="w-24 rounded-md border-gray-300 shadow-sm text-sm focus:border-blue-500 focus:ring-blue-500">
+                                    <p class="text-xs text-gray-500 mt-1">{{ $maxQuantity ?? '?' }} available</p>
                                 </div>
 
                                 {{-- Calculated total display --}}
