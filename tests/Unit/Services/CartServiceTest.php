@@ -4,11 +4,14 @@ namespace Tests\Unit\Services;
 
 use App\Models\Product;
 use App\Services\CartService;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use InvalidArgumentException;
 use Tests\TestCase;
 
 class CartServiceTest extends TestCase
 {
+    use RefreshDatabase;
+
     private CartService $cartService;
 
     protected function setUp(): void
@@ -246,6 +249,213 @@ class CartServiceTest extends TestCase
         $this->assertNull($items[0]['rental_end_date']);
         $this->assertNull($items[0]['domain_name']);
         $this->assertEquals(1, $items[0]['quantity']);
+    }
+
+    // ──────────────────────────────────────────────────────────────────
+    // addItem — one_off items with quantity
+    // ──────────────────────────────────────────────────────────────────
+
+    public function test_one_off_product_accepts_quantity(): void
+    {
+        $product = $this->makeAvailableProduct([
+            'product_type' => 'one_off',
+            'price' => 15.00,
+            'stock_quantity' => 10,
+        ]);
+
+        $this->cartService->addItem($product, ['quantity' => 3]);
+
+        $items = $this->cartService->getItems();
+        $this->assertCount(1, $items);
+        $this->assertEquals(3, $items[0]['quantity']);
+        $this->assertEquals(45.00, $items[0]['total_price']); // 15 × 3
+    }
+
+    public function test_one_off_product_quantity_cannot_exceed_stock(): void
+    {
+        $product = $this->makeAvailableProduct([
+            'product_type' => 'one_off',
+            'stock_quantity' => 5,
+        ]);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Only 5 units available');
+
+        $this->cartService->addItem($product, ['quantity' => 6]);
+    }
+
+    public function test_one_off_product_quantity_must_be_at_least_1(): void
+    {
+        $product = $this->makeAvailableProduct([
+            'product_type' => 'one_off',
+            'stock_quantity' => 10,
+        ]);
+
+        // quantity of 0 gets clamped to 1 via max(1, ...) so it should succeed with qty=1
+        $this->cartService->addItem($product, ['quantity' => 0]);
+
+        $items = $this->cartService->getItems();
+        $this->assertEquals(1, $items[0]['quantity']);
+    }
+
+    public function test_one_off_product_unlimited_stock_allows_any_quantity(): void
+    {
+        $product = $this->makeAvailableProduct([
+            'product_type' => 'one_off',
+            'stock_quantity' => null, // unlimited
+            'price' => 10.00,
+        ]);
+
+        $this->cartService->addItem($product, ['quantity' => 99]);
+
+        $items = $this->cartService->getItems();
+        $this->assertEquals(99, $items[0]['quantity']);
+        $this->assertEquals(990.00, $items[0]['total_price']);
+    }
+
+    // ──────────────────────────────────────────────────────────────────
+    // addItem — duplicate one-off detection
+    // ──────────────────────────────────────────────────────────────────
+
+    public function test_adding_same_one_off_product_increments_quantity(): void
+    {
+        $product = $this->makeAvailableProduct([
+            'product_type' => 'one_off',
+            'price' => 20.00,
+            'stock_quantity' => 10,
+        ]);
+
+        $this->cartService->addItem($product, ['quantity' => 2]);
+        $this->cartService->addItem($product, ['quantity' => 3]);
+
+        $items = $this->cartService->getItems();
+        $this->assertCount(1, $items); // Still one line
+        $this->assertEquals(5, $items[0]['quantity']); // 2 + 3
+        $this->assertEquals(100.00, $items[0]['total_price']); // 20 × 5
+    }
+
+    public function test_adding_same_one_off_product_rejects_if_combined_quantity_exceeds_stock(): void
+    {
+        $product = $this->makeAvailableProduct([
+            'product_type' => 'one_off',
+            'price' => 10.00,
+            'stock_quantity' => 5,
+        ]);
+
+        $this->cartService->addItem($product, ['quantity' => 3]);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Only 5 units available');
+
+        $this->cartService->addItem($product, ['quantity' => 3]); // 3 + 3 = 6 > 5
+    }
+
+    public function test_different_one_off_products_are_separate_lines(): void
+    {
+        $product1 = $this->makeAvailableProduct([
+            'product_type' => 'one_off',
+            'name' => 'Product A',
+            'price' => 10.00,
+        ]);
+        $product2 = $this->makeAvailableProduct([
+            'product_type' => 'one_off',
+            'name' => 'Product B',
+            'price' => 20.00,
+        ]);
+
+        $this->cartService->addItem($product1);
+        $this->cartService->addItem($product2);
+
+        $items = $this->cartService->getItems();
+        $this->assertCount(2, $items);
+        $this->assertEquals('Product A', $items[0]['name']);
+        $this->assertEquals('Product B', $items[1]['name']);
+    }
+
+    // ──────────────────────────────────────────────────────────────────
+    // updateItemQuantity
+    // ──────────────────────────────────────────────────────────────────
+
+    public function test_update_item_quantity_for_one_off_product(): void
+    {
+        $product = Product::factory()->create([
+            'product_type' => 'one_off',
+            'price' => 25.00,
+            'stock_quantity' => 10,
+            'is_archived' => false,
+        ]);
+
+        $this->cartService->addItem($product, ['quantity' => 1]);
+
+        $this->cartService->updateItemQuantity(0, 4);
+
+        $items = $this->cartService->getItems();
+        $this->assertEquals(4, $items[0]['quantity']);
+        $this->assertEquals(100.00, $items[0]['total_price']); // 25 × 4
+    }
+
+    public function test_update_item_quantity_rejects_exceeding_stock(): void
+    {
+        $product = Product::factory()->create([
+            'product_type' => 'one_off',
+            'price' => 10.00,
+            'stock_quantity' => 3,
+            'is_archived' => false,
+        ]);
+
+        $this->cartService->addItem($product, ['quantity' => 1]);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Only 3 units available');
+
+        $this->cartService->updateItemQuantity(0, 5);
+    }
+
+    public function test_update_item_quantity_rejects_zero(): void
+    {
+        $product = Product::factory()->create([
+            'product_type' => 'one_off',
+            'price' => 10.00,
+            'stock_quantity' => 10,
+            'is_archived' => false,
+        ]);
+
+        $this->cartService->addItem($product, ['quantity' => 2]);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Quantity must be at least 1');
+
+        $this->cartService->updateItemQuantity(0, 0);
+    }
+
+    public function test_update_item_quantity_rejects_non_one_off_product(): void
+    {
+        $product = Product::factory()->create([
+            'product_type' => 'equipment_rental',
+            'price' => 50.00,
+            'stock_quantity' => 10,
+            'is_archived' => false,
+            'min_rental_days' => null,
+        ]);
+
+        $this->cartService->addItem($product, [
+            'rental_start_date' => '2025-08-01',
+            'rental_end_date' => '2025-08-04',
+            'quantity' => 1,
+        ]);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Quantity can only be adjusted for one-off products');
+
+        $this->cartService->updateItemQuantity(0, 3);
+    }
+
+    public function test_update_item_quantity_rejects_invalid_index(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Cart item not found');
+
+        $this->cartService->updateItemQuantity(99, 1);
     }
 
     // ──────────────────────────────────────────────────────────────────

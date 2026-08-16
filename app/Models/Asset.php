@@ -22,6 +22,7 @@ class Asset extends Model
         'device_type',
         'serial_number',
         'notes',
+        'product_id',
     ];
 
     public function customer(): BelongsTo
@@ -29,8 +30,26 @@ class Asset extends Model
         return $this->belongsTo(Customer::class, 'customer_id', 'company_id');
     }
 
+    public function product(): BelongsTo
+    {
+        return $this->belongsTo(Product::class);
+    }
+
+    public function bookingAssets(): HasMany
+    {
+        return $this->hasMany(BookingAsset::class, 'asset_id', 'device_id');
+    }
+
     public function tickets(): HasMany
     {
         return $this->hasMany(Ticket::class, 'asset_id', 'device_id');
+    }
+
+    /**
+     * Check if this asset is available for rental assignment.
+     */
+    public function isAvailableForRental(): bool
+    {
+        return $this->asset_status === 'Available';
     }
 }

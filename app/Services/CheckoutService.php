@@ -113,6 +113,9 @@ class CheckoutService
                 // Handle rental items: create Bookings with pessimistic locking
                 $this->handleRentalItems($order, $orderItems, $cartItems, $checkoutOptions);
 
+                // Decrement stock for one-off products with pessimistic locking
+                $this->decrementStockForOneOffItems($cartItems);
+
                 // Handle Stripe: create Checkout Session for one-off + rental items
                 $checkoutSessionUrl = $this->createStripeCheckoutSession($customer, $order, $cartItems, $orderItems, $deliveryCharge, $discountAmount);
 
@@ -274,6 +277,48 @@ class CheckoutService
         }
 
         return round($total, 2);
+    }
+
+    /**
+     * Decrement stock for one-off products using pessimistic locking.
+     *
+     * Locks each product row with SELECT ... FOR UPDATE, re-validates that
+     * sufficient stock exists, and decrements stock_quantity by the ordered quantity.
+     *
+     * @throws \InvalidArgumentException If stock is insufficient for any product.
+     */
+    private function decrementStockForOneOffItems(array $cartItems): void
+    {
+        foreach ($cartItems as $item) {
+            if (($item['product_type'] ?? '') !== 'one_off') {
+                continue;
+            }
+
+            $quantity = $item['quantity'] ?? 1;
+            $productId = $item['product_id'];
+
+            // Lock the product row to prevent race conditions
+            $product = Product::lockForUpdate()->find($productId);
+
+            if (!$product) {
+                continue;
+            }
+
+            // Skip stock decrement if stock is unlimited (null)
+            if ($product->stock_quantity === null) {
+                continue;
+            }
+
+            // Re-validate stock at checkout time
+            if ($product->stock_quantity < $quantity) {
+                throw new \InvalidArgumentException(
+                    "Insufficient stock for '{$product->name}'. Only {$product->stock_quantity} units available."
+                );
+            }
+
+            // Decrement stock by the ordered quantity
+            $product->decrement('stock_quantity', $quantity);
+        }
     }
 
     /**

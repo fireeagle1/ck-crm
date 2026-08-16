@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Asset;
 use App\Models\Customer;
+use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -30,11 +31,17 @@ class AssetController extends Controller
         return view('admin.assets.index', compact('assets'));
     }
 
-    public function create(): View
+    public function create(Request $request): View
     {
         $customers = Customer::orderBy('company_name')->get();
+        $products = Product::where('product_type', 'equipment_rental')
+            ->orderBy('name')
+            ->get();
 
-        return view('admin.assets.create', compact('customers'));
+        // Support pre-filling product_id when coming from product edit page
+        $prefilledProductId = $request->input('product_id');
+
+        return view('admin.assets.create', compact('customers', 'products', 'prefilledProductId'));
     }
 
     public function store(Request $request)
@@ -43,10 +50,11 @@ class AssetController extends Controller
             'customer_id' => 'required|exists:customers,company_id',
             'device_name' => 'required|string|max:255',
             'location' => 'nullable|string|max:255',
-            'asset_status' => 'in:Active,Decommissioned,In Repair',
+            'asset_status' => 'in:Active,Available,Rented Out,Reserved,In Repair,Decommissioned',
             'device_type' => 'nullable|string|max:255',
             'serial_number' => 'nullable|string|max:255',
             'notes' => 'nullable|string',
+            'product_id' => 'nullable|exists:products,id',
         ]);
 
         Asset::create($validated);
@@ -65,8 +73,11 @@ class AssetController extends Controller
     public function edit(Asset $asset): View
     {
         $customers = Customer::orderBy('company_name')->get();
+        $products = Product::where('product_type', 'equipment_rental')
+            ->orderBy('name')
+            ->get();
 
-        return view('admin.assets.edit', compact('asset', 'customers'));
+        return view('admin.assets.edit', compact('asset', 'customers', 'products'));
     }
 
     public function update(Request $request, Asset $asset)
@@ -75,10 +86,11 @@ class AssetController extends Controller
             'customer_id' => 'required|exists:customers,company_id',
             'device_name' => 'required|string|max:255',
             'location' => 'nullable|string|max:255',
-            'asset_status' => 'in:Active,Decommissioned,In Repair',
+            'asset_status' => 'in:Active,Available,Rented Out,Reserved,In Repair,Decommissioned',
             'device_type' => 'nullable|string|max:255',
             'serial_number' => 'nullable|string|max:255',
             'notes' => 'nullable|string',
+            'product_id' => 'nullable|exists:products,id',
         ]);
 
         $asset->update($validated);

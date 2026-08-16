@@ -38,6 +38,7 @@
                     <tr>
                         <th class="px-5 py-3 text-left font-semibold text-gray-600">Product</th>
                         <th class="px-5 py-3 text-left font-semibold text-gray-600">Type</th>
+                        <th class="px-5 py-3 text-center font-semibold text-gray-600">Qty</th>
                         <th class="px-5 py-3 text-right font-semibold text-gray-600">Price</th>
                         <th class="px-5 py-3 text-right font-semibold text-gray-600"></th>
                     </tr>
@@ -59,10 +60,47 @@
                                     {{ str_replace('_', ' ', ucfirst($item['product_type'])) }}
                                 </span>
                             </td>
+                            <td class="px-5 py-4 text-center">
+                                @if ($item['product_type'] === 'one_off')
+                                    {{-- Editable quantity for one-off items --}}
+                                    <form method="POST" action="{{ route('portal.cart.updateQuantity', $index) }}" class="inline-flex items-center gap-1">
+                                        @csrf
+                                        @method('PUT')
+                                        <input type="hidden" name="quantity" value="{{ $item['quantity'] ?? 1 }}" id="qty-input-{{ $index }}">
+                                        <button type="button"
+                                                class="w-7 h-7 flex items-center justify-center rounded bg-gray-100 text-gray-600 hover:bg-gray-200 transition text-sm font-bold disabled:opacity-50 disabled:cursor-not-allowed"
+                                                aria-label="Decrease quantity"
+                                                @if (($item['quantity'] ?? 1) <= 1) disabled @endif
+                                                onclick="let i=document.getElementById('qty-input-{{ $index }}');i.value=Math.max(1,parseInt(i.value)-1);this.closest('form').submit()">
+                                            &minus;
+                                        </button>
+                                        <input type="number" value="{{ $item['quantity'] ?? 1 }}" min="1"
+                                               class="w-14 h-7 text-center text-sm border border-gray-300 rounded focus:border-blue-500 focus:ring-blue-500"
+                                               aria-label="Quantity"
+                                               onchange="document.getElementById('qty-input-{{ $index }}').value=this.value;this.closest('form').submit()">
+                                        <button type="button"
+                                                class="w-7 h-7 flex items-center justify-center rounded bg-gray-100 text-gray-600 hover:bg-gray-200 transition text-sm font-bold"
+                                                aria-label="Increase quantity"
+                                                onclick="let i=document.getElementById('qty-input-{{ $index }}');i.value=parseInt(i.value)+1;this.closest('form').submit()">
+                                            +
+                                        </button>
+                                    </form>
+                                @elseif ($item['product_type'] === 'equipment_rental')
+                                    {{-- Read-only quantity for rental items --}}
+                                    <span class="text-gray-700">{{ $item['quantity'] ?? 1 }}</span>
+                                @else
+                                    <span class="text-gray-400">&mdash;</span>
+                                @endif
+                            </td>
                             <td class="px-5 py-4 text-right">
-                                <p class="font-semibold text-gray-900">&pound;{{ number_format($item['price'], 2) }}</p>
-                                @if ($item['billing_frequency'])
-                                    <p class="text-xs text-gray-500">/{{ $item['billing_frequency'] }}</p>
+                                @if ($item['product_type'] === 'one_off' && ($item['quantity'] ?? 1) > 1)
+                                    <p class="font-semibold text-gray-900">&pound;{{ number_format($item['total_price'] ?? $item['price'] * ($item['quantity'] ?? 1), 2) }}</p>
+                                    <p class="text-xs text-gray-500">&pound;{{ number_format($item['price'], 2) }} &times; {{ $item['quantity'] }}</p>
+                                @else
+                                    <p class="font-semibold text-gray-900">&pound;{{ number_format($item['total_price'] ?? $item['price'], 2) }}</p>
+                                    @if ($item['billing_frequency'])
+                                        <p class="text-xs text-gray-500">/{{ $item['billing_frequency'] }}</p>
+                                    @endif
                                 @endif
                             </td>
                             <td class="px-5 py-4 text-right">

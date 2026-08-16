@@ -28,6 +28,7 @@ class Product extends Model
         'delivery_charge',
         'low_stock_threshold',
         'low_stock_notified',
+        'track_individual_assets',
     ];
 
     protected $casts = [
@@ -39,6 +40,7 @@ class Product extends Model
         'cooldown_days' => 'integer',
         'low_stock_threshold' => 'integer',
         'low_stock_notified' => 'boolean',
+        'track_individual_assets' => 'boolean',
     ];
 
     public function visibilityRule(): HasOne
@@ -54,6 +56,34 @@ class Product extends Model
     public function bookings(): HasMany
     {
         return $this->hasMany(Booking::class, 'product_id');
+    }
+
+    public function assets(): HasMany
+    {
+        return $this->hasMany(Asset::class);
+    }
+
+    /**
+     * Get the number of available assets for this product.
+     * If track_individual_assets is enabled, counts linked assets with 'Available' status.
+     * Otherwise, returns the manual stock_quantity value.
+     */
+    public function getAvailableAssetCount(): int
+    {
+        if (!$this->track_individual_assets) {
+            return $this->stock_quantity ?? 0;
+        }
+
+        return $this->assets()->where('asset_status', 'Available')->count();
+    }
+
+    /**
+     * Get a query builder for available assets linked to this product.
+     * Returns assets with status 'Available'.
+     */
+    public function getAvailableAssets(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->assets()->where('asset_status', 'Available');
     }
 
     /**

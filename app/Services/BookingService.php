@@ -119,6 +119,7 @@ class BookingService
                 'quantity' => $quantity,
                 'total_price' => $totalPrice,
                 'status' => 'confirmed',
+                'fulfilment_stage' => 'ordered',
                 'signature_data' => $signatureData,
                 'agreement_accepted_at' => $agreementText ? now() : null,
                 'agreement_text_snapshot' => $agreementText,

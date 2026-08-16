@@ -4,6 +4,7 @@
     <div class="flex items-center justify-between mb-6">
         <h1 class="text-2xl font-bold">{{ $customer->company_name }}</h1>
         <div class="flex gap-2">
+            <a href="{{ route('admin.customers.shop', $customer) }}" class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-md text-sm font-semibold hover:bg-indigo-700">Shop & Rentals</a>
             @if ($customer->services->where('service_type', 'Technical Support')->where('status', 'Active')->isNotEmpty())
                 <a href="{{ route('admin.customers.scorecard', $customer) }}" class="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-md text-sm font-semibold hover:bg-green-700">Scorecard</a>
             @endif
@@ -28,7 +29,7 @@
     @endif
 
     {{-- KPI strip --}}
-    <div class="grid grid-cols-3 sm:grid-cols-6 gap-3 mb-6">
+    <div class="grid grid-cols-3 sm:grid-cols-7 gap-3 mb-6">
         <div class="bg-white rounded-lg p-4 border">
             <p class="text-xs font-medium text-gray-500 uppercase">Services</p>
             <p class="text-2xl font-bold mt-1">{{ $customer->services->where('status', 'Active')->count() }}</p>
@@ -48,6 +49,10 @@
         <div class="bg-white rounded-lg p-4 border">
             <p class="text-xs font-medium text-gray-500 uppercase">Total Income</p>
             <p class="text-2xl font-bold mt-1">£{{ number_format($totalIncome, 2) }}</p>
+        </div>
+        <div class="bg-white rounded-lg p-4 border">
+            <p class="text-xs font-medium text-gray-500 uppercase">Shop Spend</p>
+            <p class="text-2xl font-bold mt-1">£{{ number_format($shopSpend, 2) }}</p>
         </div>
         <div class="bg-white rounded-lg p-4 border">
             <p class="text-xs font-medium text-gray-500 uppercase">Billing</p>

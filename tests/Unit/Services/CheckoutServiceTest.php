@@ -546,4 +546,230 @@ class CheckoutServiceTest extends TestCase
         $this->assertNull($result->checkoutSessionUrl);
         $this->assertEquals(['sub_rental'], $result->subscriptionIds);
     }
+
+    // ─── Stock Decrement Tests (processCheckout) ─────────────────────────
+
+    /**
+     * Test: Checkout decrements stock_quantity by the purchased quantity for one-off products.
+     *
+     * **Validates: Requirements 1.3, 1.6**
+     */
+    public function test_checkout_decrements_stock_by_purchased_quantity(): void
+    {
+        $product = Product::factory()->oneOff()->create([
+            'name' => 'Widget',
+            'price' => 10.00,
+            'stock_quantity' => 20,
+        ]);
+
+        $cartItems = [
+            [
+                'product_id' => $product->id,
+                'name' => $product->name,
+                'price' => 10.00,
+                'product_type' => 'one_off',
+                'billing_frequency' => null,
+                'quantity' => 5,
+                'total_price' => 50.00,
+            ],
+        ];
+
+        $cartService = Mockery::mock(\App\Services\CartService::class);
+        $cartService->shouldReceive('getItems')->andReturn($cartItems);
+        $cartService->shouldReceive('hasOnlyHostingItems')->andReturn(false);
+        $cartService->shouldReceive('getDeliveryTotal')->andReturn(0.0);
+        $cartService->shouldReceive('clear')->once();
+
+        $this->stripeService->shouldReceive('ensureCustomer')->once()->andReturn('cus_test_123');
+        $this->stripeService->shouldReceive('createCheckoutSessionWithParams')->once()
+            ->andReturn(\Stripe\Checkout\Session::constructFrom(['id' => 'cs_test', 'url' => 'https://checkout.stripe.com/test']));
+
+        $this->notificationService->shouldReceive('notifyAdminNewOrder')->once();
+
+        $result = $this->checkoutService->processCheckout($this->customer, $cartService, [
+            'address_line1' => '123 Main St',
+            'city' => 'London',
+            'postal_code' => 'SW1A 1AA',
+            'country' => 'GB',
+        ]);
+
+        $this->assertTrue($result->success, 'Checkout failed: ' . ($result->errorMessage ?? 'unknown'));
+
+        // Verify stock was decremented by 5
+        $product->refresh();
+        $this->assertEquals(15, $product->stock_quantity);
+    }
+
+    /**
+     * Test: Checkout fails with user-friendly error when stock is insufficient.
+     *
+     * **Validates: Requirements 1.6**
+     */
+    public function test_checkout_fails_when_stock_insufficient(): void
+    {
+        $product = Product::factory()->oneOff()->create([
+            'name' => 'Limited Widget',
+            'price' => 10.00,
+            'stock_quantity' => 3,
+        ]);
+
+        $cartItems = [
+            [
+                'product_id' => $product->id,
+                'name' => $product->name,
+                'price' => 10.00,
+                'product_type' => 'one_off',
+                'billing_frequency' => null,
+                'quantity' => 5,
+                'total_price' => 50.00,
+            ],
+        ];
+
+        $cartService = Mockery::mock(\App\Services\CartService::class);
+        $cartService->shouldReceive('getItems')->andReturn($cartItems);
+        $cartService->shouldReceive('hasOnlyHostingItems')->andReturn(false);
+        $cartService->shouldReceive('getDeliveryTotal')->andReturn(0.0);
+
+        $this->stripeService->shouldReceive('ensureCustomer')->once()->andReturn('cus_test_123');
+
+        $result = $this->checkoutService->processCheckout($this->customer, $cartService, [
+            'address_line1' => '123 Main St',
+            'city' => 'London',
+            'postal_code' => 'SW1A 1AA',
+            'country' => 'GB',
+        ]);
+
+        $this->assertFalse($result->success);
+        $this->assertStringContainsString("Insufficient stock for 'Limited Widget'", $result->errorMessage);
+        $this->assertStringContainsString('Only 3 units available', $result->errorMessage);
+
+        // Verify stock was NOT decremented (transaction rolled back)
+        $product->refresh();
+        $this->assertEquals(3, $product->stock_quantity);
+    }
+
+    /**
+     * Test: Checkout does not decrement stock for products with unlimited stock (null).
+     *
+     * **Validates: Requirements 1.3**
+     */
+    public function test_checkout_skips_decrement_for_unlimited_stock(): void
+    {
+        $product = Product::factory()->oneOff()->create([
+            'name' => 'Unlimited Widget',
+            'price' => 10.00,
+            'stock_quantity' => null,
+        ]);
+
+        $cartItems = [
+            [
+                'product_id' => $product->id,
+                'name' => $product->name,
+                'price' => 10.00,
+                'product_type' => 'one_off',
+                'billing_frequency' => null,
+                'quantity' => 100,
+                'total_price' => 1000.00,
+            ],
+        ];
+
+        $cartService = Mockery::mock(\App\Services\CartService::class);
+        $cartService->shouldReceive('getItems')->andReturn($cartItems);
+        $cartService->shouldReceive('hasOnlyHostingItems')->andReturn(false);
+        $cartService->shouldReceive('getDeliveryTotal')->andReturn(0.0);
+        $cartService->shouldReceive('clear')->once();
+
+        $this->stripeService->shouldReceive('ensureCustomer')->once()->andReturn('cus_test_123');
+        $this->stripeService->shouldReceive('createCheckoutSessionWithParams')->once()
+            ->andReturn(\Stripe\Checkout\Session::constructFrom(['id' => 'cs_test', 'url' => 'https://checkout.stripe.com/test']));
+
+        $this->notificationService->shouldReceive('notifyAdminNewOrder')->once();
+
+        $result = $this->checkoutService->processCheckout($this->customer, $cartService, [
+            'address_line1' => '123 Main St',
+            'city' => 'London',
+            'postal_code' => 'SW1A 1AA',
+            'country' => 'GB',
+        ]);
+
+        $this->assertTrue($result->success, 'Checkout failed: ' . ($result->errorMessage ?? 'unknown'));
+
+        // Verify stock remains null (unlimited)
+        $product->refresh();
+        $this->assertNull($product->stock_quantity);
+    }
+
+    /**
+     * Test: Only one-off products get stock decremented, not rental or hosting.
+     *
+     * **Validates: Requirements 1.3**
+     */
+    public function test_checkout_only_decrements_stock_for_one_off_products(): void
+    {
+        $oneOff = Product::factory()->oneOff()->create([
+            'name' => 'One-Off Widget',
+            'price' => 10.00,
+            'stock_quantity' => 20,
+        ]);
+        $rental = Product::factory()->equipmentRental()->create([
+            'name' => 'Router Rental',
+            'price' => 15.00,
+            'stock_quantity' => 10,
+        ]);
+
+        $cartItems = [
+            [
+                'product_id' => $oneOff->id,
+                'name' => $oneOff->name,
+                'price' => 10.00,
+                'product_type' => 'one_off',
+                'billing_frequency' => null,
+                'quantity' => 3,
+                'total_price' => 30.00,
+            ],
+            [
+                'product_id' => $rental->id,
+                'name' => $rental->name,
+                'price' => 15.00,
+                'product_type' => 'equipment_rental',
+                'billing_frequency' => null,
+                'quantity' => 2,
+                'total_price' => 30.00,
+                'rental_start_date' => now()->addDays(1)->toDateString(),
+                'rental_end_date' => now()->addDays(7)->toDateString(),
+            ],
+        ];
+
+        $cartService = Mockery::mock(\App\Services\CartService::class);
+        $cartService->shouldReceive('getItems')->andReturn($cartItems);
+        $cartService->shouldReceive('hasOnlyHostingItems')->andReturn(false);
+        $cartService->shouldReceive('getDeliveryTotal')->andReturn(0.0);
+        $cartService->shouldReceive('clear')->once();
+
+        $this->stripeService->shouldReceive('ensureCustomer')->once()->andReturn('cus_test_123');
+        $this->stripeService->shouldReceive('createCheckoutSessionWithParams')->once()
+            ->andReturn(\Stripe\Checkout\Session::constructFrom(['id' => 'cs_test', 'url' => 'https://checkout.stripe.com/test']));
+
+        $this->bookingService->shouldReceive('createBooking')->once()
+            ->andReturn(new \App\Models\Booking(['id' => 1]));
+
+        $this->notificationService->shouldReceive('notifyAdminNewOrder')->once();
+
+        $result = $this->checkoutService->processCheckout($this->customer, $cartService, [
+            'address_line1' => '123 Main St',
+            'city' => 'London',
+            'postal_code' => 'SW1A 1AA',
+            'country' => 'GB',
+        ]);
+
+        $this->assertTrue($result->success, 'Checkout failed: ' . ($result->errorMessage ?? 'unknown'));
+
+        // One-off product stock should be decremented
+        $oneOff->refresh();
+        $this->assertEquals(17, $oneOff->stock_quantity);
+
+        // Rental product stock should NOT be decremented
+        $rental->refresh();
+        $this->assertEquals(10, $rental->stock_quantity);
+    }
 }

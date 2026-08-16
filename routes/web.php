@@ -85,6 +85,7 @@ Route::middleware(['auth', 'verified'])->prefix('portal')->name('portal.')->grou
     Route::post('/cart/checkout', [Portal\CartController::class, 'checkout'])->name('cart.checkout');
     Route::post('/cart/{product}', [Portal\CartController::class, 'add'])->name('cart.add');
     Route::delete('/cart/{index}', [Portal\CartController::class, 'remove'])->name('cart.remove');
+    Route::put('/cart/{index}/quantity', [Portal\CartController::class, 'updateQuantity'])->name('cart.updateQuantity');
     Route::get('/orders', [Portal\OrderController::class, 'index'])->name('orders.index');
     Route::get('/orders/{order}', [Portal\OrderController::class, 'show'])->name('orders.show');
     Route::get('/orders/{order}/download-invoice', [Portal\OrderController::class, 'downloadInvoice'])->name('orders.downloadInvoice');
@@ -212,6 +213,8 @@ Route::middleware(['auth', 'verified', EnsureIsAdmin::class])->prefix('admin')->
     Route::resource('shop/products', Admin\ShopProductController::class)->except(['show', 'destroy'])->names('shop.products');
     Route::post('shop/products/{product}/archive', [Admin\ShopProductController::class, 'archive'])->name('shop.products.archive');
     Route::post('shop/products/{product}/restore', [Admin\ShopProductController::class, 'restore'])->name('shop.products.restore');
+    Route::post('shop/products/{product}/link-asset', [Admin\ShopProductController::class, 'linkAsset'])->name('shop.products.link-asset');
+    Route::delete('shop/products/{product}/unlink-asset/{asset}', [Admin\ShopProductController::class, 'unlinkAsset'])->name('shop.products.unlink-asset');
     Route::get('shop/orders', [Admin\ShopOrderController::class, 'index'])->name('shop.orders.index');
     Route::get('shop/orders/{order}', [Admin\ShopOrderController::class, 'show'])->name('shop.orders.show');
     Route::post('shop/orders/{order}/fulfil', [Admin\ShopOrderController::class, 'fulfil'])->name('shop.orders.fulfil');
@@ -234,6 +237,18 @@ Route::middleware(['auth', 'verified', EnsureIsAdmin::class])->prefix('admin')->
 
     // Discount Codes Management
     Route::resource('shop/discount-codes', Admin\DiscountCodeController::class)->except(['show'])->names('shop.discount-codes');
+
+    // Fulfilment Queue
+    Route::prefix('fulfilment')->name('fulfilment.')->group(function () {
+        Route::get('/', [Admin\FulfilmentQueueController::class, 'index'])->name('index');
+        Route::get('/{booking}', [Admin\FulfilmentQueueController::class, 'show'])->name('show');
+        Route::post('/{booking}/assign-assets', [Admin\FulfilmentQueueController::class, 'assignAssets'])->name('assignAssets');
+        Route::post('/{booking}/advance', [Admin\FulfilmentQueueController::class, 'advance'])->name('advance');
+        Route::post('/{booking}/inspect', [Admin\FulfilmentQueueController::class, 'inspect'])->name('inspect');
+    });
+
+    // Customer Shop & Rental History
+    Route::get('/customers/{customer}/shop', [Admin\CustomerShopController::class, 'index'])->name('customers.shop');
 });
 
 /*

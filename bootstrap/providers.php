@@ -6,4 +6,5 @@ use App\Providers\StripeServiceProvider;
 return [
     AppServiceProvider::class,
     StripeServiceProvider::class,
+    \Mews\Purifier\PurifierServiceProvider::class,
 ];

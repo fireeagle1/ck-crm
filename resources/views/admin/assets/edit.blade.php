@@ -58,11 +58,25 @@
                     <div>
                         <label for="asset_status" class="block text-sm font-medium text-gray-700">Status</label>
                         <select name="asset_status" id="asset_status" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                            @foreach (['Active', 'In Repair', 'Decommissioned'] as $s)
+                            @foreach (['Active', 'Available', 'Rented Out', 'Reserved', 'In Repair', 'Decommissioned'] as $s)
                                 <option value="{{ $s }}" {{ old('asset_status', $asset->asset_status) === $s ? 'selected' : '' }}>{{ $s }}</option>
                             @endforeach
                         </select>
                     </div>
+                </div>
+
+                <div>
+                    <label for="product_id" class="block text-sm font-medium text-gray-700">Link to Product (optional)</label>
+                    <select name="product_id" id="product_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                        <option value="">None</option>
+                        @foreach ($products as $product)
+                            <option value="{{ $product->id }}" {{ old('product_id', $asset->product_id) == $product->id ? 'selected' : '' }}>
+                                {{ $product->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                    <p class="text-xs text-gray-500 mt-1">Only equipment rental products are shown.</p>
+                    @error('product_id') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
                 </div>
 
                 <div>

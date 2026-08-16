@@ -1,0 +1,692 @@
+{
+  "pbtResults": {},
+  "executionHistory": {
+    "1.1 Create migration to add `product_id` to `cmdb` table": [
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786871995377
+      },
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786872004963
+      },
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786872130204
+      }
+    ],
+    "1.2 Create migration to add `fulfilment_stage` to `bookings` table": [
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786871995418
+      },
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786872005914
+      },
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786872131080
+      }
+    ],
+    "1.3 Create `booking_assets` pivot table migration": [
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786871995457
+      },
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786872006692
+      },
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786872131951
+      }
+    ],
+    "1.4 Create `booking_inspections` table migration": [
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786871995483
+      },
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786872007534
+      },
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786872132818
+      }
+    ],
+    "1.5 Create migration to add `track_individual_assets` to `products` table": [
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786871995515
+      },
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786872008434
+      },
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786872133720
+      }
+    ],
+    "2.1 Create `BookingAsset` model": [
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786871995541
+      },
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786872138297
+      },
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786872229650
+      }
+    ],
+    "2.2 Create `BookingInspection` model": [
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786871995567
+      },
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786872139029
+      },
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786872230379
+      }
+    ],
+    "2.3 Update `Asset` model": [
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786871995592
+      },
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786872139911
+      },
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786872231141
+      }
+    ],
+    "2.4 Update `Booking` model": [
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786871995625
+      },
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786872140613
+      },
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786872232036
+      }
+    ],
+    "2.5 Update `Product` model": [
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786871995651
+      },
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786872141443
+      },
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786872232736
+      }
+    ],
+    "3. Checkpoint — Run migrations, verify models load correctly": [
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786871995685
+      },
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786872237518
+      },
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786890249317
+      }
+    ],
+    "4.1 Create `FulfilmentStageService`": [
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786871995722
+      },
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786890253981
+      },
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786890526443
+      }
+    ],
+    "4.2 Create `AssetAssignmentService`": [
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786871995751
+      },
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786890254868
+      },
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786890527180
+      }
+    ],
+    "4.3 Create `BookingInspectionService`": [
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786871995783
+      },
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786890255570
+      },
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786890528009
+      }
+    ],
+    "4.4 Enhance `CartService` for one-off quantity": [
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786871995810
+      },
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786890256494
+      },
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786890529074
+      }
+    ],
+    "5. Checkpoint — Verify services instantiate and basic logic works": [
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786871995842
+      },
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786890533534
+      }
+    ],
+    "6.1 Create `Admin\\FulfilmentQueueController`": [
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786871995869
+      },
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786890666325
+      },
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786890867584
+      }
+    ],
+    "6.2 Create `Admin\\CustomerShopController`": [
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786871995907
+      },
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786890667170
+      },
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786890868431
+      }
+    ],
+    "6.3 Enhance `Admin\\AssetController` for product linking": [
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786871995932
+      },
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786890668031
+      },
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786890869334
+      }
+    ],
+    "6.4 Enhance `Admin\\ShopProductController` for asset pool display": [
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786871995957
+      },
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786890668887
+      },
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786890870207
+      }
+    ],
+    "7.1 Enhance `Portal\\CartController`": [
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786871995985
+      },
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786890669723
+      },
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786890871098
+      }
+    ],
+    "7.2 Enhance `Portal\\CartController@add` for one-off quantity": [
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786871996016
+      },
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786890875450
+      },
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786890930926
+      }
+    ],
+    "7.3 Enhance `Portal\\ShopController@show` for one-off quantity data": [
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786871996042
+      },
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786890876342
+      },
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786890931743
+      }
+    ],
+    "8.1 Create `admin.fulfilment.index` view": [
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786871996068
+      },
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786890936551
+      },
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786891203484
+      }
+    ],
+    "8.2 Create `admin.fulfilment.show` view": [
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786871996098
+      },
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786890937326
+      },
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786891204316
+      }
+    ],
+    "8.3 Create `admin.customers.shop` view": [
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786871996122
+      },
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786890938183
+      },
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786891205098
+      }
+    ],
+    "8.4 Update `admin.customers.show` to link to shop page": [
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786871996149
+      },
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786890939056
+      },
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786891206166
+      }
+    ],
+    "8.5 Update `admin.assets.edit` and `admin.assets.create` views": [
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786871996176
+      },
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786890939951
+      },
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786891206998
+      }
+    ],
+    "8.6 Update `admin.shop.products.edit` view for asset pool": [
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786871996207
+      },
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786891211675
+      },
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786891402732
+      }
+    ],
+    "9.1 Update `portal.shop.show` for one-off quantity input": [
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786871996241
+      },
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786891212590
+      },
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786891403594
+      }
+    ],
+    "9.2 Update `portal.cart.index` for quantity adjustment": [
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786871996275
+      },
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786891213382
+      },
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786891405507
+      }
+    ],
+    "9.3 Update `portal.orders.show` for quantity display": [
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786871996301
+      },
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786891214248
+      },
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786891404576
+      }
+    ],
+    "10.1 Update `CheckoutService` to handle quantity for one-off products": [
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786871996327
+      },
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786891414544
+      },
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786891615935
+      }
+    ],
+    "11.1 Register fulfilment queue routes": [
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786871996357
+      },
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786891620519
+      },
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786891841097
+      }
+    ],
+    "11.2 Wire fulfilment stage into existing checkout flow": [
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786871996383
+      },
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786891621411
+      },
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786891842880
+      }
+    ],
+    "11.3 Add navigation links": [
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786871996415
+      },
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786891622186
+      },
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786891841997
+      }
+    ],
+    "12. Final Checkpoint — End-to-end verification": [
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786871996440
+      },
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786891847660
+      },
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786892038333
+      }
+    ],
+    "1. Database migrations": [
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786872133762
+      }
+    ],
+    "2. Models": [
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786872232777
+      }
+    ],
+    "4. Services": [
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786890529121
+      }
+    ],
+    "6. Admin Controllers": [
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786890870241
+      }
+    ],
+    "7. Portal Controllers (Quantity Selection)": [
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786890931775
+      }
+    ],
+    "8. Admin Views": [
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786891402781
+      }
+    ],
+    "9. Portal Views (Quantity Selection)": [
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786891405545
+      }
+    ],
+    "10. Checkout flow enhancement for quantity stock decrement": [
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786891615981
+      }
+    ],
+    "11. Route registration and wiring": [
+      {
+        "executionId": "9deda2e5-7fc6-4ab8-a659-38eff438c7d7",
+        "chatSessionId": "sess_b0751e10-628d-4ddc-b1bf-9577e200ecf1",
+        "timestamp": 1786891842922
+      }
+    ]
+  }
+}

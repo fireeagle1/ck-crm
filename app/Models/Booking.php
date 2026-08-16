@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Booking extends Model
 {
@@ -20,6 +22,7 @@ class Booking extends Model
         'quantity',
         'total_price',
         'status',
+        'fulfilment_stage',
         'returned_at',
         'signature_data',
         'agreement_accepted_at',
@@ -33,6 +36,7 @@ class Booking extends Model
         'total_price' => 'decimal:2',
         'returned_at' => 'datetime',
         'agreement_accepted_at' => 'datetime',
+        'fulfilment_stage' => 'string',
     ];
 
     // ──────────────────────────────────────────────
@@ -52,6 +56,26 @@ class Booking extends Model
     public function customer(): BelongsTo
     {
         return $this->belongsTo(Customer::class, 'company_id', 'company_id');
+    }
+
+    public function assignedAssets(): HasMany
+    {
+        return $this->hasMany(BookingAsset::class);
+    }
+
+    public function inspections(): HasMany
+    {
+        return $this->hasMany(BookingInspection::class);
+    }
+
+    public function checkoutInspection(): HasOne
+    {
+        return $this->hasOne(BookingInspection::class)->where('type', 'checkout');
+    }
+
+    public function returnInspection(): HasOne
+    {
+        return $this->hasOne(BookingInspection::class)->where('type', 'return');
     }
 
     // ──────────────────────────────────────────────
@@ -98,5 +122,27 @@ class Booking extends Model
     {
         return $query->where('start_date', '<=', $endDate)
                      ->where('end_date', '>=', $startDate);
+    }
+
+    /**
+     * Scope to filter bookings at a specific fulfilment stage.
+     */
+    public function scopeAtStage(Builder $query, string $stage): Builder
+    {
+        return $query->where('fulfilment_stage', $stage);
+    }
+
+    /**
+     * Scope to filter bookings that still need action (all stages before 'inspected').
+     */
+    public function scopeNeedsAction(Builder $query): Builder
+    {
+        return $query->whereIn('fulfilment_stage', [
+            'ordered',
+            'packing',
+            'ready',
+            'checked_out',
+            'returned',
+        ]);
     }
 }

@@ -23,6 +23,9 @@ class CartService
     /**
      * Add a product to the cart with optional rental/hosting data.
      *
+     * For one-off products, if the same product already exists in the cart,
+     * the quantity is incremented rather than adding a new line.
+     *
      * @param Product $product The product to add.
      * @param array $options Optional data: rental_start_date, rental_end_date, quantity, domain_name.
      *
@@ -39,7 +42,27 @@ class CartService
         // Validate options based on product type
         $this->validateOptions($product, $options);
 
+        $quantity = max(1, (int) ($options['quantity'] ?? 1));
+
+        // Validate quantity against stock for one-off products
+        if ($product->isOneOff()) {
+            $this->validateOneOffQuantity($product, $quantity);
+        }
+
         $items = $this->getItems();
+
+        // For one-off products, check for duplicate and increment quantity instead of adding a new line
+        if ($product->isOneOff()) {
+            $existingIndex = $this->findDuplicateOneOffIndex($items, $product);
+            if ($existingIndex !== null) {
+                $newQuantity = $items[$existingIndex]['quantity'] + $quantity;
+                $this->validateOneOffQuantity($product, $newQuantity);
+                $items[$existingIndex]['quantity'] = $newQuantity;
+                $items[$existingIndex]['total_price'] = (float) $product->price * $newQuantity;
+                session()->put(self::SESSION_KEY, $items);
+                return;
+            }
+        }
 
         $item = [
             'product_id' => $product->id,
@@ -47,7 +70,7 @@ class CartService
             'price' => (float) $product->price,
             'product_type' => $product->product_type,
             'billing_frequency' => $product->billing_frequency,
-            'quantity' => max(1, (int) ($options['quantity'] ?? 1)),
+            'quantity' => $quantity,
             'rental_start_date' => $options['rental_start_date'] ?? null,
             'rental_end_date' => $options['rental_end_date'] ?? null,
             'domain_name' => $options['domain_name'] ?? null,
@@ -149,6 +172,40 @@ class CartService
     }
 
     /**
+     * Validate quantity for one-off products against stock.
+     *
+     * @throws InvalidArgumentException if quantity < 1 or exceeds stock.
+     */
+    private function validateOneOffQuantity(Product $product, int $quantity): void
+    {
+        if ($quantity < 1) {
+            throw new InvalidArgumentException('Quantity must be at least 1.');
+        }
+
+        if ($product->stock_quantity !== null && $quantity > $product->stock_quantity) {
+            throw new InvalidArgumentException(
+                "Only {$product->stock_quantity} units available for \"{$product->name}\"."
+            );
+        }
+    }
+
+    /**
+     * Find the index of an existing one-off item in the cart for the same product.
+     *
+     * Returns the index if a duplicate one-off item is found, or null if not.
+     */
+    private function findDuplicateOneOffIndex(array $items, Product $product): ?int
+    {
+        foreach ($items as $index => $item) {
+            if ($item['product_id'] === $product->id && $item['product_type'] === 'one_off') {
+                return $index;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Validate a domain name format.
      */
     public function isValidDomain(string $domain): bool
@@ -186,6 +243,50 @@ class CartService
 
         // Re-index the array to maintain sequential keys
         session()->put(self::SESSION_KEY, array_values($items));
+    }
+
+    /**
+     * Update the quantity of a cart item (for one-off products).
+     *
+     * Validates the new quantity against the product's stock_quantity and
+     * recalculates the line total.
+     *
+     * @param int $index The cart item index.
+     * @param int $quantity The new quantity (must be >= 1).
+     *
+     * @throws InvalidArgumentException if the index is invalid, item is not one-off, or quantity exceeds stock.
+     */
+    public function updateItemQuantity(int $index, int $quantity): void
+    {
+        $items = $this->getItems();
+
+        if (!array_key_exists($index, $items)) {
+            throw new InvalidArgumentException('Cart item not found.');
+        }
+
+        $item = $items[$index];
+
+        if ($item['product_type'] !== 'one_off') {
+            throw new InvalidArgumentException('Quantity can only be adjusted for one-off products.');
+        }
+
+        if ($quantity < 1) {
+            throw new InvalidArgumentException('Quantity must be at least 1.');
+        }
+
+        // Validate against stock
+        $product = Product::find($item['product_id']);
+        if ($product && $product->stock_quantity !== null && $quantity > $product->stock_quantity) {
+            throw new InvalidArgumentException(
+                "Only {$product->stock_quantity} units available for \"{$item['name']}\"."
+            );
+        }
+
+        // Update quantity and recalculate line total
+        $items[$index]['quantity'] = $quantity;
+        $items[$index]['total_price'] = (float) $items[$index]['price'] * $quantity;
+
+        session()->put(self::SESSION_KEY, $items);
     }
 
     /**

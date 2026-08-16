@@ -82,4 +82,9 @@ class Customer extends Model
     {
         return $this->hasMany(Order::class, 'company_id', 'company_id');
     }
+
+    public function bookings(): HasMany
+    {
+        return $this->hasMany(Booking::class, 'company_id', 'company_id');
+    }
 }

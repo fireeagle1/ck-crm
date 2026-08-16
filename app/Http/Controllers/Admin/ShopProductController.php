@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Asset;
 use App\Models\Customer;
 use App\Models\CustomerTier;
 use App\Models\Product;
@@ -105,7 +106,27 @@ class ShopProductController extends Controller
         $selectedCustomerIds = $product->visibilityRule?->customers->pluck('company_id')->toArray() ?? [];
         $selectedTierIds = $product->visibilityRule?->tiers->pluck('id')->toArray() ?? [];
 
-        return view('admin.shop.products.edit', compact('product', 'customers', 'tiers', 'selectedCustomerIds', 'selectedTierIds'));
+        // Load linked assets data for equipment_rental products
+        $linkedAssets = collect();
+        $availableAssetCount = 0;
+        $totalAssetCount = 0;
+
+        if ($product->isEquipmentRental()) {
+            $linkedAssets = $product->assets()->orderBy('device_name')->get();
+            $totalAssetCount = $linkedAssets->count();
+            $availableAssetCount = $product->getAvailableAssetCount();
+        }
+
+        return view('admin.shop.products.edit', compact(
+            'product',
+            'customers',
+            'tiers',
+            'selectedCustomerIds',
+            'selectedTierIds',
+            'linkedAssets',
+            'availableAssetCount',
+            'totalAssetCount'
+        ));
     }
 
     public function update(Request $request, Product $product): RedirectResponse
@@ -176,6 +197,49 @@ class ShopProductController extends Controller
 
         return redirect()->route('admin.shop.products.index')
             ->with('success', "Product '{$product->name}' restored.");
+    }
+
+    /**
+     * Link an existing asset to an equipment_rental product.
+     */
+    public function linkAsset(Request $request, Product $product): RedirectResponse
+    {
+        if (!$product->isEquipmentRental()) {
+            return redirect()->route('admin.shop.products.edit', $product)
+                ->with('error', 'Only equipment rental products support asset linking.');
+        }
+
+        $validated = $request->validate([
+            'asset_id' => 'required|exists:cmdb,device_id',
+        ]);
+
+        $asset = Asset::where('device_id', $validated['asset_id'])->firstOrFail();
+
+        if ($asset->product_id !== null && $asset->product_id !== $product->id) {
+            return redirect()->route('admin.shop.products.edit', $product)
+                ->with('error', 'This asset is already linked to another product.');
+        }
+
+        $asset->update(['product_id' => $product->id]);
+
+        return redirect()->route('admin.shop.products.edit', $product)
+            ->with('success', "Asset '{$asset->device_name}' linked successfully.");
+    }
+
+    /**
+     * Unlink an asset from an equipment_rental product.
+     */
+    public function unlinkAsset(Product $product, Asset $asset): RedirectResponse
+    {
+        if ($asset->product_id !== $product->id) {
+            return redirect()->route('admin.shop.products.edit', $product)
+                ->with('error', 'This asset is not linked to this product.');
+        }
+
+        $asset->update(['product_id' => null]);
+
+        return redirect()->route('admin.shop.products.edit', $product)
+            ->with('success', "Asset '{$asset->device_name}' unlinked successfully.");
     }
 
     /**

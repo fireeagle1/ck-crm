@@ -78,9 +78,12 @@ class ShopController extends Controller
             $viewData['deliveryInstructions'] = $product->delivery_instructions;
         }
 
-        // For one_off products, pass delivery instructions if available
+        // For one_off products, pass delivery instructions and max quantity
         if ($product->isOneOff()) {
             $viewData['deliveryInstructions'] = $product->delivery_instructions;
+            $viewData['maxQuantity'] = $product->stock_quantity !== null
+                ? min((int) $product->stock_quantity, 99)
+                : 99;
         }
 
         return view('portal.shop.show', $viewData);

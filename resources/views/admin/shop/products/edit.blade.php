@@ -223,6 +223,114 @@
         </form>
     </div>
 
+    {{-- Linked Assets Section (Equipment Rental only) --}}
+    @if ($product->isEquipmentRental())
+        <div class="bg-white rounded-lg border p-6 max-w-3xl mt-6" x-data="{ showLinkForm: false }">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <h2 class="text-lg font-bold text-gray-900">Linked Assets</h2>
+                    <p class="text-sm text-gray-500 mt-0.5">
+                        <span class="font-medium text-green-700">{{ $availableAssetCount }} available</span> / {{ $totalAssetCount }} total
+                    </p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button type="button"
+                            @click="showLinkForm = !showLinkForm"
+                            class="px-3 py-2 text-sm font-medium text-blue-600 border border-blue-200 rounded-md hover:bg-blue-50">
+                        Link Existing Asset
+                    </button>
+                    <a href="{{ route('admin.assets.create', ['product_id' => $product->id]) }}"
+                       class="px-3 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700">
+                        Create New Asset
+                    </a>
+                </div>
+            </div>
+
+            {{-- Link Existing Asset Form --}}
+            <div x-show="showLinkForm" x-transition class="mb-4 p-4 bg-gray-50 rounded-md border">
+                <form method="POST" action="{{ route('admin.shop.products.link-asset', $product) }}" class="flex items-end gap-3">
+                    @csrf
+                    <div class="flex-1">
+                        <label for="asset_id" class="block text-sm font-medium text-gray-700 mb-1">Select Asset</label>
+                        <select name="asset_id" id="asset_id" required
+                                class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
+                            <option value="">Choose an asset...</option>
+                            @foreach (\App\Models\Asset::whereNull('product_id')->orderBy('device_name')->get() as $unlinkedAsset)
+                                <option value="{{ $unlinkedAsset->device_id }}">
+                                    {{ $unlinkedAsset->device_name }} — {{ $unlinkedAsset->serial_number ?: 'No serial' }}
+                                    ({{ $unlinkedAsset->asset_status }})
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700">
+                        Link
+                    </button>
+                    <button type="button" @click="showLinkForm = false" class="px-4 py-2 text-sm font-medium text-gray-600 border rounded-md hover:bg-gray-50">
+                        Cancel
+                    </button>
+                </form>
+                @error('asset_id') <p class="text-red-600 text-sm mt-2">{{ $message }}</p> @enderror
+            </div>
+
+            {{-- Assets Table --}}
+            @if ($linkedAssets->isEmpty())
+                <div class="text-center py-8 text-gray-400 text-sm">
+                    No assets linked to this product yet.
+                </div>
+            @else
+                <div class="overflow-x-auto">
+                    <table class="min-w-full text-sm">
+                        <thead class="bg-gray-50 border-b">
+                            <tr>
+                                <th class="px-4 py-2 text-left font-medium text-gray-600">Device Name</th>
+                                <th class="px-4 py-2 text-left font-medium text-gray-600">Serial Number</th>
+                                <th class="px-4 py-2 text-left font-medium text-gray-600">Status</th>
+                                <th class="px-4 py-2 text-left font-medium text-gray-600">Location</th>
+                                <th class="px-4 py-2 text-right font-medium text-gray-600">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100">
+                            @foreach ($linkedAssets as $asset)
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-4 py-2 font-medium text-gray-900">{{ $asset->device_name }}</td>
+                                    <td class="px-4 py-2 text-gray-600">{{ $asset->serial_number ?: '—' }}</td>
+                                    <td class="px-4 py-2">
+                                        @php
+                                            $statusColors = [
+                                                'Available' => 'bg-green-100 text-green-700',
+                                                'Rented Out' => 'bg-blue-100 text-blue-700',
+                                                'Reserved' => 'bg-yellow-100 text-yellow-700',
+                                                'In Repair' => 'bg-orange-100 text-orange-700',
+                                                'Decommissioned' => 'bg-gray-100 text-gray-600',
+                                            ];
+                                            $colorClass = $statusColors[$asset->asset_status] ?? 'bg-gray-100 text-gray-600';
+                                        @endphp
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium {{ $colorClass }}">
+                                            {{ $asset->asset_status }}
+                                        </span>
+                                    </td>
+                                    <td class="px-4 py-2 text-gray-600">{{ $asset->location ?: '—' }}</td>
+                                    <td class="px-4 py-2 text-right">
+                                        <form method="POST"
+                                              action="{{ route('admin.shop.products.unlink-asset', [$product, $asset->device_id]) }}"
+                                              onsubmit="return confirm('Unlink this asset from the product?')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="text-red-600 hover:underline text-xs font-medium">
+                                                Unlink
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            @endif
+        </div>
+    @endif
+
     <script>
         function productEditForm() {
             return {

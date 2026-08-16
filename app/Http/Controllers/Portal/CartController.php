@@ -33,7 +33,8 @@ class CartController extends Controller
      * Add a product to the cart after verifying availability and visibility.
      *
      * Accepts rental options (rental_start_date, rental_end_date, quantity) for equipment_rental products,
-     * and domain_name for hosting products. These are passed through to CartService for validation.
+     * quantity for one-off products, and domain_name for hosting products.
+     * These are passed through to CartService for validation.
      */
     public function add(Request $request, Product $product): RedirectResponse
     {
@@ -50,6 +51,10 @@ class CartController extends Controller
             $options['rental_start_date'] = $request->input('rental_start_date');
             $options['rental_end_date'] = $request->input('rental_end_date');
             $options['quantity'] = $request->input('quantity', 1);
+        }
+
+        if ($product->isOneOff()) {
+            $options['quantity'] = (int) $request->input('quantity', 1);
         }
 
         if ($product->isHosting()) {
@@ -75,6 +80,26 @@ class CartController extends Controller
 
         return redirect()->route('portal.cart.index')
             ->with('success', 'Item removed from cart.');
+    }
+
+    /**
+     * Update the quantity of a one-off cart item.
+     */
+    public function updateQuantity(Request $request, int $index): RedirectResponse
+    {
+        $request->validate([
+            'quantity' => 'required|integer|min:1',
+        ]);
+
+        try {
+            $this->cartService->updateItemQuantity($index, (int) $request->input('quantity'));
+
+            return redirect()->route('portal.cart.index')
+                ->with('success', 'Quantity updated.');
+        } catch (\InvalidArgumentException $e) {
+            return redirect()->route('portal.cart.index')
+                ->with('error', $e->getMessage());
+        }
     }
 
     /**

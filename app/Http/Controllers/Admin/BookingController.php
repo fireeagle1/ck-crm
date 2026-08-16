@@ -10,11 +10,13 @@ use App\Models\OrderItem;
 use App\Models\Product;
 use App\Services\AvailabilityService;
 use App\Services\BookingService;
+use App\Services\FulfilmentStageService;
 use App\Services\NotificationService;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 
 class BookingController extends Controller
@@ -23,6 +25,7 @@ class BookingController extends Controller
         private BookingService $bookingService,
         private AvailabilityService $availabilityService,
         private NotificationService $notificationService,
+        private FulfilmentStageService $fulfilmentStageService,
     ) {}
 
     /**
@@ -74,13 +77,28 @@ class BookingController extends Controller
     }
 
     /**
-     * Mark a booking as returned, trigger notification.
+     * Mark a booking as returned, trigger notification, and advance fulfilment stage.
      *
-     * Requirements: 7.3
+     * Requirements: 7.3, 3.9
      */
     public function markReturned(Booking $booking): RedirectResponse
     {
         $this->bookingService->markReturned($booking);
+
+        // Advance fulfilment stage to 'returned' if booking is at 'checked_out' stage
+        if ($booking->fulfilment_stage === 'checked_out') {
+            try {
+                $this->fulfilmentStageService->advance($booking, 'returned');
+            } catch (\InvalidArgumentException $e) {
+                // Log but don't block the return — the booking status is already updated
+                Log::warning('Could not advance fulfilment stage on markReturned', [
+                    'booking_id' => $booking->id,
+                    'current_stage' => $booking->fulfilment_stage,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        }
+
         $this->notificationService->notifyCustomerReturnConfirmed($booking);
 
         return redirect()->route('admin.shop.bookings.show', $booking)
@@ -189,6 +207,7 @@ class BookingController extends Controller
                     'quantity' => $quantity,
                     'total_price' => $totalPrice,
                     'status' => 'confirmed',
+                    'fulfilment_stage' => 'ordered',
                 ]);
 
                 // Link booking to order item

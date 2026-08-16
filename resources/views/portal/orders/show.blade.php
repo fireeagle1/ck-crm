@@ -121,6 +121,7 @@
                     <th class="px-4 py-3 text-left font-semibold text-gray-600">Product</th>
                     <th class="px-4 py-3 text-left font-semibold text-gray-600">Type</th>
                     <th class="px-4 py-3 text-left font-semibold text-gray-600">Billing</th>
+                    <th class="px-4 py-3 text-center font-semibold text-gray-600">Qty</th>
                     <th class="px-4 py-3 text-right font-semibold text-gray-600">Price</th>
                 </tr>
             </thead>
@@ -142,12 +143,26 @@
                             @endswitch
                         </td>
                         <td class="px-4 py-3 text-gray-500">{{ $item->billing_frequency ? ucfirst($item->billing_frequency) : '—' }}</td>
-                        <td class="px-4 py-3 text-right font-medium">&pound;{{ number_format($item->price, 2) }}</td>
+                        <td class="px-4 py-3 text-center text-gray-700">
+                            @if ($item->product_type === 'one_off' && $item->quantity > 1)
+                                &times;{{ $item->quantity }}
+                            @else
+                                —
+                            @endif
+                        </td>
+                        <td class="px-4 py-3 text-right font-medium">
+                            @if ($item->product_type === 'one_off' && $item->quantity > 1)
+                                <span class="text-gray-500 text-xs">&pound;{{ number_format($item->price, 2) }} &times; {{ $item->quantity }}</span>
+                                <br>&pound;{{ number_format($item->price * $item->quantity, 2) }}
+                            @else
+                                &pound;{{ number_format($item->price, 2) }}
+                            @endif
+                        </td>
                     </tr>
                     {{-- Delivery instructions for this item --}}
                     @if ($item->product && $item->product->delivery_instructions)
                         <tr class="bg-blue-50">
-                            <td colspan="4" class="px-4 py-2">
+                            <td colspan="5" class="px-4 py-2">
                                 <div class="flex items-start gap-2 text-xs text-blue-700">
                                     <svg class="w-4 h-4 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
@@ -161,7 +176,7 @@
             </tbody>
             <tfoot class="border-t bg-gray-50">
                 <tr>
-                    <td colspan="3" class="px-4 py-3 text-right font-semibold text-gray-600">Total</td>
+                    <td colspan="4" class="px-4 py-3 text-right font-semibold text-gray-600">Total</td>
                     <td class="px-4 py-3 text-right font-bold">&pound;{{ number_format($order->total_amount, 2) }}</td>
                 </tr>
             </tfoot>
