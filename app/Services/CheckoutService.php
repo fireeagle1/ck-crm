@@ -32,7 +32,7 @@ class CheckoutService
      * @param Customer $customer The customer placing the order.
      * @param CartService $cart The cart service with items to checkout.
      * @param array $deliveryAddress Address fields: address_line1, address_line2, city, state, postal_code, country.
-     * @param array $checkoutOptions Optional: rental_agreements (product_id => text), signatures (product_id => base64).
+     * @param array $checkoutOptions Optional: rental_agreements, signatures, delivery_method, discount_code, discount_amount.
      * @return CheckoutResult
      */
     public function processCheckout(
@@ -65,10 +65,20 @@ class CheckoutService
                 $this->validateDeliveryAddress($deliveryAddress);
             }
 
+            // Determine delivery method and charge
+            $deliveryMethod = $checkoutOptions['delivery_method'] ?? 'delivery';
+            $deliveryCharge = $cart->getDeliveryTotal($deliveryMethod);
+
+            // Determine discount
+            $discountCode = $checkoutOptions['discount_code'] ?? null;
+            $discountAmount = (float) ($checkoutOptions['discount_amount'] ?? 0);
+
             // Create Order and OrderItems within a transaction, then handle payments
-            $result = DB::transaction(function () use ($customer, $cartItems, $deliveryAddress, $checkoutOptions, $requiresAddress) {
-                // Calculate total amount
-                $totalAmount = $this->calculateTotalAmount($cartItems);
+            $result = DB::transaction(function () use ($customer, $cartItems, $deliveryAddress, $checkoutOptions, $requiresAddress, $deliveryMethod, $deliveryCharge, $discountCode, $discountAmount) {
+                // Calculate total amount (items + delivery - discount)
+                $itemsTotal = $this->calculateTotalAmount($cartItems);
+                $totalAmount = round($itemsTotal + $deliveryCharge - $discountAmount, 2);
+                $totalAmount = max(0, $totalAmount);
 
                 // Create the Order
                 $orderData = [
@@ -76,10 +86,14 @@ class CheckoutService
                     'payment_status' => 'pending',
                     'fulfilment_status' => $this->determineFulfilmentStatus($cartItems),
                     'total_amount' => $totalAmount,
+                    'delivery_method' => $deliveryMethod,
+                    'delivery_charge' => $deliveryCharge,
+                    'discount_code' => $discountCode,
+                    'discount_amount' => $discountAmount,
                 ];
 
                 // Add delivery address if provided and required
-                if ($requiresAddress && !empty($deliveryAddress)) {
+                if ($requiresAddress && !empty($deliveryAddress) && $deliveryMethod === 'delivery') {
                     $orderData['delivery_address_line1'] = $deliveryAddress['address_line1'] ?? null;
                     $orderData['delivery_address_line2'] = $deliveryAddress['address_line2'] ?? null;
                     $orderData['delivery_city'] = $deliveryAddress['city'] ?? null;
@@ -100,7 +114,7 @@ class CheckoutService
                 $this->handleRentalItems($order, $orderItems, $cartItems, $checkoutOptions);
 
                 // Handle Stripe: create Checkout Session for one-off + rental items
-                $checkoutSessionUrl = $this->createStripeCheckoutSession($customer, $order, $cartItems, $orderItems);
+                $checkoutSessionUrl = $this->createStripeCheckoutSession($customer, $order, $cartItems, $orderItems, $deliveryCharge, $discountAmount);
 
                 // Store checkout session ID on the order
                 if ($this->lastCheckoutSessionId) {
@@ -370,10 +384,11 @@ class CheckoutService
     /**
      * Create a Stripe Checkout Session for one-off items and equipment rental items.
      * Equipment rental items are included as one-time charges in the session.
+     * Includes delivery charge as a line item and applies discount.
      *
      * @return string|null The checkout session URL, or null if no payable items.
      */
-    private function createStripeCheckoutSession(Customer $customer, Order $order, array $cartItems, array $orderItems): ?string
+    private function createStripeCheckoutSession(Customer $customer, Order $order, array $cartItems, array $orderItems, float $deliveryCharge = 0, float $discountAmount = 0): ?string
     {
         // Collect items that go through Stripe Checkout Session (one-off + equipment_rental)
         $lineItems = [];
@@ -406,6 +421,20 @@ class CheckoutService
             }
         }
 
+        // Add delivery charge as a line item
+        if ($deliveryCharge > 0) {
+            $lineItems[] = [
+                'price_data' => [
+                    'currency' => 'gbp',
+                    'product_data' => [
+                        'name' => 'Delivery Charge',
+                    ],
+                    'unit_amount' => (int) round($deliveryCharge * 100),
+                ],
+                'quantity' => 1,
+            ];
+        }
+
         if (empty($lineItems)) {
             $this->lastCheckoutSessionId = null;
             return null;
@@ -414,12 +443,35 @@ class CheckoutService
         $successUrl = route('portal.orders.index') . '?checkout=success';
         $cancelUrl = route('portal.cart.index') . '?checkout=cancelled';
 
-        $session = $this->stripe->createCheckoutSession(
-            $customer->stripe_customer_id,
-            $lineItems,
-            $successUrl,
-            $cancelUrl,
-        );
+        // Build session params
+        $sessionParams = [
+            'customer' => $customer->stripe_customer_id,
+            'line_items' => $lineItems,
+            'mode' => 'payment',
+            'success_url' => $successUrl,
+            'cancel_url' => $cancelUrl,
+        ];
+
+        // Apply discount as a coupon if applicable
+        if ($discountAmount > 0) {
+            // Create an inline coupon for the discount amount
+            try {
+                $coupon = \Stripe\Coupon::create([
+                    'amount_off' => (int) round($discountAmount * 100),
+                    'currency' => 'gbp',
+                    'duration' => 'once',
+                    'name' => 'Discount',
+                ]);
+                $sessionParams['discounts'] = [['coupon' => $coupon->id]];
+            } catch (\Throwable $e) {
+                Log::warning('Failed to create Stripe coupon for discount, proceeding without', [
+                    'discount_amount' => $discountAmount,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        }
+
+        $session = $this->stripe->createCheckoutSessionWithParams($sessionParams);
 
         $this->lastCheckoutSessionId = $session->id;
 

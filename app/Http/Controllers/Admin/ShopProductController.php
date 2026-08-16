@@ -64,6 +64,7 @@ class ShopProductController extends Controller
             'cooldown_days' => 'nullable|integer|min:0',
             'rental_agreement_text' => 'nullable|string',
             'delivery_instructions' => 'nullable|string',
+            'delivery_charge' => 'nullable|numeric|min:0',
             'low_stock_threshold' => 'nullable|integer|min:1',
         ]);
 
@@ -85,6 +86,7 @@ class ShopProductController extends Controller
             'cooldown_days' => $validated['cooldown_days'] ?? null,
             'rental_agreement_text' => isset($validated['rental_agreement_text']) ? Purifier::clean($validated['rental_agreement_text']) : null,
             'delivery_instructions' => $validated['delivery_instructions'] ?? null,
+            'delivery_charge' => $validated['delivery_charge'] ?? null,
             'low_stock_threshold' => $validated['low_stock_threshold'] ?? null,
         ]);
 
@@ -125,6 +127,7 @@ class ShopProductController extends Controller
             'cooldown_days' => 'nullable|integer|min:0',
             'rental_agreement_text' => 'nullable|string',
             'delivery_instructions' => 'nullable|string',
+            'delivery_charge' => 'nullable|numeric|min:0',
             'low_stock_threshold' => 'nullable|integer|min:1',
         ]);
 
@@ -149,6 +152,7 @@ class ShopProductController extends Controller
             'cooldown_days' => $validated['cooldown_days'] ?? null,
             'rental_agreement_text' => isset($validated['rental_agreement_text']) ? Purifier::clean($validated['rental_agreement_text']) : null,
             'delivery_instructions' => $validated['delivery_instructions'] ?? null,
+            'delivery_charge' => $validated['delivery_charge'] ?? null,
             'low_stock_threshold' => $validated['low_stock_threshold'] ?? null,
         ]);
 

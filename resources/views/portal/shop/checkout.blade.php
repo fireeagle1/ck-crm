@@ -76,20 +76,51 @@
                     </div>
                 </div>
 
-                {{-- Delivery Address (shown only for physical items) --}}
+                {{-- Delivery Method (shown only for physical items) --}}
                 @if ($hasPhysicalItems)
-                    <div class="bg-white rounded-lg border overflow-hidden">
+                    <div class="bg-white rounded-lg border overflow-hidden" x-data="{ deliveryMethod: '{{ old('delivery_method', 'delivery') }}' }">
                         <div class="px-5 py-4 border-b bg-gray-50">
-                            <h2 class="font-semibold text-gray-900">Delivery Address</h2>
-                            <p class="text-sm text-gray-500 mt-1">Where should we deliver or collect your items?</p>
+                            <h2 class="font-semibold text-gray-900">Delivery Method</h2>
+                            <p class="text-sm text-gray-500 mt-1">Choose how you'd like to receive your items.</p>
                         </div>
-                        <div class="px-5 py-4 space-y-4">
+                        <div class="px-5 py-4 space-y-3">
+                            <label class="flex items-start gap-3 p-3 border rounded-lg cursor-pointer hover:bg-gray-50 transition"
+                                   :class="deliveryMethod === 'delivery' ? 'border-blue-500 bg-blue-50' : 'border-gray-200'">
+                                <input type="radio" name="delivery_method" value="delivery"
+                                       x-model="deliveryMethod"
+                                       class="mt-0.5 text-blue-600 focus:ring-blue-500">
+                                <div>
+                                    <p class="font-medium text-gray-900">Delivery</p>
+                                    <p class="text-sm text-gray-500">We'll deliver to your address.
+                                        @if ($deliveryTotal > 0)
+                                            <span class="font-semibold text-gray-700">&pound;{{ number_format($deliveryTotal, 2) }}</span>
+                                        @else
+                                            <span class="text-green-600 font-medium">Free</span>
+                                        @endif
+                                    </p>
+                                </div>
+                            </label>
+                            <label class="flex items-start gap-3 p-3 border rounded-lg cursor-pointer hover:bg-gray-50 transition"
+                                   :class="deliveryMethod === 'collection' ? 'border-blue-500 bg-blue-50' : 'border-gray-200'">
+                                <input type="radio" name="delivery_method" value="collection"
+                                       x-model="deliveryMethod"
+                                       class="mt-0.5 text-blue-600 focus:ring-blue-500">
+                                <div>
+                                    <p class="font-medium text-gray-900">Collection</p>
+                                    <p class="text-sm text-gray-500">Collect from North Manchester. <span class="text-green-600 font-medium">Free</span></p>
+                                </div>
+                            </label>
+                        </div>
+
+                        {{-- Delivery Address (shown only when delivery is selected) --}}
+                        <div x-show="deliveryMethod === 'delivery'" x-transition class="px-5 py-4 border-t space-y-4">
+                            <h3 class="text-sm font-semibold text-gray-700">Delivery Address</h3>
                             <div>
                                 <label for="address_line1" class="block text-sm font-medium text-gray-700">Address Line 1 <span class="text-red-500">*</span></label>
                                 <input type="text" name="address_line1" id="address_line1"
                                        value="{{ old('address_line1', $customer->address_line1) }}"
                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                                       required>
+                                       :required="deliveryMethod === 'delivery'">
                                 @error('address_line1')
                                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                 @enderror
@@ -108,7 +139,7 @@
                                     <input type="text" name="city" id="city"
                                            value="{{ old('city', $customer->city) }}"
                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                                           required>
+                                           :required="deliveryMethod === 'delivery'">
                                     @error('city')
                                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                     @enderror
@@ -128,7 +159,7 @@
                                     <input type="text" name="postal_code" id="postal_code"
                                            value="{{ old('postal_code', $customer->postal_code) }}"
                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                                           required>
+                                           :required="deliveryMethod === 'delivery'">
                                     @error('postal_code')
                                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                     @enderror
@@ -139,10 +170,24 @@
                                     <input type="text" name="country" id="country"
                                            value="{{ old('country', $customer->country ?? 'United Kingdom') }}"
                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-                                           required>
+                                           :required="deliveryMethod === 'delivery'">
                                     @error('country')
                                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                     @enderror
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- Collection Info (shown only when collection is selected) --}}
+                        <div x-show="deliveryMethod === 'collection'" x-transition class="px-5 py-4 border-t">
+                            <div class="flex items-start gap-3 p-3 bg-blue-50 rounded-lg">
+                                <svg class="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                </svg>
+                                <div>
+                                    <p class="font-medium text-gray-900">Collection Point</p>
+                                    <p class="text-sm text-gray-600 mt-1">North Manchester — we'll email you the full address and collection instructions once your order is confirmed.</p>
                                 </div>
                             </div>
                         </div>
@@ -226,9 +271,28 @@
                         @endforeach
                     </div>
 
-                    <div class="flex items-center justify-between mb-6">
+                    @if ($hasPhysicalItems && $deliveryTotal > 0)
+                        <div class="flex justify-between text-sm mb-2" id="delivery-charge-row">
+                            <span class="text-gray-600">Delivery</span>
+                            <span class="text-gray-900 font-medium" id="delivery-charge-amount">&pound;{{ number_format($deliveryTotal, 2) }}</span>
+                        </div>
+                    @endif
+
+                    {{-- Discount Code Input --}}
+                    <div class="border-t pt-4 mb-4">
+                        <label for="discount_code" class="block text-sm font-medium text-gray-700 mb-1">Discount Code</label>
+                        <div class="flex gap-2">
+                            <input type="text" name="discount_code" id="discount_code"
+                                   value="{{ old('discount_code') }}"
+                                   placeholder="Enter code"
+                                   class="flex-1 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
+                        </div>
+                        <p class="text-xs text-gray-400 mt-1">Applied at checkout if valid.</p>
+                    </div>
+
+                    <div class="flex items-center justify-between mb-6 border-t pt-4">
                         <span class="text-lg font-semibold text-gray-900">Total</span>
-                        <span class="text-2xl font-bold text-gray-900">&pound;{{ number_format($total, 2) }}</span>
+                        <span class="text-2xl font-bold text-gray-900">&pound;{{ number_format($total + $deliveryTotal, 2) }}</span>
                     </div>
 
                     <button type="submit"

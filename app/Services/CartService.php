@@ -51,6 +51,7 @@ class CartService
             'rental_start_date' => $options['rental_start_date'] ?? null,
             'rental_end_date' => $options['rental_end_date'] ?? null,
             'domain_name' => $options['domain_name'] ?? null,
+            'delivery_charge' => $product->hasDeliveryCharge() ? (float) $product->delivery_charge : 0,
         ];
 
         // Calculate total_price for rental items
@@ -200,6 +201,28 @@ class CartService
         }
 
         return $total;
+    }
+
+    /**
+     * Get the total delivery charge for all physical items in the cart.
+     * Returns 0 if delivery method is 'collection'.
+     */
+    public function getDeliveryTotal(string $deliveryMethod = 'delivery'): float
+    {
+        if ($deliveryMethod === 'collection') {
+            return 0.0;
+        }
+
+        $items = $this->getItems();
+        $total = 0.0;
+
+        foreach ($items as $item) {
+            if (in_array($item['product_type'], ['one_off', 'equipment_rental'], true)) {
+                $total += (float) ($item['delivery_charge'] ?? 0);
+            }
+        }
+
+        return round($total, 2);
     }
 
     /**

@@ -92,6 +92,7 @@ class CartController extends Controller
         $items = $this->cartService->getItems();
         $total = $this->cartService->getTotal();
         $hasPhysicalItems = $this->cartService->hasPhysicalItems();
+        $deliveryTotal = $this->cartService->getDeliveryTotal('delivery');
 
         // Load product details for items that have rental agreements
         $rentalAgreements = [];
@@ -113,7 +114,8 @@ class CartController extends Controller
             'total',
             'customer',
             'hasPhysicalItems',
-            'rentalAgreements'
+            'rentalAgreements',
+            'deliveryTotal'
         ));
     }
 
@@ -129,8 +131,11 @@ class CartController extends Controller
 
         $customer = Customer::find($request->user()->company_id);
 
-        // Validate delivery address if cart has physical items and form was submitted with address fields
-        if ($this->cartService->hasPhysicalItems() && $request->has('address_line1')) {
+        // Determine delivery method
+        $deliveryMethod = $request->input('delivery_method', 'delivery');
+
+        // Validate delivery address if delivery method is 'delivery' and cart has physical items
+        if ($this->cartService->hasPhysicalItems() && $deliveryMethod === 'delivery' && $request->has('address_line1')) {
             $request->validate([
                 'address_line1' => 'required|string|max:255',
                 'city' => 'required|string|max:255',
@@ -139,6 +144,25 @@ class CartController extends Controller
                 'address_line2' => 'nullable|string|max:255',
                 'state' => 'nullable|string|max:100',
             ]);
+        }
+
+        // Validate and apply discount code
+        $discountCode = null;
+        $discountAmount = 0;
+        if ($request->filled('discount_code')) {
+            $code = trim($request->input('discount_code'));
+            $discountService = app(\App\Services\DiscountCodeService::class);
+            $itemsTotal = $this->cartService->getTotal();
+            $validation = $discountService->validate($code, $itemsTotal);
+
+            if (!$validation['valid']) {
+                return redirect()->route('portal.cart.showCheckout')
+                    ->withInput()
+                    ->with('error', $validation['message']);
+            }
+
+            $discountCode = $code;
+            $discountAmount = $validation['discount_amount'];
         }
 
         // Validate rental agreement acceptance for items with agreements
@@ -159,9 +183,9 @@ class CartController extends Controller
             }
         }
 
-        // Collect delivery address from request (if provided)
+        // Collect delivery address from request (if delivery method is 'delivery')
         $deliveryAddress = [];
-        if ($request->has('address_line1')) {
+        if ($deliveryMethod === 'delivery' && $request->has('address_line1')) {
             $deliveryAddress = [
                 'address_line1' => $request->input('address_line1'),
                 'address_line2' => $request->input('address_line2'),
@@ -172,8 +196,12 @@ class CartController extends Controller
             ];
         }
 
-        // Collect checkout options (rental agreements and signatures)
-        $checkoutOptions = [];
+        // Collect checkout options (rental agreements, signatures, delivery method, discount)
+        $checkoutOptions = [
+            'delivery_method' => $deliveryMethod,
+            'discount_code' => $discountCode,
+            'discount_amount' => $discountAmount,
+        ];
         if ($request->has('rental_agreements')) {
             $checkoutOptions['rental_agreements'] = $request->input('rental_agreements', []);
         }
@@ -189,7 +217,11 @@ class CartController extends Controller
         );
 
         if ($result->success) {
-            // Cart is cleared by CheckoutService on success
+            // Increment discount code usage if one was applied
+            if ($discountCode) {
+                $discountService = app(\App\Services\DiscountCodeService::class);
+                $discountService->incrementUsage($discountCode);
+            }
 
             // If there's a Stripe checkout session URL (one-off items), redirect to Stripe
             if ($result->checkoutSessionUrl) {

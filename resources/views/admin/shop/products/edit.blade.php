@@ -133,6 +133,16 @@
                     @error('delivery_instructions') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
                 </div>
 
+                {{-- Delivery Charge (shown for equipment_rental and one_off, hidden for hosting) --}}
+                <div x-show="productType === 'equipment_rental' || productType === 'one_off'" x-transition>
+                    <label for="delivery_charge" class="block text-sm font-semibold text-gray-700">Delivery Charge (&pound;)</label>
+                    <input type="number" name="delivery_charge" id="delivery_charge" value="{{ old('delivery_charge', $product->delivery_charge) }}" step="0.01" min="0"
+                           class="mt-1 block w-full max-w-xs rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                           placeholder="0.00">
+                    <p class="text-xs text-gray-400 mt-1">Leave empty or 0 for free delivery. Customers can also choose to collect from North Manchester for free.</p>
+                    @error('delivery_charge') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
+                </div>
+
                 {{-- Image Upload --}}
                 <div>
                     <label for="image" class="block text-sm font-semibold text-gray-700">Product Image</label>

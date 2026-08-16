@@ -127,6 +127,54 @@ class StripeService
     }
 
     /**
+     * Create a Stripe Checkout Session with full params (supports discounts, metadata, etc.).
+     */
+    public function createCheckoutSessionWithParams(array $params): Session
+    {
+        try {
+            return Session::create($params);
+        } catch (ApiErrorException $e) {
+            Log::error('Stripe: Failed to create checkout session', [
+                'error' => $e->getMessage(),
+            ]);
+
+            throw new HttpException(502, 'Unable to create checkout session: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Create a refund for a payment intent.
+     *
+     * @param string $paymentIntentId The Stripe payment intent ID.
+     * @param int|null $amount Amount in pence to refund (null = full refund).
+     * @param string $reason Reason for refund: duplicate, fraudulent, requested_by_customer.
+     * @return \Stripe\Refund
+     */
+    public function createRefund(string $paymentIntentId, ?int $amount = null, string $reason = 'requested_by_customer'): \Stripe\Refund
+    {
+        try {
+            $params = [
+                'payment_intent' => $paymentIntentId,
+                'reason' => $reason,
+            ];
+
+            if ($amount !== null) {
+                $params['amount'] = $amount;
+            }
+
+            return \Stripe\Refund::create($params);
+        } catch (ApiErrorException $e) {
+            Log::error('Stripe: Failed to create refund', [
+                'payment_intent' => $paymentIntentId,
+                'amount' => $amount,
+                'error' => $e->getMessage(),
+            ]);
+
+            throw new HttpException(502, 'Unable to create refund: ' . $e->getMessage());
+        }
+    }
+
+    /**
      * Create a Stripe Subscription for recurring items.
      */
     public function createSubscription(
