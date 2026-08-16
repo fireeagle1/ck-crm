@@ -97,4 +97,12 @@ class AssetController extends Controller
 
         return back()->with('success', 'Asset updated.');
     }
+
+    /**
+     * Display a printable QR label for an asset.
+     */
+    public function label(Asset $asset): View
+    {
+        return view('admin.assets.label', compact('asset'));
+    }
 }

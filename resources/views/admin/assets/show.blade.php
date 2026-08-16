@@ -12,7 +12,8 @@
     </div>
 
     <div class="bg-white rounded-lg shadow-sm border p-6 max-w-3xl">
-        <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
+        <div class="flex justify-between items-start">
+            <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4 flex-1">
             <div>
                 <dt class="text-xs uppercase tracking-wide text-gray-500 font-semibold">Customer</dt>
                 <dd class="mt-1 text-sm">
@@ -51,6 +52,13 @@
                 <dd class="mt-1 text-sm text-gray-800">{{ $asset->location ?? '—' }}</dd>
             </div>
         </dl>
+
+            {{-- QR Code --}}
+            <div class="ml-4 flex-shrink-0">
+                <x-qr-code value="CMDB-{{ $asset->device_id }}" :size="100" label="CMDB-{{ $asset->device_id }}" />
+                <a href="{{ route('admin.assets.label', $asset) }}" class="block text-center text-xs text-blue-600 hover:underline mt-1">Print Label</a>
+            </div>
+        </div>
 
         @if ($asset->notes)
             <div class="mt-6 pt-4 border-t">

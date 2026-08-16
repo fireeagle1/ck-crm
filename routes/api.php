@@ -71,5 +71,8 @@ Route::prefix('admin')->group(function () {
         // Device tokens (push notifications)
         Route::post('/device-tokens', [DeviceTokenController::class, 'store']);
         Route::delete('/device-tokens', [DeviceTokenController::class, 'destroy']);
+
+        // QR Code Scanner — resolve a scanned code to an entity
+        Route::get('/scan/{code}', [\App\Http\Controllers\Api\Admin\ScanController::class, 'resolve']);
     });
 });

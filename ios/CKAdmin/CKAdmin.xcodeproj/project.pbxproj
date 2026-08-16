@@ -21,6 +21,7 @@
 		0ABB2C3D4E5F6A7B8C9D0E1F /* OrderActionDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AABB2C3D4E5F6A7B8C9D0E1F /* OrderActionDetailView.swift */; };
 		0ACC3C4D5E6F7A8B9C0D1E2F /* InspectionUploadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AACC3C4D5E6F7A8B9C0D1E2F /* InspectionUploadView.swift */; };
 		0ADD4C5D6E7F8A9B0C1D2E3F /* BookingCalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AADD4C5D6E7F8A9B0C1D2E3F /* BookingCalendarView.swift */; };
+		0AEE5C6D7E8F9A0B1C2D3E4F /* QRScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAEE5C6D7E8F9A0B1C2D3E4F /* QRScannerView.swift */; };
 		14E1399DB0A019DC80ADCBD7 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 807E14E89910931B525638EC /* LoginView.swift */; };
 		14FE5D418971AEF30FD1953A /* CustomerListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA77B08BC22B3673DC440742 /* CustomerListViewModel.swift */; };
 		1B169C960FE4400EA563A518 /* TicketListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1C0BBD0BC09F7D833D737AA /* TicketListViewModel.swift */; };
@@ -98,6 +99,7 @@
 		AABB2C3D4E5F6A7B8C9D0E1F /* OrderActionDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrderActionDetailView.swift; sourceTree = "<group>"; };
 		AACC3C4D5E6F7A8B9C0D1E2F /* InspectionUploadView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InspectionUploadView.swift; sourceTree = "<group>"; };
 		AADD4C5D6E7F8A9B0C1D2E3F /* BookingCalendarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookingCalendarView.swift; sourceTree = "<group>"; };
+		AAEE5C6D7E8F9A0B1C2D3E4F /* QRScannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRScannerView.swift; sourceTree = "<group>"; };
 		AC6C1F8FF9AA3E9740EDA8D1 /* DashboardViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardViewModel.swift; sourceTree = "<group>"; };
 		B79C5C2C45E9713BEBDE2EBD /* CustomerDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomerDetailView.swift; sourceTree = "<group>"; };
 		BA77B08BC22B3673DC440742 /* CustomerListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomerListViewModel.swift; sourceTree = "<group>"; };
@@ -227,6 +229,7 @@
 			isa = PBXGroup;
 			children = (
 				69FC499F866ECF5C71FE1C5B /* ContentView.swift */,
+				AAEE5C6D7E8F9A0B1C2D3E4F /* QRScannerView.swift */,
 				41630DB3511F103BEDC1AE6C /* Assets */,
 				DDB968DAEBC40037412F5C36 /* Auth */,
 				35DDBBF7FA5F844F3D6D8B61 /* Customers */,
@@ -375,6 +378,7 @@
 				0ABB2C3D4E5F6A7B8C9D0E1F /* OrderActionDetailView.swift in Sources */,
 				0ACC3C4D5E6F7A8B9C0D1E2F /* InspectionUploadView.swift in Sources */,
 				0ADD4C5D6E7F8A9B0C1D2E3F /* BookingCalendarView.swift in Sources */,
+				0AEE5C6D7E8F9A0B1C2D3E4F /* QRScannerView.swift in Sources */,
 				28B5755D66AA39B9A1A1E5A9 /* TicketContext.swift in Sources */,
 				2C17E2E44BBADA6A5C4D9318 /* TicketCreateView.swift in Sources */,
 				F8B18CE5B8D32723914E8076 /* TicketDetail.swift in Sources */,
@@ -518,6 +522,7 @@
 				DEVELOPMENT_TEAM = 8ZPKDN48HL;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "CK Admin";
+INFOPLIST_KEY_NSCameraUsageDescription = "CK Admin uses the camera to scan QR codes on assets, orders, and bookings.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -546,6 +551,7 @@
 				DEVELOPMENT_TEAM = 8ZPKDN48HL;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "CK Admin";
+INFOPLIST_KEY_NSCameraUsageDescription = "CK Admin uses the camera to scan QR codes on assets, orders, and bookings.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

@@ -171,8 +171,10 @@
                 <div class="bg-white rounded-lg shadow-sm border overflow-hidden">
                     <div class="px-4 py-3 border-b bg-purple-50 flex items-center justify-between">
                         <h2 class="text-sm font-semibold text-purple-800">Rental: {{ $item->product_name }}</h2>
-                        @php
-                            $bookingStatusColors = [
+                        <div class="flex items-center gap-3">
+                            <x-qr-code value="BKG-{{ $booking->id }}" :size="48" />
+                            @php
+                                $bookingStatusColors = [
                                 'confirmed' => 'bg-blue-100 text-blue-700',
                                 'active' => 'bg-green-100 text-green-700',
                                 'returned' => 'bg-gray-100 text-gray-700',
@@ -182,6 +184,7 @@
                         <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium {{ $bookingStatusColors[$booking->status] ?? 'bg-gray-100 text-gray-700' }}">
                             {{ ucfirst($booking->status) }}
                         </span>
+                        </div>
                     </div>
 
                     <div class="p-4 space-y-5">
@@ -497,6 +500,13 @@
 
         {{-- Sidebar --}}
         <div class="space-y-4">
+            {{-- QR Code --}}
+            <div class="bg-white rounded-lg shadow-sm border overflow-hidden">
+                <div class="p-4 flex justify-center">
+                    <x-qr-code value="ORD-{{ $order->id }}" :size="120" label="ORD-{{ $order->id }}" />
+                </div>
+            </div>
+
             {{-- Quick Actions --}}
             <div class="bg-white rounded-lg shadow-sm border overflow-hidden">
                 <div class="px-4 py-3 border-b bg-gray-50">
