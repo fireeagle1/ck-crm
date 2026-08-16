@@ -234,6 +234,8 @@ Route::middleware(['auth', 'verified', EnsureIsAdmin::class])->prefix('admin')->
     Route::get('shop/bookings/create', [Admin\BookingController::class, 'create'])->name('shop.bookings.create');
     Route::post('shop/bookings', [Admin\BookingController::class, 'store'])->name('shop.bookings.store');
     Route::post('shop/bookings/block-dates', [Admin\BookingController::class, 'blockDates'])->name('shop.bookings.blockDates');
+    Route::put('shop/bookings/{booking}/block', [Admin\BookingController::class, 'updateBlock'])->name('shop.bookings.updateBlock');
+    Route::delete('shop/bookings/{booking}/block', [Admin\BookingController::class, 'deleteBlock'])->name('shop.bookings.deleteBlock');
     Route::get('shop/bookings/{booking}', [Admin\BookingController::class, 'show'])->name('shop.bookings.show');
     Route::patch('shop/bookings/{booking}/returned', [Admin\BookingController::class, 'markReturned'])->name('shop.bookings.markReturned');
 

@@ -126,7 +126,8 @@
                                     @endphp
                                     <div class="h-5 {{ $color }} {{ $roundStart }} {{ $roundEnd }} opacity-90 hover:opacity-100 transition-opacity"
                                          @if($isBlocked)
-                                             style="background: repeating-linear-gradient(45deg, #dc2626, #dc2626 2px, #fca5a5 2px, #fca5a5 4px);"
+                                             style="background: repeating-linear-gradient(45deg, #dc2626, #dc2626 2px, #fca5a5 2px, #fca5a5 4px); cursor: pointer;"
+                                             onclick="openEditBlock({{ $booking->id }}, '{{ $booking->product->name ?? 'Product' }}', '{{ $booking->start_date->format('Y-m-d') }}', '{{ $booking->end_date->format('Y-m-d') }}')"
                                          @endif
                                          title="{{ $customerName }} | {{ $booking->start_date->format('d M') }} - {{ $booking->end_date->format('d M') }} ({{ ucfirst($booking->status) }})"
                                          @if(!$isBlocked)
@@ -146,7 +147,7 @@
         </table>
     </div>
 
-    <p class="mt-3 text-xs text-gray-500">Click on an empty cell to create a new booking. Hover over bars for details.</p>
+    <p class="mt-3 text-xs text-gray-500">Click on an empty cell to create a new booking. Click on a blocked bar to edit or remove it. Hover over bars for details.</p>
 
     {{-- Block Dates Modal --}}
     <div id="blockDatesModal" class="hidden fixed inset-0 z-50 overflow-y-auto">
@@ -212,5 +213,69 @@
             url.searchParams.set('start_date', date);
             window.location.href = url.toString();
         }
+
+        function openEditBlock(bookingId, productName, startDate, endDate) {
+            document.getElementById('edit_block_product_name').textContent = productName;
+            document.getElementById('edit_block_start_date').value = startDate;
+            document.getElementById('edit_block_end_date').value = endDate;
+
+            // Set form actions
+            const updateForm = document.getElementById('editBlockForm');
+            updateForm.action = '{{ url("admin/shop/bookings") }}/' + bookingId + '/block';
+
+            const deleteForm = document.getElementById('deleteBlockForm');
+            deleteForm.action = '{{ url("admin/shop/bookings") }}/' + bookingId + '/block';
+
+            document.getElementById('editBlockModal').classList.remove('hidden');
+        }
     </script>
+
+    {{-- Edit Block Modal --}}
+    <div id="editBlockModal" class="hidden fixed inset-0 z-50 overflow-y-auto">
+        <div class="flex items-center justify-center min-h-screen px-4">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" onclick="document.getElementById('editBlockModal').classList.add('hidden')"></div>
+            <div class="relative bg-white rounded-lg shadow-xl max-w-md w-full z-10">
+                <div class="px-6 py-4 border-b">
+                    <h3 class="text-lg font-semibold text-gray-900">Edit Blocked Dates</h3>
+                    <p class="text-sm text-gray-500 mt-1">Product: <span id="edit_block_product_name" class="font-medium text-gray-700"></span></p>
+                </div>
+                <form method="POST" id="editBlockForm" class="p-6 space-y-4">
+                    @csrf
+                    @method('PUT')
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label for="edit_block_start_date" class="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+                            <input type="date" name="start_date" id="edit_block_start_date" required
+                                   class="w-full rounded-md border-gray-300 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label for="edit_block_end_date" class="block text-sm font-medium text-gray-700 mb-1">End Date</label>
+                            <input type="date" name="end_date" id="edit_block_end_date" required
+                                   class="w-full rounded-md border-gray-300 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                        </div>
+                    </div>
+                    <div class="flex justify-end gap-3 pt-4 border-t">
+                        <button type="button" onclick="document.getElementById('editBlockModal').classList.add('hidden')"
+                                class="px-4 py-2 bg-gray-100 text-gray-700 rounded-md text-sm font-medium hover:bg-gray-200 border">
+                            Cancel
+                        </button>
+                        <button type="submit"
+                                class="px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700 transition">
+                            Update Block
+                        </button>
+                    </div>
+                </form>
+                <div class="px-6 pb-6">
+                    <form method="POST" id="deleteBlockForm">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" onclick="return confirm('Are you sure you want to remove this block? The dates will become available again.')"
+                                class="w-full px-4 py-2 bg-red-100 text-red-700 rounded-md text-sm font-medium hover:bg-red-200 border border-red-200 transition">
+                            Remove Block
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 </x-admin-layout>

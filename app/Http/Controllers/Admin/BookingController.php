@@ -316,4 +316,71 @@ class BookingController extends Controller
             'year' => $startDate->year,
         ])->with('success', 'Dates blocked successfully.' . ($validated['reason'] ? ' Reason: ' . $validated['reason'] : ''));
     }
+
+    /**
+     * Update a blocked date range.
+     */
+    public function updateBlock(Request $request, Booking $booking): RedirectResponse
+    {
+        // Only allow editing blocks (bookings with no company_id)
+        if ($booking->company_id !== null) {
+            abort(403, 'Only blocked dates can be edited here.');
+        }
+
+        $validated = $request->validate([
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after_or_equal:start_date',
+        ]);
+
+        $startDate = Carbon::parse($validated['start_date']);
+        $endDate = Carbon::parse($validated['end_date']);
+
+        // Check for conflicts with real bookings (exclude the current block)
+        $conflicts = Booking::forProduct($booking->product_id)
+            ->where('id', '!=', $booking->id)
+            ->where(function ($q) {
+                $q->where('status', 'confirmed')
+                  ->orWhere('status', 'active');
+            })
+            ->overlapping($startDate, $endDate)
+            ->where('company_id', '!=', null)
+            ->exists();
+
+        if ($conflicts) {
+            return redirect()->back()->withErrors([
+                'start_date' => 'There are existing bookings in this date range. Cannot block these dates.',
+            ]);
+        }
+
+        $booking->update([
+            'start_date' => $startDate,
+            'end_date' => $endDate,
+        ]);
+
+        return redirect()->route('admin.shop.bookings.calendar', [
+            'month' => $startDate->month,
+            'year' => $startDate->year,
+        ])->with('success', 'Block updated successfully.');
+    }
+
+    /**
+     * Delete a blocked date range.
+     */
+    public function deleteBlock(Booking $booking): RedirectResponse
+    {
+        // Only allow deleting blocks (bookings with no company_id)
+        if ($booking->company_id !== null) {
+            abort(403, 'Only blocked dates can be deleted here.');
+        }
+
+        $month = $booking->start_date->month;
+        $year = $booking->start_date->year;
+
+        $booking->delete();
+
+        return redirect()->route('admin.shop.bookings.calendar', [
+            'month' => $month,
+            'year' => $year,
+        ])->with('success', 'Block removed successfully.');
+    }
 }
