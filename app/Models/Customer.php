@@ -25,7 +25,15 @@ class Customer extends Model
         'country',
         'stripe_customer_id',
         'banner_image',
+        'terms_accepted_at',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'terms_accepted_at' => 'datetime',
+        ];
+    }
 
     public function users(): HasMany
     {

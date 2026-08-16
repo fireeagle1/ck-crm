@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Booking;
 use App\Models\Domain;
 use App\Models\Invoice;
+use App\Models\Order;
 use App\Models\Service;
 use App\Models\Ticket;
 use Illuminate\Http\Request;
@@ -102,6 +103,11 @@ class DashboardController extends Controller
             ->orderBy('start_date')
             ->get();
 
+        // Check if customer has no services or orders — prompt them to visit the shop
+        $hasNoProducts = $activeServices === 0
+            && !Order::where('company_id', $companyId)->exists()
+            && !Service::where('company_id', $companyId)->exists();
+
         return view('portal.dashboard', compact(
             'activeServices',
             'openTickets',
@@ -116,6 +122,7 @@ class DashboardController extends Controller
             'overdueInvoices',
             'activeBookings',
             'upcomingBookings',
+            'hasNoProducts',
         ));
     }
 }

@@ -34,6 +34,30 @@
         </div>
     @endif
 
+    {{-- No products prompt — encourage new customers to browse the shop --}}
+    @if ($hasNoProducts)
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-8">
+            <div class="flex items-start gap-4">
+                <div class="shrink-0">
+                    <svg class="w-10 h-10 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                    </svg>
+                </div>
+                <div class="flex-1">
+                    <h3 class="text-lg font-semibold text-gray-900">Get started with your first purchase</h3>
+                    <p class="text-sm text-gray-600 mt-1">
+                        Welcome to your portal! You don't have any services or orders yet. Browse our shop to find hosting, support packages, and more.
+                    </p>
+                    <a href="{{ route('portal.shop.index') }}"
+                       class="inline-flex items-center gap-2 mt-4 px-5 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z"/></svg>
+                        Browse the shop
+                    </a>
+                </div>
+            </div>
+        </div>
+    @endif
+
     {{-- KPI strip --}}
     <div class="grid grid-cols-3 gap-4 mb-8">
         <a href="{{ route('portal.services.index') }}" class="bg-white rounded-lg p-5 border hover:shadow-md transition">

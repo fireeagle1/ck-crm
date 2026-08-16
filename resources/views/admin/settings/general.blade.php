@@ -122,6 +122,16 @@
                             @error('favicon') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
                         </div>
 
+                        {{-- Terms & Conditions --}}
+                        <div class="pt-4 border-t">
+                            <label for="terms_conditions" class="block text-sm font-medium text-gray-700 mb-1">Terms & Conditions</label>
+                            <p class="text-xs text-gray-500 mb-2">Displayed on the public registration page. Supports plain text with line breaks. Use blank lines to separate paragraphs.</p>
+                            <textarea name="terms_conditions" id="terms_conditions" rows="14"
+                                      class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm font-mono"
+                                      placeholder="Enter your terms and conditions here...">{{ old('terms_conditions', $settings['terms_conditions']) }}</textarea>
+                            @error('terms_conditions') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
+                        </div>
+
                         <div class="pt-2">
                             <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700">
                                 Save Settings

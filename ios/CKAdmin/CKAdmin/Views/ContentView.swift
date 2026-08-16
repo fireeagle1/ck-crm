@@ -49,6 +49,7 @@ struct ContentView: View {
 
             NavigationStack {
                 ShopHubView(apiClient: apiClient)
+                ShopHubView(apiClient: apiClient)
             }
             .tabItem { Label("Shop", systemImage: "bag") }
             .tag(5)

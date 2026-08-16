@@ -45,6 +45,7 @@
     </form>
 
     <p class="mt-6 text-center text-sm text-gray-500">
-        Need access? Contact your administrator.
+        Don't have an account?
+        <a href="{{ route('register') }}" class="text-blue-600 hover:text-blue-700 font-medium">Register your company</a>
     </p>
 </x-guest-layout>

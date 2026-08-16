@@ -17,6 +17,7 @@ class SettingsController extends Controller
             'logo_path' => Setting::get('logo_path'),
             'logo_dark_path' => Setting::get('logo_dark_path'),
             'favicon_path' => Setting::get('favicon_path'),
+            'terms_conditions' => Setting::get('terms_conditions', ''),
         ];
 
         return view('admin.settings.general', compact('settings'));
@@ -29,9 +30,11 @@ class SettingsController extends Controller
             'logo' => 'nullable|image|mimes:png,jpg,jpeg,webp|max:2048',
             'logo_dark' => 'nullable|image|mimes:png,jpg,jpeg,webp|max:2048',
             'favicon' => 'nullable|mimes:ico,png|max:512',
+            'terms_conditions' => 'nullable|string|max:65000',
         ]);
 
         Setting::set('site_name', $request->input('site_name'));
+        Setting::set('terms_conditions', $request->input('terms_conditions'));
 
         // Light/transparent logo (for dark backgrounds — header, nav)
         if ($request->hasFile('logo')) {
