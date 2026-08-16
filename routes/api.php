@@ -48,15 +48,25 @@ Route::prefix('admin')->group(function () {
         Route::post('/invoices', [InvoiceController::class, 'store']);
         Route::post('/invoices/{invoice}/remind', [InvoiceController::class, 'remind']);
 
-        // Shop — Orders (read-only)
+        // Shop — Orders (full management)
         Route::get('/shop/orders', [ShopOrderController::class, 'index']);
         Route::get('/shop/orders/{order}', [ShopOrderController::class, 'show']);
+        Route::post('/shop/orders/{order}/fulfil', [ShopOrderController::class, 'fulfil']);
+        Route::post('/shop/orders/{order}/cancel', [ShopOrderController::class, 'cancel']);
+        Route::post('/shop/orders/{order}/mark-paid-offline', [ShopOrderController::class, 'markPaidOffline']);
+        Route::post('/shop/orders/{order}/note', [ShopOrderController::class, 'addNote']);
+        Route::post('/shop/orders/{order}/bookings/{booking}/advance-stage', [ShopOrderController::class, 'advanceStage']);
+        Route::post('/shop/orders/{order}/bookings/{booking}/assign-assets', [ShopOrderController::class, 'assignAssets']);
+        Route::post('/shop/orders/{order}/bookings/{booking}/inspect', [ShopOrderController::class, 'inspect']);
+        Route::post('/shop/orders/{order}/bookings/{booking}/mark-returned', [ShopOrderController::class, 'markReturned']);
 
         // Shop — Products (read-only)
         Route::get('/shop/products', [ShopProductController::class, 'index']);
 
-        // Shop — Rentals/Bookings (read-only)
+        // Shop — Rentals/Bookings
         Route::get('/shop/rentals', [BookingController::class, 'index']);
+        Route::get('/shop/rentals/{booking}', [BookingController::class, 'show']);
+        Route::get('/shop/rentals/calendar', [BookingController::class, 'calendar']);
 
         // Device tokens (push notifications)
         Route::post('/device-tokens', [DeviceTokenController::class, 'store']);

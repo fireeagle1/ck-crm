@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Hub view for the Shop tab providing segmented navigation between Orders, Products, and Rentals.
+/// Hub view for the Shop tab providing segmented navigation between Orders, Products, Rentals, and Calendar.
 struct ShopHubView: View {
     @State private var selectedSection: ShopSection = .orders
 
@@ -24,6 +24,8 @@ struct ShopHubView: View {
                 ProductListView(apiClient: apiClient)
             case .rentals:
                 RentalListView(apiClient: apiClient)
+            case .calendar:
+                BookingCalendarView(apiClient: apiClient)
             }
         }
         .navigationTitle("Shop")
@@ -35,6 +37,7 @@ enum ShopSection: String, CaseIterable, Identifiable {
     case orders
     case products
     case rentals
+    case calendar
 
     var id: String { rawValue }
 
@@ -43,6 +46,7 @@ enum ShopSection: String, CaseIterable, Identifiable {
         case .orders: return "Orders"
         case .products: return "Products"
         case .rentals: return "Rentals"
+        case .calendar: return "Calendar"
         }
     }
 }

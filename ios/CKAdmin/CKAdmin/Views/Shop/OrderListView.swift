@@ -78,7 +78,7 @@ struct OrderListView: View {
             await viewModel.loadInitial()
         }
         .navigationDestination(for: Int.self) { orderId in
-            OrderDetailView(apiClient: apiClient, orderId: orderId)
+            OrderActionDetailView(apiClient: apiClient, orderId: orderId)
         }
         .overlay {
             if viewModel.orders.isEmpty && !viewModel.isLoading {
