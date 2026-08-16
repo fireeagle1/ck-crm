@@ -323,14 +323,70 @@
                         <h2 class="text-sm font-semibold text-gray-700">Cancel Order</h2>
                     </div>
                     <div class="p-4">
-                        <p class="text-sm text-gray-500 mb-4">Cancel this order and any associated bookings/services. Refunds must be processed manually via the Stripe dashboard.</p>
+                        <p class="text-sm text-gray-500 mb-4">Cancel this order and any associated bookings/services.</p>
                         <form method="POST" action="{{ route('admin.shop.orders.cancel', $order) }}">
                             @csrf
                             <button type="submit"
-                                    onclick="return confirm('Are you sure you want to cancel this order? This will cancel all associated bookings and pending services. Refunds are NOT automatic.')"
+                                    onclick="return confirm('Are you sure you want to cancel this order? This will cancel all associated bookings and pending services.')"
                                     class="w-full inline-flex items-center justify-center px-4 py-2 bg-red-600 text-white rounded-md text-sm font-medium hover:bg-red-700 transition">
                                 Cancel Order
                             </button>
+                        </form>
+                    </div>
+                </div>
+            @endif
+
+            {{-- Refund --}}
+            @if ($order->stripe_payment_intent_id && $order->refund_status !== 'full')
+                <div class="bg-white rounded-lg shadow-sm border overflow-hidden">
+                    <div class="px-4 py-3 border-b bg-gray-50">
+                        <h2 class="text-sm font-semibold text-gray-700">Refund</h2>
+                    </div>
+                    <div class="p-4">
+                        @if ($order->refund_amount > 0)
+                            <div class="mb-3 p-2 bg-yellow-50 border border-yellow-200 rounded text-xs text-yellow-800">
+                                Already refunded: <strong>&pound;{{ number_format($order->refund_amount, 2) }}</strong>
+                                ({{ ucfirst($order->refund_status) }})
+                                @if ($order->stripe_refund_id)
+                                    <br>Last Refund ID: <code>{{ $order->stripe_refund_id }}</code>
+                                @endif
+                            </div>
+                        @endif
+
+                        @php
+                            $maxRefundable = (float) $order->total_amount - (float) $order->refund_amount;
+                        @endphp
+
+                        <p class="text-sm text-gray-500 mb-3">
+                            Process a refund via Stripe. Max refundable: <strong>&pound;{{ number_format($maxRefundable, 2) }}</strong>
+                        </p>
+
+                        <form method="POST" action="{{ route('admin.shop.orders.refund', $order) }}">
+                            @csrf
+                            <div class="space-y-3">
+                                <div>
+                                    <label for="refund_amount" class="block text-xs font-medium text-gray-600">Amount (&pound;)</label>
+                                    <input type="number" name="refund_amount" id="refund_amount"
+                                           step="0.01" min="0.01" max="{{ $maxRefundable }}"
+                                           value="{{ $maxRefundable }}"
+                                           class="mt-1 block w-full rounded-md border-gray-300 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                    <p class="text-xs text-gray-400 mt-1">Leave as full amount for a complete refund, or enter a partial amount.</p>
+                                </div>
+                                <div>
+                                    <label for="refund_reason" class="block text-xs font-medium text-gray-600">Reason</label>
+                                    <select name="refund_reason" id="refund_reason"
+                                            class="mt-1 block w-full rounded-md border-gray-300 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                        <option value="requested_by_customer">Requested by customer</option>
+                                        <option value="duplicate">Duplicate charge</option>
+                                        <option value="fraudulent">Fraudulent</option>
+                                    </select>
+                                </div>
+                                <button type="submit"
+                                        onclick="return confirm('Process this refund? This will transfer funds back to the customer via Stripe.')"
+                                        class="w-full inline-flex items-center justify-center px-4 py-2 bg-orange-600 text-white rounded-md text-sm font-medium hover:bg-orange-700 transition">
+                                    Process Refund
+                                </button>
+                            </div>
                         </form>
                     </div>
                 </div>

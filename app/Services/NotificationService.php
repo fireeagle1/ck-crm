@@ -6,6 +6,7 @@ use App\Mail\AdminNewOrder;
 use App\Mail\HostingProvisioned;
 use App\Mail\LowStockAdmin;
 use App\Mail\OrderConfirmation;
+use App\Mail\OrderFulfilled;
 use App\Mail\PaymentFailedAdmin;
 use App\Mail\PaymentFailedCustomer;
 use App\Mail\RentalEndedAdmin;
@@ -180,6 +181,35 @@ class NotificationService
             Log::warning('NotificationService: No customer email found for payment failure notification', [
                 'order_id' => $order->id,
                 'company_id' => $order->company_id,
+            ]);
+        }
+    }
+
+    /**
+     * Send order fulfilled/dispatched notification to customer.
+     *
+     * Dispatches a queued email to the customer notifying them that their
+     * order has been fulfilled — either dispatched for delivery or ready for collection.
+     */
+    public function notifyCustomerOrderFulfilled(Order $order): void
+    {
+        $customerEmail = $order->customer?->users()->first()?->email;
+
+        if (!$customerEmail) {
+            Log::warning('NotificationService: No customer email found for order fulfilled notification', [
+                'order_id' => $order->id,
+                'company_id' => $order->company_id,
+            ]);
+            return;
+        }
+
+        try {
+            $order->load('items');
+            Mail::to($customerEmail)->queue(new OrderFulfilled($order));
+        } catch (\Exception $e) {
+            Log::error('NotificationService: Failed to dispatch order fulfilled notification', [
+                'order_id' => $order->id,
+                'error' => $e->getMessage(),
             ]);
         }
     }

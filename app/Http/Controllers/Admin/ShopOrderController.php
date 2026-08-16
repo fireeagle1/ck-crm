@@ -7,6 +7,7 @@ use App\Models\Customer;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Services\FulfilmentService;
+use App\Services\StripeService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -16,8 +17,10 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ShopOrderController extends Controller
 {
-    public function __construct(private FulfilmentService $fulfilmentService)
-    {
+    public function __construct(
+        private FulfilmentService $fulfilmentService,
+        private StripeService $stripeService,
+    ) {
     }
 
     /**
@@ -182,6 +185,69 @@ class ShopOrderController extends Controller
         });
 
         return redirect()->route('admin.shop.orders.show', $order)
-            ->with('success', 'Order cancelled. Refunds must be processed manually via Stripe dashboard.');
+            ->with('success', 'Order cancelled. Use the refund section to process a refund if needed.');
+    }
+
+    /**
+     * Process a full or partial refund for an order via Stripe.
+     *
+     * Requires a valid stripe_payment_intent_id on the order.
+     * Accepts an optional refund_amount for partial refunds.
+     */
+    public function refund(Request $request, Order $order): RedirectResponse
+    {
+        // Validate the order can be refunded
+        if (!$order->stripe_payment_intent_id) {
+            return redirect()->route('admin.shop.orders.show', $order)
+                ->with('error', 'No Stripe payment intent found for this order. Refund must be processed manually.');
+        }
+
+        if ($order->refund_status === 'full') {
+            return redirect()->route('admin.shop.orders.show', $order)
+                ->with('error', 'This order has already been fully refunded.');
+        }
+
+        $validated = $request->validate([
+            'refund_amount' => 'nullable|numeric|min:0.01',
+            'refund_reason' => 'nullable|in:duplicate,fraudulent,requested_by_customer',
+        ]);
+
+        $maxRefundable = (float) $order->total_amount - (float) $order->refund_amount;
+
+        // Determine refund amount (null = full remaining balance)
+        $refundAmount = isset($validated['refund_amount'])
+            ? min((float) $validated['refund_amount'], $maxRefundable)
+            : $maxRefundable;
+
+        if ($refundAmount <= 0) {
+            return redirect()->route('admin.shop.orders.show', $order)
+                ->with('error', 'No refundable amount remaining on this order.');
+        }
+
+        $reason = $validated['refund_reason'] ?? 'requested_by_customer';
+
+        try {
+            $stripeRefund = $this->stripeService->createRefund(
+                $order->stripe_payment_intent_id,
+                (int) round($refundAmount * 100),
+                $reason
+            );
+
+            // Update order with refund details
+            $totalRefunded = (float) $order->refund_amount + $refundAmount;
+            $refundStatus = $totalRefunded >= (float) $order->total_amount ? 'full' : 'partial';
+
+            $order->update([
+                'refund_amount' => $totalRefunded,
+                'refund_status' => $refundStatus,
+                'stripe_refund_id' => $stripeRefund->id,
+            ]);
+
+            return redirect()->route('admin.shop.orders.show', $order)
+                ->with('success', "Refund of £" . number_format($refundAmount, 2) . " processed successfully. Stripe Refund ID: {$stripeRefund->id}");
+        } catch (\Throwable $e) {
+            return redirect()->route('admin.shop.orders.show', $order)
+                ->with('error', 'Refund failed: ' . $e->getMessage());
+        }
     }
 }

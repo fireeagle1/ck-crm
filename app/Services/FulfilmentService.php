@@ -15,7 +15,8 @@ use RuntimeException;
 class FulfilmentService
 {
     public function __construct(
-        protected BookingService $bookingService
+        protected BookingService $bookingService,
+        protected NotificationService $notificationService,
     ) {}
 
     /**
@@ -136,7 +137,7 @@ class FulfilmentService
 
     /**
      * Mark an order as fulfilled: set fulfilment_status to "completed", record timestamp,
-     * and activate any associated pending services.
+     * and activate any associated pending services. Sends fulfilment notification to customer.
      *
      * Wrapped in DB::transaction for atomicity. On failure, full rollback occurs
      * and details are logged with event context.
@@ -168,6 +169,9 @@ class FulfilmentService
                     }
                 });
             });
+
+            // Send fulfilment notification to customer (outside transaction)
+            $this->notificationService->notifyCustomerOrderFulfilled($order);
         } catch (\Throwable $e) {
             Log::error('FulfilmentService: fulfilOrder transaction failed — full rollback', [
                 'order_id' => $order->id,
