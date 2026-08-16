@@ -426,6 +426,9 @@ class CheckoutService
             // Auto-assign assets from CMDB pool if product tracks individual assets
             $this->assetAssignmentService->autoAssign($booking);
 
+            // Generate booking confirmation PDF
+            app(BookingConfirmationPdfService::class)->generate($booking);
+
             $orderItem->update(['booking_id' => $booking->id]);
         }
     }
