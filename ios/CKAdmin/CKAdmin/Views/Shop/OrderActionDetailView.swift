@@ -1,5 +1,15 @@
 import SwiftUI
 
+/// Identifiable wrapper for presenting inspection sheets via .sheet(item:)
+private struct InspectionSheetItem: Identifiable {
+    let id: Int // bookingId
+}
+
+/// Identifiable wrapper for presenting packing scan sheets via .sheet(item:)
+private struct PackingSheetItem: Identifiable {
+    let id: Int // bookingId
+}
+
 /// Full order detail view with action buttons (fulfil, cancel, mark paid, notes)
 /// and embedded booking fulfilment pipeline.
 struct OrderActionDetailView: View {
@@ -10,10 +20,8 @@ struct OrderActionDetailView: View {
     @State private var isPerformingAction = false
     @State private var showNoteSheet = false
     @State private var noteText = ""
-    @State private var showInspectionSheet = false
-    @State private var inspectionBookingId: Int?
-    @State private var showPackingScanSheet = false
-    @State private var packingBookingId: Int?
+    @State private var inspectionItem: InspectionSheetItem?
+    @State private var packingItem: PackingSheetItem?
 
     private let apiClient: APIClient
     private let orderId: Int
@@ -38,20 +46,16 @@ struct OrderActionDetailView: View {
         .navigationBarTitleDisplayMode(.inline)
         .task { await loadOrder() }
         .sheet(isPresented: $showNoteSheet) { addNoteSheet }
-        .sheet(isPresented: $showInspectionSheet) {
-            if let bookingId = inspectionBookingId {
-                InspectionUploadView(apiClient: apiClient, orderId: orderId, bookingId: bookingId) {
-                    showInspectionSheet = false
-                    Task { await loadOrder() }
-                }
+        .sheet(item: $inspectionItem) { item in
+            InspectionUploadView(apiClient: apiClient, orderId: orderId, bookingId: item.id) {
+                inspectionItem = nil
+                Task { await loadOrder() }
             }
         }
-        .sheet(isPresented: $showPackingScanSheet) {
-            if let bookingId = packingBookingId {
-                PackingScanView(apiClient: apiClient, orderId: orderId, bookingId: bookingId) {
-                    showPackingScanSheet = false
-                    Task { await loadOrder() }
-                }
+        .sheet(item: $packingItem) { item in
+            PackingScanView(apiClient: apiClient, orderId: orderId, bookingId: item.id) {
+                packingItem = nil
+                Task { await loadOrder() }
             }
         }
     }
@@ -203,23 +207,20 @@ struct OrderActionDetailView: View {
             if let nextStage = booking.nextStage {
                 if nextStage == "checked_out" && !booking.hasCheckoutInspection {
                     Button {
-                        inspectionBookingId = booking.id
-                        showInspectionSheet = true
+                        inspectionItem = InspectionSheetItem(id: booking.id)
                     } label: {
                         Label("Checkout Inspection (Photos)", systemImage: "camera")
                     }
                 } else if nextStage == "inspected" && !booking.hasReturnInspection {
                     Button {
-                        inspectionBookingId = booking.id
-                        showInspectionSheet = true
+                        inspectionItem = InspectionSheetItem(id: booking.id)
                     } label: {
                         Label("Return Inspection (Photos)", systemImage: "camera")
                     }
                 } else if ["packing", "ready"].contains(nextStage) {
                     // Packing stage — show scan-to-pack button
                     Button {
-                        packingBookingId = booking.id
-                        showPackingScanSheet = true
+                        packingItem = PackingSheetItem(id: booking.id)
                     } label: {
                         Label("Scan Items to Pack", systemImage: "qrcode.viewfinder")
                     }
