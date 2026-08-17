@@ -3,71 +3,71 @@
 namespace App\Services;
 
 use App\Models\Booking;
+use App\Models\BookingInspection;
 use App\Models\Setting;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
-use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
-class BookingConfirmationPdfService
+class InspectionReportPdfService
 {
     /**
-     * Generate a booking confirmation PDF and store it.
+     * Generate a return inspection report PDF and store it.
      *
      * Returns the relative storage path on success, null on failure.
-     * Updates the booking's confirmation_pdf_path field.
+     * The PDF includes inspection photos, condition notes, damage status,
+     * and booking/customer details.
      */
-    public function generate(Booking $booking): ?string
+    public function generate(Booking $booking, BookingInspection $inspection): ?string
     {
         $booking->loadMissing(['product', 'customer', 'orderItem.order']);
+        $inspection->loadMissing('inspector');
 
-        // Generate QR code as base64 PNG for embedding in the PDF
-        $qrCode = $this->generateQrCode($booking);
+        // Convert stored photo paths to base64-encoded data URIs for embedding in the PDF
+        $photoDataUris = $this->buildPhotoDataUris($inspection->photos ?? []);
 
         // Load logo as base64 for embedding
         $logoBase64 = $this->getLogoBase64();
 
         $data = [
             'booking' => $booking,
+            'inspection' => $inspection,
             'customer' => $booking->customer,
             'order' => $booking->orderItem?->order,
+            'product' => $booking->product,
+            'inspector' => $inspection->inspector,
+            'photos' => $photoDataUris,
             'companyName' => Setting::get('company_name', config('app.name', 'Company')),
             'companyAddress' => Setting::get('company_address', ''),
             'companyPhone' => Setting::get('company_phone', ''),
             'companyEmail' => Setting::get('company_email', ''),
-            'deliveryInstructions' => $booking->product?->delivery_instructions,
-            'rentalAgreementText' => $booking->product?->rental_agreement_text,
-            'qrCodeBase64' => $qrCode,
             'logoBase64' => $logoBase64,
         ];
 
         try {
-            $pdf = Pdf::loadView('pdf.booking-confirmation', $data);
+            $pdf = Pdf::loadView('pdf.inspection-report', $data);
             $pdf->setPaper('A4', 'portrait');
 
-            $relativePath = 'bookings/confirmation-' . $booking->id . '.pdf';
+            $relativePath = "inspections/report-{$booking->id}-return.pdf";
 
-            // Use Storage facade to write to the correct disk location
             $pdfContent = $pdf->output();
             Storage::disk('local')->put($relativePath, $pdfContent);
 
-            // Verify the file was actually written
             if (!Storage::disk('local')->exists($relativePath)) {
-                Log::error('BookingConfirmationPdfService: PDF file not found after save', [
+                Log::error('InspectionReportPdfService: PDF file not found after save', [
                     'booking_id' => $booking->id,
+                    'inspection_id' => $inspection->id,
                     'path' => $relativePath,
                 ]);
 
                 return null;
             }
 
-            // Store the path on the booking
-            $booking->updateQuietly(['confirmation_pdf_path' => $relativePath]);
-
             return $relativePath;
         } catch (\Exception $e) {
-            Log::error('BookingConfirmationPdfService: Failed to generate PDF', [
+            Log::error('InspectionReportPdfService: Failed to generate PDF', [
                 'booking_id' => $booking->id,
+                'inspection_id' => $inspection->id,
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
             ]);
@@ -77,33 +77,43 @@ class BookingConfirmationPdfService
     }
 
     /**
-     * Generate a QR code containing the booking reference (BKG-{id}) as a base64 PNG.
+     * Convert stored photo paths to base64 data URIs for PDF embedding.
+     *
+     * @param array $photoPaths
+     * @return array<array{uri: string|null, index: int}>
      */
-    private function generateQrCode(Booking $booking): ?string
+    private function buildPhotoDataUris(array $photoPaths): array
     {
-        try {
-            $qrContent = 'BKG-' . $booking->id;
+        $results = [];
 
-            $qrSvg = QrCode::format('svg')
-                ->size(200)
-                ->margin(1)
-                ->errorCorrection('H')
-                ->generate($qrContent);
+        foreach ($photoPaths as $index => $path) {
+            $uri = null;
 
-            return 'data:image/svg+xml;base64,' . base64_encode($qrSvg);
-        } catch (\Exception $e) {
-            Log::warning('BookingConfirmationPdfService: QR code generation failed', [
-                'booking_id' => $booking->id,
-                'error' => $e->getMessage(),
-            ]);
+            try {
+                if (Storage::disk('local')->exists($path)) {
+                    $contents = Storage::disk('local')->get($path);
+                    $extension = pathinfo($path, PATHINFO_EXTENSION);
+                    $mime = $extension === 'png' ? 'image/png' : 'image/jpeg';
+                    $uri = "data:{$mime};base64," . base64_encode($contents);
+                }
+            } catch (\Exception $e) {
+                Log::warning('InspectionReportPdfService: Failed to read photo', [
+                    'path' => $path,
+                    'error' => $e->getMessage(),
+                ]);
+            }
 
-            return null;
+            $results[] = [
+                'uri' => $uri,
+                'index' => $index + 1,
+            ];
         }
+
+        return $results;
     }
 
     /**
      * Load the company logo from public storage as a base64-encoded data URI.
-     * Falls back to the absolute file path if base64 encoding fails.
      */
     private function getLogoBase64(): ?string
     {
@@ -122,7 +132,7 @@ class BookingConfirmationPdfService
 
             return 'data:image/png;base64,' . base64_encode($contents);
         } catch (\Exception $e) {
-            Log::warning('BookingConfirmationPdfService: Logo loading failed', [
+            Log::warning('InspectionReportPdfService: Logo loading failed', [
                 'error' => $e->getMessage(),
             ]);
 

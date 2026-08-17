@@ -5,34 +5,55 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <title>Booking Confirmation — BKG-{{ $booking->id }}</title>
     <style>
-        body { font-family: DejaVu Sans, sans-serif; font-size: 12px; color: #333; margin: 0; padding: 30px; }
-        .header { margin-bottom: 25px; border-bottom: 3px solid #7c3aed; padding-bottom: 15px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: DejaVu Sans, sans-serif; font-size: 11px; color: #333; padding: 25px 30px; line-height: 1.4; }
+
+        /* Header */
+        .header { margin-bottom: 20px; border-bottom: 3px solid #7c3aed; padding-bottom: 12px; }
         .header-table { width: 100%; }
         .logo-cell { width: 50%; vertical-align: middle; }
-        .logo-cell img { max-height: 60px; max-width: 200px; }
-        .company-name { font-size: 20px; font-weight: bold; color: #1f2937; margin: 0 0 4px; }
-        .company-details { font-size: 10px; color: #6b7280; line-height: 1.4; }
-        .conf-title { font-size: 22px; font-weight: bold; color: #7c3aed; text-align: right; }
-        .conf-meta { text-align: right; font-size: 11px; color: #6b7280; line-height: 1.5; }
-        .section-label { font-size: 10px; font-weight: bold; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; }
-        .detail-block { font-size: 12px; color: #374151; line-height: 1.6; }
+        .logo-cell img { max-height: 50px; max-width: 180px; }
+        .company-name { font-size: 18px; font-weight: bold; color: #1f2937; }
+        .company-details { font-size: 9px; color: #6b7280; line-height: 1.3; margin-top: 3px; }
+        .conf-title { font-size: 20px; font-weight: bold; color: #7c3aed; text-align: right; line-height: 1.1; }
+        .conf-meta { text-align: right; font-size: 10px; color: #6b7280; line-height: 1.4; margin-top: 4px; }
+
+        /* Sections */
+        .section-label { font-size: 9px; font-weight: bold; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 3px; }
+        .detail-block { font-size: 11px; color: #374151; line-height: 1.5; }
         .detail-block strong { color: #1f2937; }
-        .info-box { background-color: #f5f3ff; border: 1px solid #e5e7eb; border-radius: 4px; padding: 15px; margin-bottom: 15px; }
-        .info-row { font-size: 12px; color: #374151; margin-bottom: 4px; }
+
+        /* Info boxes */
+        .info-box { background-color: #f5f3ff; border: 1px solid #e5e7eb; border-radius: 4px; padding: 10px 12px; margin-bottom: 12px; }
+        .info-row { font-size: 11px; color: #374151; margin-bottom: 2px; }
         .info-row strong { color: #1f2937; }
-        .status-badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: bold; }
+
+        /* Status */
+        .status-badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 9px; font-weight: bold; }
         .status-confirmed { background: #dcfce7; color: #166534; }
         .status-active { background: #dbeafe; color: #1e40af; }
-        .footer { margin-top: 30px; padding-top: 15px; border-top: 2px solid #7c3aed; text-align: center; font-size: 10px; color: #9ca3af; }
-        .qr-section { text-align: center; margin-top: 20px; padding: 15px; border: 1px solid #e5e7eb; border-radius: 4px; background: #fafafa; }
-        .qr-section img { width: 150px; height: 150px; }
-        .qr-label { font-size: 10px; color: #6b7280; margin-top: 6px; font-weight: bold; }
-        .qr-ref { font-size: 14px; font-weight: bold; color: #1f2937; font-family: monospace; margin-top: 4px; }
-        .delivery-box { background-color: #eff6ff; border: 1px solid #bfdbfe; border-radius: 4px; padding: 12px; margin-top: 15px; }
-        .delivery-title { font-size: 10px; font-weight: bold; color: #1e40af; text-transform: uppercase; margin-bottom: 5px; }
-        .terms-box { background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 4px; padding: 12px; margin-top: 15px; }
-        .terms-title { font-size: 10px; font-weight: bold; color: #374151; text-transform: uppercase; margin-bottom: 8px; }
-        .terms-content { font-size: 9px; color: #6b7280; line-height: 1.5; }
+
+        /* QR Code */
+        .qr-section { text-align: center; padding: 10px; border: 1px solid #e5e7eb; border-radius: 4px; background: #fafafa; }
+        .qr-section img { width: 120px; height: 120px; }
+        .qr-label { font-size: 8px; color: #6b7280; margin-top: 4px; }
+        .qr-ref { font-size: 12px; font-weight: bold; color: #1f2937; font-family: monospace; margin-top: 2px; }
+
+        /* Delivery box */
+        .delivery-box { background-color: #eff6ff; border: 1px solid #bfdbfe; border-radius: 4px; padding: 10px 12px; margin-bottom: 12px; }
+        .delivery-title { font-size: 9px; font-weight: bold; color: #1e40af; text-transform: uppercase; margin-bottom: 4px; }
+
+        /* Terms */
+        .terms-box { background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 4px; padding: 12px; margin-top: 12px; }
+        .terms-title { font-size: 9px; font-weight: bold; color: #374151; text-transform: uppercase; margin-bottom: 6px; }
+        .terms-content { font-size: 8px; color: #4b5563; line-height: 1.4; }
+        .terms-content p { margin-bottom: 4px; }
+        .terms-content h2, .terms-content h3 { font-size: 9px; font-weight: bold; color: #1f2937; margin-top: 8px; margin-bottom: 3px; }
+
+        /* Footer */
+        .footer { margin-top: 20px; padding-top: 10px; border-top: 2px solid #7c3aed; text-align: center; font-size: 9px; color: #9ca3af; }
+
+        /* Page break */
         .page-break { page-break-before: always; }
     </style>
 </head>
@@ -65,7 +86,7 @@
     </div>
 
     {{-- Customer Details & QR Code --}}
-    <table style="width: 100%; margin-bottom: 20px;">
+    <table style="width: 100%; margin-bottom: 15px;">
         <tr>
             <td style="width: 60%; vertical-align: top;">
                 <div class="section-label">Customer</div>
@@ -75,12 +96,9 @@
                     @if($customer?->address_line1) {{ $customer->address_line1 }}<br> @endif
                     @if($customer?->city) {{ $customer->city }} {{ $customer->postal_code }}<br> @endif
                 </div>
-
-                <div style="margin-top: 12px;">
+                <div style="margin-top: 8px;">
                     <div class="section-label">Booking Status</div>
-                    <div class="detail-block">
-                        <span class="status-badge status-{{ $booking->status }}">{{ ucfirst($booking->status) }}</span>
-                    </div>
+                    <span class="status-badge status-{{ $booking->status }}">{{ ucfirst($booking->status) }}</span>
                 </div>
             </td>
             <td style="width: 40%; vertical-align: top;">
@@ -102,7 +120,7 @@
 
     {{-- Booking Details --}}
     <div class="info-box">
-        <div class="section-label" style="margin-bottom: 10px;">Rental Details</div>
+        <div class="section-label" style="margin-bottom: 6px;">Rental Details</div>
         <table style="width: 100%;">
             <tr>
                 <td style="width: 50%;">
@@ -123,24 +141,25 @@
     @if($deliveryInstructions)
         <div class="delivery-box">
             <div class="delivery-title">Collection / Delivery Information</div>
-            <div style="font-size: 12px; color: #374151; line-height: 1.5;">{!! nl2br(e($deliveryInstructions)) !!}</div>
+            <div style="font-size: 11px; color: #374151; line-height: 1.4;">{!! nl2br(e($deliveryInstructions)) !!}</div>
         </div>
     @endif
 
     {{-- Order Reference --}}
     @if($order)
-        <div class="info-box" style="margin-top: 15px; background: #f9fafb;">
-            <div class="section-label" style="margin-bottom: 8px;">Order Reference</div>
+        <div class="info-box" style="background: #f9fafb;">
+            <div class="section-label" style="margin-bottom: 4px;">Order Reference</div>
             <div class="info-row"><strong>Order #:</strong> {{ $order->id }}</div>
             <div class="info-row"><strong>Payment:</strong> {{ ucwords(str_replace('_', ' ', $order->payment_status)) }}</div>
         </div>
     @endif
 
-    {{-- Terms and Conditions --}}
+    {{-- Terms and Conditions (rendered as actual HTML, on new page if present) --}}
     @if($rentalAgreementText)
+        <div class="page-break"></div>
         <div class="terms-box">
             <div class="terms-title">Terms &amp; Conditions</div>
-            <div class="terms-content">{!! nl2br(e($rentalAgreementText)) !!}</div>
+            <div class="terms-content">{!! clean($rentalAgreementText) !!}</div>
         </div>
     @endif
 
