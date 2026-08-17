@@ -234,8 +234,10 @@ class BookingController extends Controller
      */
     public function downloadConfirmation(Booking $booking): \Symfony\Component\HttpFoundation\StreamedResponse|\Illuminate\Http\RedirectResponse
     {
-        // Generate on-the-fly if not already generated
-        if (!$booking->confirmation_pdf_path || !\Illuminate\Support\Facades\Storage::disk('local')->exists($booking->confirmation_pdf_path)) {
+        $disk = \Illuminate\Support\Facades\Storage::disk('local');
+
+        // Generate on-the-fly if not already generated or file is missing from disk
+        if (!$booking->confirmation_pdf_path || !$disk->exists($booking->confirmation_pdf_path)) {
             try {
                 $path = app(\App\Services\BookingConfirmationPdfService::class)->generate($booking);
                 if (!$path) {
@@ -247,7 +249,12 @@ class BookingController extends Controller
             }
         }
 
-        return \Illuminate\Support\Facades\Storage::disk('local')->download(
+        // Final safety check: ensure the file actually exists before attempting download
+        if (!$booking->confirmation_pdf_path || !$disk->exists($booking->confirmation_pdf_path)) {
+            return redirect()->back()->with('error', 'Booking confirmation PDF could not be found. Please try again.');
+        }
+
+        return $disk->download(
             $booking->confirmation_pdf_path,
             'booking-confirmation-' . $booking->id . '.pdf'
         );

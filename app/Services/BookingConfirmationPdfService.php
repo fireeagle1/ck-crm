@@ -36,14 +36,20 @@ class BookingConfirmationPdfService
             $pdf->setPaper('A4', 'portrait');
 
             $relativePath = 'bookings/confirmation-' . $booking->id . '.pdf';
-            $fullPath = storage_path('app/' . $relativePath);
 
-            $directory = dirname($fullPath);
-            if (!is_dir($directory)) {
-                mkdir($directory, 0755, true);
+            // Use Storage facade to write to the correct disk location
+            $pdfContent = $pdf->output();
+            Storage::disk('local')->put($relativePath, $pdfContent);
+
+            // Verify the file was actually written
+            if (!Storage::disk('local')->exists($relativePath)) {
+                Log::error('BookingConfirmationPdfService: PDF file not found after save', [
+                    'booking_id' => $booking->id,
+                    'path' => $relativePath,
+                ]);
+
+                return null;
             }
-
-            $pdf->save($fullPath);
 
             // Store the path on the booking
             $booking->updateQuietly(['confirmation_pdf_path' => $relativePath]);
