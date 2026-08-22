@@ -12,6 +12,7 @@ use App\Mail\PaymentFailedCustomer;
 use App\Mail\RentalEndedAdmin;
 use App\Mail\ReturnConfirmed;
 use App\Models\Booking;
+use App\Models\BookingInspection;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\Service;
@@ -353,6 +354,64 @@ class NotificationService
                 'order_id' => $order->id,
                 'error' => $e->getMessage(),
             ]);
+        }
+    }
+
+    /**
+     * Send return inspection report to customer AND admin with PDF attached.
+     *
+     * Generates an inspection report PDF containing photos and condition details,
+     * then dispatches queued emails to the customer and all admin users.
+     */
+    public function notifyReturnInspectionComplete(Booking $booking, \App\Models\BookingInspection $inspection): void
+    {
+        $booking->loadMissing(['customer', 'product', 'orderItem.order']);
+
+        // Generate the inspection report PDF
+        $pdfService = app(InspectionReportPdfService::class);
+        $pdfPath = $pdfService->generate($booking, $inspection);
+
+        if (!$pdfPath) {
+            Log::error('NotificationService: Failed to generate inspection report PDF, skipping email', [
+                'booking_id' => $booking->id,
+                'inspection_id' => $inspection->id,
+            ]);
+            return;
+        }
+
+        $mailable = new \App\Mail\ReturnInspectionReport($booking, $inspection, $pdfPath);
+
+        // Send to customer
+        $customerEmail = $booking->customer?->users()->first()?->email;
+
+        if ($customerEmail) {
+            try {
+                Mail::to($customerEmail)->queue($mailable);
+            } catch (\Exception $e) {
+                Log::error('NotificationService: Failed to dispatch return inspection report to customer', [
+                    'booking_id' => $booking->id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        } else {
+            Log::warning('NotificationService: No customer email found for return inspection report', [
+                'booking_id' => $booking->id,
+                'company_id' => $booking->company_id,
+            ]);
+        }
+
+        // Send to admin
+        $admins = $this->getAdminEmails();
+
+        if (!empty($admins)) {
+            try {
+                Mail::to($admins)->queue(new \App\Mail\ReturnInspectionReport($booking, $inspection, $pdfPath));
+            } catch (\Exception $e) {
+                Log::error('NotificationService: Failed to dispatch return inspection report to admin', [
+                    'booking_id' => $booking->id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
         }
     }
 

@@ -9,6 +9,7 @@ use App\Services\AssetAssignmentService;
 use App\Services\BookingInspectionService;
 use App\Services\FulfilmentService;
 use App\Services\FulfilmentStageService;
+use App\Services\NotificationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -21,6 +22,7 @@ class ShopOrderController extends Controller
         private FulfilmentStageService $fulfilmentStageService,
         private AssetAssignmentService $assetAssignmentService,
         private BookingInspectionService $bookingInspectionService,
+        private NotificationService $notificationService,
     ) {}
 
     /**
@@ -271,13 +273,16 @@ class ShopOrderController extends Controller
 
         try {
             if ($isReturnInspection) {
-                $this->bookingInspectionService->createReturnInspection($booking, $photos, $notes, $damageFlagged, $adminId);
+                $inspection = $this->bookingInspectionService->createReturnInspection($booking, $photos, $notes, $damageFlagged, $adminId);
 
                 if ($booking->fulfilment_stage === 'checked_out') {
                     $this->fulfilmentStageService->advance($booking, 'returned');
                     $booking->refresh();
                 }
                 $this->fulfilmentStageService->advance($booking, 'inspected');
+
+                // Send return inspection report email to customer and admin
+                $this->notificationService->notifyReturnInspectionComplete($booking, $inspection);
 
                 return response()->json(['message' => 'Return inspection recorded.', 'fulfilment_stage' => 'inspected']);
             } else {

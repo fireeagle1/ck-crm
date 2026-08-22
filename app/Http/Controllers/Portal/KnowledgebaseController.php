@@ -45,8 +45,13 @@ class KnowledgebaseController extends Controller
         return view('portal.knowledgebase.index', compact('articles', 'categories'));
     }
 
-    public function show(Article $article): View
+    public function show(Request $request, Article $article): View
     {
+        // Ensure customer can only view public articles or ones assigned to their company
+        if (!$article->is_public && $article->company_id !== $request->user()->company_id) {
+            abort(403);
+        }
+
         return view('portal.knowledgebase.show', compact('article'));
     }
 }

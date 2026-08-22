@@ -11,6 +11,7 @@ use App\Services\AssetAssignmentService;
 use App\Services\BookingInspectionService;
 use App\Services\FulfilmentService;
 use App\Services\FulfilmentStageService;
+use App\Services\NotificationService;
 use App\Services\StripeService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -28,6 +29,7 @@ class ShopOrderController extends Controller
         private FulfilmentStageService $fulfilmentStageService,
         private AssetAssignmentService $assetAssignmentService,
         private BookingInspectionService $bookingInspectionService,
+        private NotificationService $notificationService,
     ) {
     }
 
@@ -368,7 +370,7 @@ class ShopOrderController extends Controller
 
         try {
             if ($isReturnInspection) {
-                $this->bookingInspectionService->createReturnInspection(
+                $inspection = $this->bookingInspectionService->createReturnInspection(
                     $booking, $photos, $notes, $damageFlagged, $adminId
                 );
 
@@ -377,6 +379,9 @@ class ShopOrderController extends Controller
                     $booking->refresh();
                 }
                 $this->fulfilmentStageService->advance($booking, 'inspected');
+
+                // Send return inspection report email to customer and admin
+                $this->notificationService->notifyReturnInspectionComplete($booking, $inspection);
 
                 return redirect()->route('admin.shop.orders.show', $order)
                     ->with('success', 'Return inspection recorded and booking marked as inspected.');

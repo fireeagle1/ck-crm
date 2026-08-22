@@ -7,6 +7,7 @@ use App\Models\Booking;
 use App\Services\AssetAssignmentService;
 use App\Services\BookingInspectionService;
 use App\Services\FulfilmentStageService;
+use App\Services\NotificationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -18,6 +19,7 @@ class FulfilmentQueueController extends Controller
         private FulfilmentStageService $fulfilmentStageService,
         private AssetAssignmentService $assetAssignmentService,
         private BookingInspectionService $bookingInspectionService,
+        private NotificationService $notificationService,
     ) {}
 
     /**
@@ -164,7 +166,7 @@ class FulfilmentQueueController extends Controller
 
         try {
             if ($isReturnInspection) {
-                $this->bookingInspectionService->createReturnInspection(
+                $inspection = $this->bookingInspectionService->createReturnInspection(
                     $booking,
                     $photos,
                     $notes,
@@ -179,6 +181,9 @@ class FulfilmentQueueController extends Controller
                     $booking->refresh();
                 }
                 $this->fulfilmentStageService->advance($booking, 'inspected');
+
+                // Send return inspection report email to customer and admin
+                $this->notificationService->notifyReturnInspectionComplete($booking, $inspection);
 
                 return redirect()->route('admin.fulfilment.show', $booking)
                     ->with('success', 'Return inspection recorded and booking marked as inspected.');
