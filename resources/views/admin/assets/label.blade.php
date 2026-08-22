@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <title>Asset Label — CMDB-{{ $asset->device_id }}</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cabin+Sketch:wght@700&display=swap" rel="stylesheet">
     <style>
         :root {
             --label-width: 62mm;
@@ -73,7 +72,7 @@
         }
 
         .label-logo {
-            font-family: 'Cabin Sketch', cursive;
+            font-family: Arial, Helvetica, sans-serif;
             font-size: var(--font-logo);
             font-weight: 700;
             color: #000;
@@ -84,7 +83,7 @@
         .label-id {
             font-size: var(--font-id);
             font-weight: 700;
-            font-family: 'Courier New', monospace;
+            font-family: Arial, Helvetica, sans-serif;
             color: #000;
             line-height: 1.2;
         }
@@ -102,7 +101,7 @@
         .label-serial {
             font-size: var(--font-serial);
             color: #000;
-            font-family: 'Courier New', monospace;
+            font-family: Arial, Helvetica, sans-serif;
             line-height: 1.3;
         }
 
