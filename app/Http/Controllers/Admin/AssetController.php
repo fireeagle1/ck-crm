@@ -99,10 +99,12 @@ class AssetController extends Controller
     }
 
     /**
-     * Display a printable QR label for an asset.
+     * Display a printable QR label for an asset (Brother QL-700 compatible).
      */
-    public function label(Asset $asset): View
+    public function label(Request $request, Asset $asset): View
     {
-        return view('admin.assets.label', compact('asset'));
+        $size = $request->input('size', 'standard'); // standard or compact
+
+        return view('admin.assets.label', compact('asset', 'size'));
     }
 }
