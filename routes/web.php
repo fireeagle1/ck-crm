@@ -145,6 +145,7 @@ Route::middleware(['auth', 'verified', EnsureIsAdmin::class])->prefix('admin')->
     // Assets (CMDB)
     Route::resource('assets', Admin\AssetController::class);
     Route::get('assets/{asset}/label', [Admin\AssetController::class, 'label'])->name('assets.label');
+    Route::get('assets/{asset}/label-download', [Admin\AssetController::class, 'labelDownload'])->name('assets.label-download');
 
     // Projects
     Route::resource('projects', Admin\ProjectController::class);
