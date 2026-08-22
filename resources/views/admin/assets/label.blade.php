@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <title>Asset Label — CMDB-{{ $asset->device_id }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cabin+Sketch:wght@700&display=swap" rel="stylesheet">
     <style>
         :root {
             --label-width: 62mm;
             --label-height: {{ $size === 'compact' ? '30mm' : '40mm' }};
             --qr-size: {{ $size === 'compact' ? '18mm' : '24mm' }};
-            --logo-height: {{ $size === 'compact' ? '6mm' : '8mm' }};
+            --font-logo: {{ $size === 'compact' ? '11pt' : '14pt' }};
             --font-id: {{ $size === 'compact' ? '9pt' : '11pt' }};
             --font-name: {{ $size === 'compact' ? '8pt' : '9pt' }};
             --font-serial: {{ $size === 'compact' ? '6.5pt' : '7.5pt' }};
@@ -46,21 +47,15 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            border: 1px solid #d1d5db;
+            border: 1px solid #000;
             overflow: hidden;
+            color: #000;
         }
 
         .label-top {
             display: flex;
             align-items: flex-start;
             gap: var(--gap);
-        }
-
-        .label-logo {
-            height: var(--logo-height);
-            width: auto;
-            max-width: 20mm;
-            object-fit: contain;
         }
 
         .label-qr {
@@ -77,18 +72,27 @@
             justify-content: center;
         }
 
+        .label-logo {
+            font-family: 'Cabin Sketch', cursive;
+            font-size: var(--font-logo);
+            font-weight: 700;
+            color: #000;
+            line-height: 1.2;
+            margin-bottom: 1mm;
+        }
+
         .label-id {
             font-size: var(--font-id);
             font-weight: 700;
             font-family: 'Courier New', monospace;
-            color: #111827;
+            color: #000;
             line-height: 1.2;
         }
 
         .label-name {
             font-size: var(--font-name);
             font-weight: 600;
-            color: #374151;
+            color: #000;
             line-height: 1.2;
             white-space: nowrap;
             overflow: hidden;
@@ -97,26 +101,27 @@
 
         .label-serial {
             font-size: var(--font-serial);
-            color: #6b7280;
+            color: #000;
             font-family: 'Courier New', monospace;
             line-height: 1.3;
         }
 
         .label-type {
             font-size: var(--font-serial);
-            color: #9ca3af;
+            color: #000;
             line-height: 1.3;
         }
 
         .label-footer {
-            border-top: 0.3pt solid #e5e7eb;
+            border-top: 0.3pt solid #000;
             padding-top: 1mm;
             text-align: center;
         }
 
         .label-support {
             font-size: var(--font-support);
-            color: #6b7280;
+            color: #000;
+            font-weight: 500;
         }
 
         /* Controls (hidden when printing) */
@@ -187,16 +192,7 @@
 
             {{-- Asset Info --}}
             <div class="label-info">
-                {{-- Logo --}}
-                @php
-                    $logoPath = \App\Models\Setting::get('logo_dark_path') ?? \App\Models\Setting::get('logo_path');
-                @endphp
-                @if ($logoPath)
-                    <img class="label-logo" src="{{ asset($logoPath) }}" alt="CK Enterprises">
-                @else
-                    <span style="font-size: var(--font-name); font-weight: 700; color: #111827;">CK Enterprises</span>
-                @endif
-
+                <div class="label-logo">CK Enterprises UK</div>
                 <div class="label-id">CMDB-{{ $asset->device_id }}</div>
                 <div class="label-name">{{ $asset->device_name }}</div>
                 @if ($asset->serial_number)
@@ -215,15 +211,7 @@
 
     {{-- Controls (not printed) --}}
     <div class="controls no-print">
-        <a href="{{ route('admin.assets.label-download', ['asset' => $asset->device_id, 'size' => $size]) }}" class="btn btn-primary">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
-                <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
-            </svg>
-            Download Label (PNG)
-        </a>
-
-        <button class="btn btn-outline" onclick="window.print()">
+        <button class="btn btn-primary" onclick="window.print()">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
                 <path d="M2.5 8a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1z"/>
                 <path d="M5 1a2 2 0 0 0-2 2v2H2a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h1v1a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-1h1a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-1V3a2 2 0 0 0-2-2H5zM4 3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2H4V3zm1 10a1 1 0 0 1-1-1v-2h8v2a1 1 0 0 1-1 1H5z"/>
