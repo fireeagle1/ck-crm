@@ -145,7 +145,8 @@ class AssetController extends Controller
         $y = $padding;
 
         // --- QR Code ---
-        $qrUrl = 'https://quickchart.io/qr?text=' . urlencode(url('/admin/assets/' . $asset->device_id)) . '&size=' . ($qrSize * 2) . '&margin=0';
+        $qrValue = 'CMDB-' . $asset->device_id;
+        $qrUrl = 'https://quickchart.io/qr?text=' . urlencode($qrValue) . '&size=' . ($qrSize * 2) . '&margin=0';
         $qrData = @file_get_contents($qrUrl);
         if ($qrData) {
             $qrImg = @imagecreatefromstring($qrData);
@@ -166,7 +167,11 @@ class AssetController extends Controller
         $logoPath = Setting::get('logo_dark_path') ?? Setting::get('logo_path');
         $logoDrawn = false;
         if ($logoPath) {
+            // Check both public/branding and public/storage/branding locations
             $fullLogoPath = public_path($logoPath);
+            if (!file_exists($fullLogoPath)) {
+                $fullLogoPath = public_path('storage/' . $logoPath);
+            }
             if (file_exists($fullLogoPath)) {
                 $logoInfo = @getimagesize($fullLogoPath);
                 if ($logoInfo) {

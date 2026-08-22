@@ -182,7 +182,7 @@
         <div class="label-top">
             {{-- QR Code --}}
             <img class="label-qr"
-                 src="https://quickchart.io/qr?text={{ urlencode(url('/admin/assets/' . $asset->device_id)) }}&size=200&margin=0"
+                 src="https://quickchart.io/qr?text={{ urlencode('CMDB-' . $asset->device_id) }}&size=200&margin=0"
                  alt="QR: CMDB-{{ $asset->device_id }}">
 
             {{-- Asset Info --}}
