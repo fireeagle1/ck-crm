@@ -64,7 +64,7 @@ class StripeService
                 'error' => $e->getMessage(),
             ]);
 
-            throw new HttpException(502, 'Unable to create Stripe customer: ' . $e->getMessage());
+            throw new HttpException(502, 'Unable to create Stripe customer. Please try again or contact support.');
         }
     }
 
@@ -95,7 +95,7 @@ class StripeService
                 'error' => $e->getMessage(),
             ]);
 
-            throw new HttpException(502, 'Unable to create payment: ' . $e->getMessage());
+            throw new HttpException(502, 'Unable to process payment. Please try again or contact support.');
         }
     }
 
@@ -122,7 +122,7 @@ class StripeService
                 'error' => $e->getMessage(),
             ]);
 
-            throw new HttpException(502, 'Unable to create checkout session: ' . $e->getMessage());
+            throw new HttpException(502, 'Unable to initiate checkout. Please try again or contact support.');
         }
     }
 
@@ -138,7 +138,7 @@ class StripeService
                 'error' => $e->getMessage(),
             ]);
 
-            throw new HttpException(502, 'Unable to create checkout session: ' . $e->getMessage());
+            throw new HttpException(502, 'Unable to initiate checkout. Please try again or contact support.');
         }
     }
 
@@ -170,7 +170,7 @@ class StripeService
                 'error' => $e->getMessage(),
             ]);
 
-            throw new HttpException(502, 'Unable to create refund: ' . $e->getMessage());
+            throw new HttpException(502, 'Unable to process refund. Please try again or contact support.');
         }
     }
 
@@ -199,7 +199,7 @@ class StripeService
                 'error' => $e->getMessage(),
             ]);
 
-            throw new HttpException(502, 'Unable to create subscription: ' . $e->getMessage());
+            throw new HttpException(502, 'Unable to create subscription. Please try again or contact support.');
         }
     }
 

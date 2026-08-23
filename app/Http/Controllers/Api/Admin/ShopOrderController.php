@@ -372,6 +372,11 @@ class ShopOrderController extends Controller
      */
     public function inspectionPhoto(string $path): \Symfony\Component\HttpFoundation\StreamedResponse
     {
+        // Prevent path traversal — only allow access to inspection photos
+        if (!str_starts_with($path, 'inspections/') || str_contains($path, '..')) {
+            abort(403, 'Access denied.');
+        }
+
         $disk = \Illuminate\Support\Facades\Storage::disk('local');
 
         if (!$disk->exists($path)) {

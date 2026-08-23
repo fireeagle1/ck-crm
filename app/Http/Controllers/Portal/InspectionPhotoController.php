@@ -16,6 +16,11 @@ class InspectionPhotoController extends Controller
      */
     public function show(string $path): StreamedResponse
     {
+        // Prevent path traversal — only allow access to inspection photos
+        if (!str_starts_with($path, 'inspections/') || str_contains($path, '..')) {
+            abort(403, 'Access denied.');
+        }
+
         $disk = Storage::disk('local');
 
         if (!$disk->exists($path)) {

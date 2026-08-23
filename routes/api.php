@@ -15,8 +15,8 @@ use App\Http\Middleware\EnsureIsAdmin;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('admin')->group(function () {
-    // Public (unauthenticated) route
-    Route::post('/auth/login', [AuthController::class, 'login']);
+    // Public (unauthenticated) route — rate limited to prevent brute-force
+    Route::post('/auth/login', [AuthController::class, 'login'])->middleware('throttle:5,1');
 
     // Authenticated admin routes
     Route::middleware(['auth:sanctum', EnsureIsAdmin::class])->group(function () {

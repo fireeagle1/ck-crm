@@ -8,9 +8,20 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
 {
+    /**
+     * Maximum failed login attempts before account is locked.
+     */
+    private const MAX_FAILED_ATTEMPTS = 5;
+
+    /**
+     * Lock duration in minutes after exceeding max failed attempts.
+     */
+    private const LOCK_DURATION_MINUTES = 15;
+
     /**
      * Authenticate an admin user and issue a Sanctum token.
      */
@@ -23,8 +34,8 @@ class AuthController extends Controller
 
         $user = User::where('email', $validated['email'])->first();
 
-        // Invalid credentials — user not found or password mismatch
-        if (! $user || ! Hash::check($validated['password'], $user->password)) {
+        // Invalid credentials — user not found
+        if (! $user) {
             return response()->json([
                 'message' => 'Invalid credentials.',
             ], 401);
@@ -32,16 +43,26 @@ class AuthController extends Controller
 
         // Account is locked
         if ($user->is_locked) {
-            // If lock_until is set and has expired, the account is no longer locked
+            // If lock_until is set and has expired, unlock the account
             if ($user->lock_until && $user->lock_until->isPast()) {
                 $user->is_locked = false;
                 $user->lock_until = null;
+                $user->failed_attempts = 0;
                 $user->save();
             } else {
                 return response()->json([
-                    'message' => 'Account is locked.',
+                    'message' => 'Account is locked. Please try again later.',
                 ], 403);
             }
+        }
+
+        // Invalid credentials — password mismatch
+        if (! Hash::check($validated['password'], $user->password)) {
+            $this->recordFailedAttempt($user);
+
+            return response()->json([
+                'message' => 'Invalid credentials.',
+            ], 401);
         }
 
         // User is not an admin
@@ -50,6 +71,11 @@ class AuthController extends Controller
                 'message' => 'Insufficient permissions.',
             ], 403);
         }
+
+        // Successful login — reset failed attempts and update last login
+        $user->failed_attempts = 0;
+        $user->last_login = now();
+        $user->save();
 
         // Create Sanctum personal access token
         $token = $user->createToken('mobile-app')->plainTextToken;
@@ -62,6 +88,30 @@ class AuthController extends Controller
                 'email' => $user->email,
             ],
         ]);
+    }
+
+    /**
+     * Record a failed login attempt and lock the account if threshold exceeded.
+     */
+    private function recordFailedAttempt(User $user): void
+    {
+        $attempts = ($user->failed_attempts ?? 0) + 1;
+
+        $user->failed_attempts = $attempts;
+        $user->last_failed_login = now();
+
+        if ($attempts >= self::MAX_FAILED_ATTEMPTS) {
+            $user->is_locked = true;
+            $user->lock_until = now()->addMinutes(self::LOCK_DURATION_MINUTES);
+
+            Log::warning('Account locked due to excessive failed login attempts', [
+                'user_id' => $user->id,
+                'email' => $user->email,
+                'failed_attempts' => $attempts,
+            ]);
+        }
+
+        $user->save();
     }
 
     /**

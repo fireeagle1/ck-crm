@@ -11,7 +11,7 @@ class DeviceTokenController extends Controller
     public function store(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'token' => 'required|string',
+            'token' => 'required|string|max:500',
         ]);
 
         $request->user()->deviceTokens()->updateOrCreate(
@@ -25,7 +25,7 @@ class DeviceTokenController extends Controller
     public function destroy(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'token' => 'required|string',
+            'token' => 'required|string|max:500',
         ]);
 
         $request->user()->deviceTokens()->where('token', $validated['token'])->delete();

@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\View\View;
+use Mews\Purifier\Facades\Purifier;
 
 class CommunicationController extends Controller
 {
@@ -27,7 +28,7 @@ class CommunicationController extends Controller
 
         $html = view('emails.broadcast', [
             'subject' => $request->input('subject'),
-            'emailBody' => $request->input('body'),
+            'emailBody' => Purifier::clean($request->input('body')),
             'recipientName' => 'Preview Customer',
         ])->render();
 
@@ -57,7 +58,7 @@ class CommunicationController extends Controller
             try {
                 Mail::send('emails.broadcast', [
                     'subject' => $validated['subject'],
-                    'emailBody' => $validated['body'],
+                    'emailBody' => Purifier::clean($validated['body']),
                     'recipientName' => $user->first_name ?? 'there',
                 ], function ($message) use ($user, $validated) {
                     $message->to($user->email, $user->full_name)

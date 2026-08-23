@@ -23,7 +23,7 @@ class WhmService
         $url = "https://{$hostname}:2087/json-api/listaccts?api.version=1";
 
         try {
-            $response = Http::withoutVerifying()
+            $response = $this->buildRequest($hostname)
                 ->withHeaders([
                     'Authorization' => "WHM root:{$apiToken}",
                 ])
@@ -79,7 +79,7 @@ class WhmService
         $url = "https://{$hostname}:2087/json-api/createacct";
 
         try {
-            $response = Http::withoutVerifying()
+            $response = $this->buildRequest($hostname)
                 ->withHeaders([
                     'Authorization' => "WHM root:{$apiToken}",
                 ])
@@ -144,6 +144,21 @@ class WhmService
                 $e
             );
         }
+    }
+
+    /**
+     * Build an HTTP request, disabling SSL verification only for local connections.
+     *
+     * Remote WHM connections use standard certificate verification.
+     * Local connections (localhost/127.0.0.1) skip verification since there's no network to intercept.
+     */
+    private function buildRequest(string $hostname): \Illuminate\Http\Client\PendingRequest
+    {
+        $isLocal = in_array($hostname, ['localhost', '127.0.0.1', '::1'], true)
+            || str_starts_with($hostname, '192.168.')
+            || str_starts_with($hostname, '10.');
+
+        return $isLocal ? Http::withoutVerifying() : Http::withOptions(['verify' => true]);
     }
 
     /**

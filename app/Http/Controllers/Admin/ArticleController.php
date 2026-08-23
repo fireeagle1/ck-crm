@@ -7,6 +7,7 @@ use App\Models\Article;
 use App\Models\Customer;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use Mews\Purifier\Facades\Purifier;
 
 class ArticleController extends Controller
 {
@@ -36,11 +37,8 @@ class ArticleController extends Controller
             'is_public' => 'boolean',
         ]);
 
-        // Sanitize HTML content - allow safe formatting tags only
-        $validated['content'] = strip_tags(
-            $validated['content'],
-            '<p><br><strong><b><em><i><u><a><ul><ol><li><h1><h2><h3><blockquote><pre><code><del><sub><sup><span><div>'
-        );
+        // Sanitize HTML content using HTMLPurifier (strips dangerous attributes and scripts)
+        $validated['content'] = Purifier::clean($validated['content']);
 
         Article::create($validated);
 
@@ -65,11 +63,8 @@ class ArticleController extends Controller
             'is_public' => 'boolean',
         ]);
 
-        // Sanitize HTML content - allow safe formatting tags only
-        $validated['content'] = strip_tags(
-            $validated['content'],
-            '<p><br><strong><b><em><i><u><a><ul><ol><li><h1><h2><h3><blockquote><pre><code><del><sub><sup><span><div>'
-        );
+        // Sanitize HTML content using HTMLPurifier (strips dangerous attributes and scripts)
+        $validated['content'] = Purifier::clean($validated['content']);
 
         $article->update($validated);
 
