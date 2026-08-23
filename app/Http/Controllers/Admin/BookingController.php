@@ -172,6 +172,44 @@ class BookingController extends Controller
     }
 
     /**
+     * Delete a booking and its associated order/order item (if no other items exist).
+     * Intended for cleaning up test bookings.
+     */
+    public function destroy(Booking $booking): RedirectResponse
+    {
+        $bookingId = $booking->id;
+        $orderItem = $booking->orderItem;
+        $order = $orderItem?->order;
+
+        // Unlink booking from order item first
+        if ($orderItem) {
+            $orderItem->update(['booking_id' => null]);
+        }
+
+        // Delete associated asset assignments
+        $booking->assignedAssets()->delete();
+
+        // Delete inspections (photos remain on disk for audit)
+        $booking->inspections()->delete();
+
+        // Delete the booking
+        $booking->delete();
+
+        // If the order item has no other bookings or purpose, clean up
+        if ($orderItem) {
+            $orderItem->delete();
+        }
+
+        // If the order has no remaining items, delete it too
+        if ($order && $order->items()->count() === 0) {
+            $order->delete();
+        }
+
+        return redirect()->route('admin.shop.bookings.index')
+            ->with('success', 'Booking #' . $bookingId . ' deleted successfully.');
+    }
+
+    /**
      * Show form for manual booking creation.
      *
      * Requirements: 16.1, 16.2

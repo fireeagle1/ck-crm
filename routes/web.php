@@ -251,6 +251,7 @@ Route::middleware(['auth', 'verified', EnsureIsAdmin::class])->prefix('admin')->
     Route::post('bookings/{booking}/advance-stage', [Admin\BookingController::class, 'advanceStage'])->name('bookings.advance-stage');
     Route::post('bookings/{booking}/mark-returned-list', [Admin\BookingController::class, 'markReturnedFromList'])->name('bookings.mark-returned-list');
     Route::get('bookings/{booking}/inspection-report', [Admin\BookingInspectionReportController::class, 'download'])->name('bookings.inspection-report');
+    Route::delete('bookings/{booking}', [Admin\BookingController::class, 'destroy'])->name('bookings.destroy');
 
     Route::resource('shop/tiers', Admin\CustomerTierController::class)->except(['show', 'edit', 'create'])->names('shop.tiers');
 

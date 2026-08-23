@@ -143,6 +143,16 @@
                                         Download Inspection Report
                                     </a>
                                 @endif
+
+                                {{-- Delete Booking --}}
+                                <form method="POST" action="{{ route('admin.bookings.destroy', $booking) }}"
+                                      onsubmit="return confirm('Are you sure you want to delete booking #{{ $booking->id }}? This will also remove the associated order item and order (if empty). This cannot be undone.')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="text-xs bg-red-100 text-red-700 px-2 py-1 rounded hover:bg-red-200">
+                                        Delete
+                                    </button>
+                                </form>
                             </div>
                         </td>
                     </tr>
