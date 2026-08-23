@@ -54,6 +54,8 @@ struct TicketDetailView: View {
                 if !ticket.activities.isEmpty { activitySection(ticket.activities) }
             }
             .listStyle(.insetGrouped)
+            .scrollContentBackground(.hidden)
+            .background(CKTheme.backgroundPrimary)
             .refreshable { await viewModel.loadTicket() }
 
             replyComposer(replyText: $vm.replyText, isInternal: $vm.isInternalNote)
@@ -67,14 +69,14 @@ struct TicketDetailView: View {
             HStack { badge(ticket.status, color: statusColor(ticket.status)); Spacer(); badge(ticket.priority, color: priorityColor(ticket.priority)) }
             if let type = ticket.ticketType { row("Type", type) }
             if let desc = ticket.description, !desc.isEmpty {
-                VStack(alignment: .leading, spacing: 4) { Text("Description").font(.caption).foregroundStyle(.secondary); Text(desc) }
+                VStack(alignment: .leading, spacing: 4) { Text("Description").font(CKTypography.caption).foregroundStyle(CKTheme.textSecondary); Text(desc).font(CKTypography.body).foregroundStyle(CKTheme.textPrimary) }
             }
             if let c = ticket.customerName { row("Customer", c) }
             if let u = ticket.assignedUserName { row("Assigned To", u) }
             if let a = ticket.assetName { row("Asset", a) }
             if let s = ticket.serviceName { row("Service", s) }
             if let cat = ticket.requestCategory, !cat.isEmpty { row("Category", cat) }
-            if let created = ticket.createdAt { HStack { Text("Created").font(.subheadline).foregroundStyle(.secondary); Spacer(); Text(created, style: .relative).font(.subheadline).foregroundStyle(.secondary) } }
+            if let created = ticket.createdAt { HStack { Text("Created").font(CKTypography.body).foregroundStyle(CKTheme.textSecondary); Spacer(); Text(created, style: .relative).font(CKTypography.body).foregroundStyle(CKTheme.textSecondary) } }
         }
     }
 
@@ -85,15 +87,15 @@ struct TicketDetailView: View {
             ForEach(replies) { reply in
                 VStack(alignment: .leading, spacing: 6) {
                     HStack {
-                        Text(reply.userName ?? "Unknown").font(.subheadline).fontWeight(.semibold)
+                        Text(reply.userName ?? "Unknown").font(CKTypography.headline).foregroundStyle(CKTheme.textPrimary)
                         if reply.isInternal == true {
                             Text("Internal").font(.caption2).fontWeight(.medium).padding(.horizontal, 6).padding(.vertical, 1)
-                                .background(Color.yellow.opacity(0.2)).foregroundStyle(.orange).clipShape(Capsule())
+                                .background(CKTheme.warning.opacity(0.2)).foregroundStyle(CKTheme.warning).clipShape(Capsule())
                         }
                         Spacer()
-                        if let t = reply.createdAt { Text(t, style: .relative).font(.caption).foregroundStyle(.secondary) }
+                        if let t = reply.createdAt { Text(t, style: .relative).font(CKTypography.caption).foregroundStyle(CKTheme.textTertiary) }
                     }
-                    Text(reply.body).font(.body)
+                    Text(reply.body).font(CKTypography.body).foregroundStyle(CKTheme.textPrimary)
                 }.padding(.vertical, 4)
             }
         }
@@ -105,14 +107,14 @@ struct TicketDetailView: View {
         Section("Activity (\(activities.count))") {
             ForEach(activities) { activity in
                 HStack(alignment: .top, spacing: 10) {
-                    Image(systemName: activityIcon(activity.type)).font(.caption).foregroundStyle(.secondary).frame(width: 20)
+                    Image(systemName: activityIcon(activity.type)).font(CKTypography.caption).foregroundStyle(CKTheme.textTertiary).frame(width: 20)
                     VStack(alignment: .leading, spacing: 2) {
                         if let old = activity.oldValue, let new = activity.newValue {
-                            Text("\(activity.type?.replacingOccurrences(of: "_", with: " ").capitalized ?? "Change"): \(old) → \(new)").font(.subheadline)
+                            Text("\(activity.type?.replacingOccurrences(of: "_", with: " ").capitalized ?? "Change"): \(old) → \(new)").font(CKTypography.body).foregroundStyle(CKTheme.textPrimary)
                         }
                         HStack(spacing: 4) {
-                            if let u = activity.userName { Text(u).font(.caption).foregroundStyle(.secondary) }
-                            if let t = activity.createdAt { Text("·").font(.caption).foregroundStyle(.tertiary); Text(t, style: .relative).font(.caption).foregroundStyle(.secondary) }
+                            if let u = activity.userName { Text(u).font(CKTypography.caption).foregroundStyle(CKTheme.textSecondary) }
+                            if let t = activity.createdAt { Text("·").font(CKTypography.caption).foregroundStyle(CKTheme.textTertiary); Text(t, style: .relative).font(CKTypography.caption).foregroundStyle(CKTheme.textSecondary) }
                         }
                     }
                     Spacer()
@@ -129,7 +131,7 @@ struct TicketDetailView: View {
             VStack(spacing: 8) {
                 HStack {
                     Toggle("Internal note", isOn: isInternal)
-                        .font(.caption)
+                        .font(CKTypography.caption)
                         .toggleStyle(.switch)
                         .controlSize(.mini)
                 }
@@ -137,30 +139,31 @@ struct TicketDetailView: View {
                     TextField("Write a reply...", text: replyText, axis: .vertical)
                         .lineLimit(1...5)
                         .textFieldStyle(.plain)
+                        .font(CKTypography.body)
                         .padding(10)
-                        .background(Color(.systemGray6))
+                        .background(CKTheme.backgroundSecondary)
                         .clipShape(RoundedRectangle(cornerRadius: 10))
                     Button { Task { await viewModel.sendReply() } } label: {
                         if viewModel.isSendingReply { ProgressView().controlSize(.small) }
-                        else { Image(systemName: "arrow.up.circle.fill").font(.title2) }
+                        else { Image(systemName: "arrow.up.circle.fill").font(.title2).foregroundStyle(CKTheme.accent) }
                     }
                     .disabled(viewModel.replyText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || viewModel.isSendingReply)
                 }
             }
             .padding(.horizontal)
             .padding(.vertical, 8)
-            .background(Color(.systemBackground))
+            .background(CKTheme.backgroundCard)
         }
     }
 
     // MARK: - Helpers
 
     private func row(_ label: String, _ value: String) -> some View {
-        HStack { Text(label).font(.subheadline).foregroundStyle(.secondary); Spacer(); Text(value).font(.subheadline) }
+        HStack { Text(label).font(CKTypography.body).foregroundStyle(CKTheme.textSecondary); Spacer(); Text(value).font(CKTypography.body).foregroundStyle(CKTheme.textPrimary) }
     }
 
     private func badge(_ text: String, color: Color) -> some View {
-        Text(text).font(.caption).fontWeight(.medium).padding(.horizontal, 10).padding(.vertical, 4)
+        Text(text).font(CKTypography.caption).fontWeight(.medium).padding(.horizontal, 10).padding(.vertical, 4)
             .background(color.opacity(0.15)).foregroundStyle(color).clipShape(Capsule())
     }
 
@@ -178,9 +181,10 @@ struct TicketDetailView: View {
 
     private func errorView(_ msg: String) -> some View {
         VStack(spacing: 16) {
-            Image(systemName: "exclamationmark.triangle").font(.system(size: 48)).foregroundStyle(.orange)
-            Text(msg).font(.subheadline).foregroundStyle(.secondary)
+            Image(systemName: "exclamationmark.triangle").font(.system(size: 48)).foregroundStyle(CKTheme.warning)
+            Text(msg).font(CKTypography.body).foregroundStyle(CKTheme.textSecondary)
             Button { Task { await viewModel.loadTicket() } } label: { Label("Retry", systemImage: "arrow.clockwise") }.buttonStyle(.borderedProminent)
         }.frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(CKTheme.backgroundPrimary)
     }
 }

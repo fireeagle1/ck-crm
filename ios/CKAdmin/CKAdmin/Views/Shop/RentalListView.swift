@@ -63,6 +63,8 @@ struct RentalListView: View {
             }
         }
         .listStyle(.plain)
+        .scrollContentBackground(.hidden)
+        .background(CKTheme.backgroundPrimary)
         .refreshable {
             await viewModel.loadInitial()
         }
@@ -80,54 +82,48 @@ struct RentalListView: View {
     // MARK: - Rental Row
 
     private func rentalRow(_ rental: RentalListItem) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
-            HStack {
+        CKRow {
+            VStack(alignment: .leading, spacing: 4) {
                 Text(rental.productName ?? "Unknown Product")
-                    .font(.body)
-                    .fontWeight(.medium)
+                    .font(CKTypography.headline)
+                    .foregroundStyle(CKTheme.textPrimary)
                     .lineLimit(1)
 
-                Spacer()
-
-                statusBadge(rental.status)
-            }
-
-            HStack {
                 Text(rental.customerName ?? "Unknown Customer")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    .font(CKTypography.body)
+                    .foregroundStyle(CKTheme.textSecondary)
                     .lineLimit(1)
 
-                Spacer()
+                HStack {
+                    if let start = rental.startDate, let end = rental.endDate {
+                        Label("\(formattedDate(start)) – \(formattedDate(end))", systemImage: "calendar")
+                            .font(CKTypography.caption)
+                            .foregroundStyle(CKTheme.textSecondary)
+                    }
 
+                    Spacer()
+
+                    if rental.quantity > 1 {
+                        Label("Qty: \(rental.quantity)", systemImage: "number")
+                            .font(CKTypography.caption)
+                            .foregroundStyle(CKTheme.textSecondary)
+                    }
+                }
+
+                if rental.status == "returned", let returnedAt = rental.returnedAt {
+                    Label("Returned: \(returnedAt, style: .date)", systemImage: "checkmark.circle")
+                        .font(CKTypography.caption)
+                        .foregroundStyle(CKTheme.success)
+                }
+            }
+        } trailing: {
+            VStack(alignment: .trailing, spacing: 6) {
+                statusBadge(rental.status)
                 Text(formattedAmount(rental.totalPrice))
-                    .font(.subheadline)
-                    .fontWeight(.semibold)
-            }
-
-            HStack {
-                if let start = rental.startDate, let end = rental.endDate {
-                    Label("\(formattedDate(start)) – \(formattedDate(end))", systemImage: "calendar")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-
-                Spacer()
-
-                if rental.quantity > 1 {
-                    Label("Qty: \(rental.quantity)", systemImage: "number")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-            }
-
-            if rental.status == "returned", let returnedAt = rental.returnedAt {
-                Label("Returned: \(returnedAt, style: .date)", systemImage: "checkmark.circle")
-                    .font(.caption)
-                    .foregroundStyle(.green)
+                    .font(CKTypography.callout)
+                    .foregroundStyle(CKTheme.textPrimary)
             }
         }
-        .padding(.vertical, 2)
         .accessibilityElement(children: .combine)
         .accessibilityLabel("\(rental.productName ?? "Unknown"), \(rental.customerName ?? "Unknown"), \(rental.status)")
     }
@@ -136,7 +132,7 @@ struct RentalListView: View {
 
     private func statusBadge(_ status: String) -> some View {
         Text(status.capitalized)
-            .font(.caption2)
+            .font(CKTypography.caption)
             .fontWeight(.medium)
             .padding(.horizontal, 8)
             .padding(.vertical, 2)
@@ -147,11 +143,11 @@ struct RentalListView: View {
 
     private func statusColor(_ status: String) -> Color {
         switch status {
-        case "active": return .blue
-        case "confirmed": return .green
-        case "returned": return .gray
-        case "cancelled": return .red
-        default: return .gray
+        case "active": return CKTheme.info
+        case "confirmed": return CKTheme.success
+        case "returned": return CKTheme.textTertiary
+        case "cancelled": return CKTheme.error
+        default: return CKTheme.textTertiary
         }
     }
 
@@ -182,7 +178,9 @@ struct RentalListView: View {
         HStack {
             Spacer()
             ProgressView().controlSize(.small)
-            Text("Loading more...").font(.caption).foregroundStyle(.secondary)
+            Text("Loading more...")
+                .font(CKTypography.caption)
+                .foregroundStyle(CKTheme.textSecondary)
             Spacer()
         }
         .listRowSeparator(.hidden)
@@ -191,28 +189,35 @@ struct RentalListView: View {
     private var loadingView: some View {
         VStack(spacing: 16) {
             ProgressView().controlSize(.large)
-            Text("Loading rentals...").font(.subheadline).foregroundStyle(.secondary)
+            Text("Loading rentals...")
+                .font(CKTypography.body)
+                .foregroundStyle(CKTheme.textSecondary)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(CKTheme.backgroundPrimary)
     }
 
     private func errorView(message: String) -> some View {
         VStack(spacing: 16) {
             Image(systemName: "exclamationmark.triangle")
                 .font(.system(size: 48))
-                .foregroundStyle(.orange)
-            Text("Unable to Load Rentals").font(.headline)
+                .foregroundStyle(CKTheme.warning)
+            Text("Unable to Load Rentals")
+                .font(CKTypography.headline)
+                .foregroundStyle(CKTheme.textPrimary)
             Text(message)
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .font(CKTypography.body)
+                .foregroundStyle(CKTheme.textSecondary)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal)
             Button { Task { await viewModel.loadInitial() } } label: {
                 Label("Retry", systemImage: "arrow.clockwise").fontWeight(.medium)
             }
             .buttonStyle(.borderedProminent)
+            .tint(CKTheme.accent)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(CKTheme.backgroundPrimary)
     }
 }
 

@@ -122,10 +122,12 @@ struct AssetListView: View {
                     }
             }
             if viewModel.isLoadingMore {
-                HStack { Spacer(); ProgressView().controlSize(.small); Text("Loading...").font(.caption).foregroundStyle(.secondary); Spacer() }
+                HStack { Spacer(); ProgressView().controlSize(.small); Text("Loading...").font(CKTypography.caption).foregroundStyle(CKTheme.textSecondary); Spacer() }
             }
         }
         .listStyle(.plain)
+        .scrollContentBackground(.hidden)
+        .background(CKTheme.backgroundPrimary)
         .navigationDestination(for: AssetListItem.self) { asset in
             AssetDetailView(deviceId: asset.deviceId, apiClient: apiClient)
         }
@@ -138,47 +140,64 @@ struct AssetListView: View {
     }
 
     private func assetRow(_ asset: AssetListItem) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
-            HStack {
-                Text(asset.deviceName).font(.body).fontWeight(.medium).lineLimit(1)
-                Spacer()
-                Text(asset.assetStatus).font(.caption2).fontWeight(.medium)
-                    .padding(.horizontal, 8).padding(.vertical, 2)
-                    .background(statusColor(asset.assetStatus).opacity(0.15))
-                    .foregroundStyle(statusColor(asset.assetStatus))
-                    .clipShape(Capsule())
+        CKRow {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(asset.deviceName)
+                    .font(CKTypography.headline)
+                    .foregroundStyle(CKTheme.textPrimary)
+                    .lineLimit(1)
+                if let type = asset.deviceType, !type.isEmpty {
+                    Text(type)
+                        .font(CKTypography.body)
+                        .foregroundStyle(CKTheme.textSecondary)
+                }
+                HStack {
+                    if let customer = asset.customerName {
+                        Label(customer, systemImage: "person")
+                            .font(CKTypography.caption)
+                            .foregroundStyle(CKTheme.textSecondary)
+                    }
+                    Spacer()
+                    if let loc = asset.location, !loc.isEmpty {
+                        Label(loc, systemImage: "mappin")
+                            .font(CKTypography.caption)
+                            .foregroundStyle(CKTheme.textSecondary)
+                    }
+                }
             }
-            if let type = asset.deviceType, !type.isEmpty {
-                Text(type).font(.subheadline).foregroundStyle(.secondary)
-            }
-            HStack {
-                if let customer = asset.customerName { Label(customer, systemImage: "person").font(.caption).foregroundStyle(.secondary) }
-                Spacer()
-                if let loc = asset.location, !loc.isEmpty { Label(loc, systemImage: "mappin").font(.caption).foregroundStyle(.secondary) }
-            }
-        }.padding(.vertical, 2)
+        } trailing: {
+            Text(asset.assetStatus)
+                .font(CKTypography.caption)
+                .fontWeight(.medium)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 2)
+                .background(statusColor(asset.assetStatus).opacity(0.15))
+                .foregroundStyle(statusColor(asset.assetStatus))
+                .clipShape(Capsule())
+        }
     }
 
     private func statusColor(_ s: String) -> Color {
         switch s.lowercased() {
-        case "active": return .green
-        case "decommissioned": return .gray
-        case "in repair": return .orange
-        default: return .gray
+        case "active": return CKTheme.success
+        case "decommissioned": return CKTheme.textTertiary
+        case "in repair": return CKTheme.warning
+        default: return CKTheme.textTertiary
         }
     }
 
     private var loadingView: some View {
-        VStack(spacing: 16) { ProgressView().controlSize(.large); Text("Loading assets...").font(.subheadline).foregroundStyle(.secondary) }
+        VStack(spacing: 16) { ProgressView().controlSize(.large); Text("Loading assets...").font(CKTypography.body).foregroundStyle(CKTheme.textSecondary) }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(CKTheme.backgroundPrimary)
     }
 
     private func errorView(_ message: String) -> some View {
         VStack(spacing: 16) {
-            Image(systemName: "exclamationmark.triangle").font(.system(size: 48)).foregroundStyle(.orange)
-            Text("Unable to Load Assets").font(.headline)
-            Text(message).font(.subheadline).foregroundStyle(.secondary).multilineTextAlignment(.center).padding(.horizontal)
-            Button { Task { await viewModel.loadInitial() } } label: { Label("Retry", systemImage: "arrow.clockwise").fontWeight(.medium) }.buttonStyle(.borderedProminent)
-        }.frame(maxWidth: .infinity, maxHeight: .infinity)
+            Image(systemName: "exclamationmark.triangle").font(.system(size: 48)).foregroundStyle(CKTheme.warning)
+            Text("Unable to Load Assets").font(CKTypography.headline).foregroundStyle(CKTheme.textPrimary)
+            Text(message).font(CKTypography.body).foregroundStyle(CKTheme.textSecondary).multilineTextAlignment(.center).padding(.horizontal)
+            Button { Task { await viewModel.loadInitial() } } label: { Label("Retry", systemImage: "arrow.clockwise").fontWeight(.medium) }.buttonStyle(.borderedProminent).tint(CKTheme.accent)
+        }.frame(maxWidth: .infinity, maxHeight: .infinity).background(CKTheme.backgroundPrimary)
     }
 }

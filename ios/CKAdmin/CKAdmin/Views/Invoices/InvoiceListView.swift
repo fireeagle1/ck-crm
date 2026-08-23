@@ -112,6 +112,8 @@ struct InvoiceListView: View {
             }
         }
         .listStyle(.plain)
+        .scrollContentBackground(.hidden)
+        .background(CKTheme.backgroundPrimary)
         .refreshable {
             await viewModel.loadInitial()
         }
@@ -129,46 +131,36 @@ struct InvoiceListView: View {
     // MARK: - Invoice Row
 
     private func invoiceRow(_ invoice: InvoiceListItem) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
-            HStack {
+        CKRow {
+            VStack(alignment: .leading, spacing: 4) {
                 Text(invoice.customerName ?? "Unknown Customer")
-                    .font(.body)
-                    .fontWeight(.medium)
+                    .font(CKTypography.headline)
+                    .foregroundStyle(CKTheme.textPrimary)
                     .lineLimit(1)
 
-                Spacer()
-
-                statusBadge(invoice.invoiceStatus)
-            }
-
-            HStack {
                 Text(formattedAmount(invoice.invoiceAmount))
-                    .font(.subheadline)
-                    .fontWeight(.semibold)
-                    .foregroundStyle(.primary)
+                    .font(CKTypography.callout)
+                    .foregroundStyle(CKTheme.textPrimary)
 
-                Spacer()
+                HStack(spacing: 8) {
+                    Text("Issued: \(invoice.invoiceDate.map { formattedDate($0) } ?? "—")")
+                        .font(CKTypography.caption)
+                        .foregroundStyle(CKTheme.textSecondary)
 
-                Text("Issued: \(formattedDate(invoice.invoiceDate))")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
-
-            HStack {
-                Label("Due: \(formattedDate(invoice.dueDate))", systemImage: "calendar")
-                    .font(.caption)
-                    .foregroundStyle(invoice.isOverdue ? .red : .secondary)
-
-                Spacer()
+                    Label("Due: \(invoice.dueDate.map { formattedDate($0) } ?? "—")", systemImage: "calendar")
+                        .font(CKTypography.caption)
+                        .foregroundStyle(invoice.isOverdue ? CKTheme.error : CKTheme.textSecondary)
+                }
 
                 if let paidDate = invoice.paidDate {
                     Label("Paid: \(formattedDate(paidDate))", systemImage: "checkmark.circle")
-                        .font(.caption)
-                        .foregroundStyle(.green)
+                        .font(CKTypography.caption)
+                        .foregroundStyle(CKTheme.success)
                 }
             }
+        } trailing: {
+            statusBadge(invoice.invoiceStatus)
         }
-        .padding(.vertical, 2)
         .accessibilityElement(children: .combine)
         .accessibilityLabel("\(invoice.customerName ?? "Unknown"), \(formattedAmount(invoice.invoiceAmount)), \(invoice.invoiceStatus)")
     }
@@ -177,7 +169,7 @@ struct InvoiceListView: View {
 
     private func statusBadge(_ status: String) -> some View {
         Text(status)
-            .font(.caption2)
+            .font(CKTypography.caption)
             .fontWeight(.medium)
             .padding(.horizontal, 8)
             .padding(.vertical, 2)
@@ -189,13 +181,13 @@ struct InvoiceListView: View {
     private func statusColor(_ status: String) -> Color {
         switch status.lowercased() {
         case "paid":
-            return .green
+            return CKTheme.success
         case "unpaid":
-            return .orange
+            return CKTheme.warning
         case "overdue":
-            return .red
+            return CKTheme.error
         default:
-            return .gray
+            return CKTheme.textTertiary
         }
     }
 
@@ -232,8 +224,8 @@ struct InvoiceListView: View {
             ProgressView()
                 .controlSize(.small)
             Text("Loading more...")
-                .font(.caption)
-                .foregroundStyle(.secondary)
+                .font(CKTypography.caption)
+                .foregroundStyle(CKTheme.textSecondary)
             Spacer()
         }
         .listRowSeparator(.hidden)
@@ -247,10 +239,11 @@ struct InvoiceListView: View {
             ProgressView()
                 .controlSize(.large)
             Text("Loading invoices...")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .font(CKTypography.body)
+                .foregroundStyle(CKTheme.textSecondary)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(CKTheme.backgroundPrimary)
         .accessibilityLabel("Loading invoice list")
     }
 
@@ -260,14 +253,15 @@ struct InvoiceListView: View {
         VStack(spacing: 16) {
             Image(systemName: "exclamationmark.triangle")
                 .font(.system(size: 48))
-                .foregroundStyle(.orange)
+                .foregroundStyle(CKTheme.warning)
 
             Text("Unable to Load Invoices")
-                .font(.headline)
+                .font(CKTypography.headline)
+                .foregroundStyle(CKTheme.textPrimary)
 
             Text(message)
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .font(CKTypography.body)
+                .foregroundStyle(CKTheme.textSecondary)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal)
 
@@ -280,8 +274,10 @@ struct InvoiceListView: View {
                     .fontWeight(.medium)
             }
             .buttonStyle(.borderedProminent)
+            .tint(CKTheme.accent)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(CKTheme.backgroundPrimary)
         .accessibilityElement(children: .contain)
         .accessibilityLabel("Error loading invoices: \(message)")
     }

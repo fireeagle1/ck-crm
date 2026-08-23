@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Booking;
 use App\Models\Domain;
 use App\Models\Invoice;
 use App\Models\Ticket;
@@ -25,6 +26,7 @@ class DashboardService
             'recent_tickets' => $this->getRecentTickets(),
             'recent_logins' => $this->getRecentLogins(),
             'expiring_domains' => $this->getExpiringDomains(),
+            'rentals' => $this->getRentalMetrics(),
         ];
     }
 
@@ -136,5 +138,28 @@ class DashboardService
                 'days_until_expiry' => (int) $now->diffInDays($domain->expiry_date, false),
             ])
             ->all();
+    }
+
+    private function getRentalMetrics(): array
+    {
+        $activeRentalsCount = Booking::where(function ($q) {
+            $q->where('status', 'active')
+              ->orWhere('fulfilment_stage', 'checked_out');
+        })->count();
+
+        $upcomingReturnsCount = Booking::where('status', 'active')
+            ->where('end_date', '<=', now()->addDays(7)->toDateString())
+            ->where('end_date', '>=', now()->toDateString())
+            ->count();
+
+        $recentlyReturnedCount = Booking::whereNotNull('returned_at')
+            ->where('returned_at', '>=', now()->subDays(7))
+            ->count();
+
+        return [
+            'active_rentals_count' => $activeRentalsCount,
+            'upcoming_returns_count' => $upcomingReturnsCount,
+            'recently_returned_count' => $recentlyReturnedCount,
+        ];
     }
 }

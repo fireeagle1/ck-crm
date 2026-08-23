@@ -19,6 +19,7 @@ struct BookingCalendarView: View {
             if isLoading && calendarData == nil {
                 ProgressView("Loading calendar...")
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background(CKTheme.backgroundPrimary)
             } else if let errorMessage, calendarData == nil {
                 errorView(message: errorMessage)
             } else if let data = calendarData {
@@ -41,13 +42,14 @@ struct BookingCalendarView: View {
                         Image(systemName: "chevron.left")
                             .font(.title3)
                             .fontWeight(.semibold)
+                            .foregroundStyle(CKTheme.accent)
                     }
 
                     Spacer()
 
                     Text(monthYearLabel)
-                        .font(.title3)
-                        .fontWeight(.bold)
+                        .font(CKTypography.title2)
+                        .foregroundStyle(CKTheme.textPrimary)
 
                     Spacer()
 
@@ -55,6 +57,7 @@ struct BookingCalendarView: View {
                         Image(systemName: "chevron.right")
                             .font(.title3)
                             .fontWeight(.semibold)
+                            .foregroundStyle(CKTheme.accent)
                     }
                 }
                 .padding(.horizontal)
@@ -79,6 +82,7 @@ struct BookingCalendarView: View {
             }
             .padding()
         }
+        .background(CKTheme.backgroundPrimary)
         .refreshable { await loadCalendar() }
     }
 
@@ -87,7 +91,8 @@ struct BookingCalendarView: View {
     private func productSection(name: String, bookings: [CalendarBooking]) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             Text(name)
-                .font(.headline)
+                .font(CKTypography.headline)
+                .foregroundStyle(CKTheme.textPrimary)
                 .padding(.bottom, 2)
 
             ForEach(bookings) { booking in
@@ -99,18 +104,18 @@ struct BookingCalendarView: View {
 
                     VStack(alignment: .leading, spacing: 2) {
                         Text(booking.customerName ?? "Unknown Customer")
-                            .font(.subheadline)
-                            .fontWeight(.medium)
+                            .font(CKTypography.body)
+                            .foregroundStyle(CKTheme.textPrimary)
 
                         HStack {
                             Text("\(formatDate(booking.startDate)) – \(formatDate(booking.endDate))")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
+                                .font(CKTypography.caption)
+                                .foregroundStyle(CKTheme.textSecondary)
 
                             if booking.quantity > 1 {
                                 Text("×\(booking.quantity)")
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
+                                    .font(CKTypography.caption)
+                                    .foregroundStyle(CKTheme.textSecondary)
                             }
                         }
                     }
@@ -118,7 +123,7 @@ struct BookingCalendarView: View {
                     Spacer()
 
                     Text((booking.fulfilmentStage ?? booking.status).replacingOccurrences(of: "_", with: " ").capitalized)
-                        .font(.caption2)
+                        .font(CKTypography.caption)
                         .fontWeight(.medium)
                         .padding(.horizontal, 6)
                         .padding(.vertical, 2)
@@ -128,14 +133,14 @@ struct BookingCalendarView: View {
                 }
                 .padding(.vertical, 6)
                 .padding(.horizontal, 10)
-                .background(Color(.systemGray6))
+                .background(CKTheme.backgroundSecondary)
                 .clipShape(RoundedRectangle(cornerRadius: 8))
             }
         }
         .padding()
-        .background(Color(.systemBackground))
+        .background(CKTheme.backgroundCard)
         .clipShape(RoundedRectangle(cornerRadius: 12))
-        .shadow(color: .black.opacity(0.05), radius: 2, y: 1)
+        .shadow(color: .black.opacity(0.06), radius: 8, y: 2)
     }
 
     // MARK: - Navigation
@@ -184,15 +189,15 @@ struct BookingCalendarView: View {
 
     private func stageColor(_ stage: String) -> Color {
         switch stage {
-        case "ordered": return .blue
-        case "packing": return .orange
-        case "ready": return .purple
-        case "checked_out": return .green
-        case "returned": return .mint
-        case "inspected": return .gray
-        case "active": return .blue
-        case "confirmed": return .green
-        default: return .gray
+        case "ordered": return CKTheme.info
+        case "packing": return CKTheme.warning
+        case "ready": return CKTheme.accent
+        case "checked_out": return CKTheme.success
+        case "returned": return CKTheme.textTertiary
+        case "inspected": return CKTheme.textTertiary
+        case "active": return CKTheme.info
+        case "confirmed": return CKTheme.success
+        default: return CKTheme.textTertiary
         }
     }
 
@@ -208,12 +213,22 @@ struct BookingCalendarView: View {
 
     private func errorView(message: String) -> some View {
         VStack(spacing: 16) {
-            Image(systemName: "exclamationmark.triangle").font(.system(size: 48)).foregroundStyle(.orange)
-            Text("Unable to Load Calendar").font(.headline)
-            Text(message).font(.subheadline).foregroundStyle(.secondary)
+            Image(systemName: "exclamationmark.triangle")
+                .font(.system(size: 48))
+                .foregroundStyle(CKTheme.warning)
+            Text("Unable to Load Calendar")
+                .font(CKTypography.headline)
+                .foregroundStyle(CKTheme.textPrimary)
+            Text(message)
+                .font(CKTypography.body)
+                .foregroundStyle(CKTheme.textSecondary)
             Button { Task { await loadCalendar() } } label: {
                 Label("Retry", systemImage: "arrow.clockwise").fontWeight(.medium)
-            }.buttonStyle(.borderedProminent)
-        }.frame(maxWidth: .infinity, maxHeight: .infinity)
+            }
+            .buttonStyle(.borderedProminent)
+            .tint(CKTheme.accent)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(CKTheme.backgroundPrimary)
     }
 }

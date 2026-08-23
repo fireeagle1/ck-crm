@@ -15,6 +15,28 @@ struct AssetListItem: Decodable, Identifiable, Hashable {
     var id: Int { deviceId }
 }
 
+// MARK: - Asset Current Booking
+
+struct AssetCurrentBooking: Decodable {
+    let id: Int
+    let status: String
+    let fulfilmentStage: String
+    let startDate: String
+    let endDate: String
+    let customerName: String?
+}
+
+// MARK: - Asset Inspection
+
+struct AssetInspection: Decodable, Identifiable {
+    let id: Int
+    let type: String  // "checkout" or "return"
+    let conditionNotes: String?
+    let damageFlagged: Bool
+    let inspectorName: String?
+    let inspectedAt: String
+}
+
 // MARK: - Asset Detail
 
 struct AssetDetail: Decodable, Identifiable {
@@ -30,6 +52,8 @@ struct AssetDetail: Decodable, Identifiable {
     let createdAt: String?
     let updatedAt: String?
     let tickets: [AssetTicket]?
+    let currentBooking: AssetCurrentBooking?
+    let recentInspections: [AssetInspection]?
 
     var id: Int { deviceId }
 }

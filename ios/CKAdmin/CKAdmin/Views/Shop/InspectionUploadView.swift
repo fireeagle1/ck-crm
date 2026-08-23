@@ -82,12 +82,12 @@ struct InspectionUploadView: View {
 
                     if selectedPhotos.count >= 10 {
                         Text("Maximum 10 photos reached")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .font(CKTypography.caption)
+                            .foregroundStyle(CKTheme.textSecondary)
                     } else {
                         Text("\(selectedPhotos.count)/10 photos selected")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .font(CKTypography.caption)
+                            .foregroundStyle(CKTheme.textSecondary)
                     }
                 }
 
@@ -105,14 +105,15 @@ struct InspectionUploadView: View {
                     .tint(.red)
                 } footer: {
                     Text("If flagged, assets will be marked as 'In Repair' upon completion.")
+                        .font(CKTypography.caption)
                 }
 
                 // Error
                 if let errorMessage {
                     Section {
                         Text(errorMessage)
-                            .font(.subheadline)
-                            .foregroundStyle(.red)
+                            .font(CKTypography.body)
+                            .foregroundStyle(CKTheme.error)
                     }
                 }
             }

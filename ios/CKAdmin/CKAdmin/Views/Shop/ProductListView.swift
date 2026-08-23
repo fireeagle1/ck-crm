@@ -65,6 +65,8 @@ struct ProductListView: View {
             }
         }
         .listStyle(.plain)
+        .scrollContentBackground(.hidden)
+        .background(CKTheme.backgroundPrimary)
         .refreshable {
             await viewModel.loadInitial()
         }
@@ -82,65 +84,60 @@ struct ProductListView: View {
     // MARK: - Product Row
 
     private func productRow(_ product: ProductListItem) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
-            HStack {
+        CKRow {
+            VStack(alignment: .leading, spacing: 4) {
                 Text(product.name)
-                    .font(.body)
-                    .fontWeight(.medium)
+                    .font(CKTypography.headline)
+                    .foregroundStyle(CKTheme.textPrimary)
                     .lineLimit(1)
 
-                Spacer()
+                Text(formattedPrice(product))
+                    .font(CKTypography.callout)
+                    .foregroundStyle(CKTheme.textPrimary)
 
+                HStack {
+                    if let stock = product.stockQuantity {
+                        Label("\(stock) in stock", systemImage: "archivebox")
+                            .font(CKTypography.caption)
+                            .foregroundStyle(stock > 0 ? CKTheme.textSecondary : CKTheme.error)
+                    } else {
+                        Label("Unlimited stock", systemImage: "infinity")
+                            .font(CKTypography.caption)
+                            .foregroundStyle(CKTheme.textSecondary)
+                    }
+
+                    Spacer()
+
+                    Circle()
+                        .fill(product.isAvailable ? CKTheme.success : CKTheme.error)
+                        .frame(width: 8, height: 8)
+                    Text(product.isAvailable ? "Available" : "Unavailable")
+                        .font(CKTypography.caption)
+                        .foregroundStyle(CKTheme.textSecondary)
+                }
+            }
+        } trailing: {
+            VStack(alignment: .trailing, spacing: 6) {
                 if product.isArchived {
                     Text("Archived")
-                        .font(.caption2)
+                        .font(CKTypography.caption)
                         .fontWeight(.medium)
                         .padding(.horizontal, 8)
                         .padding(.vertical, 2)
-                        .background(Color.gray.opacity(0.15))
-                        .foregroundStyle(.gray)
+                        .background(CKTheme.textTertiary.opacity(0.15))
+                        .foregroundStyle(CKTheme.textTertiary)
                         .clipShape(Capsule())
                 }
-            }
-
-            HStack {
-                Text(formattedPrice(product))
-                    .font(.subheadline)
-                    .fontWeight(.semibold)
-
-                Spacer()
 
                 Text(product.productTypeLabel)
-                    .font(.caption)
+                    .font(CKTypography.caption)
                     .padding(.horizontal, 6)
                     .padding(.vertical, 1)
                     .background(typeColor(product.productType).opacity(0.12))
                     .foregroundStyle(typeColor(product.productType))
                     .clipShape(Capsule())
             }
-
-            HStack {
-                if let stock = product.stockQuantity {
-                    Label("\(stock) in stock", systemImage: "archivebox")
-                        .font(.caption)
-                        .foregroundStyle(stock > 0 ? Color.secondary : Color.red)
-                } else {
-                    Label("Unlimited stock", systemImage: "infinity")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-
-                Spacer()
-
-                Circle()
-                    .fill(product.isAvailable ? .green : .red)
-                    .frame(width: 8, height: 8)
-                Text(product.isAvailable ? "Available" : "Unavailable")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
         }
-        .padding(.vertical, 2)
         .accessibilityElement(children: .combine)
         .accessibilityLabel("\(product.name), \(product.productTypeLabel), \(formattedPrice(product))")
     }
@@ -162,10 +159,10 @@ struct ProductListView: View {
 
     private func typeColor(_ type: String) -> Color {
         switch type {
-        case "equipment_rental": return .blue
-        case "hosting": return .purple
-        case "one_off": return .orange
-        default: return .gray
+        case "equipment_rental": return CKTheme.info
+        case "hosting": return CKTheme.accent
+        case "one_off": return CKTheme.warning
+        default: return CKTheme.textTertiary
         }
     }
 
@@ -175,7 +172,9 @@ struct ProductListView: View {
         HStack {
             Spacer()
             ProgressView().controlSize(.small)
-            Text("Loading more...").font(.caption).foregroundStyle(.secondary)
+            Text("Loading more...")
+                .font(CKTypography.caption)
+                .foregroundStyle(CKTheme.textSecondary)
             Spacer()
         }
         .listRowSeparator(.hidden)
@@ -184,28 +183,35 @@ struct ProductListView: View {
     private var loadingView: some View {
         VStack(spacing: 16) {
             ProgressView().controlSize(.large)
-            Text("Loading products...").font(.subheadline).foregroundStyle(.secondary)
+            Text("Loading products...")
+                .font(CKTypography.body)
+                .foregroundStyle(CKTheme.textSecondary)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(CKTheme.backgroundPrimary)
     }
 
     private func errorView(message: String) -> some View {
         VStack(spacing: 16) {
             Image(systemName: "exclamationmark.triangle")
                 .font(.system(size: 48))
-                .foregroundStyle(.orange)
-            Text("Unable to Load Products").font(.headline)
+                .foregroundStyle(CKTheme.warning)
+            Text("Unable to Load Products")
+                .font(CKTypography.headline)
+                .foregroundStyle(CKTheme.textPrimary)
             Text(message)
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .font(CKTypography.body)
+                .foregroundStyle(CKTheme.textSecondary)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal)
             Button { Task { await viewModel.loadInitial() } } label: {
                 Label("Retry", systemImage: "arrow.clockwise").fontWeight(.medium)
             }
             .buttonStyle(.borderedProminent)
+            .tint(CKTheme.accent)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(CKTheme.backgroundPrimary)
     }
 }
 

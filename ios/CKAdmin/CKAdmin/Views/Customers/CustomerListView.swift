@@ -64,8 +64,34 @@ struct CustomerListView: View {
         List {
             ForEach(viewModel.customers) { customer in
                 NavigationLink(value: customer) {
-                    customerRow(customer)
+                    CKRow {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(customer.companyName)
+                                .font(CKTypography.headline)
+                                .foregroundStyle(CKTheme.textPrimary)
+                                .lineLimit(1)
+
+                            Text(customer.customerName)
+                                .font(CKTypography.body)
+                                .foregroundStyle(CKTheme.textSecondary)
+                                .lineLimit(1)
+
+                            if let phone = customer.phoneNumber, !phone.isEmpty {
+                                Label(phone, systemImage: "phone")
+                                    .font(CKTypography.caption)
+                                    .foregroundStyle(CKTheme.textTertiary)
+                                    .lineLimit(1)
+                            }
+                        }
+                    } trailing: {
+                        Image(systemName: "chevron.right")
+                            .font(CKTypography.caption)
+                            .foregroundStyle(CKTheme.textTertiary)
+                    }
+                    .accessibilityElement(children: .combine)
+                    .accessibilityLabel("\(customer.companyName), \(customer.customerName)")
                 }
+                .listRowInsets(EdgeInsets())
                 .onAppear {
                     if customer.id == viewModel.customers.last?.id {
                         Task {
@@ -80,6 +106,8 @@ struct CustomerListView: View {
             }
         }
         .listStyle(.plain)
+        .scrollContentBackground(.hidden)
+        .background(CKTheme.backgroundPrimary)
         .navigationDestination(for: CustomerListItem.self) { customer in
             CustomerDetailView(companyId: customer.companyId, apiClient: apiClient)
         }
@@ -93,32 +121,6 @@ struct CustomerListView: View {
         }
     }
 
-    // MARK: - Customer Row
-
-    private func customerRow(_ customer: CustomerListItem) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text(customer.companyName)
-                .font(.body)
-                .fontWeight(.medium)
-                .lineLimit(1)
-
-            Text(customer.customerName)
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-                .lineLimit(1)
-
-            if let phone = customer.phoneNumber, !phone.isEmpty {
-                Label(phone, systemImage: "phone")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .lineLimit(1)
-            }
-        }
-        .padding(.vertical, 2)
-        .accessibilityElement(children: .combine)
-        .accessibilityLabel("\(customer.companyName), \(customer.customerName)")
-    }
-
     // MARK: - Loading More Row
 
     private var loadingMoreRow: some View {
@@ -127,8 +129,8 @@ struct CustomerListView: View {
             ProgressView()
                 .controlSize(.small)
             Text("Loading more...")
-                .font(.caption)
-                .foregroundStyle(.secondary)
+                .font(CKTypography.caption)
+                .foregroundStyle(CKTheme.textSecondary)
             Spacer()
         }
         .listRowSeparator(.hidden)
@@ -142,10 +144,11 @@ struct CustomerListView: View {
             ProgressView()
                 .controlSize(.large)
             Text("Loading customers...")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .font(CKTypography.body)
+                .foregroundStyle(CKTheme.textSecondary)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(CKTheme.backgroundPrimary)
         .accessibilityLabel("Loading customer list")
     }
 
@@ -155,14 +158,15 @@ struct CustomerListView: View {
         VStack(spacing: 16) {
             Image(systemName: "exclamationmark.triangle")
                 .font(.system(size: 48))
-                .foregroundStyle(.orange)
+                .foregroundStyle(CKTheme.warning)
 
             Text("Unable to Load Customers")
-                .font(.headline)
+                .font(CKTypography.headline)
+                .foregroundStyle(CKTheme.textPrimary)
 
             Text(message)
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .font(CKTypography.body)
+                .foregroundStyle(CKTheme.textSecondary)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal)
 
@@ -175,8 +179,10 @@ struct CustomerListView: View {
                     .fontWeight(.medium)
             }
             .buttonStyle(.borderedProminent)
+            .tint(CKTheme.accent)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(CKTheme.backgroundPrimary)
         .accessibilityElement(children: .contain)
         .accessibilityLabel("Error loading customers: \(message)")
     }

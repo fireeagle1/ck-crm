@@ -3,15 +3,11 @@ import SwiftUI
 /// Displays a full customer record with all fields and relationship counts.
 ///
 /// Loads the customer detail from the API on appear, provides toolbar actions
-/// for editing and deleting the customer.
+/// for editing the customer.
 struct CustomerDetailView: View {
-    @Environment(\.dismiss) private var dismiss
-
     @State private var customer: CustomerDetail?
     @State private var isLoading = true
     @State private var errorMessage: String?
-    @State private var showingDeleteConfirmation = false
-    @State private var isDeleting = false
     @State private var showingEditForm = false
     @State private var showingCreateTicket = false
 
@@ -59,20 +55,6 @@ struct CustomerDetailView: View {
                 }
             }
         }
-        .confirmationDialog(
-            "Delete Customer",
-            isPresented: $showingDeleteConfirmation,
-            titleVisibility: .visible
-        ) {
-            Button("Delete", role: .destructive) {
-                Task {
-                    await deleteCustomer()
-                }
-            }
-            Button("Cancel", role: .cancel) {}
-        } message: {
-            Text("Are you sure you want to delete this customer? This action cannot be undone.")
-        }
         .sheet(isPresented: $showingEditForm) {
             if let customer {
                 NavigationStack {
@@ -101,58 +83,59 @@ struct CustomerDetailView: View {
     private func customerContent(_ customer: CustomerDetail) -> some View {
         List {
             // Relationship Counts
-            Section("Overview") {
+            Section {
                 countRow(label: "Services", count: customer.servicesCount, icon: "server.rack")
                 countRow(label: "Tickets", count: customer.ticketsCount, icon: "ticket")
                 countRow(label: "Invoices", count: customer.invoicesCount, icon: "doc.text")
                 countRow(label: "Domains", count: customer.domainsCount, icon: "globe")
+            } header: {
+                Text("Overview")
+                    .font(CKTypography.caption)
+                    .foregroundStyle(CKTheme.textSecondary)
             }
 
             // Quick Actions
-            Section("Actions") {
+            Section {
                 Button {
                     showingCreateTicket = true
                 } label: {
                     Label("Log Ticket / Service Request", systemImage: "plus.circle")
+                        .font(CKTypography.body)
+                        .foregroundStyle(CKTheme.accent)
                 }
+            } header: {
+                Text("Actions")
+                    .font(CKTypography.caption)
+                    .foregroundStyle(CKTheme.textSecondary)
             }
 
             // Contact Information
-            Section("Contact") {
+            Section {
                 detailRow(label: "Company", value: customer.companyName)
                 detailRow(label: "Contact Name", value: customer.customerName)
                 detailRow(label: "Phone", value: customer.phoneNumber)
+            } header: {
+                Text("Contact")
+                    .font(CKTypography.caption)
+                    .foregroundStyle(CKTheme.textSecondary)
             }
 
             // Address
-            Section("Address") {
+            Section {
                 detailRow(label: "Address Line 1", value: customer.addressLine1)
                 detailRow(label: "Address Line 2", value: customer.addressLine2)
                 detailRow(label: "City", value: customer.city)
                 detailRow(label: "State", value: customer.state)
                 detailRow(label: "Postal Code", value: customer.postalCode)
                 detailRow(label: "Country", value: customer.country)
-            }
-
-            // Actions
-            Section {
-                Button(role: .destructive) {
-                    showingDeleteConfirmation = true
-                } label: {
-                    HStack {
-                        Spacer()
-                        if isDeleting {
-                            ProgressView()
-                                .controlSize(.small)
-                                .padding(.trailing, 8)
-                        }
-                        Label("Delete Customer", systemImage: "trash")
-                        Spacer()
-                    }
-                }
-                .disabled(isDeleting)
+            } header: {
+                Text("Address")
+                    .font(CKTypography.caption)
+                    .foregroundStyle(CKTheme.textSecondary)
             }
         }
+        .scrollContentBackground(.hidden)
+        .background(CKTheme.backgroundPrimary)
         .refreshable {
             await loadCustomer()
         }
@@ -161,25 +144,28 @@ struct CustomerDetailView: View {
     // MARK: - Helper Views
 
     private func countRow(label: String, count: Int, icon: String) -> some View {
-        HStack {
+        CKRow {
             Label(label, systemImage: icon)
-                .foregroundStyle(.primary)
-            Spacer()
+                .font(CKTypography.body)
+                .foregroundStyle(CKTheme.textPrimary)
+        } trailing: {
             Text("\(count)")
-                .foregroundStyle(.secondary)
-                .fontWeight(.medium)
+                .font(CKTypography.callout)
+                .foregroundStyle(CKTheme.textSecondary)
         }
         .accessibilityElement(children: .combine)
         .accessibilityLabel("\(label): \(count)")
     }
 
     private func detailRow(label: String, value: String?) -> some View {
-        HStack {
+        CKRow {
             Text(label)
-                .foregroundStyle(.secondary)
-            Spacer()
+                .font(CKTypography.body)
+                .foregroundStyle(CKTheme.textSecondary)
+        } trailing: {
             Text(value ?? "—")
-                .foregroundStyle(value != nil ? .primary : .tertiary)
+                .font(CKTypography.body)
+                .foregroundStyle(value != nil ? CKTheme.textPrimary : CKTheme.textTertiary)
                 .multilineTextAlignment(.trailing)
         }
         .accessibilityElement(children: .combine)
@@ -193,10 +179,11 @@ struct CustomerDetailView: View {
             ProgressView()
                 .controlSize(.large)
             Text("Loading customer...")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .font(CKTypography.body)
+                .foregroundStyle(CKTheme.textSecondary)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(CKTheme.backgroundPrimary)
         .accessibilityLabel("Loading customer details")
     }
 
@@ -206,14 +193,15 @@ struct CustomerDetailView: View {
         VStack(spacing: 16) {
             Image(systemName: "exclamationmark.triangle")
                 .font(.system(size: 48))
-                .foregroundStyle(.orange)
+                .foregroundStyle(CKTheme.warning)
 
             Text("Unable to Load Customer")
-                .font(.headline)
+                .font(CKTypography.headline)
+                .foregroundStyle(CKTheme.textPrimary)
 
             Text(message)
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .font(CKTypography.body)
+                .foregroundStyle(CKTheme.textSecondary)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal)
 
@@ -226,8 +214,10 @@ struct CustomerDetailView: View {
                     .fontWeight(.medium)
             }
             .buttonStyle(.borderedProminent)
+            .tint(CKTheme.accent)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(CKTheme.backgroundPrimary)
         .accessibilityElement(children: .contain)
         .accessibilityLabel("Error loading customer: \(message)")
     }
@@ -250,23 +240,6 @@ struct CustomerDetailView: View {
         }
 
         isLoading = false
-    }
-
-    @MainActor
-    private func deleteCustomer() async {
-        isDeleting = true
-
-        do {
-            let endpoint = Endpoint(method: .delete, path: "/admin/customers/\(companyId)")
-            try await apiClient.requestVoid(endpoint)
-            dismiss()
-        } catch let error as APIError {
-            errorMessage = error.errorDescription
-        } catch {
-            errorMessage = "Failed to delete customer."
-        }
-
-        isDeleting = false
     }
 }
 

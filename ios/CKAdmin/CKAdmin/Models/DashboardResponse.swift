@@ -9,6 +9,16 @@ struct DashboardResponse: Decodable {
     let recentTickets: [RecentTicket]
     let recentLogins: [RecentLogin]
     let expiringDomains: [ExpiringDomain]
+    let rentals: RentalStats?
+}
+
+// MARK: - Rental Statistics
+
+/// Rental activity metrics for the dashboard.
+struct RentalStats: Decodable {
+    let activeRentalsCount: Int
+    let upcomingReturnsCount: Int
+    let recentlyReturnedCount: Int
 }
 
 // MARK: - Ticket Statistics

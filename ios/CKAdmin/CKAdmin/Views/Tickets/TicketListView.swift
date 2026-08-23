@@ -102,6 +102,7 @@ struct TicketListView: View {
                 NavigationLink(destination: TicketDetailView(ticketId: ticket.ticketId, apiClient: apiClient)) {
                     ticketRow(ticket)
                 }
+                .listRowBackground(CKTheme.backgroundCard)
                 .onAppear {
                     if ticket.id == viewModel.tickets.last?.id {
                         Task {
@@ -116,6 +117,8 @@ struct TicketListView: View {
             }
         }
         .listStyle(.plain)
+        .scrollContentBackground(.hidden)
+        .background(CKTheme.backgroundPrimary)
         .refreshable {
             await viewModel.loadInitial()
         }
@@ -133,50 +136,47 @@ struct TicketListView: View {
     // MARK: - Ticket Row
 
     private func ticketRow(_ ticket: TicketListItem) -> some View {
-        VStack(alignment: .leading, spacing: 6) {
-            // Subject line with priority badge
-            HStack {
+        CKRow {
+            VStack(alignment: .leading, spacing: 6) {
+                // Subject line
                 Text(ticket.subject)
-                    .font(.body)
-                    .fontWeight(.medium)
+                    .font(CKTypography.headline)
+                    .foregroundStyle(CKTheme.textPrimary)
                     .lineLimit(2)
 
-                Spacer()
+                // Status badge and created time
+                HStack {
+                    statusBadge(ticket.status)
 
-                priorityBadge(ticket.priority)
-            }
+                    Spacer()
 
-            // Status badge and created time
-            HStack {
-                statusBadge(ticket.status)
-
-                Spacer()
-
-                Text(ticket.createdAt, style: .relative)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
-
-            // Customer and assigned user
-            HStack {
-                if let customerName = ticket.customerName, !customerName.isEmpty {
-                    Label(customerName, systemImage: "person")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .lineLimit(1)
+                    Text(ticket.createdAt, style: .relative)
+                        .font(CKTypography.caption)
+                        .foregroundStyle(CKTheme.textTertiary)
                 }
 
-                Spacer()
+                // Customer and assigned user
+                HStack {
+                    if let customerName = ticket.customerName, !customerName.isEmpty {
+                        Label(customerName, systemImage: "person")
+                            .font(CKTypography.caption)
+                            .foregroundStyle(CKTheme.textSecondary)
+                            .lineLimit(1)
+                    }
 
-                if let assignedUser = ticket.assignedUserName, !assignedUser.isEmpty {
-                    Label(assignedUser, systemImage: "person.badge.shield.checkmark")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .lineLimit(1)
+                    Spacer()
+
+                    if let assignedUser = ticket.assignedUserName, !assignedUser.isEmpty {
+                        Label(assignedUser, systemImage: "person.badge.shield.checkmark")
+                            .font(CKTypography.caption)
+                            .foregroundStyle(CKTheme.textSecondary)
+                            .lineLimit(1)
+                    }
                 }
             }
+        } trailing: {
+            priorityBadge(ticket.priority)
         }
-        .padding(.vertical, 2)
         .accessibilityElement(children: .combine)
         .accessibilityLabel("\(ticket.subject), \(ticket.status), \(ticket.priority) priority")
     }
@@ -245,8 +245,8 @@ struct TicketListView: View {
             ProgressView()
                 .controlSize(.small)
             Text("Loading more...")
-                .font(.caption)
-                .foregroundStyle(.secondary)
+                .font(CKTypography.caption)
+                .foregroundStyle(CKTheme.textSecondary)
             Spacer()
         }
         .listRowSeparator(.hidden)
@@ -260,10 +260,11 @@ struct TicketListView: View {
             ProgressView()
                 .controlSize(.large)
             Text("Loading tickets...")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .font(CKTypography.body)
+                .foregroundStyle(CKTheme.textSecondary)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(CKTheme.backgroundPrimary)
         .accessibilityLabel("Loading ticket list")
     }
 
@@ -273,14 +274,15 @@ struct TicketListView: View {
         VStack(spacing: 16) {
             Image(systemName: "exclamationmark.triangle")
                 .font(.system(size: 48))
-                .foregroundStyle(.orange)
+                .foregroundStyle(CKTheme.warning)
 
             Text("Unable to Load Tickets")
-                .font(.headline)
+                .font(CKTypography.headline)
+                .foregroundStyle(CKTheme.textPrimary)
 
             Text(message)
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .font(CKTypography.body)
+                .foregroundStyle(CKTheme.textSecondary)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal)
 
@@ -295,6 +297,7 @@ struct TicketListView: View {
             .buttonStyle(.borderedProminent)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(CKTheme.backgroundPrimary)
         .accessibilityElement(children: .contain)
         .accessibilityLabel("Error loading tickets: \(message)")
     }

@@ -24,7 +24,7 @@ struct LoginView: View {
                             .frame(height: 50)
                             .accessibilityHidden(true)
 
-                        Text("Admin Portal")
+                        Text("CK Enterprises UK")
                             .font(.title3)
                             .fontWeight(.medium)
                             .foregroundStyle(.secondary)

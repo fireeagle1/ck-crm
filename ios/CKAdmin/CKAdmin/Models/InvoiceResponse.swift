@@ -7,8 +7,8 @@ struct InvoiceListItem: Identifiable {
     let invoiceId: Int
     let invoiceStatus: String
     let invoiceAmount: Double
-    let invoiceDate: String
-    let dueDate: String
+    let invoiceDate: String?   // Nullable: API may return null via ->toDateString()
+    let dueDate: String?       // Nullable: API may return null via ->toDateString()
     let paidDate: String?
     let customerName: String?
 
@@ -17,8 +17,8 @@ struct InvoiceListItem: Identifiable {
     /// Whether this invoice is overdue (Unpaid and past due date).
     var isOverdue: Bool {
         guard invoiceStatus == "Unpaid" else { return false }
-        guard let due = Self.dateFormatter.date(from: dueDate) else { return false }
-        return due < Date()
+        guard let due = dueDate, let dueDate = Self.dateFormatter.date(from: due) else { return false }
+        return dueDate < Date()
     }
 
     private static let dateFormatter: DateFormatter = {
@@ -38,8 +38,8 @@ extension InvoiceListItem: Decodable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         invoiceId = try container.decode(Int.self, forKey: .invoiceId)
         invoiceStatus = try container.decode(String.self, forKey: .invoiceStatus)
-        invoiceDate = try container.decode(String.self, forKey: .invoiceDate)
-        dueDate = try container.decode(String.self, forKey: .dueDate)
+        invoiceDate = try container.decodeIfPresent(String.self, forKey: .invoiceDate)
+        dueDate = try container.decodeIfPresent(String.self, forKey: .dueDate)
         paidDate = try container.decodeIfPresent(String.self, forKey: .paidDate)
         customerName = try container.decodeIfPresent(String.self, forKey: .customerName)
 

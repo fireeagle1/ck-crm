@@ -1,0 +1,721 @@
+{
+  "pbtResults": {},
+  "executionHistory": {
+    "1.1 Create `CKTheme.swift` with colour palette tokens": [
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787479448336
+      },
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787479455881
+      },
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787479608780
+      }
+    ],
+    "1.2 Create `CKTypography.swift` with typography scale": [
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787479448379
+      },
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787479456587
+      },
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787479609544
+      }
+    ],
+    "1.3 Create `CKCard.swift` reusable card component": [
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787479448405
+      },
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787479723534
+      },
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787479801736
+      }
+    ],
+    "1.4 Create `CKRow.swift` reusable row component": [
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787479448437
+      },
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787479724353
+      },
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787479802477
+      }
+    ],
+    "1.5 Create `CKMetricCard.swift` metric card component": [
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787479448461
+      },
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787479725224
+      },
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787479803315
+      }
+    ],
+    "1.6 Update app branding to \"CK Enterprises UK\"": [
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787479448493
+      },
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787479457421
+      },
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787479610418
+      }
+    ],
+    "2.1 Fix `InvoiceListItem` model decoding for nullable dates": [
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787479448519
+      },
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787479458257
+      },
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787479611580
+      }
+    ],
+    "2.2 Update `InvoiceListView` to handle nil dates": [
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787479448545
+      },
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787479726100
+      },
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787479804183
+      }
+    ],
+    "3.1 Extend `AssetController::show()` to include `current_booking`": [
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787479448569
+      },
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787479459106
+      },
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787479612629
+      }
+    ],
+    "3.2 Extend `AssetController::show()` to include `recent_inspections`": [
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787479448595
+      },
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787479615971
+      },
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787479715887
+      }
+    ],
+    "4.1 Add `getRentalMetrics()` method to `DashboardService`": [
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787479448628
+      },
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787479616827
+      },
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787479716695
+      }
+    ],
+    "5. Checkpoint - Backend changes complete": [
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787479448653
+      },
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787479824352
+      },
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787479827253
+      }
+    ],
+    "6.1 Extend `AssetDetail` model with rental and inspection fields": [
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787479448679
+      },
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787479849291
+      },
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787479981525
+      }
+    ],
+    "6.2 Create `BookingResponse.swift` with booking models": [
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787479448703
+      },
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787479850026
+      },
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787479983095
+      }
+    ],
+    "6.3 Extend `DashboardResponse` model with rental metrics": [
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787479448728
+      },
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787479850868
+      },
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787479982214
+      }
+    ],
+    "7.1 Add rental status section to `AssetDetailView`": [
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787479448752
+      },
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787480047554
+      },
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787480176611
+      }
+    ],
+    "7.2 Add inspection history section to `AssetDetailView`": [
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787479448779
+      },
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787480048362
+      },
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787480177303
+      }
+    ],
+    "8.1 Add rental metrics section to `DashboardView`": [
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787479448804
+      },
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787480049114
+      },
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787480178152
+      }
+    ],
+    "9.1 Create `RentalListViewModel`": [
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787479448830
+      },
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787480049938
+      },
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787480178986
+      }
+    ],
+    "9.2 Create `RentalListView`": [
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787479448855
+      },
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787480185683
+      },
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787480411935
+      }
+    ],
+    "9.3 Create `BookingDetailView`": [
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787479448881
+      },
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787480186346
+      },
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787480412687
+      }
+    ],
+    "9.4 Add Rentals tab to `ContentView`": [
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787479448919
+      },
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787480430457
+      },
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787480467023
+      }
+    ],
+    "10.1 Remove delete functionality from `AssetDetailView`": [
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787479448945
+      },
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787479851626
+      },
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787479983887
+      }
+    ],
+    "10.2 Remove delete functionality from `CustomerDetailView`": [
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787479448970
+      },
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787479852453
+      },
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787479984718
+      }
+    ],
+    "10.3 Remove delete functionality from `ServiceDetailView`": [
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787479448994
+      },
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787479992072
+      },
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787480044138
+      }
+    ],
+    "11. Checkpoint - Core features complete": [
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787479449020
+      },
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787480471491
+      },
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787480472223
+      }
+    ],
+    "12.1 Apply design system to Dashboard tab": [
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787479449044
+      },
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787480475957
+      },
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787480822564
+      }
+    ],
+    "12.2 Apply design system to Tickets tab": [
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787479449069
+      },
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787480476706
+      },
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787480819515
+      }
+    ],
+    "12.3 Apply design system to Customers tab": [
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787479449094
+      },
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787480477491
+      },
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787480820943
+      }
+    ],
+    "12.4 Apply design system to CMDB (Assets) tab": [
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787479449121
+      },
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787480478280
+      },
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787480820098
+      }
+    ],
+    "12.5 Apply design system to Invoices tab": [
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787479449146
+      },
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787480479122
+      },
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787480821775
+      }
+    ],
+    "12.6 Apply design system to Shop tab": [
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787479449170
+      },
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787480827141
+      }
+    ],
+    "12.7 Apply design system to Rentals tab": [
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787479449196
+      },
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787480827174
+      },
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787481124811
+      }
+    ],
+    "12.8 Verify accessibility and navigation preservation": [
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787479449228
+      },
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787481131721
+      },
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787481226990
+      }
+    ],
+    "13. Final Checkpoint": [
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787479449253
+      },
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787481230831
+      },
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787481255132
+      }
+    ],
+    "3. Backend API: Asset Detail Extension": [
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787479715919
+      }
+    ],
+    "4. Backend API: Dashboard Rental Metrics": [
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787479716729
+      }
+    ],
+    "1. Design System Foundation": [
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787479803351
+      }
+    ],
+    "2. Invoice Loading Fix": [
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787479804208
+      }
+    ],
+    "2.3 Write unit tests for invoice decoding": [
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787479844089
+      }
+    ],
+    "3.3 Write unit tests for asset detail endpoint extensions": [
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787479844833
+      }
+    ],
+    "4.2 Write unit tests for dashboard rental metrics": [
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787479845602
+      }
+    ],
+    "6. iOS Models: Asset Detail & Booking": [
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787479983130
+      }
+    ],
+    "10. Remove Delete Actions": [
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787480044182
+      }
+    ],
+    "7. iOS Views: Asset Detail Enhancements": [
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787480177344
+      }
+    ],
+    "8. iOS Views: Dashboard Rental Metrics": [
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787480178177
+      }
+    ],
+    "7.3 Write property test for asset rental status rendering": [
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787480423798
+      }
+    ],
+    "7.4 Write property test for asset inspection UI rendering": [
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787480424579
+      }
+    ],
+    "8.2 Write property test for dashboard rental metrics rendering": [
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787480425314
+      }
+    ],
+    "9.5 Write property test for rental list stage filtering": [
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787480426065
+      }
+    ],
+    "9.6 Write property test for booking list item rendering": [
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787480426923
+      }
+    ],
+    "9. iOS Views: Rentals Tab": [
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787480467058
+      }
+    ],
+    "12. Design System Application": [
+      {
+        "executionId": "e86d55ef-d7e4-44b1-a775-36e320812849",
+        "chatSessionId": "sess_c839bd4a-7779-482e-9a72-a8f504ea7fb7",
+        "timestamp": 1787481227030
+      }
+    ]
+  }
+}

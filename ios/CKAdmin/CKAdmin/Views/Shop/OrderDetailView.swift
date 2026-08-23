@@ -19,6 +19,7 @@ struct OrderDetailView: View {
             if isLoading {
                 ProgressView("Loading order...")
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background(CKTheme.backgroundPrimary)
             } else if let errorMessage {
                 errorView(message: errorMessage)
             } else if let order {
@@ -58,7 +59,8 @@ struct OrderDetailView: View {
             if let address = order.deliveryAddress?.formatted {
                 Section("Delivery Address") {
                     Text(address)
-                        .font(.subheadline)
+                        .font(CKTypography.body)
+                        .foregroundStyle(CKTheme.textPrimary)
                 }
             }
 
@@ -73,11 +75,13 @@ struct OrderDetailView: View {
             if let notes = order.adminNotes, !notes.isEmpty {
                 Section("Admin Notes") {
                     Text(notes)
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                        .font(CKTypography.body)
+                        .foregroundStyle(CKTheme.textSecondary)
                 }
             }
         }
+        .scrollContentBackground(.hidden)
+        .background(CKTheme.backgroundPrimary)
     }
 
     // MARK: - Item Row
@@ -86,56 +90,56 @@ struct OrderDetailView: View {
         VStack(alignment: .leading, spacing: 4) {
             HStack {
                 Text(item.productName ?? "Unknown Product")
-                    .font(.body)
-                    .fontWeight(.medium)
+                    .font(CKTypography.headline)
+                    .foregroundStyle(CKTheme.textPrimary)
 
                 Spacer()
 
                 Text(formattedAmount(item.price))
-                    .font(.subheadline)
-                    .fontWeight(.semibold)
+                    .font(CKTypography.callout)
+                    .foregroundStyle(CKTheme.textPrimary)
             }
 
             HStack {
                 if let type = item.productType {
                     Text(productTypeLabel(type))
-                        .font(.caption)
+                        .font(CKTypography.caption)
                         .padding(.horizontal, 6)
                         .padding(.vertical, 1)
-                        .background(Color.secondary.opacity(0.12))
+                        .background(CKTheme.textSecondary.opacity(0.12))
                         .clipShape(Capsule())
                 }
 
                 if item.quantity > 1 {
                     Text("Qty: \(item.quantity)")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .font(CKTypography.caption)
+                        .foregroundStyle(CKTheme.textSecondary)
                 }
 
                 if let freq = item.billingFrequency {
                     Text("(\(freq))")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .font(CKTypography.caption)
+                        .foregroundStyle(CKTheme.textSecondary)
                 }
             }
 
             if let domain = item.domainName, !domain.isEmpty {
                 Label(domain, systemImage: "globe")
-                    .font(.caption)
-                    .foregroundStyle(.blue)
+                    .font(CKTypography.caption)
+                    .foregroundStyle(CKTheme.info)
             }
 
             if let start = item.rentalStartDate, let end = item.rentalEndDate {
                 Label("\(start) – \(end)", systemImage: "calendar")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .font(CKTypography.caption)
+                    .foregroundStyle(CKTheme.textSecondary)
             }
 
             if let bookingStatus = item.bookingStatus {
                 HStack {
                     Text("Booking:")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .font(CKTypography.caption)
+                        .foregroundStyle(CKTheme.textSecondary)
                     statusBadge(bookingStatus, color: rentalStatusColor(bookingStatus))
                 }
             }
@@ -147,7 +151,7 @@ struct OrderDetailView: View {
 
     private func statusBadge(_ text: String, color: Color) -> some View {
         Text(text.replacingOccurrences(of: "_", with: " ").capitalized)
-            .font(.caption2)
+            .font(CKTypography.caption)
             .fontWeight(.medium)
             .padding(.horizontal, 8)
             .padding(.vertical, 2)
@@ -158,29 +162,29 @@ struct OrderDetailView: View {
 
     private func paymentColor(_ status: String) -> Color {
         switch status {
-        case "paid", "paid_offline": return .green
-        case "pending": return .orange
-        case "failed": return .red
-        default: return .gray
+        case "paid", "paid_offline": return CKTheme.success
+        case "pending": return CKTheme.warning
+        case "failed": return CKTheme.error
+        default: return CKTheme.textTertiary
         }
     }
 
     private func fulfilmentColor(_ status: String) -> Color {
         switch status {
-        case "completed": return .green
-        case "awaiting_fulfilment": return .blue
-        case "pending": return .orange
-        default: return .gray
+        case "completed": return CKTheme.success
+        case "awaiting_fulfilment": return CKTheme.info
+        case "pending": return CKTheme.warning
+        default: return CKTheme.textTertiary
         }
     }
 
     private func rentalStatusColor(_ status: String) -> Color {
         switch status {
-        case "active": return .blue
-        case "confirmed": return .green
-        case "returned": return .gray
-        case "cancelled": return .red
-        default: return .gray
+        case "active": return CKTheme.info
+        case "confirmed": return CKTheme.success
+        case "returned": return CKTheme.textTertiary
+        case "cancelled": return CKTheme.error
+        default: return CKTheme.textTertiary
         }
     }
 
@@ -224,19 +228,23 @@ struct OrderDetailView: View {
         VStack(spacing: 16) {
             Image(systemName: "exclamationmark.triangle")
                 .font(.system(size: 48))
-                .foregroundStyle(.orange)
-            Text("Unable to Load Order").font(.headline)
+                .foregroundStyle(CKTheme.warning)
+            Text("Unable to Load Order")
+                .font(CKTypography.headline)
+                .foregroundStyle(CKTheme.textPrimary)
             Text(message)
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .font(CKTypography.body)
+                .foregroundStyle(CKTheme.textSecondary)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal)
             Button { Task { await loadOrder() } } label: {
                 Label("Retry", systemImage: "arrow.clockwise").fontWeight(.medium)
             }
             .buttonStyle(.borderedProminent)
+            .tint(CKTheme.accent)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(CKTheme.backgroundPrimary)
     }
 }
 

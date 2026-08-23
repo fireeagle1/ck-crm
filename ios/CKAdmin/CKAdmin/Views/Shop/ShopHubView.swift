@@ -28,6 +28,7 @@ struct ShopHubView: View {
                 BookingCalendarView(apiClient: apiClient)
             }
         }
+        .background(CKTheme.backgroundPrimary)
         .navigationTitle("Shop")
     }
 }

@@ -5,6 +5,9 @@ import SwiftUI
 /// Shows ticket statistics, financial metrics, expiring domains,
 /// recent tickets, and recent admin logins. Supports pull-to-refresh
 /// and displays loading/error states.
+///
+/// Uses the CKTheme colour palette, CKTypography font scale, and
+/// CKMetricCard components for a consistent design system look.
 struct DashboardView: View {
     @State private var viewModel: DashboardViewModel
     @State private var showingCreateTicket = false
@@ -54,10 +57,11 @@ struct DashboardView: View {
             ProgressView()
                 .controlSize(.large)
             Text("Loading dashboard...")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .font(CKTypography.body)
+                .foregroundStyle(CKTheme.textSecondary)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(CKTheme.backgroundPrimary)
         .accessibilityLabel("Loading dashboard metrics")
     }
 
@@ -67,14 +71,15 @@ struct DashboardView: View {
         VStack(spacing: 16) {
             Image(systemName: "exclamationmark.triangle")
                 .font(.system(size: 48))
-                .foregroundStyle(.orange)
+                .foregroundStyle(CKTheme.warning)
 
             Text("Unable to Load Dashboard")
-                .font(.headline)
+                .font(CKTypography.headline)
+                .foregroundStyle(CKTheme.textPrimary)
 
             Text(message)
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .font(CKTypography.body)
+                .foregroundStyle(CKTheme.textSecondary)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal)
 
@@ -87,8 +92,10 @@ struct DashboardView: View {
                     .fontWeight(.medium)
             }
             .buttonStyle(.borderedProminent)
+            .tint(CKTheme.accent)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(CKTheme.backgroundPrimary)
         .accessibilityElement(children: .contain)
         .accessibilityLabel("Error loading dashboard: \(message)")
     }
@@ -107,7 +114,7 @@ struct DashboardView: View {
                         .clipped()
                         .overlay(
                             LinearGradient(
-                                colors: [.clear, .black.opacity(0.6)],
+                                colors: [.clear, CKTheme.primary.opacity(0.7)],
                                 startPoint: .top,
                                 endPoint: .bottom
                             )
@@ -118,8 +125,8 @@ struct DashboardView: View {
                             .resizable()
                             .scaledToFit()
                             .frame(height: 24)
-                        Text("Admin Dashboard")
-                            .font(.subheadline)
+                        Text("CK Enterprises UK")
+                            .font(CKTypography.callout)
                             .foregroundStyle(.white.opacity(0.8))
                     }
                     .padding()
@@ -128,31 +135,38 @@ struct DashboardView: View {
             }
 
             // Quick Actions
-            Section("Quick Actions") {
+            Section {
                 LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
-                    actionButton(title: "New Ticket", icon: "ticket", color: .blue) {
+                    actionButton(title: "New Ticket", icon: "ticket", color: CKTheme.info) {
                         showingCreateTicket = true
                     }
-                    actionButton(title: "New Invoice", icon: "doc.text", color: .green) {
+                    actionButton(title: "New Invoice", icon: "doc.text", color: CKTheme.success) {
                         showingCreateInvoice = true
                     }
                     actionButton(title: "Customers", icon: "person.2", color: .purple) {
                         selectedTab = 2
                     }
-                    actionButton(title: "CMDB", icon: "desktopcomputer", color: .orange) {
+                    actionButton(title: "CMDB", icon: "desktopcomputer", color: CKTheme.warning) {
                         selectedTab = 3
                     }
                 }
                 .padding(.vertical, 4)
+            } header: {
+                Text("Quick Actions")
+                    .font(CKTypography.caption)
+                    .foregroundStyle(CKTheme.textSecondary)
             }
 
             ticketStatsSection(dashboard.tickets)
+            rentalMetricsSection(dashboard.rentals)
             financialSection(dashboard.financials)
             expiringDomainsSection(dashboard.expiringDomains)
             recentTicketsSection(dashboard.recentTickets)
             recentLoginsSection(dashboard.recentLogins)
         }
         .listStyle(.insetGrouped)
+        .scrollContentBackground(.hidden)
+        .background(CKTheme.backgroundPrimary)
         .refreshable {
             await viewModel.loadMetrics()
         }
@@ -167,9 +181,9 @@ struct DashboardView: View {
                     .font(.title2)
                     .foregroundStyle(color)
                 Text(title)
-                    .font(.caption)
+                    .font(CKTypography.caption)
                     .fontWeight(.medium)
-                    .foregroundStyle(.primary)
+                    .foregroundStyle(CKTheme.textPrimary)
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, 12)
@@ -183,13 +197,36 @@ struct DashboardView: View {
 
     private func ticketStatsSection(_ stats: TicketStats) -> some View {
         Section {
-            metricRow(label: "Open Tickets", value: "\(stats.openCount)", icon: "envelope.open", color: .blue)
-            metricRow(label: "Critical", value: "\(stats.criticalCount)", icon: "exclamationmark.circle", color: .red)
-            metricRow(label: "High Priority", value: "\(stats.highCount)", icon: "arrow.up.circle", color: .orange)
-            metricRow(label: "Overdue", value: "\(stats.overdueCount)", icon: "clock.badge.exclamationmark", color: .purple)
-            metricRow(label: "Avg Response", value: formatResponseTime(stats.avgResponseTimeMinutes ?? 0), icon: "timer", color: .green)
+            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
+                CKMetricCard(title: "Open Tickets", value: "\(stats.openCount)", icon: "envelope.open", color: CKTheme.info)
+                CKMetricCard(title: "Critical", value: "\(stats.criticalCount)", icon: "exclamationmark.circle", color: CKTheme.error)
+                CKMetricCard(title: "High Priority", value: "\(stats.highCount)", icon: "arrow.up.circle", color: CKTheme.warning)
+                CKMetricCard(title: "Overdue", value: "\(stats.overdueCount)", icon: "clock.badge.exclamationmark", color: .purple)
+            }
+            metricRow(label: "Avg Response", value: formatResponseTime(stats.avgResponseTimeMinutes ?? 0), icon: "timer", color: CKTheme.success)
         } header: {
             Label("Ticket Statistics", systemImage: "ticket")
+                .font(CKTypography.caption)
+                .foregroundStyle(CKTheme.textSecondary)
+        }
+    }
+
+    // MARK: - Rental Metrics Section
+
+    @ViewBuilder
+    private func rentalMetricsSection(_ rentals: RentalStats?) -> some View {
+        if let rentals {
+            Section {
+                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
+                    CKMetricCard(title: "Active Rentals", value: "\(rentals.activeRentalsCount)", icon: "box.truck", color: .teal)
+                    CKMetricCard(title: "Upcoming Returns", value: "\(rentals.upcomingReturnsCount)", icon: "calendar.badge.clock", color: CKTheme.warning)
+                    CKMetricCard(title: "Recently Returned", value: "\(rentals.recentlyReturnedCount)", icon: "checkmark.circle", color: CKTheme.success)
+                }
+            } header: {
+                Label("Rentals", systemImage: "shippingbox")
+                    .font(CKTypography.caption)
+                    .foregroundStyle(CKTheme.textSecondary)
+            }
         }
     }
 
@@ -197,13 +234,17 @@ struct DashboardView: View {
 
     private func financialSection(_ financials: FinancialStats) -> some View {
         Section {
-            metricRow(label: "MRR", value: formatCurrency(financials.mrr), icon: "sterlingsign.circle", color: .green)
-            metricRow(label: "ARR", value: formatCurrency(financials.arr), icon: "chart.line.uptrend.xyaxis", color: .green)
-            metricRow(label: "Overdue Invoices", value: "\(financials.overdueInvoicesCount)", icon: "doc.badge.clock", color: .red)
-            metricRow(label: "Overdue Amount", value: formatCurrency(financials.overdueInvoicesAmount), icon: "sterlingsign.arrow.circlepath", color: .red)
-            metricRow(label: "Revenue (Month)", value: formatCurrency(financials.revenueThisMonth), icon: "banknote", color: .blue)
+            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
+                CKMetricCard(title: "MRR", value: formatCurrency(financials.mrr), icon: "sterlingsign.circle", color: CKTheme.success)
+                CKMetricCard(title: "ARR", value: formatCurrency(financials.arr), icon: "chart.line.uptrend.xyaxis", color: CKTheme.success)
+                CKMetricCard(title: "Overdue Invoices", value: "\(financials.overdueInvoicesCount)", icon: "doc.badge.clock", color: CKTheme.error)
+                CKMetricCard(title: "Overdue Amount", value: formatCurrency(financials.overdueInvoicesAmount), icon: "sterlingsign.arrow.circlepath", color: CKTheme.error)
+            }
+            metricRow(label: "Revenue (Month)", value: formatCurrency(financials.revenueThisMonth), icon: "banknote", color: CKTheme.info)
         } header: {
             Label("Financials", systemImage: "chart.bar")
+                .font(CKTypography.caption)
+                .foregroundStyle(CKTheme.textSecondary)
         }
     }
 
@@ -213,26 +254,27 @@ struct DashboardView: View {
         Section {
             if domains.isEmpty {
                 Text("No domains expiring soon")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    .font(CKTypography.body)
+                    .foregroundStyle(CKTheme.textSecondary)
             } else {
                 ForEach(domains) { domain in
                     HStack {
                         VStack(alignment: .leading, spacing: 4) {
                             Text(domain.domainName)
-                                .font(.body)
+                                .font(CKTypography.body)
                                 .fontWeight(.medium)
+                                .foregroundStyle(CKTheme.textPrimary)
                             Text(domain.customerName)
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
+                                .font(CKTypography.caption)
+                                .foregroundStyle(CKTheme.textSecondary)
                         }
 
                         Spacer()
 
                         Text("\(domain.daysUntilExpiry)d")
-                            .font(.callout)
+                            .font(CKTypography.callout)
                             .fontWeight(.semibold)
-                            .foregroundStyle(domain.daysUntilExpiry <= 7 ? .red : .orange)
+                            .foregroundStyle(domain.daysUntilExpiry <= 7 ? CKTheme.error : CKTheme.warning)
                             .accessibilityLabel("\(domain.daysUntilExpiry) days until expiry")
                     }
                     .accessibilityElement(children: .combine)
@@ -240,6 +282,8 @@ struct DashboardView: View {
             }
         } header: {
             Label("Expiring Domains", systemImage: "globe")
+                .font(CKTypography.caption)
+                .foregroundStyle(CKTheme.textSecondary)
         }
     }
 
@@ -249,18 +293,19 @@ struct DashboardView: View {
         Section {
             if tickets.isEmpty {
                 Text("No recent tickets")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    .font(CKTypography.body)
+                    .foregroundStyle(CKTheme.textSecondary)
             } else {
                 ForEach(tickets) { ticket in
                     HStack {
                         VStack(alignment: .leading, spacing: 4) {
                             Text(ticket.subject)
-                                .font(.body)
+                                .font(CKTypography.body)
+                                .foregroundStyle(CKTheme.textPrimary)
                                 .lineLimit(1)
                             Text(ticket.customerName)
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
+                                .font(CKTypography.caption)
+                                .foregroundStyle(CKTheme.textSecondary)
                         }
 
                         Spacer()
@@ -273,6 +318,8 @@ struct DashboardView: View {
             }
         } header: {
             Label("Recent Tickets", systemImage: "list.bullet.clipboard")
+                .font(CKTypography.caption)
+                .foregroundStyle(CKTheme.textSecondary)
         }
     }
 
@@ -282,19 +329,20 @@ struct DashboardView: View {
         Section {
             if logins.isEmpty {
                 Text("No recent logins")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    .font(CKTypography.body)
+                    .foregroundStyle(CKTheme.textSecondary)
             } else {
                 ForEach(logins) { login in
                     HStack {
                         Label(login.userName, systemImage: "person.circle")
-                            .font(.body)
+                            .font(CKTypography.body)
+                            .foregroundStyle(CKTheme.textPrimary)
 
                         Spacer()
 
                         Text(login.lastLogin, style: .relative)
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .font(CKTypography.caption)
+                            .foregroundStyle(CKTheme.textSecondary)
                     }
                     .accessibilityElement(children: .combine)
                     .accessibilityLabel("\(login.userName), logged in recently")
@@ -302,6 +350,8 @@ struct DashboardView: View {
             }
         } header: {
             Label("Recent Logins", systemImage: "person.badge.clock")
+                .font(CKTypography.caption)
+                .foregroundStyle(CKTheme.textSecondary)
         }
     }
 
@@ -311,14 +361,13 @@ struct DashboardView: View {
         HStack {
             Label(label, systemImage: icon)
                 .foregroundStyle(color)
-                .font(.subheadline)
+                .font(CKTypography.body)
 
             Spacer()
 
             Text(value)
-                .font(.body)
-                .fontWeight(.semibold)
-                .monospacedDigit()
+                .font(CKTypography.metricSmall)
+                .foregroundStyle(CKTheme.textPrimary)
         }
         .accessibilityElement(children: .combine)
         .accessibilityLabel("\(label): \(value)")
@@ -326,7 +375,7 @@ struct DashboardView: View {
 
     private func statusBadge(_ status: String) -> some View {
         Text(status)
-            .font(.caption2)
+            .font(CKTypography.caption)
             .fontWeight(.medium)
             .padding(.horizontal, 8)
             .padding(.vertical, 3)
@@ -358,15 +407,15 @@ struct DashboardView: View {
     private func statusColor(for status: String) -> Color {
         switch status.lowercased() {
         case "open":
-            return .blue
+            return CKTheme.info
         case "pending":
-            return .orange
+            return CKTheme.warning
         case "in progress":
             return .purple
         case "closed", "resolved":
-            return .green
+            return CKTheme.success
         default:
-            return .gray
+            return CKTheme.textTertiary
         }
     }
 }

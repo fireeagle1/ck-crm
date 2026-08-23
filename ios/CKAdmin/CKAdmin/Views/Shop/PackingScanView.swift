@@ -51,12 +51,13 @@ struct PackingScanView: View {
                 if let error = lastError {
                     HStack {
                         Image(systemName: "exclamationmark.triangle.fill")
-                            .foregroundStyle(.orange)
+                            .foregroundStyle(CKTheme.warning)
                         Text(error)
-                            .font(.caption)
+                            .font(CKTypography.caption)
+                            .foregroundStyle(CKTheme.textPrimary)
                     }
                     .padding(8)
-                    .background(Color.orange.opacity(0.1), in: RoundedRectangle(cornerRadius: 8))
+                    .background(CKTheme.warning.opacity(0.1), in: RoundedRectangle(cornerRadius: 8))
                     .padding(.horizontal)
                     .padding(.top, 8)
                 }
@@ -66,26 +67,26 @@ struct PackingScanView: View {
                     Section("Scanned Items (\(scannedAssets.count))") {
                         if scannedAssets.isEmpty {
                             Text("No items scanned yet. Point camera at asset QR codes.")
-                                .font(.subheadline)
-                                .foregroundStyle(.secondary)
+                                .font(CKTypography.body)
+                                .foregroundStyle(CKTheme.textSecondary)
                         } else {
                             ForEach(scannedAssets) { item in
                                 HStack {
                                     Image(systemName: "checkmark.circle.fill")
-                                        .foregroundStyle(.green)
+                                        .foregroundStyle(CKTheme.success)
                                     VStack(alignment: .leading) {
                                         Text(item.deviceName)
-                                            .font(.subheadline)
-                                            .fontWeight(.medium)
+                                            .font(CKTypography.body)
+                                            .foregroundStyle(CKTheme.textPrimary)
                                         Text("CMDB-\(item.assetId)")
-                                            .font(.caption)
-                                            .foregroundStyle(.secondary)
+                                            .font(CKTypography.caption)
+                                            .foregroundStyle(CKTheme.textSecondary)
                                     }
                                     Spacer()
                                     if let serial = item.serialNumber {
                                         Text(serial)
-                                            .font(.caption2)
-                                            .foregroundStyle(.secondary)
+                                            .font(CKTypography.caption)
+                                            .foregroundStyle(CKTheme.textSecondary)
                                     }
                                 }
                             }

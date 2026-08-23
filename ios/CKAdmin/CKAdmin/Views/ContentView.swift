@@ -64,6 +64,12 @@ struct ContentView: View {
                 }
                 .tabItem { Label("Shop", systemImage: "bag") }
                 .tag(5)
+
+                NavigationStack {
+                    RentalListView(apiClient: apiClient)
+                }
+                .tabItem { Label("Rentals", systemImage: "shippingbox") }
+                .tag(6)
             }
 
             // Floating Scan Button

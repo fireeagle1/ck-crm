@@ -74,6 +74,8 @@ struct OrderListView: View {
             }
         }
         .listStyle(.plain)
+        .scrollContentBackground(.hidden)
+        .background(CKTheme.backgroundPrimary)
         .refreshable {
             await viewModel.loadInitial()
         }
@@ -94,43 +96,37 @@ struct OrderListView: View {
     // MARK: - Order Row
 
     private func orderRow(_ order: OrderListItem) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
-            HStack {
+        CKRow {
+            VStack(alignment: .leading, spacing: 4) {
                 Text(order.customerName ?? "Unknown Customer")
-                    .font(.body)
-                    .fontWeight(.medium)
+                    .font(CKTypography.headline)
+                    .foregroundStyle(CKTheme.textPrimary)
                     .lineLimit(1)
 
-                Spacer()
-
-                paymentBadge(order.paymentStatus)
-            }
-
-            HStack {
                 Text(formattedAmount(order.totalAmount))
-                    .font(.subheadline)
-                    .fontWeight(.semibold)
+                    .font(CKTypography.callout)
+                    .foregroundStyle(CKTheme.textPrimary)
 
-                Spacer()
+                HStack {
+                    Label("\(order.itemCount) item\(order.itemCount == 1 ? "" : "s")", systemImage: "shippingbox")
+                        .font(CKTypography.caption)
+                        .foregroundStyle(CKTheme.textSecondary)
 
-                fulfilmentBadge(order.fulfilmentStatus)
-            }
+                    Spacer()
 
-            HStack {
-                Label("\(order.itemCount) item\(order.itemCount == 1 ? "" : "s")", systemImage: "shippingbox")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-
-                Spacer()
-
-                if let date = order.createdAt {
-                    Text(date, style: .date)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                    if let date = order.createdAt {
+                        Text(date, style: .date)
+                            .font(CKTypography.caption)
+                            .foregroundStyle(CKTheme.textSecondary)
+                    }
                 }
             }
+        } trailing: {
+            VStack(alignment: .trailing, spacing: 6) {
+                paymentBadge(order.paymentStatus)
+                fulfilmentBadge(order.fulfilmentStatus)
+            }
         }
-        .padding(.vertical, 2)
         .accessibilityElement(children: .combine)
         .accessibilityLabel("\(order.customerName ?? "Unknown"), \(formattedAmount(order.totalAmount)), \(order.paymentStatus)")
     }
@@ -139,7 +135,7 @@ struct OrderListView: View {
 
     private func paymentBadge(_ status: String) -> some View {
         Text(status.replacingOccurrences(of: "_", with: " ").capitalized)
-            .font(.caption2)
+            .font(CKTypography.caption)
             .fontWeight(.medium)
             .padding(.horizontal, 8)
             .padding(.vertical, 2)
@@ -150,7 +146,7 @@ struct OrderListView: View {
 
     private func fulfilmentBadge(_ status: String) -> some View {
         Text(status.replacingOccurrences(of: "_", with: " ").capitalized)
-            .font(.caption2)
+            .font(CKTypography.caption)
             .fontWeight(.medium)
             .padding(.horizontal, 8)
             .padding(.vertical, 2)
@@ -161,19 +157,19 @@ struct OrderListView: View {
 
     private func paymentColor(_ status: String) -> Color {
         switch status {
-        case "paid", "paid_offline": return .green
-        case "pending": return .orange
-        case "failed": return .red
-        default: return .gray
+        case "paid", "paid_offline": return CKTheme.success
+        case "pending": return CKTheme.warning
+        case "failed": return CKTheme.error
+        default: return CKTheme.textTertiary
         }
     }
 
     private func fulfilmentColor(_ status: String) -> Color {
         switch status {
-        case "completed": return .green
-        case "awaiting_fulfilment": return .blue
-        case "pending": return .orange
-        default: return .gray
+        case "completed": return CKTheme.success
+        case "awaiting_fulfilment": return CKTheme.info
+        case "pending": return CKTheme.warning
+        default: return CKTheme.textTertiary
         }
     }
 
@@ -193,7 +189,9 @@ struct OrderListView: View {
         HStack {
             Spacer()
             ProgressView().controlSize(.small)
-            Text("Loading more...").font(.caption).foregroundStyle(.secondary)
+            Text("Loading more...")
+                .font(CKTypography.caption)
+                .foregroundStyle(CKTheme.textSecondary)
             Spacer()
         }
         .listRowSeparator(.hidden)
@@ -202,28 +200,35 @@ struct OrderListView: View {
     private var loadingView: some View {
         VStack(spacing: 16) {
             ProgressView().controlSize(.large)
-            Text("Loading orders...").font(.subheadline).foregroundStyle(.secondary)
+            Text("Loading orders...")
+                .font(CKTypography.body)
+                .foregroundStyle(CKTheme.textSecondary)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(CKTheme.backgroundPrimary)
     }
 
     private func errorView(message: String) -> some View {
         VStack(spacing: 16) {
             Image(systemName: "exclamationmark.triangle")
                 .font(.system(size: 48))
-                .foregroundStyle(.orange)
-            Text("Unable to Load Orders").font(.headline)
+                .foregroundStyle(CKTheme.warning)
+            Text("Unable to Load Orders")
+                .font(CKTypography.headline)
+                .foregroundStyle(CKTheme.textPrimary)
             Text(message)
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .font(CKTypography.body)
+                .foregroundStyle(CKTheme.textSecondary)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal)
             Button { Task { await viewModel.loadInitial() } } label: {
                 Label("Retry", systemImage: "arrow.clockwise").fontWeight(.medium)
             }
             .buttonStyle(.borderedProminent)
+            .tint(CKTheme.accent)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(CKTheme.backgroundPrimary)
     }
 }
 

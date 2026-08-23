@@ -2,16 +2,12 @@ import SwiftUI
 
 /// Displays a full service record with all fields and associated customer name.
 ///
-/// Loads the service detail from the API on appear, provides toolbar actions
-/// for editing and deleting the service.
+/// Loads the service detail from the API on appear, provides a toolbar action
+/// for editing the service.
 struct ServiceDetailView: View {
-    @Environment(\.dismiss) private var dismiss
-
     @State private var service: ServiceDetail?
     @State private var isLoading = true
     @State private var errorMessage: String?
-    @State private var showingDeleteConfirmation = false
-    @State private var isDeleting = false
     @State private var showingEditForm = false
 
     private let serviceId: Int
@@ -48,20 +44,6 @@ struct ServiceDetailView: View {
                     }
                 }
             }
-        }
-        .confirmationDialog(
-            "Delete Service",
-            isPresented: $showingDeleteConfirmation,
-            titleVisibility: .visible
-        ) {
-            Button("Delete", role: .destructive) {
-                Task {
-                    await deleteService()
-                }
-            }
-            Button("Cancel", role: .cancel) {}
-        } message: {
-            Text("Are you sure you want to delete this service? This action cannot be undone.")
         }
         .sheet(isPresented: $showingEditForm) {
             if let service {
@@ -113,25 +95,6 @@ struct ServiceDetailView: View {
                 detailRow(label: "Start Date", value: service.startDate)
                 detailRow(label: "End Date", value: service.endDate)
                 detailRow(label: "Next Payment", value: service.nextPaymentDate)
-            }
-
-            // Actions
-            Section {
-                Button(role: .destructive) {
-                    showingDeleteConfirmation = true
-                } label: {
-                    HStack {
-                        Spacer()
-                        if isDeleting {
-                            ProgressView()
-                                .controlSize(.small)
-                                .padding(.trailing, 8)
-                        }
-                        Label("Delete Service", systemImage: "trash")
-                        Spacer()
-                    }
-                }
-                .disabled(isDeleting)
             }
         }
         .refreshable {
@@ -256,23 +219,6 @@ struct ServiceDetailView: View {
         }
 
         isLoading = false
-    }
-
-    @MainActor
-    private func deleteService() async {
-        isDeleting = true
-
-        do {
-            let endpoint = Endpoint(method: .delete, path: "/admin/services/\(serviceId)")
-            try await apiClient.requestVoid(endpoint)
-            dismiss()
-        } catch let error as APIError {
-            errorMessage = error.errorDescription
-        } catch {
-            errorMessage = "Failed to delete service."
-        }
-
-        isDeleting = false
     }
 }
 

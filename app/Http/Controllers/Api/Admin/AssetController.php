@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Asset;
+use App\Models\BookingInspection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -90,11 +91,48 @@ class AssetController extends Controller
     }
 
     /**
-     * Show a single asset with related tickets.
+     * Show a single asset with related tickets, current booking, and recent inspections.
      */
     public function show(Asset $asset): JsonResponse
     {
-        $asset->load(['customer', 'tickets' => fn ($q) => $q->orderByDesc('created_at')]);
+        $asset->load([
+            'customer',
+            'tickets' => fn ($q) => $q->orderByDesc('created_at'),
+            'bookingAssets' => fn ($q) => $q->whereNull('released_at')->with('booking.customer'),
+        ]);
+
+        // Derive current_booking from the active (unreleased) BookingAsset
+        $activeBookingAsset = $asset->bookingAssets->first();
+        $currentBooking = null;
+
+        if ($activeBookingAsset && $activeBookingAsset->booking) {
+            $booking = $activeBookingAsset->booking;
+            $currentBooking = [
+                'id' => $booking->id,
+                'status' => $booking->status,
+                'fulfilment_stage' => $booking->fulfilment_stage,
+                'start_date' => $booking->start_date?->toDateString(),
+                'end_date' => $booking->end_date?->toDateString(),
+                'customer_name' => $booking->customer?->company_name,
+            ];
+        }
+
+        // Fetch recent inspections linked to this asset through BookingAsset → Booking → Inspections
+        $recentInspections = BookingInspection::whereHas('booking.assignedAssets', function ($q) use ($asset) {
+            $q->where('asset_id', $asset->device_id);
+        })
+            ->with('inspector')
+            ->orderByDesc('inspected_at')
+            ->limit(5)
+            ->get()
+            ->map(fn (BookingInspection $inspection) => [
+                'id' => $inspection->id,
+                'type' => $inspection->type,
+                'condition_notes' => $inspection->condition_notes,
+                'damage_flagged' => $inspection->damage_flagged,
+                'inspector_name' => $inspection->inspector?->name,
+                'inspected_at' => $inspection->inspected_at?->toIso8601String(),
+            ]);
 
         return response()->json(['data' => [
             'device_id' => $asset->device_id,
@@ -116,6 +154,8 @@ class AssetController extends Controller
                 'ticket_type' => $t->ticket_type,
                 'created_at' => $t->created_at?->format('Y-m-d'),
             ]),
+            'current_booking' => $currentBooking,
+            'recent_inspections' => $recentInspections,
         ]]);
     }
 
