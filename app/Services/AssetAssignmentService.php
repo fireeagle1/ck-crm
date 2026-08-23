@@ -65,12 +65,12 @@ class AssetAssignmentService
             Asset::whereIn('device_id', $assignedIds)
                 ->update(['asset_status' => 'Reserved']);
 
-            // Auto-advance fulfilment stage: ordered → packing → ready
+            // Auto-advance fulfilment stage: ordered → packing
+            // Note: We only advance to 'packing' here. Advancement to 'ready'
+            // requires payment confirmation and is handled by the webhook/fulfilment
+            // pipeline via FulfilmentStageService which enforces pre-conditions.
             if ($booking->fulfilment_stage === 'ordered') {
                 $booking->update(['fulfilment_stage' => 'packing']);
-            }
-            if ($booking->fulfilment_stage === 'packing' && $assignedCount >= $quantity) {
-                $booking->update(['fulfilment_stage' => 'ready']);
             }
 
             return $assignedCount;

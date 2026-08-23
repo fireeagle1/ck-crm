@@ -25,6 +25,7 @@ class Booking extends Model
         'block_reason',
         'fulfilment_stage',
         'returned_at',
+        'overdue_notified_at',
         'signature_data',
         'agreement_accepted_at',
         'agreement_text_snapshot',
@@ -37,6 +38,7 @@ class Booking extends Model
         'quantity' => 'integer',
         'total_price' => 'decimal:2',
         'returned_at' => 'datetime',
+        'overdue_notified_at' => 'datetime',
         'agreement_accepted_at' => 'datetime',
         'fulfilment_stage' => 'string',
     ];

@@ -56,10 +56,10 @@
 
     {{-- Legend --}}
     <div class="flex items-center gap-4 mb-4 text-xs">
-        <span class="inline-flex items-center gap-1"><span class="w-3 h-3 rounded bg-green-500 inline-block"></span> Confirmed</span>
-        <span class="inline-flex items-center gap-1"><span class="w-3 h-3 rounded bg-blue-500 inline-block"></span> Active</span>
-        <span class="inline-flex items-center gap-1"><span class="w-3 h-3 rounded bg-gray-400 inline-block"></span> Returned</span>
-        <span class="inline-flex items-center gap-1"><span class="w-3 h-3 rounded bg-red-500 inline-block"></span> Cancelled</span>
+        <span class="inline-flex items-center gap-1"><span class="w-3 h-3 rounded inline-block" style="background-color: #22c55e;"></span> Confirmed</span>
+        <span class="inline-flex items-center gap-1"><span class="w-3 h-3 rounded inline-block" style="background-color: #3b82f6;"></span> Active</span>
+        <span class="inline-flex items-center gap-1"><span class="w-3 h-3 rounded inline-block" style="background-color: #9ca3af;"></span> Returned</span>
+        <span class="inline-flex items-center gap-1"><span class="w-3 h-3 rounded inline-block" style="background-color: #ef4444;"></span> Cancelled</span>
         <span class="inline-flex items-center gap-1"><span class="w-3 h-3 rounded inline-block" style="background: repeating-linear-gradient(45deg, #dc2626, #dc2626 2px, #fca5a5 2px, #fca5a5 4px);"></span> Blocked</span>
     </div>
 
@@ -131,28 +131,33 @@
                                         $isBlocked = is_null($booking->company_id);
                                         $isStart = $booking->start_date->eq($date);
                                         $statusColors = [
-                                            'confirmed' => 'bg-green-500',
-                                            'active' => 'bg-blue-500',
-                                            'returned' => 'bg-gray-400',
-                                            'cancelled' => 'bg-red-500',
+                                            'confirmed' => '#22c55e',
+                                            'active' => '#3b82f6',
+                                            'returned' => '#9ca3af',
+                                            'cancelled' => '#ef4444',
                                         ];
-                                        $color = $isBlocked ? '' : ($statusColors[$booking->status] ?? 'bg-gray-400');
+                                        $bgColor = $isBlocked ? '' : ($statusColors[$booking->status] ?? '#9ca3af');
                                         $customerName = $isBlocked ? 'BLOCKED' : ($booking->customer?->company_name ?? 'N/A');
-                                        $roundStart = $isStart ? 'rounded-l' : '';
+                                        $roundStart = $isStart ? 'border-radius-left: 4px;' : '';
                                         $isEnd = $booking->end_date->eq($date);
-                                        $roundEnd = $isEnd ? 'rounded-r' : '';
+                                        $roundEnd = $isEnd ? 'border-radius-right: 4px;' : '';
+                                        $borderRadius = ($isStart && $isEnd) ? 'border-radius: 4px;'
+                                            : ($isStart ? 'border-top-left-radius: 4px; border-bottom-left-radius: 4px;'
+                                            : ($isEnd ? 'border-top-right-radius: 4px; border-bottom-right-radius: 4px;' : ''));
                                     @endphp
-                                    <div class="h-5 {{ $color }} {{ $roundStart }} {{ $roundEnd }} opacity-90 hover:opacity-100 transition-opacity"
-                                         @if($isBlocked)
-                                             style="background: repeating-linear-gradient(45deg, #dc2626, #dc2626 2px, #fca5a5 2px, #fca5a5 4px); cursor: pointer;"
+                                    @if($isBlocked)
+                                        <div class="h-5 block"
+                                             style="background: repeating-linear-gradient(45deg, #dc2626, #dc2626 2px, #fca5a5 2px, #fca5a5 4px); cursor: pointer; {{ $borderRadius }}"
+                                             title="BLOCKED{{ $booking->block_reason ? ' — ' . $booking->block_reason : '' }} | {{ $booking->start_date->format('d M') }} - {{ $booking->end_date->format('d M') }}"
                                              onclick="openEditBlock({{ $booking->id }}, '{{ $booking->product->name ?? 'Product' }}', '{{ $booking->start_date->format('Y-m-d') }}', '{{ $booking->end_date->format('Y-m-d') }}', '{{ addslashes($booking->block_reason ?? '') }}')"
-                                         @endif
-                                         title="{{ $customerName }}{{ $isBlocked && $booking->block_reason ? ' — ' . $booking->block_reason : '' }} | {{ $booking->start_date->format('d M') }} - {{ $booking->end_date->format('d M') }} ({{ ucfirst($booking->status) }})"
-                                         @if(!$isBlocked)
-                                             onclick="window.location.href='{{ route('admin.shop.bookings.show', $booking) }}'"
-                                             style="cursor: pointer;"
-                                         @endif
-                                    ></div>
+                                        ></div>
+                                    @else
+                                        <a href="{{ route('admin.shop.bookings.show', $booking) }}"
+                                           class="h-5 block opacity-90 hover:opacity-100 transition-opacity"
+                                           style="background-color: {{ $bgColor }}; {{ $borderRadius }}"
+                                           title="{{ $customerName }} | {{ $booking->start_date->format('d M') }} - {{ $booking->end_date->format('d M') }} ({{ ucfirst($booking->status) }})"
+                                        ></a>
+                                    @endif
                                 @endforeach
                                 @if($cellBookings->isEmpty())
                                     <div class="h-5"></div>

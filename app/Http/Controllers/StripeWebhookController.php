@@ -100,6 +100,7 @@ class StripeWebhookController extends Controller
         $order->update(['payment_status' => 'paid']);
 
         $customer = $order->customer;
+        $order->load('items.booking');
 
         // Trigger fulfilment for each item based on product_type
         foreach ($order->items as $item) {

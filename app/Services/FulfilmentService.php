@@ -71,36 +71,41 @@ class FulfilmentService
     {
         try {
             return DB::transaction(function () use ($item, $customer) {
-                $product = $item->product;
+                // The booking was already created during checkout (CheckoutService::handleRentalItems).
+                // This method is called after payment confirmation via the Stripe webhook.
+                // We just need to activate the existing booking and advance its fulfilment stage.
+                $booking = $item->booking;
 
-                if (!$product) {
-                    throw new RuntimeException(
-                        "Product not found for order item \"{$item->product_name}\"."
+                if (!$booking) {
+                    // Fallback: if no booking exists yet (edge case or legacy flow), create one
+                    $product = $item->product;
+
+                    if (!$product) {
+                        throw new RuntimeException(
+                            "Product not found for order item \"{$item->product_name}\"."
+                        );
+                    }
+
+                    $booking = $this->bookingService->createBooking(
+                        $item,
+                        $product,
+                        $item->rental_start_date,
+                        $item->rental_end_date,
+                        $item->quantity ?? 1,
+                        null,
+                        null
                     );
                 }
 
-                $startDate = $item->rental_start_date;
-                $endDate = $item->rental_end_date;
-                $quantity = $item->quantity ?? 1;
+                // Payment is now confirmed — activate the booking if start_date is today or past
+                $newStatus = $booking->start_date->lte(today()) ? 'active' : 'confirmed';
+                $booking->update(['status' => $newStatus]);
 
-                // Create booking via BookingService with pessimistic locking
-                $booking = $this->bookingService->createBooking(
-                    $item,
-                    $product,
-                    $startDate,
-                    $endDate,
-                    $quantity,
-                    null, // signature data handled at checkout level
-                    null  // agreement text handled at checkout level
-                );
-
-                // Set booking status to 'active' since payment is confirmed
-                $booking->update(['status' => 'active']);
+                // Advance fulfilment stage: if assets are assigned (packing stage) and now paid,
+                // we can advance to 'ready'. If still at 'ordered', advance to 'packing'.
+                $this->advanceFulfilmentAfterPayment($booking);
 
                 $item->order->update(['fulfilment_status' => 'awaiting_fulfilment']);
-
-                // Decrement stock for equipment rental items
-                $this->decrementStock($product);
 
                 return $booking;
             });
@@ -118,6 +123,26 @@ class FulfilmentService
             ]);
 
             throw $e;
+        }
+    }
+
+    /**
+     * After payment is confirmed, advance the booking's fulfilment stage appropriately.
+     *
+     * - If at 'ordered' with no assets assigned: stays at 'ordered' (needs manual assignment)
+     * - If at 'ordered' with assets assigned: advance to 'packing'
+     * - If at 'packing' with sufficient assets: advance to 'ready'
+     */
+    protected function advanceFulfilmentAfterPayment(Booking $booking): void
+    {
+        $booking->loadCount('assignedAssets');
+
+        if ($booking->fulfilment_stage === 'ordered' && $booking->assigned_assets_count > 0) {
+            $booking->update(['fulfilment_stage' => 'packing']);
+        }
+
+        if ($booking->fulfilment_stage === 'packing' && $booking->assigned_assets_count >= $booking->quantity) {
+            $booking->update(['fulfilment_stage' => 'ready']);
         }
     }
 
