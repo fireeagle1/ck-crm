@@ -58,7 +58,11 @@ Route::prefix('admin')->group(function () {
         Route::post('/shop/orders/{order}/bookings/{booking}/advance-stage', [ShopOrderController::class, 'advanceStage']);
         Route::post('/shop/orders/{order}/bookings/{booking}/assign-assets', [ShopOrderController::class, 'assignAssets']);
         Route::post('/shop/orders/{order}/bookings/{booking}/inspect', [ShopOrderController::class, 'inspect']);
+        Route::delete('/shop/orders/{order}/bookings/{booking}/inspection/{type}', [ShopOrderController::class, 'deleteInspection']);
         Route::post('/shop/orders/{order}/bookings/{booking}/mark-returned', [ShopOrderController::class, 'markReturned']);
+
+        // Inspection photo serving
+        Route::get('/shop/bookings/inspection-photo/{path}', [ShopOrderController::class, 'inspectionPhoto'])->where('path', '.*');
 
         // Shop — Products (read-only)
         Route::get('/shop/products', [ShopProductController::class, 'index']);

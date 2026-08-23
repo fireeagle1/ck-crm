@@ -4,6 +4,8 @@ import PhotosUI
 /// View for capturing inspection photos (checkout or return) and uploading them.
 /// Supports both camera capture and photo library selection.
 struct InspectionUploadView: View {
+    @Environment(\.dismiss) private var dismiss
+
     @State private var selectedPhotos: [UIImage] = []
     @State private var conditionNotes = ""
     @State private var damageFlagged = false
@@ -16,12 +18,14 @@ struct InspectionUploadView: View {
     private let apiClient: APIClient
     private let orderId: Int
     private let bookingId: Int
+    private let inspectionType: String
     private let onComplete: () -> Void
 
-    init(apiClient: APIClient, orderId: Int, bookingId: Int, onComplete: @escaping () -> Void) {
+    init(apiClient: APIClient, orderId: Int, bookingId: Int, inspectionType: String = "checkout", onComplete: @escaping () -> Void) {
         self.apiClient = apiClient
         self.orderId = orderId
         self.bookingId = bookingId
+        self.inspectionType = inspectionType
         self.onComplete = onComplete
     }
 
@@ -97,15 +101,17 @@ struct InspectionUploadView: View {
                         .lineLimit(3...6)
                 }
 
-                // Damage flag
-                Section {
-                    Toggle(isOn: $damageFlagged) {
-                        Label("Damage Detected", systemImage: "exclamationmark.triangle")
+                // Damage flag — only for return inspections
+                if inspectionType == "return" {
+                    Section {
+                        Toggle(isOn: $damageFlagged) {
+                            Label("Damage Detected", systemImage: "exclamationmark.triangle")
+                        }
+                        .tint(.red)
+                    } footer: {
+                        Text("If flagged, assets will be marked as 'In Repair' upon completion.")
+                            .font(CKTypography.caption)
                     }
-                    .tint(.red)
-                } footer: {
-                    Text("If flagged, assets will be marked as 'In Repair' upon completion.")
-                        .font(CKTypography.caption)
                 }
 
                 // Error
@@ -117,11 +123,11 @@ struct InspectionUploadView: View {
                     }
                 }
             }
-            .navigationTitle("Inspection")
+            .navigationTitle(inspectionType == "checkout" ? "Checkout Inspection" : "Return Inspection")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { onComplete() }
+                    Button("Cancel") { dismiss() }
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Submit") {
@@ -229,6 +235,7 @@ struct InspectionUploadView: View {
             }
 
             if httpResponse.statusCode >= 200 && httpResponse.statusCode < 300 {
+                dismiss()
                 onComplete()
             } else if httpResponse.statusCode == 422 {
                 if let json = try? JSONDecoder().decode(MessageResponse.self, from: data) {

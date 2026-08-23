@@ -326,4 +326,44 @@ class ShopOrderController extends Controller
 
         return response()->json(['message' => 'Booking marked as returned.', 'fulfilment_stage' => $booking->fresh()->fulfilment_stage]);
     }
+
+    /**
+     * Delete an inspection (checkout or return) from a booking.
+     */
+    public function deleteInspection(Request $request, Order $order, Booking $booking, string $type): JsonResponse
+    {
+        abort_unless($booking->orderItem?->order_id === $order->id, 404);
+        abort_unless(in_array($type, ['checkout', 'return']), 404);
+
+        $inspection = $type === 'checkout'
+            ? $booking->checkoutInspection
+            : $booking->returnInspection;
+
+        if (!$inspection) {
+            return response()->json(['message' => 'No inspection found.'], 404);
+        }
+
+        $inspection->delete();
+
+        return response()->json(['message' => ucfirst($type) . ' inspection deleted.']);
+    }
+
+    /**
+     * Serve an inspection photo from local storage via API.
+     */
+    public function inspectionPhoto(string $path): \Symfony\Component\HttpFoundation\StreamedResponse
+    {
+        $disk = \Illuminate\Support\Facades\Storage::disk('local');
+
+        if (!$disk->exists($path)) {
+            abort(404, 'Photo not found.');
+        }
+
+        $mimeType = $disk->mimeType($path) ?: 'image/jpeg';
+
+        return $disk->response($path, null, [
+            'Content-Type' => $mimeType,
+            'Cache-Control' => 'private, max-age=3600',
+        ]);
+    }
 }

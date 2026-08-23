@@ -11,6 +11,7 @@ struct BookingDetailView: View {
     @State private var isLoading = true
     @State private var errorMessage: String?
     @State private var showInspection = false
+    @State private var inspectionType: String = "checkout"
     @State private var isAdvancing = false
     @State private var advanceError: String?
 
@@ -53,6 +54,7 @@ struct BookingDetailView: View {
                 apiClient: apiClient,
                 orderId: booking.orderId ?? 0,
                 bookingId: bookingId,
+                inspectionType: inspectionType,
                 onComplete: { Task { await loadBooking() } }
             )
         }
@@ -214,12 +216,37 @@ struct BookingDetailView: View {
 
     private func inspectionSection(title: String, inspection: InspectionRecord) -> some View {
         Section {
-            infoRow("Photos", "\(inspection.photos.count)")
+            if !inspection.photos.isEmpty {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 8) {
+                        ForEach(inspection.photos, id: \.self) { photoPath in
+                            AsyncImage(url: photoURL(photoPath)) { phase in
+                                switch phase {
+                                case .success(let image):
+                                    image.resizable().scaledToFill()
+                                case .failure:
+                                    Image(systemName: "photo").foregroundStyle(.gray)
+                                default:
+                                    ProgressView()
+                                }
+                            }
+                            .frame(width: 80, height: 80)
+                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                        }
+                    }
+                    .padding(.vertical, 4)
+                }
+            }
             infoRow("Condition Notes", inspection.conditionNotes)
             damageRow(inspection.damageFlagged)
             infoRow("Inspector", inspection.inspectorName)
             if let inspectedAt = inspection.inspectedAt {
                 infoRow("Date", formattedDateTime(inspectedAt))
+            }
+            Button(role: .destructive) {
+                Task { await deleteInspection(type: title.contains("Checkout") ? "checkout" : "return") }
+            } label: {
+                Label("Delete Inspection", systemImage: "trash")
             }
         } header: {
             Text(title)
@@ -303,7 +330,11 @@ struct BookingDetailView: View {
 
     private func handleAction(_ action: StageAction) {
         switch action {
-        case .checkOut, .returnInspection, .completeInspection:
+        case .checkOut:
+            inspectionType = "checkout"
+            showInspection = true
+        case .returnInspection, .completeInspection:
+            inspectionType = "return"
             showInspection = true
         case .advanceToPacking, .markReady, .markReturned:
             Task { await advanceStage() }
@@ -328,6 +359,30 @@ struct BookingDetailView: View {
             advanceError = "Failed to advance stage."
         }
         isAdvancing = false
+    }
+
+    @MainActor
+    private func deleteInspection(type: String) async {
+        guard let booking else { return }
+        isAdvancing = true
+        do {
+            let _: MessageResponse = try await apiClient.request(
+                Endpoint(
+                    method: .delete,
+                    path: "/admin/shop/orders/\(booking.orderId ?? 0)/bookings/\(bookingId)/inspection/\(type)"
+                )
+            )
+            await loadBooking()
+        } catch let error as APIError {
+            advanceError = error.errorDescription
+        } catch {
+            advanceError = "Failed to delete inspection."
+        }
+        isAdvancing = false
+    }
+
+    private func photoURL(_ path: String) -> URL? {
+        APIConfig.baseURL.appendingPathComponent("/api/admin/shop/bookings/inspection-photo/\(path)")
     }
 
     private var showAdvanceErrorBinding: Binding<Bool> {
