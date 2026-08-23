@@ -40,6 +40,7 @@ struct BookingDetailView: View {
             bookingInfoSection(booking)
             fulfilmentStageSection(booking)
             stageActionsSection(booking)
+            changeStageSection(booking)
             assignedAssetsSection(booking)
             checkoutInspectionSection(booking)
             returnInspectionSection(booking)
@@ -129,6 +130,42 @@ struct BookingDetailView: View {
             .buttonStyle(.bordered)
             .controlSize(.large)
         }
+    }
+
+    // MARK: - Change Stage Section
+
+    @ViewBuilder
+    private func changeStageSection(_ booking: BookingDetail) -> some View {
+        Section {
+            Picker("Set Stage", selection: Binding(
+                get: { booking.fulfilmentStage },
+                set: { newStage in
+                    Task { await setStage(newStage) }
+                }
+            )) {
+                Text("Ordered").tag("ordered")
+                Text("Packing").tag("packing")
+                Text("Ready").tag("ready")
+                Text("Checked Out").tag("checked_out")
+                Text("Returned").tag("returned")
+                Text("Inspected").tag("inspected")
+            }
+
+            // Mark Order Fulfilled button
+            Button {
+                Task { await markFulfilled() }
+            } label: {
+                Label("Mark Order Fulfilled", systemImage: "checkmark.seal")
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.bordered)
+            .tint(.green)
+        } header: {
+            Text("Admin Override")
+                .font(CKTypography.callout)
+                .foregroundStyle(CKTheme.textSecondary)
+        }
+        .listRowBackground(CKTheme.backgroundCard)
     }
 
     // MARK: - Booking Info Section
@@ -357,6 +394,47 @@ struct BookingDetailView: View {
             advanceError = error.errorDescription
         } catch {
             advanceError = "Failed to advance stage."
+        }
+        isAdvancing = false
+    }
+
+    @MainActor
+    private func setStage(_ stage: String) async {
+        guard let booking else { return }
+        isAdvancing = true
+        do {
+            let _: MessageResponse = try await apiClient.request(
+                Endpoint(
+                    method: .post,
+                    path: "/admin/shop/orders/\(booking.orderId ?? 0)/bookings/\(bookingId)/set-stage",
+                    body: ["stage": stage]
+                )
+            )
+            await loadBooking()
+        } catch let error as APIError {
+            advanceError = error.errorDescription
+        } catch {
+            advanceError = "Failed to change stage."
+        }
+        isAdvancing = false
+    }
+
+    @MainActor
+    private func markFulfilled() async {
+        guard let booking else { return }
+        isAdvancing = true
+        do {
+            let _: MessageResponse = try await apiClient.request(
+                Endpoint(
+                    method: .post,
+                    path: "/admin/shop/orders/\(booking.orderId ?? 0)/fulfil"
+                )
+            )
+            await loadBooking()
+        } catch let error as APIError {
+            advanceError = error.errorDescription
+        } catch {
+            advanceError = "Failed to mark order as fulfilled."
         }
         isAdvancing = false
     }

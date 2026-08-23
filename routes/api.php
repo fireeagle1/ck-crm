@@ -56,6 +56,7 @@ Route::prefix('admin')->group(function () {
         Route::post('/shop/orders/{order}/mark-paid-offline', [ShopOrderController::class, 'markPaidOffline']);
         Route::post('/shop/orders/{order}/note', [ShopOrderController::class, 'addNote']);
         Route::post('/shop/orders/{order}/bookings/{booking}/advance-stage', [ShopOrderController::class, 'advanceStage']);
+        Route::post('/shop/orders/{order}/bookings/{booking}/set-stage', [ShopOrderController::class, 'setStage']);
         Route::post('/shop/orders/{order}/bookings/{booking}/assign-assets', [ShopOrderController::class, 'assignAssets']);
         Route::post('/shop/orders/{order}/bookings/{booking}/inspect', [ShopOrderController::class, 'inspect']);
         Route::delete('/shop/orders/{order}/bookings/{booking}/inspection/{type}', [ShopOrderController::class, 'deleteInspection']);

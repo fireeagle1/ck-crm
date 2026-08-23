@@ -225,6 +225,25 @@ class ShopOrderController extends Controller
     }
 
     /**
+     * Set a booking's fulfilment stage directly (admin override).
+     */
+    public function setStage(Request $request, Order $order, Booking $booking): JsonResponse
+    {
+        abort_unless($booking->orderItem?->order_id === $order->id, 404);
+
+        $validated = $request->validate([
+            'stage' => 'required|string|in:ordered,packing,ready,checked_out,returned,inspected',
+        ]);
+
+        $booking->update(['fulfilment_stage' => $validated['stage']]);
+
+        return response()->json([
+            'message' => 'Stage set to "' . str_replace('_', ' ', $validated['stage']) . '".',
+            'fulfilment_stage' => $validated['stage'],
+        ]);
+    }
+
+    /**
      * Assign assets to a booking.
      */
     public function assignAssets(Request $request, Order $order, Booking $booking): JsonResponse
