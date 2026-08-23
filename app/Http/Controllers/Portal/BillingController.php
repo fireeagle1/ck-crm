@@ -30,6 +30,7 @@ class BillingController extends Controller
     public function invoices(Request $request): View
     {
         $invoices = Invoice::where('company_id', $request->user()->company_id)
+            ->collectable()
             ->orderByDesc('invoice_date')
             ->paginate(15);
 

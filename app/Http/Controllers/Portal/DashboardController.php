@@ -53,6 +53,7 @@ class DashboardController extends Controller
 
         // Recent invoices
         $recentInvoices = Invoice::where('company_id', $companyId)
+            ->collectable()
             ->orderByDesc('invoice_date')
             ->limit(5)
             ->get();
@@ -82,7 +83,6 @@ class DashboardController extends Controller
         // Overdue invoices
         $overdueInvoices = Invoice::where('company_id', $companyId)
             ->where('invoice_status', 'Unpaid')
-            ->whereNotIn('invoice_status', Invoice::EXCLUDED_STATUSES)
             ->whereDate('due_date', '<', now())
             ->get();
 
