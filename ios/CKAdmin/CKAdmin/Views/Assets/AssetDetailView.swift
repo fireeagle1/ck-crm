@@ -64,31 +64,50 @@ struct AssetDetailView: View {
             Section("Recent Inspections") {
                 if let inspections = asset.recentInspections, !inspections.isEmpty {
                     ForEach(inspections) { inspection in
-                        HStack(spacing: 10) {
-                            Text(inspection.type.capitalized)
-                                .font(CKTypography.caption)
-                                .fontWeight(.medium)
-                                .padding(.horizontal, 8)
-                                .padding(.vertical, 3)
-                                .background(inspection.type == "checkout" ? CKTheme.info.opacity(0.15) : CKTheme.success.opacity(0.15))
-                                .foregroundStyle(inspection.type == "checkout" ? CKTheme.info : CKTheme.success)
-                                .clipShape(Capsule())
-
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text(inspection.inspectorName ?? "Unknown")
-                                    .font(CKTypography.body)
-                                    .foregroundStyle(CKTheme.textPrimary)
-                                Text(inspection.inspectedAt)
-                                    .font(CKTypography.caption)
-                                    .foregroundStyle(CKTheme.textSecondary)
+                        DisclosureGroup {
+                            VStack(alignment: .leading, spacing: 6) {
+                                if let notes = inspection.conditionNotes, !notes.isEmpty {
+                                    Text(notes)
+                                        .font(CKTypography.body)
+                                        .foregroundStyle(CKTheme.textPrimary)
+                                } else {
+                                    Text("No condition notes recorded")
+                                        .font(CKTypography.body)
+                                        .foregroundStyle(CKTheme.textTertiary)
+                                }
+                                if inspection.damageFlagged {
+                                    Label("Damage was flagged during this inspection", systemImage: "exclamationmark.triangle.fill")
+                                        .font(CKTypography.caption)
+                                        .foregroundStyle(CKTheme.error)
+                                }
                             }
+                        } label: {
+                            HStack(spacing: 10) {
+                                Text(inspection.type.capitalized)
+                                    .font(CKTypography.caption)
+                                    .fontWeight(.medium)
+                                    .padding(.horizontal, 8)
+                                    .padding(.vertical, 3)
+                                    .background(inspection.type == "checkout" ? CKTheme.info.opacity(0.15) : CKTheme.success.opacity(0.15))
+                                    .foregroundStyle(inspection.type == "checkout" ? CKTheme.info : CKTheme.success)
+                                    .clipShape(Capsule())
 
-                            Spacer()
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text(inspection.inspectorName ?? "Unknown")
+                                        .font(CKTypography.body)
+                                        .foregroundStyle(CKTheme.textPrimary)
+                                    Text(inspection.inspectedAt)
+                                        .font(CKTypography.caption)
+                                        .foregroundStyle(CKTheme.textSecondary)
+                                }
 
-                            if inspection.damageFlagged {
-                                Image(systemName: "exclamationmark.triangle.fill")
-                                    .foregroundStyle(CKTheme.error)
-                                    .accessibilityLabel("Damage flagged")
+                                Spacer()
+
+                                if inspection.damageFlagged {
+                                    Image(systemName: "exclamationmark.triangle.fill")
+                                        .foregroundStyle(CKTheme.error)
+                                        .accessibilityLabel("Damage flagged")
+                                }
                             }
                         }
                     }

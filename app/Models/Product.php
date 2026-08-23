@@ -65,6 +65,11 @@ class Product extends Model
         return $this->hasMany(Asset::class);
     }
 
+    public function questions(): HasMany
+    {
+        return $this->hasMany(ProductQuestion::class)->orderBy('display_order');
+    }
+
     /**
      * Get the number of available assets for this product.
      * If track_individual_assets is enabled, counts linked assets with 'Available' status.

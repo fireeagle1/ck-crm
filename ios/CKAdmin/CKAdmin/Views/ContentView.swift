@@ -49,11 +49,6 @@ struct ContentView: View {
             .tabItem { Label("CMDB", systemImage: "desktopcomputer") }
             .tag(3)
 
-            // QR Scan tab (replaces floating button)
-            Text("")
-                .tabItem { Label("Scan", systemImage: "qrcode.viewfinder") }
-                .tag(7)
-
             NavigationStack {
                 InvoiceListView(apiClient: apiClient)
             }
@@ -75,11 +70,20 @@ struct ContentView: View {
             .tabItem { Label("Rentals", systemImage: "shippingbox") }
             .tag(6)
         }
-        .onChange(of: selectedTab) { oldValue, newValue in
-            if newValue == 7 {
-                selectedTab = oldValue
+        .overlay(alignment: .bottom) {
+            // Centered scan button above the tab bar
+            Button {
                 showingScanner = true
+            } label: {
+                Image(systemName: "qrcode.viewfinder")
+                    .font(.system(size: 22, weight: .semibold))
+                    .foregroundStyle(.white)
+                    .frame(width: 52, height: 52)
+                    .background(CKTheme.accent, in: Circle())
+                    .shadow(color: .black.opacity(0.2), radius: 6, y: 3)
             }
+            .offset(y: -28)
+            .accessibilityLabel("Scan QR Code")
         }
         .confirmationDialog(
             "Are you sure you want to log out?",

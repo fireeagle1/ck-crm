@@ -64,9 +64,9 @@ Route::prefix('admin')->group(function () {
         Route::get('/shop/products', [ShopProductController::class, 'index']);
 
         // Shop — Rentals/Bookings
+        Route::get('/shop/rentals/calendar', [BookingController::class, 'calendar']);
         Route::get('/shop/rentals', [BookingController::class, 'index']);
         Route::get('/shop/rentals/{booking}', [BookingController::class, 'show']);
-        Route::get('/shop/rentals/calendar', [BookingController::class, 'calendar']);
 
         // Device tokens (push notifications)
         Route::post('/device-tokens', [DeviceTokenController::class, 'store']);

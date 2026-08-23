@@ -29,7 +29,7 @@ class BookingController extends Controller
             $query->where('status', $status);
         }
 
-        if ($stage = $request->input('fulfilment_stage')) {
+        if ($stage = $request->input('stage') ?? $request->input('fulfilment_stage')) {
             $query->where('fulfilment_stage', $stage);
         }
 
@@ -107,6 +107,7 @@ class BookingController extends Controller
                 'checkout_inspection' => $booking->checkoutInspection ? [
                     'photos' => $booking->checkoutInspection->photos,
                     'condition_notes' => $booking->checkoutInspection->condition_notes,
+                    'damage_flagged' => $booking->checkoutInspection->damage_flagged,
                     'inspector_name' => $booking->checkoutInspection->inspector?->name,
                     'inspected_at' => $booking->checkoutInspection->inspected_at?->toIso8601String(),
                 ] : null,

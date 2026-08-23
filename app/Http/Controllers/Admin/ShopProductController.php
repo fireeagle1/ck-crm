@@ -99,7 +99,7 @@ class ShopProductController extends Controller
 
     public function edit(Product $product): View
     {
-        $product->load('visibilityRule.customers', 'visibilityRule.tiers');
+        $product->load('visibilityRule.customers', 'visibilityRule.tiers', 'questions');
         $customers = Customer::orderBy('company_name')->get();
         $tiers = CustomerTier::orderBy('name')->get();
 

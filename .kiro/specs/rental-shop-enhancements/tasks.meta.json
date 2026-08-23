@@ -1,0 +1,498 @@
+{
+  "pbtResults": {},
+  "executionHistory": {
+    "1.1 Create `product_questions` migration": [
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787486306173
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787486315071
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787486418361
+      }
+    ],
+    "1.2 Create `question_answers` migration": [
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787486306222
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787486315831
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787486419136
+      }
+    ],
+    "1.3 Create ProductQuestion model": [
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787486306255
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787486422102
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787486468989
+      }
+    ],
+    "1.4 Create QuestionAnswer model": [
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787486306285
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787486422893
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787486469772
+      }
+    ],
+    "1.5 Extend Product model with `questions()` relationship": [
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787486306358
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787486472714
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787486509366
+      }
+    ],
+    "1.6 Extend OrderItem model with `questionAnswers()` relationship": [
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787486306387
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787486473545
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787486510209
+      }
+    ],
+    "2. Checkpoint - Run migrations and verify models": [
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787486306412
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787486525856
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787486615485
+      }
+    ],
+    "3.1 Extend ShopProductController `edit()` to eager-load product questions": [
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787486306438
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787486633059
+      }
+    ],
+    "3.2 Add `syncProductQuestions()` method to ShopProductController": [
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787486306555
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787486633928
+      }
+    ],
+    "3.3 Add Alpine.js product questions UI section to product edit view": [
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787486306582
+      }
+    ],
+    "4.1 Extend checkout view to render product questions": [
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787486306605
+      }
+    ],
+    "4.2 Extend CheckoutService to validate and persist question answers": [
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787486306631
+      }
+    ],
+    "5. Checkpoint - Verify question flow end-to-end": [
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787486306661
+      }
+    ],
+    "6.1 Extend ShopOrderController `show()` to eager-load question answers": [
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787486306692
+      }
+    ],
+    "6.2 Add question answers display section to admin order detail view": [
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787486306721
+      }
+    ],
+    "6.3 Create FulfilmentTimeline Blade component": [
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787486306750
+      }
+    ],
+    "6.4 Add fulfilment timeline to admin order detail view": [
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787486306778
+      }
+    ],
+    "7.1 Add `resendConfirmation()` method to BookingController": [
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787486306806
+      }
+    ],
+    "7.2 Add `advanceStage()` method to BookingController": [
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787486306833
+      }
+    ],
+    "7.3 Add `markReturnedFromList()` method to BookingController": [
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787486306861
+      }
+    ],
+    "7.4 Register admin routes for quick actions": [
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787486306895
+      }
+    ],
+    "7.5 Add quick action buttons to bookings list view": [
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787486306925
+      }
+    ],
+    "8.1 Create InspectionReportPdfService": [
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787486306965
+      }
+    ],
+    "8.2 Create inspection report PDF Blade view": [
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787486306994
+      }
+    ],
+    "8.3 Create BookingInspectionReportController": [
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787486307018
+      }
+    ],
+    "9. Checkpoint - Verify admin features": [
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787486307044
+      }
+    ],
+    "10.1 Extend Portal OrderController `show()` with eager loading": [
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787486307120
+      }
+    ],
+    "10.2 Create portal booking details partial": [
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787486307144
+      }
+    ],
+    "10.3 Create portal inspections partial with photo gallery": [
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787486307170
+      }
+    ],
+    "10.4 Create portal question answers partial": [
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787486307258
+      }
+    ],
+    "10.5 Integrate partials into portal order detail view": [
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787486307298
+      }
+    ],
+    "11.1 Create Portal InspectionPhotoController": [
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787486307331
+      }
+    ],
+    "12.1 Apply responsive Tailwind utilities to portal order detail and partials": [
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787486307376
+      }
+    ],
+    "13. Final checkpoint - Full integration verification": [
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787486307402
+      }
+    ],
+    "14.1 Add signature_data validation rule to inspect endpoint": [
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787486307437
+      }
+    ],
+    "14.2 Store signature on booking after checkout inspection": [
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787486307467
+      }
+    ],
+    "14.3 Display signature on admin order detail": [
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787486307492
+      }
+    ],
+    "15.1 Create MultipartFormData struct": [
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787486307519
+      }
+    ],
+    "15.2 Add uploadMultipart method to APIClient": [
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787486307552
+      }
+    ],
+    "16.1 Create PhotoCaptureStep view": [
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787486307579
+      }
+    ],
+    "16.2 Create ConditionNotesStep view": [
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787486307609
+      }
+    ],
+    "16.3 Create StepProgressBar view": [
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787486307636
+      }
+    ],
+    "16.4 Create DamageFlagStep view": [
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787486307667
+      }
+    ],
+    "17.1 Create SignatureView canvas": [
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787486307693
+      }
+    ],
+    "17.2 Create SignatureStep wrapper": [
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787486307719
+      }
+    ],
+    "18.1 Create CheckoutInspectionViewModel": [
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787486307750
+      }
+    ],
+    "18.2 Create CheckoutInspectionView": [
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787486307777
+      }
+    ],
+    "19.1 Create ReturnInspectionViewModel": [
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787486307809
+      }
+    ],
+    "19.2 Create ReturnInspectionView": [
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787486307836
+      }
+    ],
+    "20.1 Create StageConfig and FulfilmentStageIndicator view": [
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787486307859
+      }
+    ],
+    "21.1 Create StageAction enum and action mapping": [
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787486307886
+      }
+    ],
+    "21.2 Integrate FulfilmentStageIndicator into BookingDetailView": [
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787486307910
+      }
+    ],
+    "21.3 Add stage action buttons to BookingDetailView": [
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787486307941
+      }
+    ],
+    "21.4 Implement sheet presentation for inspection flows": [
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787486307968
+      }
+    ],
+    "21.5 Implement simple API call for advance actions": [
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787486307993
+      }
+    ],
+    "22. Checkpoint - iOS inspection flows complete": [
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787486308020
+      }
+    ],
+    "1. Database migrations and new models": [
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787486510239
+      }
+    ],
+    "1.7 Write property test for display order invariant": [
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787486628650
+      }
+    ],
+    "1.8 Write property test for answer preservation on question modification": [
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787486629588
+      }
+    ]
+  }
+}

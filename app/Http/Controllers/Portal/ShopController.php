@@ -88,6 +88,14 @@ class ShopController extends Controller
                 $maxQuantity = $product->stock_quantity ?? 99;
             }
             $viewData['maxQuantity'] = max(1, (int) $maxQuantity);
+
+            // Pass granular availability data for the visual calendar
+            // bookedUnitsPerDay allows showing partially-booked dates in amber
+            $availabilityService = app(\App\Services\AvailabilityService::class);
+            $bookedUnitsPerDay = $availabilityService->getBookedUnitsPerDay($product, $rangeStart, $rangeEnd);
+            $viewData['bookedUnitsPerDay'] = json_encode($bookedUnitsPerDay);
+            $viewData['totalStock'] = $maxQuantity;
+            $viewData['cooldownDays'] = $product->cooldown_days ?? 0;
         }
 
         // For one_off products, pass delivery instructions and max quantity
