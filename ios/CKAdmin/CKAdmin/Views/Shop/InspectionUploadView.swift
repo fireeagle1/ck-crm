@@ -184,7 +184,7 @@ struct InspectionUploadView: View {
             request.httpMethod = "POST"
             request.setValue("application/json", forHTTPHeaderField: "Accept")
 
-            if let token = await getToken() {
+            if let token = getToken() {
                 request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
             }
 

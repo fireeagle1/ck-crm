@@ -131,7 +131,7 @@ struct PackingScanView: View {
         lastError = nil
 
         // Parse CMDB-{id} format
-        guard let match = code.range(of: #"^CMDB-(\d+)$"#, options: .regularExpression) else {
+        guard code.range(of: #"^CMDB-(\d+)$"#, options: .regularExpression) != nil else {
             lastError = "Not an asset code: \(code)"
             return
         }

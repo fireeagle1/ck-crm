@@ -156,6 +156,22 @@
                             </div>
                         </td>
                     </tr>
+
+                    {{-- Question Answers Row --}}
+                    @if($booking->orderItem && $booking->orderItem->questionAnswers->isNotEmpty())
+                        <tr class="bg-indigo-50/50">
+                            <td colspan="8" class="px-4 py-2">
+                                <div class="flex flex-wrap gap-x-6 gap-y-1">
+                                    @foreach($booking->orderItem->questionAnswers as $answer)
+                                        <span class="text-xs text-gray-700">
+                                            <strong class="text-gray-500">{{ $answer->question_label }}:</strong>
+                                            {{ $answer->answer_value ?: '—' }}
+                                        </span>
+                                    @endforeach
+                                </div>
+                            </td>
+                        </tr>
+                    @endif
                 @empty
                     <tr>
                         <td colspan="8" class="px-4 py-6 text-center text-gray-500">No bookings found.</td>

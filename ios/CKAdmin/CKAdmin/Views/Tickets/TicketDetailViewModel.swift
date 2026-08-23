@@ -62,7 +62,7 @@ final class TicketDetailViewModel {
         isUpdating = true; errorMessage = nil
         do {
             let endpoint = Endpoint(method: .put, path: "/admin/tickets/\(ticketId)", body: request)
-            let response: TicketUpdateResponse = try await apiClient.request(endpoint)
+            let _: TicketUpdateResponse = try await apiClient.request(endpoint)
             // Reload full detail to get activities
             await loadTicket()
             successMessage = "Ticket updated."
