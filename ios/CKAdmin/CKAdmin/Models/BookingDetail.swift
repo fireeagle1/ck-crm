@@ -20,11 +20,13 @@ struct BookingDetail: Decodable {
     let assignedAssets: [AssignedAsset]
     let checkoutInspection: InspectionRecord?
     let returnInspection: InspectionRecord?
+    let agreementText: String?
 
     enum CodingKeys: String, CodingKey {
         case id, productName, customerName, orderId, startDate, endDate
         case quantity, totalPrice, status, fulfilmentStage, returnedAt
         case nextStage, preConditions, assignedAssets, checkoutInspection, returnInspection
+        case agreementText
     }
 
     init(from decoder: Decoder) throws {
@@ -44,6 +46,7 @@ struct BookingDetail: Decodable {
         assignedAssets = try container.decodeIfPresent([AssignedAsset].self, forKey: .assignedAssets) ?? []
         checkoutInspection = try container.decodeIfPresent(InspectionRecord.self, forKey: .checkoutInspection)
         returnInspection = try container.decodeIfPresent(InspectionRecord.self, forKey: .returnInspection)
+        agreementText = try container.decodeIfPresent(String.self, forKey: .agreementText)
 
         if let p = try? container.decode(Double.self, forKey: .totalPrice) {
             totalPrice = p

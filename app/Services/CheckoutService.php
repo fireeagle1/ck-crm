@@ -7,6 +7,7 @@ use App\Models\Customer;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
+use App\Models\QuestionAnswer;
 use App\Models\Service;
 use App\ValueObjects\CheckoutResult;
 use Carbon\Carbon;
@@ -107,6 +108,18 @@ class CheckoutService
 
                 // Create OrderItems
                 $orderItems = $this->createOrderItems($order, $cartItems);
+
+                // Store question answers for each order item
+                $answers = $checkoutOptions['answers'] ?? [];
+                foreach ($cartItems as $index => $item) {
+                    $productAnswers = $answers[$item['product_id']] ?? [];
+                    if (!empty($productAnswers)) {
+                        $product = Product::with('questions')->find($item['product_id']);
+                        if ($product) {
+                            $this->storeQuestionAnswers($orderItems[$index], $productAnswers, $product);
+                        }
+                    }
+                }
 
                 // Handle hosting items: create pending Services
                 $this->handleHostingItems($order, $orderItems, $cartItems, $customer);
@@ -720,5 +733,39 @@ class CheckoutService
 
             return $order;
         });
+    }
+
+    /**
+     * Store question answers for an order item, snapshotting question label and type.
+     *
+     * Skips storage entirely if the product has no questions configured.
+     * Skips individual answers that are optional and empty.
+     *
+     * @param OrderItem $orderItem The order item to attach answers to.
+     * @param array $answers Associative array of question_id => answer_value.
+     * @param Product $product The product (with questions loaded).
+     */
+    private function storeQuestionAnswers(OrderItem $orderItem, array $answers, Product $product): void
+    {
+        if ($product->questions->isEmpty()) {
+            return;
+        }
+
+        foreach ($product->questions as $question) {
+            $value = $answers[$question->id] ?? null;
+
+            // Skip if optional and empty
+            if (!$question->is_required && empty($value)) {
+                continue;
+            }
+
+            QuestionAnswer::create([
+                'order_item_id' => $orderItem->id,
+                'product_question_id' => $question->id,
+                'answer_value' => $value,
+                'question_label' => $question->label,
+                'question_type' => $question->input_type,
+            ]);
+        }
     }
 }

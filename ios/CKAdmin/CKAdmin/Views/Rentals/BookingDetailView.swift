@@ -10,6 +10,10 @@ struct BookingDetailView: View {
     @State private var booking: BookingDetail?
     @State private var isLoading = true
     @State private var errorMessage: String?
+    @State private var showCheckoutInspection = false
+    @State private var showReturnInspection = false
+    @State private var isAdvancing = false
+    @State private var advanceError: String?
 
     var body: some View {
         Group {
@@ -33,6 +37,8 @@ struct BookingDetailView: View {
     private func content(_ booking: BookingDetail) -> some View {
         List {
             bookingInfoSection(booking)
+            fulfilmentStageSection(booking)
+            stageActionsSection(booking)
             assignedAssetsSection(booking)
             if let inspection = booking.checkoutInspection {
                 inspectionSection(title: "Checkout Inspection", inspection: inspection)
@@ -45,6 +51,78 @@ struct BookingDetailView: View {
         .scrollContentBackground(.hidden)
         .background(CKTheme.backgroundPrimary)
         .refreshable { await loadBooking() }
+        .overlay {
+            if isAdvancing {
+                ProgressView("Advancing…")
+                    .padding()
+                    .background(.ultraThinMaterial)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+            }
+        }
+        .sheet(isPresented: $showCheckoutInspection) {
+            CheckoutInspectionView(
+                orderId: booking.orderId ?? 0,
+                bookingId: bookingId,
+                agreementText: booking.agreementText,
+                apiClient: apiClient,
+                onComplete: { Task { await loadBooking() } }
+            )
+        }
+        .sheet(isPresented: $showReturnInspection) {
+            ReturnInspectionView(
+                orderId: booking.orderId ?? 0,
+                bookingId: bookingId,
+                apiClient: apiClient,
+                onComplete: { Task { await loadBooking() } }
+            )
+        }
+        .alert("Error", isPresented: showAdvanceErrorBinding) {
+            Button("OK") { advanceError = nil }
+        } message: {
+            Text(advanceError ?? "An unknown error occurred.")
+        }
+    }
+
+    // MARK: - Fulfilment Stage Section
+
+    private func fulfilmentStageSection(_ booking: BookingDetail) -> some View {
+        Section {
+            FulfilmentStageIndicator(currentStage: booking.fulfilmentStage)
+        } header: {
+            Text("Fulfilment Progress")
+                .font(CKTypography.callout)
+                .foregroundStyle(CKTheme.textSecondary)
+        }
+        .listRowBackground(CKTheme.backgroundCard)
+    }
+
+    // MARK: - Stage Actions Section
+
+    private func stageActionsSection(_ booking: BookingDetail) -> some View {
+        let actions = StageAction.actions(for: booking.fulfilmentStage)
+
+        return Group {
+            if !actions.isEmpty {
+                Section {
+                    ForEach(actions) { action in
+                        Button {
+                            handleAction(action)
+                        } label: {
+                            Label(action.title, systemImage: action.icon)
+                                .frame(maxWidth: .infinity)
+                        }
+                        .buttonStyle(action.isPrimary ? .borderedProminent : .bordered)
+                        .tint(action.isPrimary ? CKTheme.accent : nil)
+                        .controlSize(.large)
+                    }
+                } header: {
+                    Text("Actions")
+                        .font(CKTypography.callout)
+                        .foregroundStyle(CKTheme.textSecondary)
+                }
+                .listRowBackground(CKTheme.backgroundCard)
+            }
+        }
     }
 
     // MARK: - Booking Info Section
@@ -208,6 +286,46 @@ struct BookingDetailView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(CKTheme.backgroundPrimary)
+    }
+
+    // MARK: - Action Handling
+
+    private func handleAction(_ action: StageAction) {
+        switch action {
+        case .checkOut:
+            showCheckoutInspection = true
+        case .returnInspection, .completeInspection:
+            showReturnInspection = true
+        case .advanceToPacking, .markReady, .markReturned:
+            Task { await advanceStage() }
+        }
+    }
+
+    @MainActor
+    private func advanceStage() async {
+        guard let booking else { return }
+        isAdvancing = true
+        do {
+            let _: MessageResponse = try await apiClient.request(
+                Endpoint(
+                    method: .post,
+                    path: "/admin/shop/orders/\(booking.orderId ?? 0)/bookings/\(bookingId)/advance-stage"
+                )
+            )
+            await loadBooking()
+        } catch let error as APIError {
+            advanceError = error.errorDescription
+        } catch {
+            advanceError = "Failed to advance stage."
+        }
+        isAdvancing = false
+    }
+
+    private var showAdvanceErrorBinding: Binding<Bool> {
+        Binding(
+            get: { advanceError != nil },
+            set: { if !$0 { advanceError = nil } }
+        )
     }
 
     // MARK: - Data Loading

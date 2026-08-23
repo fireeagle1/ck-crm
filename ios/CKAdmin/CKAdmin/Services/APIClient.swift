@@ -270,6 +270,62 @@ final class APIClient {
     }
 }
 
+// MARK: - Multipart Upload
+
+extension APIClient {
+
+    /// Uploads multipart form data to the given path and decodes the response.
+    ///
+    /// - Parameters:
+    ///   - path: The API path (without `/api` prefix — it is added automatically).
+    ///   - formData: The multipart form data to upload.
+    /// - Returns: The decoded response of type `T`.
+    /// - Throws: `APIError` if the request fails.
+    @MainActor
+    func uploadMultipart<T: Decodable>(path: String, formData: MultipartFormData) async throws -> T {
+        let components = URLComponents(
+            url: baseURL.appendingPathComponent("/api\(path)"),
+            resolvingAgainstBaseURL: false
+        )
+
+        guard let url = components?.url else {
+            throw APIError.invalidResponse
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue(formData.contentType, forHTTPHeaderField: "Content-Type")
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+
+        if let token = authManager.token {
+            request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        }
+
+        request.httpBody = formData.buildBody()
+
+        let data: Data
+        let response: URLResponse
+
+        do {
+            (data, response) = try await session.data(for: request)
+        } catch {
+            throw APIError.networkError(error)
+        }
+
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw APIError.invalidResponse
+        }
+
+        try await handleStatusCode(httpResponse.statusCode, data: data)
+
+        do {
+            return try decoder.decode(T.self, from: data)
+        } catch {
+            throw APIError.invalidResponse
+        }
+    }
+}
+
 // MARK: - AnyEncodable
 
 /// Type-erased Encodable wrapper to allow encoding `any Encodable` values.

@@ -102,7 +102,48 @@
                             </span>
                         </td>
                         <td class="px-4 py-3 text-right">
-                            <a href="{{ route('admin.shop.bookings.show', $booking) }}" class="text-blue-600 hover:underline text-sm font-medium">View</a>
+                            <div class="flex items-center justify-end gap-2 flex-wrap">
+                                <a href="{{ route('admin.shop.bookings.show', $booking) }}" class="text-blue-600 hover:underline text-sm font-medium">View</a>
+
+                                {{-- Resend Confirmation (always visible) --}}
+                                <form method="POST" action="{{ route('admin.bookings.resend-confirmation', $booking) }}">
+                                    @csrf
+                                    <button type="submit" class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded hover:bg-blue-200">
+                                        Resend Confirmation
+                                    </button>
+                                </form>
+
+                                {{-- Advance Stage (hidden at final stage "inspected") --}}
+                                @if($booking->fulfilment_stage !== 'inspected')
+                                    @php $nextStage = app(\App\Services\FulfilmentStageService::class)->getNextStage($booking); @endphp
+                                    @if($nextStage)
+                                        <form method="POST" action="{{ route('admin.bookings.advance-stage', $booking) }}">
+                                            @csrf
+                                            <button type="submit" class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded hover:bg-green-200">
+                                                Advance &rarr; {{ ucfirst(str_replace('_', ' ', $nextStage)) }}
+                                            </button>
+                                        </form>
+                                    @endif
+                                @endif
+
+                                {{-- Mark Returned (only when checked_out) --}}
+                                @if($booking->fulfilment_stage === 'checked_out')
+                                    <form method="POST" action="{{ route('admin.bookings.mark-returned-list', $booking) }}">
+                                        @csrf
+                                        <button type="submit" class="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded hover:bg-yellow-200">
+                                            Mark Returned
+                                        </button>
+                                    </form>
+                                @endif
+
+                                {{-- Download Inspection Report (only when inspections exist) --}}
+                                @if($booking->inspections_count > 0)
+                                    <a href="{{ route('admin.bookings.inspection-report', $booking) }}"
+                                       class="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded hover:bg-purple-200">
+                                        Download Inspection Report
+                                    </a>
+                                @endif
+                            </div>
                         </td>
                     </tr>
                 @empty

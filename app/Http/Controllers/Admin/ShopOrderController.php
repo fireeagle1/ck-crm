@@ -96,6 +96,7 @@ class ShopOrderController extends Controller
             'items.booking.inspections.inspector',
             'items.booking.checkoutInspection',
             'items.booking.returnInspection',
+            'items.questionAnswers',
         ]);
 
         // For each rental booking, gather fulfilment context
@@ -358,6 +359,7 @@ class ShopOrderController extends Controller
             'photos.*' => 'required|image|mimes:jpeg,png,jpg|max:10240',
             'condition_notes' => 'nullable|string|max:2000',
             'damage_flagged' => 'nullable|boolean',
+            'signature_data' => 'nullable|string|max:500000',
         ]);
 
         $photos = $request->file('photos');
@@ -389,6 +391,9 @@ class ShopOrderController extends Controller
                 $this->bookingInspectionService->createCheckoutInspection(
                     $booking, $photos, $notes, $adminId
                 );
+
+                // Store signature data on booking (if provided)
+                $booking->update(['signature_data' => $validated['signature_data'] ?? null]);
 
                 if ($booking->fulfilment_stage === 'ready') {
                     $this->fulfilmentStageService->advance($booking, 'checked_out');

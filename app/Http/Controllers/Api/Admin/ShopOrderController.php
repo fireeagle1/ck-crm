@@ -262,6 +262,7 @@ class ShopOrderController extends Controller
             'photos.*' => 'required|image|mimes:jpeg,png,jpg|max:10240',
             'condition_notes' => 'nullable|string|max:2000',
             'damage_flagged' => 'nullable|boolean',
+            'signature_data' => 'nullable|string|max:500000',
         ]);
 
         $photos = $request->file('photos');
@@ -287,6 +288,9 @@ class ShopOrderController extends Controller
                 return response()->json(['message' => 'Return inspection recorded.', 'fulfilment_stage' => 'inspected']);
             } else {
                 $this->bookingInspectionService->createCheckoutInspection($booking, $photos, $notes, $adminId);
+
+                // Store signature data on booking (if provided)
+                $booking->update(['signature_data' => $validated['signature_data'] ?? null]);
 
                 if ($booking->fulfilment_stage === 'ready') {
                     $this->fulfilmentStageService->advance($booking, 'checked_out');

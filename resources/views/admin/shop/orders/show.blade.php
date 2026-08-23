@@ -1,10 +1,6 @@
 <x-admin-layout>
     <x-slot:title>Order #{{ $order->id }}</x-slot:title>
 
-    @php
-        $stages = \App\Services\FulfilmentStageService::STAGES;
-    @endphp
-
     <div class="flex items-center justify-between mb-4">
         <h1 class="text-2xl font-semibold">Order #{{ $order->id }}</h1>
         <a href="{{ route('admin.shop.orders.index') }}" class="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-md text-sm font-medium hover:bg-gray-200 border">
@@ -144,6 +140,23 @@
                                     </td>
                                 </tr>
                             @endif
+                            @if ($item->questionAnswers && $item->questionAnswers->isNotEmpty())
+                                <tr>
+                                    <td colspan="4" class="px-4 py-3">
+                                        <div class="mt-1 border-t pt-3">
+                                            <h5 class="text-sm font-medium text-gray-600 mb-2">Customer Responses</h5>
+                                            <dl class="grid grid-cols-1 gap-2">
+                                                @foreach($item->questionAnswers as $answer)
+                                                    <div>
+                                                        <dt class="text-xs text-gray-500">{{ $answer->question_label }}</dt>
+                                                        <dd class="text-sm text-gray-900">{{ $answer->answer_value ?: '—' }}</dd>
+                                                    </div>
+                                                @endforeach
+                                            </dl>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endif
                         @endforeach
                     </tbody>
                     <tfoot class="border-t bg-gray-50">
@@ -166,7 +179,6 @@
                     $availableAssets = $ctx['availableAssets'] ?? collect();
                     $nextStage = $ctx['nextStage'] ?? null;
                     $preConditions = $ctx['preConditions'] ?? [];
-                    $currentStageIndex = array_search($booking->fulfilment_stage, $stages);
                 @endphp
                 <div class="bg-white rounded-lg shadow-sm border overflow-hidden">
                     <div class="px-4 py-3 border-b bg-purple-50 flex items-center justify-between">
@@ -219,24 +231,11 @@
                             {{-- Fulfilment Timeline --}}
                             <div>
                                 <p class="text-xs font-medium text-gray-500 uppercase mb-2">Fulfilment Progress</p>
-                                <ol class="relative border-l border-gray-200 ml-3 space-y-3">
-                                    @foreach ($stages as $index => $stage)
-                                        @php
-                                            $isCompleted = $index < $currentStageIndex;
-                                            $isCurrent = $index === $currentStageIndex;
-                                            $dotColor = $isCompleted ? 'bg-green-500' : ($isCurrent ? 'bg-blue-500' : 'bg-gray-300');
-                                            $textColor = $isCompleted ? 'text-green-700' : ($isCurrent ? 'text-blue-700 font-semibold' : 'text-gray-400');
-                                        @endphp
-                                        <li class="ml-5">
-                                            <span class="absolute -left-1.5 flex items-center justify-center w-3 h-3 rounded-full {{ $dotColor }}">
-                                                @if ($isCompleted)
-                                                    <svg class="w-2 h-2 text-white" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
-                                                @endif
-                                            </span>
-                                            <span class="text-xs {{ $textColor }}">{{ ucwords(str_replace('_', ' ', $stage)) }}</span>
-                                        </li>
-                                    @endforeach
-                                </ol>
+                                <x-fulfilment-timeline
+                                    :current-stage="$booking->fulfilment_stage"
+                                    :labels="\App\View\Components\FulfilmentTimeline::ADMIN_STAGE_LABELS"
+                                    layout="horizontal"
+                                />
                             </div>
                         </div>
 

@@ -164,6 +164,11 @@
         "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
         "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
         "timestamp": 1787486718512
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787486823794
       }
     ],
     "4.1 Extend checkout view to render product questions": [
@@ -171,6 +176,16 @@
         "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
         "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
         "timestamp": 1787486306605
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787486836090
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787487277064
       }
     ],
     "4.2 Extend CheckoutService to validate and persist question answers": [
@@ -178,6 +193,16 @@
         "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
         "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
         "timestamp": 1787486306631
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787487285831
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787487454976
       }
     ],
     "5. Checkpoint - Verify question flow end-to-end": [
@@ -185,6 +210,11 @@
         "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
         "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
         "timestamp": 1787486306661
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787487465511
       }
     ],
     "6.1 Extend ShopOrderController `show()` to eager-load question answers": [
@@ -192,6 +222,16 @@
         "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
         "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
         "timestamp": 1787486306692
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787486836906
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787487277979
       }
     ],
     "6.2 Add question answers display section to admin order detail view": [
@@ -199,6 +239,16 @@
         "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
         "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
         "timestamp": 1787486306721
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787487285860
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787487455839
       }
     ],
     "6.3 Create FulfilmentTimeline Blade component": [
@@ -211,6 +261,11 @@
         "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
         "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
         "timestamp": 1787486719318
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787486824565
       }
     ],
     "6.4 Add fulfilment timeline to admin order detail view": [
@@ -218,6 +273,16 @@
         "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
         "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
         "timestamp": 1787486306778
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787487285889
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787487456679
       }
     ],
     "7.1 Add `resendConfirmation()` method to BookingController": [
@@ -225,6 +290,16 @@
         "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
         "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
         "timestamp": 1787486306806
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787486838807
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787487278831
       }
     ],
     "7.2 Add `advanceStage()` method to BookingController": [
@@ -232,6 +307,16 @@
         "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
         "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
         "timestamp": 1787486306833
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787486838863
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787487279681
       }
     ],
     "7.3 Add `markReturnedFromList()` method to BookingController": [
@@ -239,6 +324,16 @@
         "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
         "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
         "timestamp": 1787486306861
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787486839363
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787487280511
       }
     ],
     "7.4 Register admin routes for quick actions": [
@@ -246,6 +341,16 @@
         "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
         "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
         "timestamp": 1787486306895
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787487286679
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787487457485
       }
     ],
     "7.5 Add quick action buttons to bookings list view": [
@@ -253,6 +358,16 @@
         "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
         "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
         "timestamp": 1787486306925
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787487466345
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787487565058
       }
     ],
     "8.1 Create InspectionReportPdfService": [
@@ -260,6 +375,16 @@
         "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
         "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
         "timestamp": 1787486306965
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787487580767
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787487697696
       }
     ],
     "8.2 Create inspection report PDF Blade view": [
@@ -267,6 +392,16 @@
         "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
         "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
         "timestamp": 1787486306994
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787487701326
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787487838858
       }
     ],
     "8.3 Create BookingInspectionReportController": [
@@ -274,6 +409,16 @@
         "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
         "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
         "timestamp": 1787486307018
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787487702170
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787487839725
       }
     ],
     "9. Checkpoint - Verify admin features": [
@@ -281,6 +426,11 @@
         "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
         "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
         "timestamp": 1787486307044
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787487844758
       }
     ],
     "10.1 Extend Portal OrderController `show()` with eager loading": [
@@ -288,6 +438,16 @@
         "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
         "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
         "timestamp": 1787486307120
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787487848036
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787487920724
       }
     ],
     "10.2 Create portal booking details partial": [
@@ -295,6 +455,16 @@
         "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
         "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
         "timestamp": 1787486307144
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787487924441
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787488083374
       }
     ],
     "10.3 Create portal inspections partial with photo gallery": [
@@ -302,6 +472,16 @@
         "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
         "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
         "timestamp": 1787486307170
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787487925197
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787488082581
       }
     ],
     "10.4 Create portal question answers partial": [
@@ -309,6 +489,16 @@
         "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
         "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
         "timestamp": 1787486307258
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787487926036
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787488081746
       }
     ],
     "10.5 Integrate partials into portal order detail view": [
@@ -316,6 +506,16 @@
         "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
         "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
         "timestamp": 1787486307298
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787488086699
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787488265357
       }
     ],
     "11.1 Create Portal InspectionPhotoController": [
@@ -323,6 +523,16 @@
         "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
         "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
         "timestamp": 1787486307331
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787488273223
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787488352999
       }
     ],
     "12.1 Apply responsive Tailwind utilities to portal order detail and partials": [
@@ -330,6 +540,16 @@
         "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
         "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
         "timestamp": 1787486307376
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787488357414
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787488538269
       }
     ],
     "13. Final checkpoint - Full integration verification": [
@@ -337,6 +557,11 @@
         "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
         "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
         "timestamp": 1787486307402
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787488360892
       }
     ],
     "14.1 Add signature_data validation rule to inspect endpoint": [
@@ -344,6 +569,16 @@
         "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
         "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
         "timestamp": 1787486307437
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787488358223
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787488539093
       }
     ],
     "14.2 Store signature on booking after checkout inspection": [
@@ -351,6 +586,16 @@
         "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
         "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
         "timestamp": 1787486307467
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787488364907
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787488539993
       }
     ],
     "14.3 Display signature on admin order detail": [
@@ -358,6 +603,16 @@
         "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
         "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
         "timestamp": 1787486307492
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787488365682
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787488546196
       }
     ],
     "15.1 Create MultipartFormData struct": [
@@ -365,6 +620,16 @@
         "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
         "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
         "timestamp": 1787486307519
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787488358976
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787488540970
       }
     ],
     "15.2 Add uploadMultipart method to APIClient": [
@@ -372,6 +637,16 @@
         "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
         "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
         "timestamp": 1787486307552
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787488366499
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787488547184
       }
     ],
     "16.1 Create PhotoCaptureStep view": [
@@ -379,6 +654,16 @@
         "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
         "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
         "timestamp": 1787486307579
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787488551295
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787488739057
       }
     ],
     "16.2 Create ConditionNotesStep view": [
@@ -386,6 +671,16 @@
         "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
         "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
         "timestamp": 1787486307609
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787488552059
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787488738293
       }
     ],
     "16.3 Create StepProgressBar view": [
@@ -393,6 +688,16 @@
         "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
         "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
         "timestamp": 1787486307636
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787488552858
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787488737450
       }
     ],
     "16.4 Create DamageFlagStep view": [
@@ -400,6 +705,16 @@
         "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
         "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
         "timestamp": 1787486307667
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787488553601
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787488736652
       }
     ],
     "17.1 Create SignatureView canvas": [
@@ -407,6 +722,16 @@
         "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
         "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
         "timestamp": 1787486307693
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787488743193
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787488825212
       }
     ],
     "17.2 Create SignatureStep wrapper": [
@@ -414,6 +739,16 @@
         "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
         "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
         "timestamp": 1787486307719
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787488743956
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787488824454
       }
     ],
     "18.1 Create CheckoutInspectionViewModel": [
@@ -421,6 +756,16 @@
         "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
         "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
         "timestamp": 1787486307750
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787488829170
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787489012294
       }
     ],
     "18.2 Create CheckoutInspectionView": [
@@ -428,6 +773,16 @@
         "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
         "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
         "timestamp": 1787486307777
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787489016846
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787489206429
       }
     ],
     "19.1 Create ReturnInspectionViewModel": [
@@ -435,6 +790,16 @@
         "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
         "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
         "timestamp": 1787486307809
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787488829970
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787489013036
       }
     ],
     "19.2 Create ReturnInspectionView": [
@@ -442,6 +807,16 @@
         "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
         "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
         "timestamp": 1787486307836
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787489017636
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787489207180
       }
     ],
     "20.1 Create StageConfig and FulfilmentStageIndicator view": [
@@ -449,6 +824,16 @@
         "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
         "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
         "timestamp": 1787486307859
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787488359840
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787488541926
       }
     ],
     "21.1 Create StageAction enum and action mapping": [
@@ -456,6 +841,16 @@
         "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
         "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
         "timestamp": 1787486307886
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787489211354
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787489304210
       }
     ],
     "21.2 Integrate FulfilmentStageIndicator into BookingDetailView": [
@@ -463,6 +858,16 @@
         "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
         "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
         "timestamp": 1787486307910
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787489308321
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787489385785
       }
     ],
     "21.3 Add stage action buttons to BookingDetailView": [
@@ -470,6 +875,16 @@
         "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
         "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
         "timestamp": 1787486307941
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787489309134
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787489386592
       }
     ],
     "21.4 Implement sheet presentation for inspection flows": [
@@ -477,6 +892,16 @@
         "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
         "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
         "timestamp": 1787486307968
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787489391376
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787489550168
       }
     ],
     "21.5 Implement simple API call for advance actions": [
@@ -484,6 +909,16 @@
         "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
         "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
         "timestamp": 1787486307993
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787489390570
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787489550917
       }
     ],
     "22. Checkpoint - iOS inspection flows complete": [
@@ -491,6 +926,11 @@
         "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
         "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
         "timestamp": 1787486308020
+      },
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787489554909
       }
     ],
     "1. Database migrations and new models": [
@@ -512,6 +952,202 @@
         "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
         "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
         "timestamp": 1787486629588
+      }
+    ],
+    "3. Admin product question management": [
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787486823860
+      }
+    ],
+    "3.4 Write unit tests for syncProductQuestions logic": [
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787486832219
+      }
+    ],
+    "4. Checkout question collection": [
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787487455013
+      }
+    ],
+    "6. Admin order detail — answer display and fulfilment timeline": [
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787487456713
+      }
+    ],
+    "7. Admin bookings list — quick action buttons": [
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787487565096
+      }
+    ],
+    "4.3 Write property test for checkout validation respects required flag": [
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787487572178
+      }
+    ],
+    "4.4 Write property test for question answer round-trip persistence": [
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787487573092
+      }
+    ],
+    "4.5 Write property test for input type to HTML control mapping": [
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787487574136
+      }
+    ],
+    "6.5 Write property test for fulfilment timeline stage styling": [
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787487575058
+      }
+    ],
+    "6.6 Write property test for question answers grouped under correct order item": [
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787487576150
+      }
+    ],
+    "7.6 Write property tests for button visibility conditions": [
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787487577069
+      }
+    ],
+    "8. Inspection Report PDF": [
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787487839765
+      }
+    ],
+    "8.4 Write property test for inspection report PDF content completeness": [
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787487843851
+      }
+    ],
+    "10. Portal order detail enhancements": [
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787488265408
+      }
+    ],
+    "10.6 Write property test for portal rental booking detail display": [
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787488269574
+      }
+    ],
+    "10.7 Write property test for portal inspection privacy filter": [
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787488270547
+      }
+    ],
+    "10.8 Write property test for portal inspection display completeness": [
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787488271359
+      }
+    ],
+    "10.9 Write property test for customer-facing stage label mapping": [
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787488272366
+      }
+    ],
+    "11. Portal inspection photo access route": [
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787488353032
+      }
+    ],
+    "12. Mobile responsiveness pass": [
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787488538325
+      }
+    ],
+    "20. iOS: FulfilmentStageIndicator component": [
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787488541976
+      }
+    ],
+    "14. Backend: Extend inspect endpoint to accept signature data": [
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787488546237
+      }
+    ],
+    "15. iOS: MultipartFormData helper + APIClient extension": [
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787488547223
+      }
+    ],
+    "16. iOS: Shared inspection components": [
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787488739099
+      }
+    ],
+    "17. iOS: SignatureView + SignatureStep": [
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787488825269
+      }
+    ],
+    "18. iOS: CheckoutInspectionView + ViewModel": [
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787489206478
+      }
+    ],
+    "19. iOS: ReturnInspectionView + ViewModel": [
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787489207226
+      }
+    ],
+    "21. iOS: Stage action buttons on BookingDetailView": [
+      {
+        "executionId": "001b7054-e82e-4fc1-86d0-0f79aa2f00ed",
+        "chatSessionId": "sess_dd18c7fa-295c-4989-8130-286d4f40a3d3",
+        "timestamp": 1787489550958
       }
     ]
   }

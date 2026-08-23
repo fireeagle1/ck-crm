@@ -94,6 +94,9 @@ Route::middleware(['auth', 'verified'])->prefix('portal')->name('portal.')->grou
     // Bookings (AJAX availability endpoints)
     Route::post('/bookings/check-availability', [Portal\BookingController::class, 'checkAvailability'])->name('bookings.checkAvailability');
     Route::get('/bookings/unavailable-dates', [Portal\BookingController::class, 'getUnavailableDates'])->name('bookings.unavailableDates');
+
+    // Inspection photos
+    Route::get('/inspection-photo/{path}', [Portal\InspectionPhotoController::class, 'show'])->where('path', '.*')->name('inspection-photo');
 });
 
 /*
@@ -242,6 +245,12 @@ Route::middleware(['auth', 'verified', EnsureIsAdmin::class])->prefix('admin')->
     Route::patch('shop/bookings/{booking}/returned', [Admin\BookingController::class, 'markReturned'])->name('shop.bookings.markReturned');
     Route::get('shop/bookings/{booking}/download-confirmation', [Admin\BookingController::class, 'downloadConfirmation'])->name('shop.bookings.downloadConfirmation');
     Route::get('shop/bookings/inspection-photo/{path}', [Admin\BookingController::class, 'inspectionPhoto'])->where('path', '.*')->name('shop.bookings.inspectionPhoto');
+
+    // Booking Quick Actions
+    Route::post('bookings/{booking}/resend-confirmation', [Admin\BookingController::class, 'resendConfirmation'])->name('bookings.resend-confirmation');
+    Route::post('bookings/{booking}/advance-stage', [Admin\BookingController::class, 'advanceStage'])->name('bookings.advance-stage');
+    Route::post('bookings/{booking}/mark-returned-list', [Admin\BookingController::class, 'markReturnedFromList'])->name('bookings.mark-returned-list');
+    Route::get('bookings/{booking}/inspection-report', [Admin\BookingInspectionReportController::class, 'download'])->name('bookings.inspection-report');
 
     Route::resource('shop/tiers', Admin\CustomerTierController::class)->except(['show', 'edit', 'create'])->names('shop.tiers');
 

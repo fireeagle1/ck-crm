@@ -12,13 +12,53 @@ use Illuminate\Support\Facades\Storage;
 class InspectionReportPdfService
 {
     /**
+     * Generate an inspection report PDF for a booking containing all inspections.
+     * Returns the PDF instance for streaming (not stored).
+     */
+    public function generate(Booking $booking): \Barryvdh\DomPDF\PDF
+    {
+        $booking->loadMissing(['product', 'customer', 'inspections.inspector']);
+
+        $inspections = $booking->inspections->sortBy('inspected_at');
+
+        // Build photo data URIs for each inspection
+        $inspectionsWithPhotos = $inspections->map(function (BookingInspection $inspection) {
+            return [
+                'inspection' => $inspection,
+                'photos' => $this->buildPhotoDataUris($inspection->photos ?? []),
+            ];
+        });
+
+        // Load logo as base64 for embedding
+        $logoBase64 = $this->getLogoBase64();
+
+        $data = [
+            'booking' => $booking,
+            'customer' => $booking->customer,
+            'product' => $booking->product,
+            'inspections' => $inspections,
+            'inspectionsWithPhotos' => $inspectionsWithPhotos,
+            'companyName' => Setting::get('company_name', config('app.name', 'Company')),
+            'companyAddress' => Setting::get('company_address', ''),
+            'companyPhone' => Setting::get('company_phone', ''),
+            'companyEmail' => Setting::get('company_email', ''),
+            'logoBase64' => $logoBase64,
+        ];
+
+        $pdf = Pdf::loadView('pdf.inspection-report', $data);
+        $pdf->setPaper('A4', 'portrait');
+
+        return $pdf;
+    }
+
+    /**
      * Generate a return inspection report PDF and store it.
      *
      * Returns the relative storage path on success, null on failure.
      * The PDF includes inspection photos, condition notes, damage status,
      * and booking/customer details.
      */
-    public function generate(Booking $booking, BookingInspection $inspection): ?string
+    public function generateAndStore(Booking $booking, BookingInspection $inspection): ?string
     {
         $booking->loadMissing(['product', 'customer', 'orderItem.order']);
         $inspection->loadMissing('inspector');

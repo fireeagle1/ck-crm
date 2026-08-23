@@ -78,7 +78,7 @@
             @if ($order->invoice_pdf_path)
                 <div class="mt-4 pt-4 border-t">
                     <a href="{{ route('portal.orders.downloadInvoice', $order) }}"
-                       class="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-md text-sm font-medium hover:bg-indigo-700 transition">
+                       class="inline-flex items-center gap-2 min-w-[44px] min-h-[44px] px-4 py-2 bg-indigo-600 text-white rounded-md text-sm font-medium hover:bg-indigo-700 transition">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                         </svg>
@@ -115,6 +115,7 @@
     {{-- Order Items --}}
     <div class="bg-white rounded-lg shadow-sm border overflow-hidden mb-6">
         <h2 class="text-sm font-semibold text-gray-500 uppercase px-4 py-3 border-b bg-gray-50">Items</h2>
+        <div class="overflow-x-auto">
         <table class="min-w-full text-sm">
             <thead class="bg-gray-50 border-b">
                 <tr>
@@ -172,6 +173,24 @@
                             </td>
                         </tr>
                     @endif
+
+                    {{-- Rental booking details (Req 8.1, 10.6) --}}
+                    @if ($item->product_type === 'equipment_rental' && $item->booking)
+                        <tr>
+                            <td colspan="5" class="px-4 py-3">
+                                @include('portal.orders.partials.booking-details', ['booking' => $item->booking])
+                            </td>
+                        </tr>
+                    @endif
+
+                    {{-- Question answers (Req 11.3) --}}
+                    @if ($item->questionAnswers && $item->questionAnswers->isNotEmpty())
+                        <tr>
+                            <td colspan="5" class="px-4 py-3">
+                                @include('portal.orders.partials.question-answers', ['answers' => $item->questionAnswers])
+                            </td>
+                        </tr>
+                    @endif
                 @endforeach
             </tbody>
             <tfoot class="border-t bg-gray-50">
@@ -181,102 +200,7 @@
                 </tr>
             </tfoot>
         </table>
+        </div>
     </div>
 
-    {{-- Rental Booking Details --}}
-    @php
-        $rentalItems = $order->items->filter(fn ($item) => $item->booking);
-    @endphp
-    @if ($rentalItems->isNotEmpty())
-        <div class="bg-white rounded-lg shadow-sm border overflow-hidden mb-6">
-            <h2 class="text-sm font-semibold text-gray-500 uppercase px-4 py-3 border-b bg-gray-50">Rental Bookings</h2>
-            <div class="p-4 space-y-4">
-                @foreach ($rentalItems as $item)
-                    <div class="border rounded-lg p-4">
-                        <h3 class="text-sm font-semibold text-gray-800 mb-3">{{ $item->product_name }}</h3>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-2 text-sm">
-                            <div>
-                                <span class="text-gray-500 font-medium">Rental Dates</span>
-                                <p class="text-gray-900">{{ $item->booking->start_date->format('d M Y') }} &mdash; {{ $item->booking->end_date->format('d M Y') }}</p>
-                            </div>
-                            <div>
-                                <span class="text-gray-500 font-medium">Duration</span>
-                                <p class="text-gray-900">{{ $item->booking->start_date->diffInDays($item->booking->end_date) }} days</p>
-                            </div>
-                            <div>
-                                <span class="text-gray-500 font-medium">Quantity</span>
-                                <p class="text-gray-900">{{ $item->booking->quantity }}</p>
-                            </div>
-                            <div>
-                                <span class="text-gray-500 font-medium">Status</span>
-                                <p>
-                                    @php
-                                        $bookingStatusColors = [
-                                            'confirmed' => 'bg-blue-100 text-blue-700',
-                                            'active' => 'bg-green-100 text-green-700',
-                                            'returned' => 'bg-gray-100 text-gray-700',
-                                            'cancelled' => 'bg-red-100 text-red-700',
-                                        ];
-                                    @endphp
-                                    <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium {{ $bookingStatusColors[$item->booking->status] ?? 'bg-gray-100 text-gray-700' }}">
-                                        {{ ucfirst($item->booking->status) }}
-                                    </span>
-                                </p>
-                            </div>
-                            <div>
-                                <span class="text-gray-500 font-medium">Total Price</span>
-                                <p class="text-gray-900 font-semibold">&pound;{{ number_format($item->booking->total_price, 2) }}</p>
-                            </div>
-                            @if ($item->booking->returned_at)
-                                <div>
-                                    <span class="text-gray-500 font-medium">Returned</span>
-                                    <p class="text-gray-900">{{ $item->booking->returned_at->format('d M Y') }}</p>
-                                </div>
-                            @endif
-                        </div>
-
-                        {{-- Rental Agreement --}}
-                        @if ($item->booking->agreement_text_snapshot)
-                            <details class="mt-4 border-t pt-3">
-                                <summary class="text-sm font-medium text-gray-600 cursor-pointer hover:text-gray-800">
-                                    View Rental Agreement
-                                </summary>
-                                <div class="mt-2 p-3 bg-gray-50 rounded-md text-sm text-gray-700 prose prose-sm max-w-none">
-                                    {!! $item->booking->agreement_text_snapshot !!}
-                                </div>
-                                @if ($item->booking->agreement_accepted_at)
-                                    <p class="mt-2 text-xs text-gray-500">
-                                        Accepted on {{ $item->booking->agreement_accepted_at->format('d M Y \a\t g:ia') }}
-                                    </p>
-                                @endif
-                            </details>
-                        @endif
-
-                        {{-- Signature Image --}}
-                        @if ($item->booking->signature_data)
-                            <div class="mt-4 border-t pt-3">
-                                <p class="text-xs font-medium text-gray-500 mb-2">Your Signature</p>
-                                <div class="bg-gray-50 border rounded-md p-2 inline-block">
-                                    <img src="{{ str_starts_with($item->booking->signature_data, 'data:') ? $item->booking->signature_data : 'data:image/png;base64,' . $item->booking->signature_data }}"
-                                         alt="Your signature for {{ $item->product_name }}"
-                                         class="max-w-xs h-auto max-h-24">
-                                </div>
-                            </div>
-                        @endif
-
-                        {{-- Download Booking Confirmation PDF --}}
-                        <div class="mt-4 border-t pt-3">
-                            <a href="{{ route('portal.orders.downloadBookingConfirmation', $item->booking) }}"
-                               class="inline-flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-md text-sm font-medium hover:bg-purple-700 transition">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                                </svg>
-                                Download Booking Confirmation
-                            </a>
-                        </div>
-                    </div>
-                @endforeach
-            </div>
-        </div>
-    @endif
 </x-portal-layout>

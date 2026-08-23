@@ -71,6 +71,81 @@
                                         @endif
                                     </div>
                                 </div>
+
+                                {{-- Product Questions --}}
+                                @if (!empty($item['questions']) && count($item['questions']) > 0)
+                                    <div class="mt-4 pt-4 border-t border-gray-100">
+                                        <h4 class="text-sm font-medium text-gray-700 mb-3">Additional Information</h4>
+                                        @foreach($item['questions'] as $question)
+                                            <div class="mb-4">
+                                                <label class="block text-sm font-medium text-gray-700">
+                                                    {{ $question->label }}
+                                                    @if($question->is_required)
+                                                        <span class="text-red-500">*</span>
+                                                    @endif
+                                                </label>
+
+                                                @switch($question->input_type)
+                                                    @case('free_text')
+                                                        <input type="text"
+                                                               name="answers[{{ $item['product_id'] }}][{{ $question->id }}]"
+                                                               value="{{ old('answers.' . $item['product_id'] . '.' . $question->id) }}"
+                                                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"
+                                                               {{ $question->is_required ? 'required' : '' }} />
+                                                        @break
+                                                    @case('textarea')
+                                                        <textarea name="answers[{{ $item['product_id'] }}][{{ $question->id }}]"
+                                                                  rows="3"
+                                                                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"
+                                                                  {{ $question->is_required ? 'required' : '' }}>{{ old('answers.' . $item['product_id'] . '.' . $question->id) }}</textarea>
+                                                        @break
+                                                    @case('date')
+                                                        <input type="date"
+                                                               name="answers[{{ $item['product_id'] }}][{{ $question->id }}]"
+                                                               value="{{ old('answers.' . $item['product_id'] . '.' . $question->id) }}"
+                                                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"
+                                                               {{ $question->is_required ? 'required' : '' }} />
+                                                        @break
+                                                    @case('email')
+                                                        <input type="email"
+                                                               name="answers[{{ $item['product_id'] }}][{{ $question->id }}]"
+                                                               value="{{ old('answers.' . $item['product_id'] . '.' . $question->id) }}"
+                                                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"
+                                                               {{ $question->is_required ? 'required' : '' }} />
+                                                        @break
+                                                    @case('phone')
+                                                        <input type="tel"
+                                                               name="answers[{{ $item['product_id'] }}][{{ $question->id }}]"
+                                                               value="{{ old('answers.' . $item['product_id'] . '.' . $question->id) }}"
+                                                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"
+                                                               {{ $question->is_required ? 'required' : '' }} />
+                                                        @break
+                                                    @case('number')
+                                                        <input type="number"
+                                                               name="answers[{{ $item['product_id'] }}][{{ $question->id }}]"
+                                                               value="{{ old('answers.' . $item['product_id'] . '.' . $question->id) }}"
+                                                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"
+                                                               {{ $question->is_required ? 'required' : '' }} />
+                                                        @break
+                                                    @case('select')
+                                                        <select name="answers[{{ $item['product_id'] }}][{{ $question->id }}]"
+                                                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"
+                                                                {{ $question->is_required ? 'required' : '' }}>
+                                                            <option value="">-- Select --</option>
+                                                            @foreach($question->options ?? [] as $option)
+                                                                <option value="{{ $option }}" {{ old('answers.' . $item['product_id'] . '.' . $question->id) === $option ? 'selected' : '' }}>{{ $option }}</option>
+                                                            @endforeach
+                                                        </select>
+                                                        @break
+                                                @endswitch
+
+                                                @error('answers.' . $item['product_id'] . '.' . $question->id)
+                                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                                @enderror
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                @endif
                             </div>
                         @endforeach
                     </div>

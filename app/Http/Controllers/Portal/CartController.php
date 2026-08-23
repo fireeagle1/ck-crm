@@ -119,11 +119,20 @@ class CartController extends Controller
         $hasPhysicalItems = $this->cartService->hasPhysicalItems();
         $deliveryTotal = $this->cartService->getDeliveryTotal('delivery');
 
+        // Load product questions for each cart item
+        $productIds = collect($items)->pluck('product_id')->unique()->toArray();
+        $products = Product::with('questions')->whereIn('id', $productIds)->get()->keyBy('id');
+
+        foreach ($items as $index => $item) {
+            $product = $products->get($item['product_id']);
+            $items[$index]['questions'] = $product ? $product->questions : collect();
+        }
+
         // Load product details for items that have rental agreements
         $rentalAgreements = [];
         foreach ($items as $index => $item) {
             if ($item['product_type'] === 'equipment_rental') {
-                $product = Product::find($item['product_id']);
+                $product = $products->get($item['product_id']);
                 if ($product && $product->hasRentalAgreement()) {
                     $rentalAgreements[$index] = [
                         'product_id' => $product->id,
@@ -208,6 +217,25 @@ class CartController extends Controller
             }
         }
 
+        // Validate question answers for products with configured questions
+        $answerValidationRules = [];
+        foreach ($items as $item) {
+            $product = Product::with('questions')->find($item['product_id']);
+            if ($product && $product->questions->isNotEmpty()) {
+                foreach ($product->questions as $question) {
+                    $answerKey = "answers.{$item['product_id']}.{$question->id}";
+                    if ($question->is_required) {
+                        $answerValidationRules[$answerKey] = 'required|string|min:1';
+                    } else {
+                        $answerValidationRules[$answerKey] = 'nullable|string';
+                    }
+                }
+            }
+        }
+        if (!empty($answerValidationRules)) {
+            $request->validate($answerValidationRules);
+        }
+
         // Collect delivery address from request (if delivery method is 'delivery')
         $deliveryAddress = [];
         if ($deliveryMethod === 'delivery' && $request->has('address_line1')) {
@@ -232,6 +260,9 @@ class CartController extends Controller
         }
         if ($request->has('signatures')) {
             $checkoutOptions['signatures'] = $request->input('signatures', []);
+        }
+        if ($request->has('answers')) {
+            $checkoutOptions['answers'] = $request->input('answers', []);
         }
 
         $result = $this->checkoutService->processCheckout(

@@ -369,7 +369,7 @@ class NotificationService
 
         // Generate the inspection report PDF
         $pdfService = app(InspectionReportPdfService::class);
-        $pdfPath = $pdfService->generate($booking, $inspection);
+        $pdfPath = $pdfService->generateAndStore($booking, $inspection);
 
         if (!$pdfPath) {
             Log::error('NotificationService: Failed to generate inspection report PDF, skipping email', [

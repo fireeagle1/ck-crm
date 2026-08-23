@@ -37,6 +37,7 @@ class BookingController extends Controller
     public function index(Request $request): View
     {
         $query = Booking::with('product', 'customer')
+            ->withCount('inspections')
             ->whereNotNull('company_id'); // Exclude blocks — managed via calendar
 
         // Filter by status
@@ -109,6 +110,65 @@ class BookingController extends Controller
 
         return redirect()->route('admin.shop.bookings.show', $booking)
             ->with('success', 'Booking marked as returned. Customer has been notified.');
+    }
+
+    /**
+     * Resend booking confirmation email.
+     *
+     * Requirements: 4.1, 4.2, 4.3, 4.4
+     */
+    public function resendConfirmation(Booking $booking): RedirectResponse
+    {
+        try {
+            $this->notificationService->notifyCustomerBookingConfirmed($booking);
+
+            return redirect()->back()->with('success', 'Confirmation email resent successfully.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Failed to resend confirmation: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Advance booking to the next fulfilment stage.
+     *
+     * Requirements: 6.1, 6.2, 6.3, 6.4, 6.5
+     */
+    public function advanceStage(Booking $booking): RedirectResponse
+    {
+        $nextStage = $this->fulfilmentStageService->getNextStage($booking);
+
+        if (!$nextStage) {
+            return redirect()->back()->with('error', 'Booking is already at the final stage.');
+        }
+
+        try {
+            $this->fulfilmentStageService->advance($booking, $nextStage);
+            return redirect()->back()->with('success', 'Booking advanced to "' . $nextStage . '".');
+        } catch (\InvalidArgumentException $e) {
+            return redirect()->back()->with('error', $e->getMessage());
+        }
+    }
+
+    /**
+     * Mark booking as returned — shortcut for advance to "returned" stage.
+     * Only allowed when booking is at "checked_out" fulfilment stage.
+     *
+     * Requirements: 7.1, 7.2, 7.3, 7.4, 7.5
+     */
+    public function markReturnedFromList(Booking $booking): RedirectResponse
+    {
+        if ($booking->fulfilment_stage !== 'checked_out') {
+            return redirect()->back()->with('error', 'Only checked-out bookings can be marked as returned.');
+        }
+
+        try {
+            $this->fulfilmentStageService->advance($booking, 'returned');
+            $booking->update(['returned_at' => now()]);
+
+            return redirect()->back()->with('success', 'Booking marked as returned.');
+        } catch (\InvalidArgumentException $e) {
+            return redirect()->back()->with('error', $e->getMessage());
+        }
     }
 
     /**

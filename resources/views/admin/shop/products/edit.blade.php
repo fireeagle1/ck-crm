@@ -256,6 +256,105 @@
                     </div>
                 </div>
 
+                {{-- Custom Questions --}}
+                <div class="border-t pt-5" x-data="productQuestions(@js($product->questions ?? []))">
+                    <h3 class="text-lg font-semibold text-gray-700 mb-4">Custom Questions</h3>
+                    <p class="text-xs text-gray-400 mb-4">Define questions customers must answer during checkout for this product.</p>
+
+                    <template x-for="(question, index) in questions" :key="question._key">
+                        <div class="border rounded-lg p-4 mb-3 bg-gray-50">
+                            <div class="flex items-start justify-between gap-3">
+                                <div class="flex-1 space-y-3">
+                                    {{-- Label --}}
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Question Label</label>
+                                        <input type="text" x-model="question.label" placeholder="e.g. What size do you need?"
+                                               class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
+                                    </div>
+
+                                    {{-- Input Type --}}
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Input Type</label>
+                                        <select x-model="question.input_type"
+                                                class="block w-full max-w-xs rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
+                                            <option value="free_text">Free Text</option>
+                                            <option value="textarea">Textarea</option>
+                                            <option value="date">Date</option>
+                                            <option value="email">Email</option>
+                                            <option value="phone">Phone</option>
+                                            <option value="select">Select</option>
+                                            <option value="number">Number</option>
+                                        </select>
+                                    </div>
+
+                                    {{-- Options Editor (shown only for select type) --}}
+                                    <div x-show="question.input_type === 'select'" x-transition>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Options</label>
+                                        <template x-for="(option, optIndex) in question.options" :key="optIndex">
+                                            <div class="flex items-center gap-2 mb-2">
+                                                <input type="text" x-model="question.options[optIndex]" placeholder="Option value"
+                                                       class="block flex-1 rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm">
+                                                <button type="button" @click="question.options.splice(optIndex, 1)"
+                                                        class="text-red-500 hover:text-red-700 text-sm font-medium">
+                                                    &times;
+                                                </button>
+                                            </div>
+                                        </template>
+                                        <button type="button" @click="question.options.push('')"
+                                                class="text-xs text-blue-600 hover:text-blue-800 font-medium">
+                                            + Add Option
+                                        </button>
+                                    </div>
+
+                                    {{-- Required Toggle --}}
+                                    <div>
+                                        <label class="inline-flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+                                            <input type="checkbox" x-model="question.is_required"
+                                                   class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                            Required
+                                        </label>
+                                    </div>
+                                </div>
+
+                                {{-- Reorder & Remove Buttons --}}
+                                <div class="flex flex-col gap-1">
+                                    <button type="button" @click="moveUp(index)" :disabled="index === 0"
+                                            class="px-2 py-1 text-xs rounded border hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed"
+                                            title="Move up">
+                                        &uarr;
+                                    </button>
+                                    <button type="button" @click="moveDown(index)" :disabled="index === questions.length - 1"
+                                            class="px-2 py-1 text-xs rounded border hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed"
+                                            title="Move down">
+                                        &darr;
+                                    </button>
+                                    <button type="button" @click="removeQuestion(index)"
+                                            class="px-2 py-1 text-xs rounded border border-red-200 text-red-600 hover:bg-red-50"
+                                            title="Remove question">
+                                        &times;
+                                    </button>
+                                </div>
+                            </div>
+
+                            {{-- Hidden form inputs for submission --}}
+                            <template x-if="question.id">
+                                <input type="hidden" :name="`questions[${index}][id]`" :value="question.id">
+                            </template>
+                            <input type="hidden" :name="`questions[${index}][label]`" :value="question.label">
+                            <input type="hidden" :name="`questions[${index}][input_type]`" :value="question.input_type">
+                            <input type="hidden" :name="`questions[${index}][is_required]`" :value="question.is_required ? '1' : '0'">
+                            <template x-for="(opt, optIdx) in question.options" :key="'opt-' + optIdx">
+                                <input type="hidden" :name="`questions[${index}][options][]`" :value="opt">
+                            </template>
+                        </div>
+                    </template>
+
+                    <button type="button" @click="addQuestion()"
+                            class="px-4 py-2 text-sm font-medium text-blue-600 border border-blue-200 rounded-md hover:bg-blue-50">
+                        + Add Question
+                    </button>
+                </div>
+
                 {{-- Actions --}}
                 <div class="flex gap-3 pt-2">
                     <button type="submit" class="px-5 py-2.5 bg-blue-600 text-white rounded-md text-sm font-semibold hover:bg-blue-700">
@@ -380,6 +479,49 @@
             return {
                 productType: '{{ old('product_type', $product->product_type) }}',
                 visibilityType: '{{ old('visibility_type', $product->visibilityRule?->visibility_type ?? 'all') }}',
+            }
+        }
+
+        function productQuestions(existingQuestions) {
+            let keyCounter = 0;
+            return {
+                questions: (existingQuestions || []).map(q => ({
+                    _key: keyCounter++,
+                    id: q.id || null,
+                    label: q.label || '',
+                    input_type: q.input_type || 'free_text',
+                    options: q.options || [],
+                    is_required: q.is_required || false,
+                })),
+
+                addQuestion() {
+                    this.questions.push({
+                        _key: keyCounter++,
+                        id: null,
+                        label: '',
+                        input_type: 'free_text',
+                        options: [],
+                        is_required: false,
+                    });
+                },
+
+                removeQuestion(index) {
+                    this.questions.splice(index, 1);
+                },
+
+                moveUp(index) {
+                    if (index <= 0) return;
+                    const temp = this.questions[index];
+                    this.questions.splice(index, 1);
+                    this.questions.splice(index - 1, 0, temp);
+                },
+
+                moveDown(index) {
+                    if (index >= this.questions.length - 1) return;
+                    const temp = this.questions[index];
+                    this.questions.splice(index, 1);
+                    this.questions.splice(index + 1, 0, temp);
+                },
             }
         }
     </script>

@@ -26,7 +26,12 @@ class OrderController extends Controller
     {
         abort_unless($order->company_id === $request->user()->company_id, 404);
 
-        $order->load('items.booking', 'items.product');
+        $order->load([
+            'items.booking.checkoutInspection',
+            'items.booking.returnInspection',
+            'items.product',
+            'items.questionAnswers',
+        ]);
 
         return view('portal.orders.show', compact('order'));
     }
