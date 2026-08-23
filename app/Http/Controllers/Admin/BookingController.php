@@ -485,4 +485,25 @@ class BookingController extends Controller
             'year' => $year,
         ])->with('success', 'Block removed successfully.');
     }
+
+    /**
+     * Serve an inspection photo from local storage.
+     * Photos are stored on the 'local' disk (not public), so they need
+     * to be served through an authenticated route.
+     */
+    public function inspectionPhoto(string $path): \Symfony\Component\HttpFoundation\StreamedResponse
+    {
+        $disk = \Illuminate\Support\Facades\Storage::disk('local');
+
+        if (!$disk->exists($path)) {
+            abort(404, 'Photo not found.');
+        }
+
+        $mimeType = $disk->mimeType($path) ?: 'image/jpeg';
+
+        return $disk->response($path, null, [
+            'Content-Type' => $mimeType,
+            'Cache-Control' => 'private, max-age=3600',
+        ]);
+    }
 }

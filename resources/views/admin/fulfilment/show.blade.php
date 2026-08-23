@@ -235,7 +235,7 @@
                                     @if (!empty($booking->checkoutInspection->photos))
                                         <div class="grid grid-cols-2 gap-2">
                                             @foreach ($booking->checkoutInspection->photos as $photo)
-                                                <img src="{{ asset('storage/' . $photo) }}" alt="Checkout photo" class="rounded-md border object-cover h-32 w-full">
+                                                <img src="{{ route('admin.shop.bookings.inspectionPhoto', $photo) }}" alt="Checkout photo" class="rounded-md border object-cover h-32 w-full">
                                             @endforeach
                                         </div>
                                     @else
@@ -265,7 +265,7 @@
                                     @if (!empty($booking->returnInspection->photos))
                                         <div class="grid grid-cols-2 gap-2">
                                             @foreach ($booking->returnInspection->photos as $photo)
-                                                <img src="{{ asset('storage/' . $photo) }}" alt="Return photo" class="rounded-md border object-cover h-32 w-full">
+                                                <img src="{{ route('admin.shop.bookings.inspectionPhoto', $photo) }}" alt="Return photo" class="rounded-md border object-cover h-32 w-full">
                                             @endforeach
                                         </div>
                                     @else

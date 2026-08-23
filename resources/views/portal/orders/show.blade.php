@@ -257,7 +257,7 @@
                             <div class="mt-4 border-t pt-3">
                                 <p class="text-xs font-medium text-gray-500 mb-2">Your Signature</p>
                                 <div class="bg-gray-50 border rounded-md p-2 inline-block">
-                                    <img src="data:image/png;base64,{{ $item->booking->signature_data }}"
+                                    <img src="{{ str_starts_with($item->booking->signature_data, 'data:') ? $item->booking->signature_data : 'data:image/png;base64,' . $item->booking->signature_data }}"
                                          alt="Your signature for {{ $item->product_name }}"
                                          class="max-w-xs h-auto max-h-24">
                                 </div>

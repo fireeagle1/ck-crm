@@ -241,6 +241,7 @@ Route::middleware(['auth', 'verified', EnsureIsAdmin::class])->prefix('admin')->
     Route::get('shop/bookings/{booking}', [Admin\BookingController::class, 'show'])->name('shop.bookings.show');
     Route::patch('shop/bookings/{booking}/returned', [Admin\BookingController::class, 'markReturned'])->name('shop.bookings.markReturned');
     Route::get('shop/bookings/{booking}/download-confirmation', [Admin\BookingController::class, 'downloadConfirmation'])->name('shop.bookings.downloadConfirmation');
+    Route::get('shop/bookings/inspection-photo/{path}', [Admin\BookingController::class, 'inspectionPhoto'])->where('path', '.*')->name('shop.bookings.inspectionPhoto');
 
     Route::resource('shop/tiers', Admin\CustomerTierController::class)->except(['show', 'edit', 'create'])->names('shop.tiers');
 

@@ -369,7 +369,7 @@
                                             @if (!empty($booking->checkoutInspection->photos))
                                                 <div class="grid grid-cols-3 gap-1">
                                                     @foreach ($booking->checkoutInspection->photos as $photo)
-                                                        <img src="{{ Storage::disk('local')->exists($photo) ? route('admin.shop.orders.show', $order) : asset('storage/' . $photo) }}" alt="Checkout" class="rounded border object-cover h-20 w-full">
+                                                        <img src="{{ route('admin.shop.bookings.inspectionPhoto', $photo) }}" alt="Checkout" class="rounded border object-cover h-20 w-full">
                                                     @endforeach
                                                 </div>
                                             @endif
@@ -391,7 +391,7 @@
                                             @if (!empty($booking->returnInspection->photos))
                                                 <div class="grid grid-cols-3 gap-1">
                                                     @foreach ($booking->returnInspection->photos as $photo)
-                                                        <img src="{{ asset('storage/' . $photo) }}" alt="Return" class="rounded border object-cover h-20 w-full">
+                                                        <img src="{{ route('admin.shop.bookings.inspectionPhoto', $photo) }}" alt="Return" class="rounded border object-cover h-20 w-full">
                                                     @endforeach
                                                 </div>
                                             @endif
@@ -441,7 +441,7 @@
                                         <div>
                                             <p class="text-xs font-medium text-gray-500 mb-1">Signature</p>
                                             <div class="bg-gray-50 border rounded p-2 inline-block">
-                                                <img src="data:image/png;base64,{{ $booking->signature_data }}" alt="Signature" class="max-h-20">
+                                                <img src="{{ str_starts_with($booking->signature_data, 'data:') ? $booking->signature_data : 'data:image/png;base64,' . $booking->signature_data }}" alt="Signature" class="max-h-20">
                                             </div>
                                             @if ($booking->agreement_accepted_at)
                                                 <p class="text-xs text-gray-400 mt-1">Signed {{ $booking->agreement_accepted_at->format('d M Y H:i') }}</p>
