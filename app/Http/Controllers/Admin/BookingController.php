@@ -36,8 +36,7 @@ class BookingController extends Controller
      */
     public function index(Request $request): View
     {
-        $query = Booking::with('product', 'customer', 'orderItem.questionAnswers')
-            ->withCount('inspections')
+        $query = Booking::with('product', 'customer')
             ->whereNotNull('company_id'); // Exclude blocks — managed via calendar
 
         // Filter by status

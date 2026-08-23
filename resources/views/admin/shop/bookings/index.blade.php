@@ -76,12 +76,11 @@
                     <th class="px-4 py-3 text-left font-semibold text-gray-600">End Date</th>
                     <th class="px-4 py-3 text-left font-semibold text-gray-600">Qty</th>
                     <th class="px-4 py-3 text-left font-semibold text-gray-600">Status</th>
-                    <th class="px-4 py-3 text-right font-semibold text-gray-600">Actions</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-100">
                 @forelse ($bookings as $booking)
-                    <tr class="hover:bg-gray-50">
+                    <tr class="hover:bg-gray-50 cursor-pointer" onclick="window.location='{{ route('admin.shop.bookings.show', $booking) }}'">
                         <td class="px-4 py-3 font-medium text-gray-900">#{{ $booking->id }}</td>
                         <td class="px-4 py-3">{{ $booking->customer?->company_name ?? 'N/A' }}</td>
                         <td class="px-4 py-3">{{ $booking->product?->name ?? 'N/A' }}</td>
@@ -101,80 +100,10 @@
                                 {{ ucfirst($booking->status) }}
                             </span>
                         </td>
-                        <td class="px-4 py-3 text-right">
-                            <div class="flex items-center justify-end gap-2 flex-wrap">
-                                <a href="{{ route('admin.shop.bookings.show', $booking) }}" class="text-blue-600 hover:underline text-sm font-medium">View</a>
-
-                                {{-- Resend Confirmation (always visible) --}}
-                                <form method="POST" action="{{ route('admin.bookings.resend-confirmation', $booking) }}">
-                                    @csrf
-                                    <button type="submit" class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded hover:bg-blue-200">
-                                        Resend Confirmation
-                                    </button>
-                                </form>
-
-                                {{-- Advance Stage (hidden at final stage "inspected") --}}
-                                @if($booking->fulfilment_stage !== 'inspected')
-                                    @php $nextStage = app(\App\Services\FulfilmentStageService::class)->getNextStage($booking); @endphp
-                                    @if($nextStage)
-                                        <form method="POST" action="{{ route('admin.bookings.advance-stage', $booking) }}">
-                                            @csrf
-                                            <button type="submit" class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded hover:bg-green-200">
-                                                Advance &rarr; {{ ucfirst(str_replace('_', ' ', $nextStage)) }}
-                                            </button>
-                                        </form>
-                                    @endif
-                                @endif
-
-                                {{-- Mark Returned (only when checked_out) --}}
-                                @if($booking->fulfilment_stage === 'checked_out')
-                                    <form method="POST" action="{{ route('admin.bookings.mark-returned-list', $booking) }}">
-                                        @csrf
-                                        <button type="submit" class="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded hover:bg-yellow-200">
-                                            Mark Returned
-                                        </button>
-                                    </form>
-                                @endif
-
-                                {{-- Download Inspection Report (only when inspections exist) --}}
-                                @if($booking->inspections_count > 0)
-                                    <a href="{{ route('admin.bookings.inspection-report', $booking) }}"
-                                       class="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded hover:bg-purple-200">
-                                        Download Inspection Report
-                                    </a>
-                                @endif
-
-                                {{-- Delete Booking --}}
-                                <form method="POST" action="{{ route('admin.bookings.destroy', $booking) }}"
-                                      onsubmit="return confirm('Are you sure you want to delete booking #{{ $booking->id }}? This will also remove the associated order item and order (if empty). This cannot be undone.')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="text-xs bg-red-100 text-red-700 px-2 py-1 rounded hover:bg-red-200">
-                                        Delete
-                                    </button>
-                                </form>
-                            </div>
-                        </td>
                     </tr>
-
-                    {{-- Question Answers Row --}}
-                    @if($booking->orderItem && $booking->orderItem->questionAnswers->isNotEmpty())
-                        <tr class="bg-indigo-50/50">
-                            <td colspan="8" class="px-4 py-2">
-                                <div class="flex flex-wrap gap-x-6 gap-y-1">
-                                    @foreach($booking->orderItem->questionAnswers as $answer)
-                                        <span class="text-xs text-gray-700">
-                                            <strong class="text-gray-500">{{ $answer->question_label }}:</strong>
-                                            {{ $answer->answer_value ?: '—' }}
-                                        </span>
-                                    @endforeach
-                                </div>
-                            </td>
-                        </tr>
-                    @endif
                 @empty
                     <tr>
-                        <td colspan="8" class="px-4 py-6 text-center text-gray-500">No bookings found.</td>
+                        <td colspan="7" class="px-4 py-6 text-center text-gray-500">No bookings found.</td>
                     </tr>
                 @endforelse
             </tbody>
