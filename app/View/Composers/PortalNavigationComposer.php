@@ -25,6 +25,7 @@ class PortalNavigationComposer
                 'showServices' => false,
                 'showDomains' => false,
                 'showInvoices' => false,
+                'showOrders' => false,
             ]);
             return;
         }
@@ -38,6 +39,7 @@ class PortalNavigationComposer
                 'showServices' => false,
                 'showDomains' => false,
                 'showInvoices' => false,
+                'showOrders' => false,
             ]);
             return;
         }
@@ -50,6 +52,7 @@ class PortalNavigationComposer
         $hasServices = $customer->services()->exists();
         $hasDomains = $customer->domains()->exists();
         $hasInvoices = $customer->invoices()->exists();
+        $hasOrders = $customer->orders()->exists();
 
         $view->with([
             'showShop' => $types->isNotEmpty(),
@@ -57,6 +60,7 @@ class PortalNavigationComposer
             'showServices' => $hasServices || $types->contains('hosting'),
             'showDomains' => $hasDomains,
             'showInvoices' => $hasInvoices,
+            'showOrders' => $hasOrders,
         ]);
     }
 }

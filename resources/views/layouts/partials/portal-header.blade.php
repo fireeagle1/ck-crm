@@ -27,6 +27,11 @@
         $nav[] = ['route' => 'portal.shop.index', 'label' => 'Shop'];
     }
 
+    // Conditionally show Orders link based on customer having orders
+    if (!empty($showOrders)) {
+        $nav[] = ['route' => 'portal.orders.index', 'label' => 'Orders'];
+    }
+
     // Conditionally show Projects if customer has active projects
     $hasActiveProjects = \App\Models\Project::where('company_id', auth()->user()->company_id)
         ->where('status', '!=', 'Completed')
