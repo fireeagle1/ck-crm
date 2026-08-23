@@ -104,6 +104,87 @@
             </div>
         </div>
 
+        {{-- Rental Action Items --}}
+        @if ($overdueReturns->isNotEmpty() || $awaitingPaymentBookings->isNotEmpty() || $unassignedAssetBookings->isNotEmpty())
+        <div class="bg-white rounded-lg shadow-sm border col-span-1 lg:col-span-2">
+            <div class="px-5 py-3 border-b flex items-center justify-between">
+                <h2 class="text-lg font-semibold">Rental Action Items</h2>
+                <a href="{{ route('admin.shop.bookings.index') }}" class="text-sm text-blue-600 hover:underline">All bookings</a>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-gray-100">
+                {{-- Overdue Returns --}}
+                <div class="p-4">
+                    <h3 class="text-sm font-medium text-red-700 mb-2">
+                        Overdue Returns
+                        @if ($overdueReturns->isNotEmpty())
+                            <span class="ml-1 inline-flex items-center rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700">{{ $overdueReturns->count() }}</span>
+                        @endif
+                    </h3>
+                    <div class="space-y-2">
+                        @forelse ($overdueReturns as $booking)
+                            <div class="text-sm">
+                                <p class="font-medium text-gray-900">{{ $booking->product->name ?? 'Unknown' }}</p>
+                                <p class="text-xs text-gray-500">
+                                    {{ $booking->customer->company_name ?? 'N/A' }}
+                                    · Due {{ $booking->end_date->format('d M') }}
+                                    <span class="text-red-600 font-medium">({{ $booking->end_date->diffForHumans() }})</span>
+                                </p>
+                            </div>
+                        @empty
+                            <p class="text-xs text-gray-400">None</p>
+                        @endforelse
+                    </div>
+                </div>
+
+                {{-- Awaiting Payment --}}
+                <div class="p-4">
+                    <h3 class="text-sm font-medium text-amber-700 mb-2">
+                        Awaiting Payment
+                        @if ($awaitingPaymentBookings->isNotEmpty())
+                            <span class="ml-1 inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700">{{ $awaitingPaymentBookings->count() }}</span>
+                        @endif
+                    </h3>
+                    <div class="space-y-2">
+                        @forelse ($awaitingPaymentBookings as $booking)
+                            <div class="text-sm">
+                                <p class="font-medium text-gray-900">{{ $booking->product->name ?? 'Unknown' }}</p>
+                                <p class="text-xs text-gray-500">
+                                    {{ $booking->customer->company_name ?? 'N/A' }}
+                                    · Starts {{ $booking->start_date->format('d M') }}
+                                </p>
+                            </div>
+                        @empty
+                            <p class="text-xs text-gray-400">None</p>
+                        @endforelse
+                    </div>
+                </div>
+
+                {{-- Needs Asset Assignment --}}
+                <div class="p-4">
+                    <h3 class="text-sm font-medium text-blue-700 mb-2">
+                        Needs Asset Assignment
+                        @if ($unassignedAssetBookings->isNotEmpty())
+                            <span class="ml-1 inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700">{{ $unassignedAssetBookings->count() }}</span>
+                        @endif
+                    </h3>
+                    <div class="space-y-2">
+                        @forelse ($unassignedAssetBookings as $booking)
+                            <div class="text-sm">
+                                <p class="font-medium text-gray-900">{{ $booking->product->name ?? 'Unknown' }}</p>
+                                <p class="text-xs text-gray-500">
+                                    {{ $booking->customer->company_name ?? 'N/A' }}
+                                    · {{ $booking->start_date->format('d M') }} – {{ $booking->end_date->format('d M') }}
+                                </p>
+                            </div>
+                        @empty
+                            <p class="text-xs text-gray-400">None</p>
+                        @endforelse
+                    </div>
+                </div>
+            </div>
+        </div>
+        @endif
+
         {{-- Recent Tickets --}}
         <div class="bg-white rounded-lg shadow-sm border">
             <div class="px-5 py-3 border-b flex items-center justify-between">

@@ -18,14 +18,17 @@ class NotifyRentalEndedCommand extends Command
     {
         $log = ScheduledTaskLog::begin('app:notify-rental-ended');
 
+        // Only find overdue bookings that haven't already been notified.
+        // This prevents repeated daily notifications for the same booking.
         $bookings = Booking::where('status', 'active')
             ->where('end_date', '<=', today())
+            ->whereNull('overdue_notified_at')
             ->with(['product', 'customer'])
             ->get();
 
         if ($bookings->isEmpty()) {
-            $this->info('No ended rentals found.');
-            $log->complete('No ended rentals found.', ['count' => 0]);
+            $this->info('No new ended rentals found.');
+            $log->complete('No new ended rentals found.', ['count' => 0]);
 
             return Command::SUCCESS;
         }
@@ -35,6 +38,7 @@ class NotifyRentalEndedCommand extends Command
         foreach ($bookings as $booking) {
             try {
                 $notificationService->notifyAdminRentalEnded($booking);
+                $booking->update(['overdue_notified_at' => now()]);
                 $notified++;
             } catch (\Exception $e) {
                 Log::error('NotifyRentalEnded: Failed to notify for booking', [

@@ -35,6 +35,12 @@ Schedule::command('app:notify-rental-ended')->dailyAt('08:00');
 // Remind customers whose rental ends tomorrow — daily at 9am
 Schedule::command('app:notify-rental-ending-soon')->dailyAt('09:00');
 
+// Activate confirmed bookings whose start date has arrived — daily at 6am (before notifications)
+Schedule::command('app:activate-bookings')->dailyAt('06:00');
+
+// Clean up abandoned orders (unpaid after 2 hours) — every 30 minutes
+Schedule::command('app:cleanup-abandoned-orders')->everyThirtyMinutes();
+
 // Reset low-stock notification flags for restocked products — hourly
 Schedule::command('app:reset-low-stock-flags')->hourly();
 

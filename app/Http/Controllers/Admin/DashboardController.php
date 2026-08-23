@@ -91,6 +91,37 @@ class DashboardController extends Controller
             ->limit(8)
             ->get();
 
+        // Rental action items — bookings needing admin attention
+        $overdueReturns = Booking::with(['product', 'customer'])
+            ->where('status', 'active')
+            ->where('end_date', '<', today())
+            ->whereNotNull('company_id')
+            ->orderBy('end_date')
+            ->limit(10)
+            ->get();
+
+        $awaitingPaymentBookings = Booking::with(['product', 'customer', 'orderItem.order'])
+            ->whereNotNull('company_id')
+            ->whereIn('status', ['confirmed', 'active'])
+            ->whereHas('orderItem.order', function ($q) {
+                $q->where('payment_status', 'pending');
+            })
+            ->orderBy('start_date')
+            ->limit(10)
+            ->get();
+
+        $unassignedAssetBookings = Booking::with(['product', 'customer'])
+            ->whereNotNull('company_id')
+            ->whereIn('status', ['confirmed', 'active'])
+            ->where('fulfilment_stage', 'ordered')
+            ->whereHas('product', function ($q) {
+                $q->whereHas('assets'); // Only products that track individual assets
+            })
+            ->doesntHave('assignedAssets')
+            ->orderBy('start_date')
+            ->limit(10)
+            ->get();
+
         return view('admin.dashboard', compact(
             'openTickets',
             'criticalTickets',
@@ -108,6 +139,9 @@ class DashboardController extends Controller
             'recentTickets',
             'recentLogins',
             'upcomingRentals',
+            'overdueReturns',
+            'awaitingPaymentBookings',
+            'unassignedAssetBookings',
         ));
     }
 
