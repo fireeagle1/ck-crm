@@ -14,7 +14,7 @@
         .logo-cell { width: 50%; vertical-align: middle; }
         .logo-cell img { max-height: 50px; max-width: 180px; }
         .company-name { font-size: 18px; font-weight: bold; color: #1f2937; }
-        .logo-text { font-size: 22px; font-weight: bold; color: #1f2937; font-family: 'Courier New', Courier, monospace; letter-spacing: 1px; text-transform: uppercase; }
+        .logo-text { font-size: 28px; font-weight: bold; color: #1f2937; font-family: cabin-sketch, sans-serif; letter-spacing: 0; text-transform: none; }
         .company-details { font-size: 9px; color: #6b7280; line-height: 1.3; margin-top: 3px; }
         .report-title { font-size: 20px; font-weight: bold; color: #7c3aed; text-align: right; line-height: 1.1; }
         .report-meta { text-align: right; font-size: 10px; color: #6b7280; line-height: 1.4; margin-top: 4px; }
