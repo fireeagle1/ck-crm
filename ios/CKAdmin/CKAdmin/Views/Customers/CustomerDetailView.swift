@@ -34,7 +34,7 @@ struct CustomerDetailView: View {
             }
         }
         .navigationTitle(customer?.companyName ?? "Customer")
-        .navigationBarTitleDisplayMode(.large)
+        .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             if customer != nil {
                 ToolbarItem(placement: .topBarTrailing) {
@@ -82,11 +82,17 @@ struct CustomerDetailView: View {
 
     private func customerContent(_ customer: CustomerDetail) -> some View {
         List {
-            // Relationship Counts
+            // Relationship Counts — tappable to drill into filtered lists
             Section {
-                countRow(label: "Services", count: customer.servicesCount, icon: "server.rack")
-                countRow(label: "Tickets", count: customer.ticketsCount, icon: "ticket")
-                countRow(label: "Invoices", count: customer.invoicesCount, icon: "doc.text")
+                NavigationLink(destination: CustomerServicesView(companyId: companyId, customerName: customer.companyName, apiClient: apiClient)) {
+                    countRow(label: "Services", count: customer.servicesCount, icon: "server.rack")
+                }
+                NavigationLink(destination: CustomerTicketsView(companyId: companyId, apiClient: apiClient)) {
+                    countRow(label: "Tickets", count: customer.ticketsCount, icon: "ticket")
+                }
+                NavigationLink(destination: CustomerInvoicesView(companyId: companyId, apiClient: apiClient)) {
+                    countRow(label: "Invoices", count: customer.invoicesCount, icon: "doc.text")
+                }
                 countRow(label: "Domains", count: customer.domainsCount, icon: "globe")
             } header: {
                 Text("Overview")
@@ -94,46 +100,32 @@ struct CustomerDetailView: View {
                     .foregroundStyle(CKTheme.textSecondary)
             }
 
-            // Quick Actions
+            // Contact & Address combined
             Section {
-                Button {
-                    showingCreateTicket = true
-                } label: {
-                    Label("Log Ticket / Service Request", systemImage: "plus.circle")
-                        .font(CKTypography.body)
-                        .foregroundStyle(CKTheme.accent)
+                if let name = customer.customerName, !name.isEmpty {
+                    detailRow(label: "Contact", value: name)
+                }
+                if let phone = customer.phoneNumber, !phone.isEmpty {
+                    detailRow(label: "Phone", value: phone)
+                }
+                if let addr = formattedAddress(customer), !addr.isEmpty {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Address")
+                            .font(CKTypography.caption)
+                            .foregroundStyle(CKTheme.textSecondary)
+                        Text(addr)
+                            .font(CKTypography.body)
+                            .foregroundStyle(CKTheme.textPrimary)
+                    }
+                    .padding(.vertical, 2)
                 }
             } header: {
-                Text("Actions")
-                    .font(CKTypography.caption)
-                    .foregroundStyle(CKTheme.textSecondary)
-            }
-
-            // Contact Information
-            Section {
-                detailRow(label: "Company", value: customer.companyName)
-                detailRow(label: "Contact Name", value: customer.customerName)
-                detailRow(label: "Phone", value: customer.phoneNumber)
-            } header: {
-                Text("Contact")
-                    .font(CKTypography.caption)
-                    .foregroundStyle(CKTheme.textSecondary)
-            }
-
-            // Address
-            Section {
-                detailRow(label: "Address Line 1", value: customer.addressLine1)
-                detailRow(label: "Address Line 2", value: customer.addressLine2)
-                detailRow(label: "City", value: customer.city)
-                detailRow(label: "State", value: customer.state)
-                detailRow(label: "Postal Code", value: customer.postalCode)
-                detailRow(label: "Country", value: customer.country)
-            } header: {
-                Text("Address")
+                Text("Details")
                     .font(CKTypography.caption)
                     .foregroundStyle(CKTheme.textSecondary)
             }
         }
+        .listStyle(.insetGrouped)
         .scrollContentBackground(.hidden)
         .background(CKTheme.backgroundPrimary)
         .refreshable {
@@ -141,14 +133,28 @@ struct CustomerDetailView: View {
         }
     }
 
+    // MARK: - Address Formatting
+
+    private func formattedAddress(_ customer: CustomerDetail) -> String? {
+        let parts = [
+            customer.addressLine1,
+            customer.addressLine2,
+            customer.city,
+            customer.state,
+            customer.postalCode,
+            customer.country
+        ].compactMap { $0?.trimmingCharacters(in: .whitespaces) }.filter { !$0.isEmpty }
+        return parts.isEmpty ? nil : parts.joined(separator: ", ")
+    }
+
     // MARK: - Helper Views
 
     private func countRow(label: String, count: Int, icon: String) -> some View {
-        CKRow {
+        HStack {
             Label(label, systemImage: icon)
                 .font(CKTypography.body)
                 .foregroundStyle(CKTheme.textPrimary)
-        } trailing: {
+            Spacer()
             Text("\(count)")
                 .font(CKTypography.callout)
                 .foregroundStyle(CKTheme.textSecondary)
@@ -158,18 +164,16 @@ struct CustomerDetailView: View {
     }
 
     private func detailRow(label: String, value: String?) -> some View {
-        CKRow {
+        HStack {
             Text(label)
                 .font(CKTypography.body)
                 .foregroundStyle(CKTheme.textSecondary)
-        } trailing: {
+            Spacer()
             Text(value ?? "—")
                 .font(CKTypography.body)
                 .foregroundStyle(value != nil ? CKTheme.textPrimary : CKTheme.textTertiary)
                 .multilineTextAlignment(.trailing)
         }
-        .accessibilityElement(children: .combine)
-        .accessibilityLabel("\(label): \(value ?? "Not set")")
     }
 
     // MARK: - Loading State

@@ -71,6 +71,39 @@
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {{-- Upcoming Rentals --}}
+        <div class="bg-white rounded-lg shadow-sm border">
+            <div class="px-5 py-3 border-b flex items-center justify-between">
+                <h2 class="text-lg font-semibold">Upcoming Rentals</h2>
+                <a href="{{ route('admin.shop.bookings.calendar') }}" class="text-sm text-blue-600 hover:underline">Calendar</a>
+            </div>
+            <div class="divide-y divide-gray-100">
+                @forelse ($upcomingRentals as $rental)
+                    @php
+                        $isActive = $rental->status === 'active';
+                        $startsToday = $rental->start_date->isToday();
+                    @endphp
+                    <div class="px-5 py-3 flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-900">{{ $rental->product->name ?? 'Unknown' }}</p>
+                            <p class="text-xs text-gray-500">
+                                @if ($rental->customer)
+                                    <a href="{{ route('admin.customers.show', $rental->customer) }}" class="text-blue-600 hover:underline">{{ $rental->customer->company_name }}</a> ·
+                                @endif
+                                {{ $rental->start_date->format('d M') }} – {{ $rental->end_date->format('d M') }}
+                            </p>
+                        </div>
+                        <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium
+                            {{ $isActive ? 'bg-blue-100 text-blue-700' : ($startsToday ? 'bg-amber-100 text-amber-700' : 'bg-green-100 text-green-700') }}">
+                            {{ $isActive ? 'Active' : ($startsToday ? 'Today' : $rental->start_date->diffForHumans()) }}
+                        </span>
+                    </div>
+                @empty
+                    <p class="px-5 py-4 text-sm text-gray-500">No upcoming rentals.</p>
+                @endforelse
+            </div>
+        </div>
+
         {{-- Recent Tickets --}}
         <div class="bg-white rounded-lg shadow-sm border">
             <div class="px-5 py-3 border-b flex items-center justify-between">

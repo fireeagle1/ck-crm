@@ -262,6 +262,9 @@ class BookingController extends Controller
 
     /**
      * Display the calendar/grid view of rental bookings.
+     *
+     * For products with track_individual_assets enabled, each linked asset
+     * gets its own row so you can see per-unit availability at a glance.
      */
     public function calendar(Request $request): View
     {
@@ -276,20 +279,84 @@ class BookingController extends Controller
             ->orderBy('name')
             ->get();
 
-        $bookings = Booking::with('customer')
+        $bookings = Booking::with(['customer', 'assignedAssets', 'product'])
             ->whereIn('product_id', $products->pluck('id'))
             ->where('start_date', '<=', $endOfMonth)
             ->where('end_date', '>=', $startOfMonth)
             ->get();
 
-        // Group bookings by product_id
-        $bookingsByProduct = $bookings->groupBy('product_id');
+        // Build calendar rows — each row is either a product or an individual asset
+        $calendarRows = collect();
+        $bookingsByRow = [];
+
+        foreach ($products as $product) {
+            $productBookings = $bookings->where('product_id', $product->id);
+
+            if ($product->track_individual_assets) {
+                // Get all rentable assets for this product
+                $assets = $product->assets()
+                    ->whereIn('asset_status', ['Available', 'Reserved', 'Rented Out'])
+                    ->orderBy('device_name')
+                    ->get();
+
+                foreach ($assets as $asset) {
+                    $rowKey = 'asset_' . $asset->device_id;
+                    $calendarRows->push([
+                        'key' => $rowKey,
+                        'label' => $asset->device_name,
+                        'sublabel' => $product->name,
+                        'product_id' => $product->id,
+                        'is_asset_row' => true,
+                        'asset_id' => $asset->device_id,
+                    ]);
+
+                    // Filter bookings assigned to this specific asset
+                    $assetBookings = $productBookings->filter(function ($booking) use ($asset) {
+                        return $booking->assignedAssets->contains('asset_id', $asset->device_id);
+                    });
+
+                    $bookingsByRow[$rowKey] = $assetBookings;
+                }
+
+                // Also add a row for unassigned bookings (bookings not linked to any asset)
+                $unassignedBookings = $productBookings->filter(function ($booking) {
+                    return $booking->assignedAssets->isEmpty();
+                });
+
+                if ($unassignedBookings->isNotEmpty()) {
+                    $rowKey = 'unassigned_' . $product->id;
+                    $calendarRows->push([
+                        'key' => $rowKey,
+                        'label' => 'Unassigned',
+                        'sublabel' => $product->name,
+                        'product_id' => $product->id,
+                        'is_asset_row' => true,
+                        'asset_id' => null,
+                    ]);
+                    $bookingsByRow[$rowKey] = $unassignedBookings;
+                }
+            } else {
+                // Standard row — one row per product (existing behaviour)
+                $rowKey = 'product_' . $product->id;
+                $calendarRows->push([
+                    'key' => $rowKey,
+                    'label' => $product->name,
+                    'sublabel' => null,
+                    'product_id' => $product->id,
+                    'is_asset_row' => false,
+                    'asset_id' => null,
+                    'stock_quantity' => $product->stock_quantity ?? 1,
+                ]);
+                $bookingsByRow[$rowKey] = $productBookings;
+            }
+        }
 
         $daysInMonth = $startOfMonth->daysInMonth;
 
         return view('admin.shop.bookings.calendar', compact(
             'products',
-            'bookingsByProduct',
+            'calendarRows',
+            'bookingsByRow',
             'startOfMonth',
             'endOfMonth',
             'daysInMonth',

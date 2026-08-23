@@ -14,79 +14,72 @@ struct ContentView: View {
     let apiClient: APIClient
 
     var body: some View {
-        ZStack(alignment: .bottomTrailing) {
-            TabView(selection: $selectedTab) {
-                NavigationStack {
-                    DashboardView(apiClient: apiClient, selectedTab: $selectedTab)
-                        .toolbar {
-                            ToolbarItem(placement: .topBarTrailing) {
-                                Button(role: .destructive) { showingLogoutConfirmation = true } label: {
-                                    Label("Logout", systemImage: "rectangle.portrait.and.arrow.right")
-                                }
+        TabView(selection: $selectedTab) {
+            NavigationStack {
+                DashboardView(apiClient: apiClient, selectedTab: $selectedTab)
+                    .toolbar {
+                        ToolbarItem(placement: .topBarTrailing) {
+                            Button(role: .destructive) { showingLogoutConfirmation = true } label: {
+                                Label("Logout", systemImage: "rectangle.portrait.and.arrow.right")
                             }
                         }
-                }
-                .tabItem { Label("Dashboard", systemImage: "chart.bar") }
-                .tag(0)
-
-                NavigationStack {
-                    TicketListView(apiClient: apiClient)
-                }
-                .tabItem { Label("Tickets", systemImage: "ticket") }
-                .tag(1)
-
-                NavigationStack {
-                    CustomerListView(apiClient: apiClient)
-                }
-                .tabItem { Label("Customers", systemImage: "person.2") }
-                .tag(2)
-
-                NavigationStack(path: $assetNavPath) {
-                    AssetListView(apiClient: apiClient)
-                        .navigationDestination(for: ScanDeepLink.self) { link in
-                            AssetDetailView(deviceId: link.id, apiClient: apiClient)
-                        }
-                }
-                .tabItem { Label("CMDB", systemImage: "desktopcomputer") }
-                .tag(3)
-
-                NavigationStack {
-                    InvoiceListView(apiClient: apiClient)
-                }
-                .tabItem { Label("Invoices", systemImage: "doc.text") }
-                .tag(4)
-
-                NavigationStack(path: $shopNavPath) {
-                    ShopHubView(apiClient: apiClient)
-                        .navigationDestination(for: ScanDeepLink.self) { link in
-                            OrderActionDetailView(apiClient: apiClient, orderId: link.id)
-                        }
-                }
-                .tabItem { Label("Shop", systemImage: "bag") }
-                .tag(5)
-
-                NavigationStack {
-                    RentalListView(apiClient: apiClient)
-                }
-                .tabItem { Label("Rentals", systemImage: "shippingbox") }
-                .tag(6)
+                    }
             }
+            .tabItem { Label("Dashboard", systemImage: "chart.bar") }
+            .tag(0)
 
-            // Floating Scan Button
-            Button {
+            NavigationStack {
+                TicketListView(apiClient: apiClient)
+            }
+            .tabItem { Label("Tickets", systemImage: "ticket") }
+            .tag(1)
+
+            NavigationStack {
+                CustomerListView(apiClient: apiClient)
+            }
+            .tabItem { Label("Customers", systemImage: "person.2") }
+            .tag(2)
+
+            NavigationStack(path: $assetNavPath) {
+                AssetListView(apiClient: apiClient)
+                    .navigationDestination(for: ScanDeepLink.self) { link in
+                        AssetDetailView(deviceId: link.id, apiClient: apiClient)
+                    }
+            }
+            .tabItem { Label("CMDB", systemImage: "desktopcomputer") }
+            .tag(3)
+
+            // QR Scan tab (replaces floating button)
+            Text("")
+                .tabItem { Label("Scan", systemImage: "qrcode.viewfinder") }
+                .tag(7)
+
+            NavigationStack {
+                InvoiceListView(apiClient: apiClient)
+            }
+            .tabItem { Label("Invoices", systemImage: "doc.text") }
+            .tag(4)
+
+            NavigationStack(path: $shopNavPath) {
+                ShopHubView(apiClient: apiClient)
+                    .navigationDestination(for: ScanDeepLink.self) { link in
+                        OrderActionDetailView(apiClient: apiClient, orderId: link.id)
+                    }
+            }
+            .tabItem { Label("Shop", systemImage: "bag") }
+            .tag(5)
+
+            NavigationStack {
+                RentalListView(apiClient: apiClient)
+            }
+            .tabItem { Label("Rentals", systemImage: "shippingbox") }
+            .tag(6)
+        }
+        .onChange(of: selectedTab) { oldValue, newValue in
+            if newValue == 7 {
+                selectedTab = oldValue
                 showingScanner = true
-            } label: {
-                Image(systemName: "qrcode.viewfinder")
-                    .font(.title2)
-                    .fontWeight(.semibold)
-                    .foregroundStyle(.white)
-                    .frame(width: 56, height: 56)
-                    .background(Color.blue, in: Circle())
-                    .shadow(color: .black.opacity(0.25), radius: 8, y: 4)
             }
-            .padding(.trailing, 20)
-            .padding(.bottom, 90)
-            .accessibilityLabel("Scan QR Code")
         }
         .confirmationDialog(
             "Are you sure you want to log out?",

@@ -23,7 +23,7 @@ struct ShopHubView: View {
             case .products:
                 ProductListView(apiClient: apiClient)
             case .rentals:
-                RentalListView(apiClient: apiClient)
+                ShopRentalListView(apiClient: apiClient)
             case .calendar:
                 BookingCalendarView(apiClient: apiClient)
             }

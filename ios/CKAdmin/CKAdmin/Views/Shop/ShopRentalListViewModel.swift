@@ -3,7 +3,7 @@ import Observation
 
 /// View model for the rentals/bookings list screen.
 @Observable
-final class RentalListViewModel {
+final class ShopRentalListViewModel {
 
     // MARK: - State
 

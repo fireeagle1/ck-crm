@@ -34,7 +34,8 @@ struct DashboardView: View {
                 loadingView
             }
         }
-        .navigationTitle("Dashboard")
+        .navigationTitle("CK Enterprises UK")
+        .navigationBarTitleDisplayMode(.inline)
         .sheet(isPresented: $showingCreateTicket) {
             TicketCreateView(apiClient: apiClient) {
                 await viewModel.loadMetrics()
@@ -104,57 +105,59 @@ struct DashboardView: View {
 
     private func dashboardContent(_ dashboard: DashboardResponse) -> some View {
         List {
-            // Hero image header
+            // Compact hero header with image background
             Section {
-                ZStack(alignment: .bottomLeading) {
+                ZStack(alignment: .leading) {
                     Image("HeroImage")
                         .resizable()
                         .scaledToFill()
-                        .frame(height: 160)
+                        .frame(height: 100)
                         .clipped()
                         .overlay(
                             LinearGradient(
-                                colors: [.clear, CKTheme.primary.opacity(0.7)],
+                                colors: [CKTheme.primary.opacity(0.6), CKTheme.primary.opacity(0.85)],
                                 startPoint: .top,
                                 endPoint: .bottom
                             )
                         )
 
-                    VStack(alignment: .leading, spacing: 4) {
-                        Image("Logo")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(height: 24)
-                        Text("CK Enterprises UK")
-                            .font(CKTypography.callout)
-                            .foregroundStyle(.white.opacity(0.8))
+                    HStack {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Image("Logo")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(height: 20)
+                            Text("CK Enterprises UK")
+                                .font(CKTypography.title)
+                                .foregroundStyle(.white)
+                        }
+                        Spacer()
                     }
-                    .padding()
+                    .padding(.horizontal, 16)
                 }
                 .listRowInsets(EdgeInsets())
             }
 
-            // Quick Actions
+            // Quick Actions — compact single row
             Section {
-                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
-                    actionButton(title: "New Ticket", icon: "ticket", color: CKTheme.info) {
-                        showingCreateTicket = true
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 10) {
+                        actionButton(title: "New Ticket", icon: "ticket", color: CKTheme.info) {
+                            showingCreateTicket = true
+                        }
+                        actionButton(title: "New Invoice", icon: "doc.text", color: CKTheme.success) {
+                            showingCreateInvoice = true
+                        }
+                        actionButton(title: "Customers", icon: "person.2", color: .purple) {
+                            selectedTab = 2
+                        }
+                        actionButton(title: "CMDB", icon: "desktopcomputer", color: CKTheme.warning) {
+                            selectedTab = 3
+                        }
                     }
-                    actionButton(title: "New Invoice", icon: "doc.text", color: CKTheme.success) {
-                        showingCreateInvoice = true
-                    }
-                    actionButton(title: "Customers", icon: "person.2", color: .purple) {
-                        selectedTab = 2
-                    }
-                    actionButton(title: "CMDB", icon: "desktopcomputer", color: CKTheme.warning) {
-                        selectedTab = 3
-                    }
+                    .padding(.vertical, 4)
                 }
-                .padding(.vertical, 4)
-            } header: {
-                Text("Quick Actions")
-                    .font(CKTypography.caption)
-                    .foregroundStyle(CKTheme.textSecondary)
+                .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
             }
 
             ticketStatsSection(dashboard.tickets)
@@ -176,17 +179,18 @@ struct DashboardView: View {
 
     private func actionButton(title: String, icon: String, color: Color, action: @escaping () -> Void) -> some View {
         Button(action: action) {
-            VStack(spacing: 8) {
+            VStack(spacing: 6) {
                 Image(systemName: icon)
-                    .font(.title2)
+                    .font(.title3)
                     .foregroundStyle(color)
                 Text(title)
                     .font(CKTypography.caption)
                     .fontWeight(.medium)
                     .foregroundStyle(CKTheme.textPrimary)
+                    .lineLimit(1)
             }
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 12)
+            .frame(width: 80)
+            .padding(.vertical, 10)
             .background(color.opacity(0.1))
             .clipShape(RoundedRectangle(cornerRadius: 10))
         }
@@ -198,10 +202,22 @@ struct DashboardView: View {
     private func ticketStatsSection(_ stats: TicketStats) -> some View {
         Section {
             LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
-                CKMetricCard(title: "Open Tickets", value: "\(stats.openCount)", icon: "envelope.open", color: CKTheme.info)
-                CKMetricCard(title: "Critical", value: "\(stats.criticalCount)", icon: "exclamationmark.circle", color: CKTheme.error)
-                CKMetricCard(title: "High Priority", value: "\(stats.highCount)", icon: "arrow.up.circle", color: CKTheme.warning)
-                CKMetricCard(title: "Overdue", value: "\(stats.overdueCount)", icon: "clock.badge.exclamationmark", color: .purple)
+                Button { selectedTab = 1 } label: {
+                    CKMetricCard(title: "Open Tickets", value: "\(stats.openCount)", icon: "envelope.open", color: CKTheme.info)
+                }
+                .buttonStyle(.plain)
+                Button { selectedTab = 1 } label: {
+                    CKMetricCard(title: "Critical", value: "\(stats.criticalCount)", icon: "exclamationmark.circle", color: CKTheme.error)
+                }
+                .buttonStyle(.plain)
+                Button { selectedTab = 1 } label: {
+                    CKMetricCard(title: "High Priority", value: "\(stats.highCount)", icon: "arrow.up.circle", color: CKTheme.warning)
+                }
+                .buttonStyle(.plain)
+                Button { selectedTab = 1 } label: {
+                    CKMetricCard(title: "Overdue", value: "\(stats.overdueCount)", icon: "clock.badge.exclamationmark", color: .purple)
+                }
+                .buttonStyle(.plain)
             }
             metricRow(label: "Avg Response", value: formatResponseTime(stats.avgResponseTimeMinutes ?? 0), icon: "timer", color: CKTheme.success)
         } header: {
@@ -218,9 +234,18 @@ struct DashboardView: View {
         if let rentals {
             Section {
                 LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
-                    CKMetricCard(title: "Active Rentals", value: "\(rentals.activeRentalsCount)", icon: "box.truck", color: .teal)
-                    CKMetricCard(title: "Upcoming Returns", value: "\(rentals.upcomingReturnsCount)", icon: "calendar.badge.clock", color: CKTheme.warning)
-                    CKMetricCard(title: "Recently Returned", value: "\(rentals.recentlyReturnedCount)", icon: "checkmark.circle", color: CKTheme.success)
+                    Button { selectedTab = 6 } label: {
+                        CKMetricCard(title: "Active Rentals", value: "\(rentals.activeRentalsCount)", icon: "box.truck", color: .teal)
+                    }
+                    .buttonStyle(.plain)
+                    Button { selectedTab = 6 } label: {
+                        CKMetricCard(title: "Upcoming Returns", value: "\(rentals.upcomingReturnsCount)", icon: "calendar.badge.clock", color: CKTheme.warning)
+                    }
+                    .buttonStyle(.plain)
+                    Button { selectedTab = 6 } label: {
+                        CKMetricCard(title: "Recently Returned", value: "\(rentals.recentlyReturnedCount)", icon: "checkmark.circle", color: CKTheme.success)
+                    }
+                    .buttonStyle(.plain)
                 }
             } header: {
                 Label("Rentals", systemImage: "shippingbox")
@@ -237,8 +262,14 @@ struct DashboardView: View {
             LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
                 CKMetricCard(title: "MRR", value: formatCurrency(financials.mrr), icon: "sterlingsign.circle", color: CKTheme.success)
                 CKMetricCard(title: "ARR", value: formatCurrency(financials.arr), icon: "chart.line.uptrend.xyaxis", color: CKTheme.success)
-                CKMetricCard(title: "Overdue Invoices", value: "\(financials.overdueInvoicesCount)", icon: "doc.badge.clock", color: CKTheme.error)
-                CKMetricCard(title: "Overdue Amount", value: formatCurrency(financials.overdueInvoicesAmount), icon: "sterlingsign.arrow.circlepath", color: CKTheme.error)
+                Button { selectedTab = 4 } label: {
+                    CKMetricCard(title: "Overdue Invoices", value: "\(financials.overdueInvoicesCount)", icon: "doc.badge.clock", color: CKTheme.error)
+                }
+                .buttonStyle(.plain)
+                Button { selectedTab = 4 } label: {
+                    CKMetricCard(title: "Overdue Amount", value: formatCurrency(financials.overdueInvoicesAmount), icon: "sterlingsign.arrow.circlepath", color: CKTheme.error)
+                }
+                .buttonStyle(.plain)
             }
             metricRow(label: "Revenue (Month)", value: formatCurrency(financials.revenueThisMonth), icon: "banknote", color: CKTheme.info)
         } header: {
@@ -297,20 +328,22 @@ struct DashboardView: View {
                     .foregroundStyle(CKTheme.textSecondary)
             } else {
                 ForEach(tickets) { ticket in
-                    HStack {
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text(ticket.subject)
-                                .font(CKTypography.body)
-                                .foregroundStyle(CKTheme.textPrimary)
-                                .lineLimit(1)
-                            Text(ticket.customerName)
-                                .font(CKTypography.caption)
-                                .foregroundStyle(CKTheme.textSecondary)
+                    NavigationLink(destination: TicketDetailView(ticketId: ticket.ticketId, apiClient: apiClient)) {
+                        HStack {
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(ticket.subject)
+                                    .font(CKTypography.body)
+                                    .foregroundStyle(CKTheme.textPrimary)
+                                    .lineLimit(1)
+                                Text(ticket.customerName)
+                                    .font(CKTypography.caption)
+                                    .foregroundStyle(CKTheme.textSecondary)
+                            }
+
+                            Spacer()
+
+                            statusBadge(ticket.status)
                         }
-
-                        Spacer()
-
-                        statusBadge(ticket.status)
                     }
                     .accessibilityElement(children: .combine)
                     .accessibilityLabel("\(ticket.subject), \(ticket.customerName), status: \(ticket.status)")

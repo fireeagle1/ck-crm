@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Booking;
 use App\Models\Customer;
 use App\Models\Domain;
 use App\Models\Invoice;
@@ -81,6 +82,15 @@ class DashboardController extends Controller
             ->limit(5)
             ->get();
 
+        // Upcoming rentals — confirmed/active bookings starting soon or currently active
+        $upcomingRentals = Booking::with(['product', 'customer'])
+            ->whereNotNull('company_id') // exclude blocked dates
+            ->whereIn('status', ['confirmed', 'active'])
+            ->where('end_date', '>=', now()->toDateString())
+            ->orderBy('start_date')
+            ->limit(8)
+            ->get();
+
         return view('admin.dashboard', compact(
             'openTickets',
             'criticalTickets',
@@ -97,6 +107,7 @@ class DashboardController extends Controller
             'expiringDomains',
             'recentTickets',
             'recentLogins',
+            'upcomingRentals',
         ));
     }
 

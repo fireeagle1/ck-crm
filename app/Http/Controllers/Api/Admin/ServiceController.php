@@ -22,6 +22,11 @@ class ServiceController extends Controller
             $query->where('status', $status);
         }
 
+        // Filter by customer
+        if ($customerId = $request->input('customer_id')) {
+            $query->where('company_id', $customerId);
+        }
+
         $services = $query->orderByDesc('service_id')->paginate($perPage);
 
         return response()->json([

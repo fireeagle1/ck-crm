@@ -68,7 +68,7 @@
         <table class="w-full text-sm border-collapse" style="min-width: {{ 200 + ($daysInMonth * 36) }}px;">
             <thead class="bg-gray-50 border-b">
                 <tr>
-                    <th class="px-3 py-2 text-left font-semibold text-gray-600 sticky left-0 bg-gray-50 z-10 border-r min-w-[180px]">Product</th>
+                    <th class="px-3 py-2 text-left font-semibold text-gray-600 sticky left-0 bg-gray-50 z-10 border-r min-w-[180px]">Product / Asset</th>
                     @for ($day = 1; $day <= $daysInMonth; $day++)
                         @php
                             $date = $startOfMonth->copy()->day($day);
@@ -83,26 +83,44 @@
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-100">
-                @foreach ($products as $product)
+                @php $lastProductId = null; @endphp
+                @foreach ($calendarRows as $row)
+                    @php
+                        $isNewProduct = $row['product_id'] !== $lastProductId;
+                        $lastProductId = $row['product_id'];
+                    @endphp
+                    @if ($row['is_asset_row'] && $isNewProduct)
+                        {{-- Product group header for asset-tracked products --}}
+                        <tr class="bg-gray-50/80">
+                            <td colspan="{{ $daysInMonth + 1 }}" class="px-3 py-1.5 text-xs font-semibold text-gray-600 uppercase tracking-wide sticky left-0 bg-gray-50/80 z-10">
+                                {{ $row['sublabel'] }}
+                            </td>
+                        </tr>
+                    @endif
                     <tr class="hover:bg-gray-50/50">
                         <td class="px-3 py-2 font-medium text-gray-900 sticky left-0 bg-white z-10 border-r whitespace-nowrap">
-                            {{ $product->name }}
-                            <span class="text-xs text-gray-400 ml-1">({{ $product->stock_quantity ?? 1 }} units)</span>
+                            @if ($row['is_asset_row'])
+                                <span class="pl-3">{{ $row['label'] }}</span>
+                            @else
+                                {{ $row['label'] }}
+                                <span class="text-xs text-gray-400 ml-1">({{ $row['stock_quantity'] ?? 1 }} units)</span>
+                            @endif
                         </td>
                         @for ($day = 1; $day <= $daysInMonth; $day++)
                             @php
                                 $date = $startOfMonth->copy()->day($day);
                                 $isWeekend = $date->isWeekend();
                                 $cellBookings = collect();
-                                if (isset($bookingsByProduct[$product->id])) {
-                                    $cellBookings = $bookingsByProduct[$product->id]->filter(function ($b) use ($date) {
+                                $rowBookings = $bookingsByRow[$row['key']] ?? collect();
+                                if ($rowBookings instanceof \Illuminate\Support\Collection) {
+                                    $cellBookings = $rowBookings->filter(function ($b) use ($date) {
                                         return $b->start_date->lte($date) && $b->end_date->gte($date);
                                     });
                                 }
                             @endphp
                             <td class="px-0 py-1 text-center relative {{ $isWeekend ? 'bg-gray-50' : '' }}"
                                 @if($cellBookings->isEmpty())
-                                    data-product-id="{{ $product->id }}"
+                                    data-product-id="{{ $row['product_id'] }}"
                                     data-date="{{ $date->format('Y-m-d') }}"
                                     onclick="handleEmptyClick(this)"
                                     style="cursor: pointer;"

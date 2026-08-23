@@ -1,11 +1,11 @@
 import SwiftUI
 
 /// Rental bookings list with status filter.
-struct RentalListView: View {
-    @State private var viewModel: RentalListViewModel
+struct ShopRentalListView: View {
+    @State private var viewModel: ShopRentalListViewModel
 
     init(apiClient: APIClient) {
-        _viewModel = State(initialValue: RentalListViewModel(apiClient: apiClient))
+        _viewModel = State(initialValue: ShopRentalListViewModel(apiClient: apiClient))
     }
 
     var body: some View {
@@ -223,6 +223,6 @@ struct RentalListView: View {
 
 #Preview {
     NavigationStack {
-        RentalListView(apiClient: APIClient(authManager: AuthManager()))
+        ShopRentalListView(apiClient: APIClient(authManager: AuthManager()))
     }
 }

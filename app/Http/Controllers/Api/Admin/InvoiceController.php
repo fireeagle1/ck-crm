@@ -28,6 +28,11 @@ class InvoiceController extends Controller
             $query->where('invoice_status', $status);
         }
 
+        // Filter by customer
+        if ($customerId = $request->input('customer_id')) {
+            $query->where('company_id', $customerId);
+        }
+
         $invoices = $query->orderByDesc('invoice_date')->paginate($perPage);
 
         return response()->json([
