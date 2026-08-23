@@ -422,12 +422,55 @@
                             </div>
                         @endif
 
-                        {{-- Booking Confirmation PDF Download --}}
-                        <a href="{{ route('admin.shop.bookings.downloadConfirmation', $booking) }}"
-                           class="inline-flex items-center gap-2 px-3 py-1.5 bg-purple-600 text-white rounded text-sm font-medium hover:bg-purple-700">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                            Download Booking Confirmation
-                        </a>
+                        {{-- Booking Actions --}}
+                        <div class="flex flex-wrap items-center gap-2">
+                            {{-- Download Booking Confirmation --}}
+                            <a href="{{ route('admin.shop.bookings.downloadConfirmation', $booking) }}"
+                               class="inline-flex items-center gap-2 px-3 py-1.5 bg-purple-600 text-white rounded text-sm font-medium hover:bg-purple-700">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                Download Confirmation
+                            </a>
+
+                            {{-- Resend Confirmation Email --}}
+                            <form method="POST" action="{{ route('admin.bookings.resend-confirmation', $booking) }}">
+                                @csrf
+                                <button type="submit" class="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-600 text-white rounded text-sm font-medium hover:bg-blue-700">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                                    Resend Confirmation
+                                </button>
+                            </form>
+
+                            {{-- Mark Returned (only when checked_out) --}}
+                            @if($booking->fulfilment_stage === 'checked_out')
+                                <form method="POST" action="{{ route('admin.bookings.mark-returned-list', $booking) }}">
+                                    @csrf
+                                    <button type="submit" onclick="return confirm('Mark this booking as returned?')" class="inline-flex items-center gap-2 px-3 py-1.5 bg-yellow-500 text-white rounded text-sm font-medium hover:bg-yellow-600">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                        Mark Returned
+                                    </button>
+                                </form>
+                            @endif
+
+                            {{-- Download Inspection Report (only when inspections exist) --}}
+                            @if($booking->inspections->isNotEmpty())
+                                <a href="{{ route('admin.bookings.inspection-report', $booking) }}"
+                                   class="inline-flex items-center gap-2 px-3 py-1.5 bg-gray-600 text-white rounded text-sm font-medium hover:bg-gray-700">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                    Download Inspection Report
+                                </a>
+                            @endif
+
+                            {{-- Delete Booking --}}
+                            <form method="POST" action="{{ route('admin.bookings.destroy', $booking) }}"
+                                  onsubmit="return confirm('Are you sure you want to delete booking #{{ $booking->id }}? This will also remove the associated order item and order (if empty). This cannot be undone.')">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="inline-flex items-center gap-2 px-3 py-1.5 border border-red-300 text-red-700 rounded text-sm font-medium hover:bg-red-50">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                    Delete Booking
+                                </button>
+                            </form>
+                        </div>
 
                         {{-- Signature & Agreement (collapsible) --}}
                         @if ($booking->signature_data || $booking->agreement_text_snapshot)
