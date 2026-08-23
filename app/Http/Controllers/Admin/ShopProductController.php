@@ -187,6 +187,10 @@ class ShopProductController extends Controller
 
         $this->syncVisibility($product, $validated);
 
+        if ($request->has('questions')) {
+            $this->syncProductQuestions($product, $request->input('questions', []));
+        }
+
         return redirect()->route('admin.shop.products.index')
             ->with('success', 'Product updated successfully.');
     }
@@ -274,6 +278,35 @@ class ShopProductController extends Controller
             $visibility->tiers()->sync($validated['visibility_tiers']);
         } else {
             $visibility->tiers()->detach();
+        }
+    }
+
+    /**
+     * Sync the product's custom questions.
+     * Deletes removed questions (answers preserved via nullOnDelete FK),
+     * upserts remaining questions with display_order set by array index.
+     */
+    private function syncProductQuestions(Product $product, array $questionsData): void
+    {
+        $incomingIds = collect($questionsData)->pluck('id')->filter()->toArray();
+
+        // Delete removed questions (answers preserved via nullOnDelete FK)
+        $product->questions()->whereNotIn('id', $incomingIds)->delete();
+
+        // Upsert questions
+        foreach ($questionsData as $index => $questionData) {
+            $product->questions()->updateOrCreate(
+                ['id' => $questionData['id'] ?? null],
+                [
+                    'label' => $questionData['label'],
+                    'input_type' => $questionData['input_type'],
+                    'options' => $questionData['input_type'] === 'select'
+                        ? ($questionData['options'] ?? [])
+                        : null,
+                    'is_required' => (bool) ($questionData['is_required'] ?? false),
+                    'display_order' => $index,
+                ]
+            );
         }
     }
 

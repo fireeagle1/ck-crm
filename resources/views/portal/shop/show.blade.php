@@ -109,9 +109,7 @@
                                     @if (!empty($minRentalDays))
                                         <p class="text-xs text-gray-500 mt-1.5">Minimum rental period: {{ $minRentalDays }} {{ Str::plural('day', $minRentalDays) }}</p>
                                     @endif
-                                    @if (!empty($cooldownDays) && $cooldownDays > 0)
-                                        <p class="text-xs text-gray-500 mt-0.5">{{ $cooldownDays }}-day turnaround between bookings.</p>
-                                    @endif
+                                    
                                 </div>
 
                                 {{-- Hidden date inputs for form submission --}}

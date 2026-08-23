@@ -45,16 +45,16 @@ This plan implements four enhancement areas in sequential order: database schema
   - Ensure migrations run without errors, models instantiate correctly, and relationships resolve. Ask the user if questions arise.
 
 - [ ] 3. Admin product question management
-  - [-] 3.1 Extend ShopProductController `edit()` to eager-load product questions
+  - [x] 3.1 Extend ShopProductController `edit()` to eager-load product questions
     - Add `$product->load('questions')` so questions are available to the edit view
     - _Requirements: 1.1_
 
-  - [-] 3.2 Add `syncProductQuestions()` method to ShopProductController
+  - [x] 3.2 Add `syncProductQuestions()` method to ShopProductController
     - Implement private method that accepts product and questions array data, deletes removed questions (answers preserved via nullOnDelete FK), upserts remaining questions with display_order set by array index
     - Call from the `update()` method when `$request->has('questions')`
     - _Requirements: 1.2, 1.3, 1.4, 1.5, 1.6, 1.7_
 
-  - [~] 3.3 Add Alpine.js product questions UI section to product edit view
+  - [-] 3.3 Add Alpine.js product questions UI section to product edit view
     - Add "Custom Questions" section in `admin/shop/products/edit.blade.php`
     - Alpine component managing an array of questions with: label input, input_type select dropdown (free_text, textarea, date, email, phone, select, number), options editor (shown only for select type), required toggle, reorder buttons (up/down), remove button
     - Hidden form inputs for submission to the controller
@@ -102,7 +102,7 @@ This plan implements four enhancement areas in sequential order: database schema
     - Omit section when no answers exist
     - _Requirements: 3.1, 3.2, 3.3_
 
-  - [~] 6.3 Create FulfilmentTimeline Blade component
+  - [-] 6.3 Create FulfilmentTimeline Blade component
     - Create `app/View/Components/FulfilmentTimeline.php` accepting currentStage, labels array, and layout (horizontal/responsive)
     - Create `resources/views/components/fulfilment-timeline.blade.php` rendering stages with completed/active/future styling, connector lines, and responsive horizontal/vertical layout
     - Define ADMIN_STAGE_LABELS and CUSTOMER_STAGE_LABELS constants
