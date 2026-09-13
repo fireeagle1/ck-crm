@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin;
+use App\Http\Controllers\LeadSignupController;
 use App\Http\Controllers\Portal;
 use App\Http\Controllers\ProfileController;
 use App\Http\Middleware\EnsureIsAdmin;
@@ -13,6 +14,19 @@ use Illuminate\Support\Facades\Route;
 */
 Route::get('/', function () {
     return redirect()->route('login');
+});
+
+/*
+|--------------------------------------------------------------------------
+| Public "How can we help?" enquiry form (embeddable iframe)
+| Framed only on ckenterprises.co.uk via the `embed` middleware.
+|--------------------------------------------------------------------------
+*/
+Route::middleware('embed')->group(function () {
+    Route::get('/signup', [LeadSignupController::class, 'show'])->name('signup.show');
+    Route::post('/signup', [LeadSignupController::class, 'store'])
+        ->middleware('throttle:5,1')
+        ->name('signup.store');
 });
 
 /*

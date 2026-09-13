@@ -16,6 +16,14 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'admin' => \App\Http\Middleware\EnsureIsAdmin::class,
             'onboarded' => \App\Http\Middleware\EnsureOnboarded::class,
+            'embed' => \App\Http\Middleware\AllowEmbedding::class,
+        ]);
+
+        // Public enquiry form is embedded cross-domain (iframe on the marketing
+        // site), so the session/CSRF cookie won't be present. Protected instead
+        // by throttling + honeypot.
+        $middleware->validateCsrfTokens(except: [
+            'signup',
         ]);
 
         $middleware->redirectGuestsTo('/login');
