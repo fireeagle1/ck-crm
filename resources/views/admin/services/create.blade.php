@@ -92,16 +92,25 @@
                                     <option value="ckhostco_Unlimited" {{ old('whm_package') === 'ckhostco_Unlimited' ? 'selected' : '' }}>Unlimited</option>
                                 </select>
                             </div>
-                            <div>
-                                <label for="contact_email" class="block text-sm font-medium text-gray-700">Contact Email</label>
-                                <input type="email" name="contact_email" id="contact_email" x-model="contactEmail"
-                                       placeholder="customer@example.com"
-                                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                                <p class="text-xs text-gray-400 mt-1">Auto-filled from customer account.</p>
-                            </div>
                         </div>
                         <p class="text-xs text-blue-700 mt-2">If ticked, a cPanel account will be created on your WHM server with a random password. The customer can sign in via SSO from the portal.</p>
                     </div>
+                </div>
+
+                {{-- Contact / Stripe billing email --}}
+                <div>
+                    <label for="contact_email" class="block text-sm font-semibold text-gray-700">
+                        Contact / Billing Email
+                        <span x-show="stripeSelected" class="text-red-500">*</span>
+                    </label>
+                    <input type="email" name="contact_email" id="contact_email" x-model="contactEmail"
+                           placeholder="customer@example.com"
+                           :required="stripeSelected"
+                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                    <p class="text-xs text-gray-500 mt-1">
+                        Auto-filled from the customer account and used for Stripe invoices and WHM provisioning.
+                    </p>
+                    @error('contact_email') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
                 </div>
 
                 {{-- Stripe price --}}

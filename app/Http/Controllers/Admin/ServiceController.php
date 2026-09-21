@@ -93,7 +93,7 @@ class ServiceController extends Controller
             'cpanel_username' => 'nullable|string|max:255',
             'provision_whm' => 'nullable|boolean',
             'whm_package' => 'nullable|string|max:255',
-            'contact_email' => 'nullable|email',
+            'contact_email' => 'nullable|required_with:stripe_price_id|email',
         ]);
 
         // Duplicate prevention: check if a service with the same domain already exists for this customer
@@ -138,7 +138,10 @@ class ServiceController extends Controller
         if (!empty($validated['stripe_price_id']) && config('services.stripe.secret')) {
             try {
                 $customer = Customer::find($validated['company_id']);
-                $stripeCustomerId = $this->ensureStripeCustomer($customer);
+                $stripeCustomerId = $this->ensureStripeCustomer(
+                    $customer,
+                    $validated['contact_email'] ?? null
+                );
 
                 $subscription = \Stripe\Subscription::create([
                     'customer' => $stripeCustomerId,
@@ -200,13 +203,30 @@ class ServiceController extends Controller
         }
     }
 
-    private function ensureStripeCustomer(Customer $customer): string
+    private function ensureStripeCustomer(Customer $customer, ?string $contactEmail = null): string
     {
-        if ($customer->stripe_customer_id) {
-            return $customer->stripe_customer_id;
+        $email = $contactEmail ?: $customer->users()
+            ->whereNotNull('email')
+            ->where('email', '!=', '')
+            ->value('email');
+
+        if (!$email) {
+            throw new \InvalidArgumentException(
+                'A valid billing email is required to create an invoiced Stripe subscription.'
+            );
         }
 
-        $email = $customer->users()->first()?->email;
+        if ($customer->stripe_customer_id) {
+            $stripeCustomer = \Stripe\Customer::retrieve($customer->stripe_customer_id);
+
+            if (($stripeCustomer->email ?? null) !== $email) {
+                \Stripe\Customer::update($customer->stripe_customer_id, [
+                    'email' => $email,
+                ]);
+            }
+
+            return $customer->stripe_customer_id;
+        }
 
         $stripeCustomer = \Stripe\Customer::create([
             'name' => $customer->company_name,
