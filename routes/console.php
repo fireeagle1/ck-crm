@@ -55,4 +55,4 @@ Schedule::call(fn () => Artisan::call('app:reset-low-stock-flags'))->hourly();
 Schedule::call(fn () => Artisan::call('queue:work', [
     '--stop-when-empty' => true,
     '--tries' => 3,
-]))->everyMinute()->withoutOverlapping();
+]))->everyMinute()->name('queue-work')->withoutOverlapping();
