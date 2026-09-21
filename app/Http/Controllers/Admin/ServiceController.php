@@ -119,8 +119,8 @@ class ServiceController extends Controller
             'status' => $validated['status'] ?? 'Active',
             'start_date' => $validated['start_date'] ?? now(),
             'end_date' => $validated['end_date'] ?? null,
-            'service_monthly_charge' => $validated['service_monthly_charge'],
-            'service_payment_frequency' => $validated['service_payment_frequency'],
+            'service_monthly_charge' => $validated['service_monthly_charge'] ?? null,
+            'service_payment_frequency' => $validated['service_payment_frequency'] ?? null,
         ]);
 
         // Provision WHM account if requested
