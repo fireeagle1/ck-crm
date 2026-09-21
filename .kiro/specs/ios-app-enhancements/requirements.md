@@ -91,7 +91,7 @@ This document defines requirements for a set of enhancements to the CKAdmin iOS 
 3. IF the invoice list request fails, THEN THE CKAdmin_App SHALL display an error message with a retry option.
 4. WHEN the invoice list loads successfully, THE CKAdmin_App SHALL display each invoice with its status, amount, invoice date, due date, and customer name.
 
-### Requirement 7: Design System Foundation
+### Requirement 7: Design System 4
 
 **User Story:** As an admin, I want a polished, professional visual design so that the app feels cohesive and is easy to use.
 
