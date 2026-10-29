@@ -24,7 +24,7 @@ class CustomerAppSummaryDtoTest extends TestCase
 {
     use RefreshDatabase;
 
-    private const EXPECTED_KEYS = ['name', 'status', 'billing', 'security_summary'];
+    private const EXPECTED_KEYS = ['name', 'install_url', 'status', 'billing', 'security_summary'];
 
     public function test_free_service_billing_and_exact_key_set(): void
     {

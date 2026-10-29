@@ -75,6 +75,8 @@ class CustomerAppController extends Controller
     {
         $validated = $request->validate([
             'service_id' => 'required|integer|exists:services,service_id',
+            'display_name' => 'nullable|string|max:255',
+            'install_url' => 'nullable|url|max:255',
             'repo_url' => 'nullable|url|max:255',
             'hosting_location' => 'nullable|string|max:255',
             'codebase_info' => 'nullable|string',
@@ -116,6 +118,8 @@ class CustomerAppController extends Controller
     public function update(Request $request, CustomerApp $customerApp): JsonResponse
     {
         $validated = $request->validate([
+            'display_name' => 'nullable|string|max:255',
+            'install_url' => 'nullable|url|max:255',
             'repo_url' => 'nullable|url|max:255',
             'hosting_location' => 'nullable|string|max:255',
             'codebase_info' => 'nullable|string',
@@ -154,6 +158,8 @@ class CustomerAppController extends Controller
         return [
             'id' => $app->id,
             'service_id' => $app->service_id,
+            'display_name' => $app->display_name,
+            'install_url' => $app->install_url,
             'repo_url' => $app->repo_url,
             'hosting_location' => $app->hosting_location,
             'codebase_info' => $app->codebase_info,

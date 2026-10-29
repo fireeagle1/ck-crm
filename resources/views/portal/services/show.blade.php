@@ -117,6 +117,18 @@
                             <dd class="mt-1 font-medium">{{ $appSummary['billing'] }}</dd>
                         </div>
 
+                        @if (!empty($appSummary['install_url']))
+                            <div class="sm:col-span-2">
+                                <dt class="text-gray-500 font-medium">App URL</dt>
+                                <dd class="mt-1">
+                                    <a href="{{ $appSummary['install_url'] }}" target="_blank" rel="noopener noreferrer"
+                                       class="font-medium text-blue-600 hover:underline break-all">
+                                        {{ $appSummary['install_url'] }}
+                                    </a>
+                                </dd>
+                            </div>
+                        @endif
+
                         <div class="sm:col-span-2">
                             <dt class="text-gray-500 font-medium">Security</dt>
                             <dd class="mt-1 font-medium text-gray-900">{{ $appSummary['security_summary'] }}</dd>

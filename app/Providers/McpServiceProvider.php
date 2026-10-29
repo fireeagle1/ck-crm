@@ -11,6 +11,7 @@ use App\Mcp\Query\ServicesQueryService;
 use App\Mcp\Query\TicketQueryService;
 use App\Mcp\Registry\ToolDispatcher;
 use App\Mcp\Tools\CreateTicketTool;
+use App\Mcp\Tools\RecordAppFindingsTool;
 use App\Mcp\Tools\ReplyTicketTool;
 use App\Mcp\Tools\UpdateCustomerAppTool;
 use App\Mcp\Tools\UpdateTicketTool;
@@ -218,6 +219,10 @@ class McpServiceProvider extends ServiceProvider
 
         $dispatcher->register('apps.update', fn (array $args) => $this->app
             ->make(UpdateCustomerAppTool::class)
+            ->handle($args));
+
+        $dispatcher->register('apps.record_findings', fn (array $args) => $this->app
+            ->make(RecordAppFindingsTool::class)
             ->handle($args));
     }
 

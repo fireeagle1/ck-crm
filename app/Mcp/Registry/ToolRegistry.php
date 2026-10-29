@@ -240,8 +240,9 @@ final class ToolRegistry
             // --- Web Apps (read) --------------------------------------------
             new ToolDefinition(
                 name: 'get_app',
-                description: 'Read-only. Fetch a single web app by id, returning its technical '
-                    .'metadata (repo_url, hosting_location, codebase_info) and the linked '
+                description: 'Read-only. Fetch a single web app by id, returning its '
+                    .'customer-facing display_name and install_url plus technical metadata '
+                    .'(repo_url, hosting_location, codebase_info) and the linked '
                     .'service/customer identifiers. Does not modify any data.',
                 inputSchema: $this->object(
                     properties: [
@@ -274,13 +275,15 @@ final class ToolRegistry
             // --- Web Apps (write) -------------------------------------------
             new ToolDefinition(
                 name: 'update_app',
-                description: 'WRITE operation. Updates a web app\'s technical metadata. Only the '
-                    .'provided fields are changed; omitted fields are left untouched. Billing, '
-                    .'status, and the customer-facing name live on the linked service and are '
-                    .'never changed here. This changes CRM data. Requires the apps:write scope.',
+                description: 'WRITE operation. Updates a web app\'s customer-facing and technical '
+                    .'metadata. Only the provided fields are changed; omitted fields are left '
+                    .'untouched. Billing and status live on the linked service and are never '
+                    .'changed here. This changes CRM data. Requires the apps:write scope.',
                 inputSchema: $this->object(
                     properties: [
                         'id' => $this->integer('The web app to update (id). Must exist.'),
+                        'display_name' => $this->string('Optional customer-facing name shown instead of a raw URL.'),
+                        'install_url' => $this->string('Optional custom installation/live URL where the app is reachable (http/https).'),
                         'repo_url' => $this->string('Optional repository URL (http/https).'),
                         'hosting_location' => $this->string('Optional hosting/storage location.'),
                         'codebase_info' => $this->string('Optional free-text codebase notes (framework, language, architecture).'),
@@ -290,6 +293,55 @@ final class ToolRegistry
                 requiredScope: self::SCOPE_APPS_WRITE,
                 kind: ToolDefinition::KIND_WRITE,
                 handler: 'apps.update',
+            ),
+            new ToolDefinition(
+                name: 'record_app_findings',
+                description: 'WRITE operation. Records the result of a security review of a web '
+                    .'app: the full list of packages (name + version) it uses and the security '
+                    .'findings (vulnerabilities) discovered. REPLACES the app\'s stored packages '
+                    .'and findings, so always send the COMPLETE current set, not a delta; a '
+                    .'repeat of the same payload is idempotent. Send an empty findings array to '
+                    .'record a clean review. Returns counts only and never echoes the detail '
+                    .'back. This changes CRM data. Requires the apps:write scope. Does NOT open '
+                    .'an incident — use create_ticket (ticket_type "Incident") for that.',
+                inputSchema: $this->object(
+                    properties: [
+                        'app_id' => $this->integer('The web app these findings belong to (id). Must exist.'),
+                        'packages' => [
+                            'type' => 'array',
+                            'description' => 'Every dependency the app uses. Replaces the stored set.',
+                            'items' => $this->object(
+                                properties: [
+                                    'name' => $this->string('Package identifier (e.g. "laravel/framework").'),
+                                    'version' => $this->string('Installed version (e.g. "11.9.2").'),
+                                ],
+                                required: ['name', 'version'],
+                            ),
+                        ],
+                        'findings' => [
+                            'type' => 'array',
+                            'description' => 'Every vulnerability found. Empty array records a clean review.',
+                            'items' => $this->object(
+                                properties: [
+                                    'severity' => $this->enum(
+                                        ['critical', 'high', 'medium', 'low', 'info'],
+                                        'Severity of the vulnerability.',
+                                    ),
+                                    'description' => $this->string('What the vulnerability is: affected package, CVE/advisory id, risk, and the fixed version.'),
+                                    'status' => $this->enum(
+                                        ['open', 'resolved', 'dismissed'],
+                                        'Finding status. Use "open" for a newly found, unaddressed vulnerability.',
+                                    ),
+                                ],
+                                required: ['severity', 'description', 'status'],
+                            ),
+                        ],
+                    ],
+                    required: ['app_id'],
+                ),
+                requiredScope: self::SCOPE_APPS_WRITE,
+                kind: ToolDefinition::KIND_WRITE,
+                handler: 'apps.record_findings',
             ),
 
             // --- Tickets (read) ---------------------------------------------

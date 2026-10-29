@@ -15,6 +15,26 @@
 
             <div class="space-y-5">
                 <div>
+                    <label for="display_name" class="block text-sm font-semibold text-gray-700">Display Name</label>
+                    <input type="text" name="display_name" id="display_name"
+                           value="{{ old('display_name') }}"
+                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                           placeholder="e.g. Acme Customer Portal">
+                    <p class="text-xs text-gray-400 mt-1">Friendly name shown to the customer instead of a raw URL. Falls back to the service name if blank.</p>
+                    @error('display_name') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
+                </div>
+
+                <div>
+                    <label for="install_url" class="block text-sm font-semibold text-gray-700">App / Installation URL</label>
+                    <input type="url" name="install_url" id="install_url"
+                           value="{{ old('install_url') }}"
+                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                           placeholder="https://app.customer.com">
+                    <p class="text-xs text-gray-400 mt-1">Custom location where the app is installed. Shown to the customer and over MCP.</p>
+                    @error('install_url') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
+                </div>
+
+                <div>
                     <label for="repo_url" class="block text-sm font-semibold text-gray-700">Repository URL</label>
                     <input type="url" name="repo_url" id="repo_url"
                            value="{{ old('repo_url') }}"

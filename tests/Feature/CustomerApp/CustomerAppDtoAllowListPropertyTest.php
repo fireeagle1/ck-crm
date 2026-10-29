@@ -40,7 +40,7 @@ class CustomerAppDtoAllowListPropertyTest extends TestCase
     use RefreshDatabase;
 
     /** The complete, exclusive allow-list for the customer surface. */
-    private const ALLOW_LIST = ['name', 'status', 'billing', 'security_summary'];
+    private const ALLOW_LIST = ['name', 'install_url', 'status', 'billing', 'security_summary'];
 
     private const SEVERITIES = ['critical', 'high', 'medium', 'low', 'informational'];
 

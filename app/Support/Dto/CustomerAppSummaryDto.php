@@ -9,10 +9,11 @@ use App\Support\SecuritySummaryService;
  * Hand-built, allow-listed transformer for the customer-facing app summary.
  *
  * The customer surface must never receive technical metadata. This DTO
- * returns a fixed associative array with exactly four keys and reads only
- * from the linked Service record (name, status, billing) plus the derived
- * security summary. It never calls toArray() on a model and never touches
- * CustomerApp::repo_url / hosting_location / codebase_info / packages /
+ * returns a fixed associative array of allow-listed keys. Besides the
+ * Service-derived name/status/billing and the derived security summary, it
+ * surfaces the two customer-safe app fields (a pretty display name and the
+ * custom installation URL). It never calls toArray() on a model and never
+ * touches CustomerApp::repo_url / hosting_location / codebase_info / packages /
  * findings detail, so those values are structurally absent from the output
  * (Req 5.1, 5.3, 5.4).
  */
@@ -21,15 +22,22 @@ final class CustomerAppSummaryDto
     /**
      * Build the customer-safe summary array for the given Service.
      *
-     * @return array{name: string|null, status: string|null, billing: string, security_summary: string}
+     * The display name prefers the app's own pretty name and falls back to the
+     * service short name so the customer always sees a human label rather than
+     * a raw URL. The install URL is the custom location where the app lives.
+     *
+     * @return array{name: string|null, install_url: string|null, status: string|null, billing: string, security_summary: string}
      */
     public static function fromService(Service $service): array
     {
+        $app = $service->customerApp;
+
         return [
-            'name'             => $service->service_short,
+            'name'             => $app?->display_name ?: $service->service_short,
+            'install_url'      => $app?->install_url,
             'status'           => $service->status,
             'billing'          => self::billing($service),
-            'security_summary' => SecuritySummaryService::for($service->customerApp),
+            'security_summary' => SecuritySummaryService::for($app),
         ];
     }
 

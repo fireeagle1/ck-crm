@@ -21,6 +21,20 @@
                 <h2 class="text-sm font-semibold text-gray-700 mb-4">Technical Details</h2>
                 <dl class="grid grid-cols-1 gap-y-4 text-sm">
                     <div>
+                        <dt class="text-gray-500">Display Name <span class="text-gray-400 font-normal">(shown to customer)</span></dt>
+                        <dd class="mt-1 font-medium">{{ $customerApp->display_name ?? '—' }}</dd>
+                    </div>
+                    <div>
+                        <dt class="text-gray-500">App / Installation URL <span class="text-gray-400 font-normal">(shown to customer)</span></dt>
+                        <dd class="mt-1">
+                            @if ($customerApp->install_url)
+                                <a href="{{ $customerApp->install_url }}" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline break-all">{{ $customerApp->install_url }}</a>
+                            @else
+                                —
+                            @endif
+                        </dd>
+                    </div>
+                    <div>
                         <dt class="text-gray-500">Repository URL</dt>
                         <dd class="mt-1 font-mono text-xs break-all">{{ $customerApp->repo_url ?? '—' }}</dd>
                     </div>

@@ -34,6 +34,8 @@ class CustomerAppSchemaTest extends TestCase
         $this->assertTrue(Schema::hasColumns('customer_apps', [
             'id',
             'service_id',
+            'display_name',
+            'install_url',
             'repo_url',
             'hosting_location',
             'codebase_info',

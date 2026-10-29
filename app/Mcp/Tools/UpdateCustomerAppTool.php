@@ -11,10 +11,11 @@ use Illuminate\Validation\ValidationException;
  * MCP write tool backing `update_app` (scope `apps:write`, handler key
  * `apps.update`).
  *
- * Writes back the three editable technical-metadata fields of a Web App
- * (CustomerApp): `repo_url`, `hosting_location`, `codebase_info`. Billing,
- * status and the customer-facing name live on the linked Service and are never
- * touched here, exactly as in the admin UI
+ * Writes back the editable fields of a Web App (CustomerApp): the
+ * customer-facing `display_name` and `install_url`, plus the technical
+ * metadata `repo_url`, `hosting_location`, `codebase_info`. Billing and status
+ * live on the linked Service and are never touched here, exactly as in the
+ * admin UI
  * ({@see \App\Http\Controllers\Admin\CustomerAppController::update()}).
  *
  * Only the fields present in the arguments are updated, so the connector can
@@ -53,7 +54,7 @@ final class UpdateCustomerAppTool
      *
      * @var array<int, string>
      */
-    private const EDITABLE = ['repo_url', 'hosting_location', 'codebase_info'];
+    private const EDITABLE = ['display_name', 'install_url', 'repo_url', 'hosting_location', 'codebase_info'];
 
     /**
      * Handle an `update_app` tool call.
@@ -88,7 +89,7 @@ final class UpdateCustomerAppTool
                     'code' => self::ERR_VALIDATION,
                     'message' => 'No updatable fields were provided for "update_app".',
                     'fields' => [
-                        'repo_url' => ['Provide at least one of repo_url, hosting_location, or codebase_info.'],
+                        'display_name' => ['Provide at least one of display_name, install_url, repo_url, hosting_location, or codebase_info.'],
                     ],
                 ],
             ];
@@ -118,6 +119,8 @@ final class UpdateCustomerAppTool
     private function validate(array $data): array
     {
         return Validator::make($data, [
+            'display_name' => 'sometimes|nullable|string|max:255',
+            'install_url' => 'sometimes|nullable|url|max:255',
             'repo_url' => 'sometimes|nullable|url|max:255',
             'hosting_location' => 'sometimes|nullable|string|max:255',
             'codebase_info' => 'sometimes|nullable|string',

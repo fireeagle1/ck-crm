@@ -10,7 +10,7 @@
 
     <form method="GET" action="{{ route('admin.customer-apps.index') }}" class="mb-4">
         <input type="text" name="q" value="{{ $search }}"
-               placeholder="Search by repo, hosting, service or customer..."
+               placeholder="Search by name, URL, repo, hosting, service or customer..."
                class="w-full max-w-md rounded-md border-gray-300 shadow-sm text-sm focus:ring-blue-500 focus:border-blue-500">
     </form>
 
@@ -19,6 +19,7 @@
             <thead class="bg-gray-50 border-b">
                 <tr>
                     <th class="px-4 py-3 text-left font-semibold text-gray-600">Service</th>
+                    <th class="px-4 py-3 text-left font-semibold text-gray-600">Display Name</th>
                     <th class="px-4 py-3 text-left font-semibold text-gray-600">Customer</th>
                     <th class="px-4 py-3 text-left font-semibold text-gray-600">Repository</th>
                     <th class="px-4 py-3 text-left font-semibold text-gray-600">Hosting</th>
@@ -30,6 +31,7 @@
                 @forelse ($customerApps as $app)
                     <tr class="hover:bg-gray-50 cursor-pointer" onclick="window.location='{{ route('admin.customer-apps.show', $app) }}'">
                         <td class="px-4 py-3 font-medium text-blue-600">{{ $app->service?->service_short ?? '—' }}</td>
+                        <td class="px-4 py-3">{{ $app->display_name ?? '—' }}</td>
                         <td class="px-4 py-3">{{ $app->service?->customer?->company_name ?? '—' }}</td>
                         <td class="px-4 py-3 text-gray-500 max-w-xs truncate">{{ $app->repo_url ?? '—' }}</td>
                         <td class="px-4 py-3 text-gray-500">{{ $app->hosting_location ?? '—' }}</td>
@@ -48,7 +50,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="6" class="px-4 py-6 text-center text-gray-500">No web apps yet.</td>
+                        <td colspan="7" class="px-4 py-6 text-center text-gray-500">No web apps yet.</td>
                     </tr>
                 @endforelse
             </tbody>

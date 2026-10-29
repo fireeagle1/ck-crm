@@ -25,6 +25,8 @@ class CustomerAppController extends Controller
             ->when($search !== '', function ($query) use ($search) {
                 $query->where(function ($inner) use ($search) {
                     $inner->where('repo_url', 'like', "%{$search}%")
+                        ->orWhere('display_name', 'like', "%{$search}%")
+                        ->orWhere('install_url', 'like', "%{$search}%")
                         ->orWhere('hosting_location', 'like', "%{$search}%")
                         ->orWhereHas('service', function ($service) use ($search) {
                             $service->where('service_short', 'like', "%{$search}%")
@@ -78,12 +80,16 @@ class CustomerAppController extends Controller
         }
 
         $validated = $request->validate([
+            'display_name' => 'nullable|string|max:255',
+            'install_url' => 'nullable|url|max:255',
             'repo_url' => 'nullable|url|max:255',
             'hosting_location' => 'nullable|string|max:255',
             'codebase_info' => 'nullable|string',
         ]);
 
         $customerApp = $service->customerApp()->create([
+            'display_name' => $validated['display_name'] ?? null,
+            'install_url' => $validated['install_url'] ?? null,
             'repo_url' => $validated['repo_url'] ?? null,
             'hosting_location' => $validated['hosting_location'] ?? null,
             'codebase_info' => $validated['codebase_info'] ?? null,
@@ -121,12 +127,16 @@ class CustomerAppController extends Controller
     public function update(Request $request, CustomerApp $customerApp)
     {
         $validated = $request->validate([
+            'display_name' => 'nullable|string|max:255',
+            'install_url' => 'nullable|url|max:255',
             'repo_url' => 'nullable|url|max:255',
             'hosting_location' => 'nullable|string|max:255',
             'codebase_info' => 'nullable|string',
         ]);
 
         $customerApp->update([
+            'display_name' => $validated['display_name'] ?? null,
+            'install_url' => $validated['install_url'] ?? null,
             'repo_url' => $validated['repo_url'] ?? null,
             'hosting_location' => $validated['hosting_location'] ?? null,
             'codebase_info' => $validated['codebase_info'] ?? null,
