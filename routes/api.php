@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\Admin\AssetController;
 use App\Http\Controllers\Api\Admin\AuthController;
 use App\Http\Controllers\Api\Admin\BookingController;
+use App\Http\Controllers\Api\Admin\CustomerAppController;
 use App\Http\Controllers\Api\Admin\CustomerController;
 use App\Http\Controllers\Api\Admin\DashboardController;
 use App\Http\Controllers\Api\Admin\DeviceTokenController;
@@ -38,6 +39,10 @@ Route::prefix('admin')->group(function () {
 
         // Services (read-only)
         Route::apiResource('services', ServiceController::class)->only(['index', 'show']);
+
+        // Customer apps (technical records) — full CRUD
+        Route::apiResource('customer-apps', CustomerAppController::class)
+            ->only(['index', 'show', 'store', 'update', 'destroy']);
 
         // Tickets — full CRUD + replies
         Route::apiResource('tickets', TicketController::class)->except(['destroy']);

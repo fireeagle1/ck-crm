@@ -130,9 +130,10 @@ class FindingsEndpointAuthorizationAuditTest extends TestCase
                     $reachedIngest,
                     "case {$case} ({$flavour}, no apps:write): request must NOT be processed"
                 );
-            } elseif ($flavour !== 'invalid') {
-                // With apps:write and a shape-valid body, the controller always reaches ingest
-                // (success and unknown-app both dispatch; unknown-app throws inside ingest).
+            } else {
+                // With apps:write and a shape-valid body, the controller always reaches ingest.
+                // success persists; unknown-app and allow-list-invalid both enter ingest and throw
+                // (the service resolves the app then validates), so the request is "processed".
                 $this->assertTrue(
                     $reachedIngest,
                     "case {$case} ({$flavour}, apps:write): request must be processed (reach ingest)"
@@ -257,17 +258,17 @@ class FindingsEndpointAuthorizationAuditTest extends TestCase
     }
 
     /**
-     * Drive the controller's store() exactly as the route would, translating the framework's
-     * validation exception (shape validation) into the 422 JSON response it produces through the
-     * exception handler, so this test observes the same HTTP status a real request would.
+     * Drive the controller's store() as the route would. All generated payloads are well-shaped
+     * (they pass the controller's `packages`/`findings` array rule), so store() returns a JSON
+     * response directly rather than throwing the framework's shape-validation exception. The guard
+     * remains as defence so an unexpected shape rejection surfaces the same 422 a real request
+     * would, instead of leaking as an uncaught exception.
      */
     private function invoke(Request $request, string $identifier)
     {
         try {
             return $this->controller->store($request, $identifier);
         } catch (ValidationException $e) {
-            // The shape rule ('packages'/'findings' must be arrays) throws here; Laravel renders it
-            // as a 422. Reproduce that status so the body shape does not change the assertion.
             return response()->json([
                 'message' => $e->getMessage(),
                 'errors' => $e->errors(),

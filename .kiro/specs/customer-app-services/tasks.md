@@ -128,41 +128,41 @@ Nothing in this plan writes GitHub, ChatGPT, or OpenAI scanning logic, and the A
     - Delegate to `FindingsIngestService`; do not register in the scheduler; reference no GitHub/ChatGPT/OpenAI logic
     - _Requirements: 3.1, 3.6_
 
-  - [-]* 7.4 Write property test for endpoint authorization and audit
+  - [x]* 7.4 Write property test for endpoint authorization and audit
     - **Property 5: Findings endpoint authorization and audit**
     - Random token scope sets and request sequences; assert process iff valid token carries `apps:write`, no persistence on deny, exactly one audit row per request with matching outcome
     - **Validates: Requirements 3.5, 3.7**
 
-  - [-]* 7.5 Write smoke/structural tests for scope and no-scan guarantees
+  - [x]* 7.5 Write smoke/structural tests for scope and no-scan guarantees
     - Assert `apps:write` is in the allowed scope set and the route sits inside the MCP middleware group; assert the controller, command, and ingest service reference no GitHub/OpenAI client and the command is not scheduler-registered
     - _Requirements: 3.5, 3.6_
 
-- [~] 8. Checkpoint - findings endpoint and command
+- [x] 8. Checkpoint - findings endpoint and command
   - Ensure all tests pass, ask the user if questions arise.
 
 - [ ] 9. Implement the admin technical view
-  - [~] 9.1 Implement web `App\Http\Controllers\Admin\CustomerAppController`
+  - [x] 9.1 Implement web `App\Http\Controllers\Admin\CustomerAppController`
     - Resourceful controller mirroring `Admin\ServiceController`: route-model binding, `admin.customer-apps.*` Blade views, redirect-with-flash, admin middleware group
     - `create`/`store(Service)` build a `CustomerApp` against an existing Service; reject with a "service already has a linked app" message when `$service->customerApp()->exists()`; validate `repo_url` (nullable URL), `hosting_location`, `codebase_info`
     - `show(CustomerApp)` eager-loads `service.customer`, `packages`, `findings` and renders the full technical view plus the linked service name/status/billing
     - `edit`/`update` edit only `repo_url`, `hosting_location`, `codebase_info`
     - _Requirements: 4.1, 4.2, 4.3, 4.4, 1.4_
 
-  - [~] 9.2 Create `admin.customer-apps.*` Blade views
+  - [-] 9.2 Create `admin.customer-apps.*` Blade views
     - Show view renders repo/hosting/codebase + all packages + all findings + service name/status/billing; create/edit forms for the three editable fields
     - _Requirements: 4.1, 4.2, 4.3_
 
-  - [~] 9.3 Implement API `App\Http\Controllers\Api\Admin\CustomerAppController`
+  - [x] 9.3 Implement API `App\Http\Controllers\Api\Admin\CustomerAppController`
     - Follow the `Api\Admin\ServiceController` JSON shape (`{ data, meta }`, `min($perPage, 100)` cap)
     - Build an explicit array in `show()` rather than `$model->toArray()`
     - _Requirements: 4.1, 4.4_
 
-  - [ ]* 9.4 Write property test for one-to-one invariant
+  - [-]* 9.4 Write property test for one-to-one invariant
     - **Property 1: At most one CustomerApp per Service**
     - Random sequences of create attempts against a service; assert at most one app persists, first wins, subsequent creates rejected and reported
     - **Validates: Requirements 1.3, 1.4**
 
-  - [ ]* 9.5 Write admin feature tests
+  - [-]* 9.5 Write admin feature tests
     - Admin show renders repo/hosting/codebase + all packages + all findings + service name/status/billing; create/edit persist the expected fields; duplicate create is rejected
     - _Requirements: 4.1, 4.2, 4.3, 4.4_
 

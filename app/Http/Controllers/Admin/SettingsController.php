@@ -152,8 +152,41 @@ class SettingsController extends Controller
         ];
 
         $migrations = $this->migrationStatus();
+        $passport = $this->passportStatus();
 
-        return view('admin.settings.maintenance', compact('storageLink', 'migrations'));
+        return view('admin.settings.maintenance', compact('storageLink', 'migrations', 'passport'));
+    }
+
+    /**
+     * Report Passport/MCP readiness for the panel: whether the oauth tables
+     * exist, whether the signing keys are present, and whether the mcp_client
+     * has been created. Each check degrades to false on error so the page
+     * always renders.
+     */
+    private function passportStatus(): array
+    {
+        $tablesExist = false;
+        $clientExists = false;
+
+        try {
+            $tablesExist = \Illuminate\Support\Facades\Schema::hasTable('oauth_clients')
+                && \Illuminate\Support\Facades\Schema::hasTable('oauth_access_tokens');
+
+            if ($tablesExist) {
+                $clientExists = \Illuminate\Support\Facades\DB::table('oauth_clients')
+                    ->where('name', 'mcp_client')
+                    ->exists();
+            }
+        } catch (\Throwable) {
+            // leave defaults
+        }
+
+        return [
+            'tables_exist' => $tablesExist,
+            'keys_exist'   => file_exists(storage_path('oauth-private.key'))
+                && file_exists(storage_path('oauth-public.key')),
+            'client_exists' => $clientExists,
+        ];
     }
 
     /**
@@ -260,6 +293,73 @@ class SettingsController extends Controller
             return back()->with('migration_preview', $output !== '' ? $output : 'Nothing pending — no SQL would run.');
         } catch (\Throwable $e) {
             return back()->with('error', 'Preview failed: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Generate the Passport signing keys (storage/oauth-private.key and
+     * oauth-public.key) from the browser — the no-SSH equivalent of
+     * `php artisan passport:keys`. The OAuth/MCP flow throws "Invalid key
+     * supplied" until these exist. Will not overwrite existing keys unless
+     * explicitly forced, since regenerating keys invalidates all live tokens.
+     */
+    public function generatePassportKeys(Request $request)
+    {
+        $force = $request->boolean('force');
+
+        $private = storage_path('oauth-private.key');
+        $public = storage_path('oauth-public.key');
+
+        if ((file_exists($private) || file_exists($public)) && ! $force) {
+            return back()->with('error', 'Passport keys already exist. Tick "overwrite" only if you intend to regenerate them — doing so invalidates every issued token.');
+        }
+
+        try {
+            \Illuminate\Support\Facades\Artisan::call('passport:keys', $force ? ['--force' => true] : []);
+
+            // Lock the private key down; it is a secret.
+            if (file_exists($private)) {
+                @chmod($private, 0600);
+            }
+
+            return back()->with('success', 'Passport keys generated in storage/. Keep them out of version control.');
+        } catch (\Throwable $e) {
+            return back()->with('error', 'Key generation failed: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Create the public (PKCE, no-secret) MCP OAuth client from the browser —
+     * the no-SSH equivalent of `php artisan mcp:create-client`. Prints the
+     * Client ID to paste into OpenAI's connector. Refuses to create a second
+     * client if one named mcp_client already exists.
+     */
+    public function createMcpClient(Request $request)
+    {
+        $request->validate([
+            'redirect_uri' => 'required|url',
+        ]);
+
+        try {
+            if (! \Illuminate\Support\Facades\Schema::hasTable('oauth_clients')) {
+                return back()->with('error', 'The oauth_clients table does not exist yet — run migrations first.');
+            }
+
+            $exists = \Illuminate\Support\Facades\DB::table('oauth_clients')->where('name', 'mcp_client')->exists();
+            if ($exists) {
+                return back()->with('error', 'An "mcp_client" already exists. Delete it first if you need to recreate it.');
+            }
+
+            $clients = app(\Laravel\Passport\ClientRepository::class);
+            $client = $clients->createAuthorizationCodeGrantClient(
+                name: 'mcp_client',
+                redirectUris: [trim($request->input('redirect_uri'))],
+                confidential: false,
+            );
+
+            return back()->with('success', 'MCP client created. Client ID: ' . $client->getKey() . ' — configure OpenAI\'s connector with this ID (public client, no secret, PKCE required).');
+        } catch (\Throwable $e) {
+            return back()->with('error', 'Client creation failed: ' . $e->getMessage());
         }
     }
 

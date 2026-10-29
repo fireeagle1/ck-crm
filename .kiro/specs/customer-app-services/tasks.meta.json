@@ -251,6 +251,11 @@
         "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
         "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
         "timestamp": 1793298990854
+      },
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793300213667
       }
     ],
     "9.1 Implement web `App\\Http\\Controllers\\Admin\\CustomerAppController`": [
@@ -258,6 +263,16 @@
         "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
         "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
         "timestamp": 1793298990875
+      },
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793300221658
+      },
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793300333910
       }
     ],
     "9.2 Create `admin.customer-apps.*` Blade views": [
@@ -265,6 +280,11 @@
         "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
         "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
         "timestamp": 1793298990896
+      },
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793300341997
       }
     ],
     "9.3 Implement API `App\\Http\\Controllers\\Api\\Admin\\CustomerAppController`": [
@@ -272,6 +292,16 @@
         "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
         "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
         "timestamp": 1793298990917
+      },
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793300220495
+      },
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793300332753
       }
     ],
     "10.1 Wire the portal app summary into the `Portal\\ServiceController` pattern": [
@@ -469,6 +499,11 @@
         "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
         "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
         "timestamp": 1793299955683
+      },
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793300181934
       }
     ],
     "7.5 Write smoke/structural tests for scope and no-scan guarantees": [
@@ -481,6 +516,35 @@
         "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
         "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
         "timestamp": 1793299956682
+      },
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793300181057
+      }
+    ],
+    "9.4 Write property test for one-to-one invariant": [
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793300337851
+      },
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793300343359
+      }
+    ],
+    "9.5 Write admin feature tests": [
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793300338877
+      },
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793300344135
       }
     ]
   }

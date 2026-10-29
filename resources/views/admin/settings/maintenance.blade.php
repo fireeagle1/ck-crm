@@ -183,6 +183,84 @@
                 </form>
             </div>
 
+            {{-- MCP / Passport setup --}}
+            <div class="bg-white rounded-lg shadow-sm border p-5 mb-6">
+                <h2 class="text-sm font-semibold text-gray-700 mb-1">ChatGPT MCP / Passport Setup</h2>
+                <p class="text-xs text-gray-500 mb-4">
+                    One-time setup for the OpenAI connector, done from the browser so you don't need SSH. Complete these in order:
+                    run migrations (creates the <span class="font-mono">oauth_*</span> tables), generate signing keys, then create the client.
+                </p>
+
+                {{-- Readiness checklist --}}
+                <ol class="mb-5 space-y-2 text-sm">
+                    @php
+                        $steps = [
+                            ['done' => $passport['tables_exist'],  'label' => 'OAuth tables exist', 'hint' => 'Run migrations above if missing'],
+                            ['done' => $passport['keys_exist'],    'label' => 'Passport signing keys present', 'hint' => 'storage/oauth-*.key'],
+                            ['done' => $passport['client_exists'], 'label' => 'mcp_client created', 'hint' => 'the ID OpenAI connects with'],
+                        ];
+                    @endphp
+                    @foreach ($steps as $i => $s)
+                        <li class="flex items-center gap-2">
+                            @if ($s['done'])
+                                <span class="inline-flex w-5 h-5 items-center justify-center rounded-full bg-green-100 text-green-700">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                                </span>
+                            @else
+                                <span class="inline-flex w-5 h-5 items-center justify-center rounded-full bg-gray-200 text-gray-500 text-[11px] font-semibold">{{ $i + 1 }}</span>
+                            @endif
+                            <span class="{{ $s['done'] ? 'text-gray-700' : 'text-gray-500' }}">{{ $s['label'] }}</span>
+                            <span class="text-xs text-gray-400">— {{ $s['hint'] }}</span>
+                        </li>
+                    @endforeach
+                </ol>
+
+                <div class="space-y-4">
+                    {{-- Generate keys --}}
+                    <div class="border rounded-md p-3">
+                        <div class="text-sm font-medium text-gray-800 mb-1">Generate Passport keys</div>
+                        <p class="text-xs text-gray-400 mb-2">Writes the signing keys to <span class="font-mono">storage/</span>. Required before any OAuth request works.</p>
+                        <form method="POST" action="{{ url('/admin/settings/maintenance/passport-keys') }}"
+                              onsubmit="return confirm('Generate Passport keys now?');">
+                            @csrf
+                            @if ($passport['keys_exist'])
+                                <label class="flex items-start gap-2 mb-2 text-xs text-red-600">
+                                    <input type="checkbox" name="force" value="1" class="mt-0.5 rounded border-gray-300 text-red-600 focus:ring-red-500">
+                                    <span>Overwrite existing keys — <strong>this invalidates every issued token</strong>.</span>
+                                </label>
+                            @endif
+                            <button type="submit"
+                                    class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition
+                                           {{ $passport['keys_exist'] ? 'bg-gray-100 text-gray-700 hover:bg-gray-200' : 'bg-blue-600 text-white hover:bg-blue-700' }}">
+                                {{ $passport['keys_exist'] ? 'Regenerate keys' : 'Generate keys' }}
+                            </button>
+                        </form>
+                    </div>
+
+                    {{-- Create client --}}
+                    <div class="border rounded-md p-3">
+                        <div class="text-sm font-medium text-gray-800 mb-1">Create MCP client</div>
+                        @if ($passport['client_exists'])
+                            <p class="text-xs text-green-600">An <span class="font-mono">mcp_client</span> already exists. Manage/revoke tokens at
+                                <a href="{{ url('/admin/mcp/tokens') }}" class="underline">MCP tokens</a>.</p>
+                        @else
+                            <p class="text-xs text-gray-400 mb-2">Creates the public (PKCE, no-secret) client. Paste the OpenAI connector's callback URL.</p>
+                            <form method="POST" action="{{ url('/admin/settings/maintenance/mcp-client') }}" class="flex flex-wrap items-center gap-2">
+                                @csrf
+                                <input type="url" name="redirect_uri" required
+                                       value="https://chat.openai.com/connector_platform_oauth_redirect"
+                                       class="flex-1 min-w-[18rem] rounded-md border-gray-300 shadow-sm text-sm focus:ring-blue-500 focus:border-blue-500">
+                                <button type="submit" class="px-3 py-2 rounded-md text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 transition">
+                                    Create client
+                                </button>
+                            </form>
+                            @error('redirect_uri') <p class="text-red-600 text-xs mt-1">{{ $message }}</p> @enderror
+                            <p class="text-xs text-gray-400 mt-2">The resulting Client ID appears in the green banner at the top — copy it into OpenAI's connector (no secret needed).</p>
+                        @endif
+                    </div>
+                </div>
+            </div>
+
             {{-- Cache maintenance --}}
             <div class="bg-white rounded-lg shadow-sm border p-5">
                 <h2 class="text-sm font-semibold text-gray-700 mb-1">Caches</h2>

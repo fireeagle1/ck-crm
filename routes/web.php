@@ -140,6 +140,14 @@ Route::middleware(['auth', 'verified', EnsureIsAdmin::class])->prefix('admin')->
     Route::put('/services/{service}', [Admin\ServiceController::class, 'update'])->name('services.update');
     Route::delete('/services/{service}', [Admin\ServiceController::class, 'destroy'])->name('services.destroy');
 
+    // Customer Apps (technical records linked 1:1 to a Service)
+    Route::get('/services/{service}/customer-app/create', [Admin\CustomerAppController::class, 'create'])->name('customer-apps.create');
+    Route::post('/services/{service}/customer-app', [Admin\CustomerAppController::class, 'store'])->name('customer-apps.store');
+    Route::get('/customer-apps/{customerApp}', [Admin\CustomerAppController::class, 'show'])->name('customer-apps.show');
+    Route::get('/customer-apps/{customerApp}/edit', [Admin\CustomerAppController::class, 'edit'])->name('customer-apps.edit');
+    Route::put('/customer-apps/{customerApp}', [Admin\CustomerAppController::class, 'update'])->name('customer-apps.update');
+    Route::delete('/customer-apps/{customerApp}', [Admin\CustomerAppController::class, 'destroy'])->name('customer-apps.destroy');
+
     // Communications
     Route::get('/communications', [Admin\CommunicationController::class, 'index'])->name('communications.index');
     Route::post('/communications/preview', [Admin\CommunicationController::class, 'preview'])->name('communications.preview');
@@ -224,6 +232,8 @@ Route::middleware(['auth', 'verified', EnsureIsAdmin::class])->prefix('admin')->
     Route::post('/settings/maintenance/migrate', [Admin\SettingsController::class, 'runMigrations'])->name('settings.maintenance.migrate');
     Route::post('/settings/maintenance/migrate-sync', [Admin\SettingsController::class, 'syncMigrationHistory'])->name('settings.maintenance.migrate-sync');
     Route::post('/settings/maintenance/migrate-preview', [Admin\SettingsController::class, 'previewMigrations'])->name('settings.maintenance.migrate-preview');
+    Route::post('/settings/maintenance/passport-keys', [Admin\SettingsController::class, 'generatePassportKeys'])->name('settings.maintenance.passport-keys');
+    Route::post('/settings/maintenance/mcp-client', [Admin\SettingsController::class, 'createMcpClient'])->name('settings.maintenance.mcp-client');
     Route::get('/settings/whm', [Admin\WhmConfigController::class, 'edit'])->name('settings.whm');
     Route::post('/settings/whm', [Admin\WhmConfigController::class, 'update'])->name('settings.whm.update');
 
