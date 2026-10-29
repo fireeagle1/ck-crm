@@ -57,21 +57,21 @@ Nothing in this plan writes GitHub, ChatGPT, or OpenAI scanning logic, and the A
   - Ensure all tests pass, ask the user if questions arise.
 
 - [ ] 4. Implement the security summary and customer DTO
-  - [-] 4.1 Implement `App\Support\SecuritySummaryService`
+  - [x] 4.1 Implement `App\Support\SecuritySummaryService`
     - Static `for(?CustomerApp $app): string` deriving the string from open-finding count alone: 0 → "Security checks passing", 1 → "1 issue being addressed", N → "{N} issues being addressed"
     - Read only `status`; never touch severity/description/packages
     - _Requirements: 6.1, 6.2, 6.3, 5.2_
 
-  - [ ]* 4.2 Write property test for the security summary
+  - [-]* 4.2 Write property test for the security summary
     - **Property 7: Security summary is a status-only function of open findings**
     - Random finding multisets; assert "passing" iff open-count == 0 else exact count wording, and the string contains no severity/description/package text
     - **Validates: Requirements 5.2, 6.1, 6.2, 6.3**
 
-  - [ ]* 4.3 Write unit tests for `SecuritySummaryService` branches
+  - [~]* 4.3 Write unit tests for `SecuritySummaryService` branches
     - Zero open, one open (singular), many open (plural), and open-count ignoring `resolved`/`dismissed`
     - _Requirements: 6.1, 6.2, 6.3_
 
-  - [~] 4.4 Implement `App\Support\Dto\CustomerAppSummaryDto`
+  - [-] 4.4 Implement `App\Support\Dto\CustomerAppSummaryDto`
     - Static `fromService(Service $service): array` returning exactly `name`, `status`, `billing`, `security_summary`
     - Billing derived from the `Service` record (Free when no `stripe_subscription_id` and no `service_monthly_charge`, else the formatted charge); summary from `SecuritySummaryService`
     - Never call `toArray()`; never read `repo_url`/`hosting_location`/`codebase_info`/packages/findings detail
@@ -86,8 +86,8 @@ Nothing in this plan writes GitHub, ChatGPT, or OpenAI scanning logic, and the A
     - Assert the exact key set for a free service and a Stripe-charged service
     - _Requirements: 5.1_
 
-- [ ] 5. Implement the findings ingestion service
-  - [-] 5.1 Implement `App\Services\FindingsIngestService`
+- [x] 5. Implement the findings ingestion service
+  - [x] 5.1 Implement `App\Services\FindingsIngestService`
     - `ingest(string $appIdentifier, array $packages, array $findings): array` returning `{packages:int, findings:int}`
     - Resolve the `CustomerApp` by identifier; throw a domain exception naming the unknown identifier and persist nothing if none matches
     - Validate payload against an explicit allow-list (package: `name`+`version`; finding: `severity`+`description`+`status ∈ SecurityFinding::STATUSES`); persist nothing on failure
@@ -95,17 +95,17 @@ Nothing in this plan writes GitHub, ChatGPT, or OpenAI scanning logic, and the A
     - Reference no GitHub/OpenAI client
     - _Requirements: 3.1, 3.2, 3.3, 3.4, 2.3, 2.5_
 
-  - [ ]* 5.2 Write property test for bulk-replace idempotence
+  - [-]* 5.2 Write property test for bulk-replace idempotence
     - **Property 3: Findings ingestion is a full, idempotent bulk replacement**
     - Random prior set + random valid payload; assert stored set equals payload with `synced_at` stamped; re-apply same payload and assert unchanged
     - **Validates: Requirements 2.3, 2.5, 3.1, 3.2**
 
-  - [ ]* 5.3 Write property test for rejection without mutation
+  - [-]* 5.3 Write property test for rejection without mutation
     - **Property 4: Invalid or unknown-app payloads are rejected with no mutation**
     - Random unknown identifiers and random invalid payloads; assert reject, DB unchanged, and error identifies the unknown app or the invalid fields
     - **Validates: Requirements 2.2, 3.3, 3.4**
 
-  - [ ]* 5.4 Write unit tests for `FindingsIngestService`
+  - [-]* 5.4 Write unit tests for `FindingsIngestService`
     - Reject-unknown-app, reject-invalid-payload (no mutation), successful transactional replace, and out-of-set status rejection
     - _Requirements: 2.2, 3.3, 3.4_
 

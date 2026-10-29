@@ -109,6 +109,7 @@
                         @endif
                     </div>
                 @else
+                    @php $alreadyApplied = $migrations['already_applied'] ?? []; @endphp
                     <div class="mb-4">
                         <span class="inline-flex items-center gap-1.5 rounded-full bg-amber-100 text-amber-700 px-2.5 py-1 text-xs font-medium">
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
@@ -116,10 +117,52 @@
                         </span>
                         <ul class="mt-3 border rounded-md divide-y divide-gray-100 bg-gray-50/60 max-h-48 overflow-y-auto">
                             @foreach ($migrations['pending'] as $name)
-                                <li class="px-3 py-1.5 font-mono text-xs text-gray-600">{{ $name }}</li>
+                                <li class="px-3 py-1.5 font-mono text-xs flex items-center justify-between gap-2 {{ in_array($name, $alreadyApplied) ? 'text-gray-400' : 'text-gray-600' }}">
+                                    <span>{{ $name }}</span>
+                                    @if (in_array($name, $alreadyApplied))
+                                        <span class="shrink-0 rounded bg-gray-200 text-gray-600 px-1.5 py-0.5 text-[10px] font-sans font-medium">table exists</span>
+                                    @endif
+                                </li>
                             @endforeach
                         </ul>
                     </div>
+
+                    {{-- Drift warning: some pending migrations target tables that
+                         already exist. Running migrate would fail on these — offer
+                         the non-destructive history sync instead. --}}
+                    @if (count($alreadyApplied) > 0)
+                        <div class="mb-4 rounded-md border border-amber-300 bg-amber-50 p-4">
+                            <div class="flex items-start gap-2">
+                                <svg class="w-5 h-5 text-amber-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                <div class="text-sm text-amber-800">
+                                    <p class="font-semibold mb-1">History mismatch detected</p>
+                                    <p class="text-xs leading-relaxed">
+                                        {{ count($alreadyApplied) }} pending migration(s) create tables that <strong>already exist</strong> in this database
+                                        (common after a database copy or restore). Running migrations would fail with
+                                        <span class="font-mono">“table already exists”</span>.
+                                        <strong>Sync history</strong> marks those as already applied — it only writes to the
+                                        <span class="font-mono">migrations</span> table and makes <em>no schema changes</em>, so no data is touched.
+                                        Afterwards, run migrations to apply any genuinely new ones.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <form method="POST" action="{{ url('/admin/settings/maintenance/migrate-sync') }}" class="mt-3"
+                                  onsubmit="return confirm('Mark {{ count($alreadyApplied) }} already-present migration(s) as applied? This only updates the migrations history table — no tables are created, altered or dropped.');">
+                                @csrf
+                                <label class="flex items-start gap-2 mb-3 text-xs text-amber-800">
+                                    <input type="checkbox" name="confirm" value="1" required
+                                           class="mt-0.5 rounded border-amber-400 text-amber-600 focus:ring-amber-500">
+                                    <span>I understand this only reconciles migration history and makes no schema changes.</span>
+                                </label>
+                                <button type="submit"
+                                        class="inline-flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium bg-amber-600 text-white hover:bg-amber-700 transition">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+                                    Sync history ({{ count($alreadyApplied) }})
+                                </button>
+                            </form>
+                        </div>
+                    @endif
                 @endif
 
                 <form method="POST" action="{{ url('/admin/settings/maintenance/migrate') }}"

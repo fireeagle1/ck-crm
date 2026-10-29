@@ -179,14 +179,43 @@ class SettingsController extends Controller
                 fn ($name) => ! in_array($name, $ran, true)
             ));
 
+            // Detect drift: pending "create table" migrations whose table ALREADY
+            // exists in the DB. These would fail with "table already exists" if
+            // run — they just need their history record syncing, not re-running.
+            // Happens when a DB is restored/copied but its migrations table isn't.
+            $alreadyApplied = array_values(array_filter(
+                $pending,
+                fn ($name) => $this->migrationTargetExists($name)
+            ));
+
             return [
                 'ok' => true,
                 'ran_count' => count($ran),
                 'pending' => $pending,
+                'already_applied' => $alreadyApplied,
                 'note' => null,
             ];
         } catch (\Throwable $e) {
-            return ['ok' => false, 'ran_count' => 0, 'pending' => [], 'note' => 'Could not read migration status: ' . $e->getMessage()];
+            return ['ok' => false, 'ran_count' => 0, 'pending' => [], 'already_applied' => [], 'note' => 'Could not read migration status: ' . $e->getMessage()];
+        }
+    }
+
+    /**
+     * Best-effort check of whether a "create_<table>_table" migration's target
+     * table already exists. Only used to flag already-applied create migrations
+     * for history syncing; a false negative simply means it isn't offered for
+     * sync (and a real run would create it), so this is conservative by design.
+     */
+    private function migrationTargetExists(string $migrationName): bool
+    {
+        if (! preg_match('/create_(.+)_table$/', $migrationName, $m)) {
+            return false;
+        }
+
+        try {
+            return \Illuminate\Support\Facades\Schema::hasTable($m[1]);
+        } catch (\Throwable) {
+            return false;
         }
     }
 
@@ -211,6 +240,58 @@ class SettingsController extends Controller
             return back()->with('success', 'Migrations run. ' . ($output !== '' ? $output : 'Nothing to migrate.'));
         } catch (\Throwable $e) {
             return back()->with('error', 'Migration failed: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Reconcile the migrations history for a database whose tables already
+     * exist but whose `migrations` table doesn't record them (e.g. after a DB
+     * copy/restore). For each pending "create_<table>_table" migration whose
+     * table is already present, we INSERT a history record so Laravel stops
+     * treating it as pending — WITHOUT running any schema SQL.
+     *
+     * This is strictly non-destructive: it only inserts rows into the
+     * `migrations` table. It never creates, alters or drops any application
+     * table, so existing data cannot be touched.
+     */
+    public function syncMigrationHistory(Request $request)
+    {
+        $request->validate([
+            'confirm' => 'accepted',
+        ]);
+
+        try {
+            $migrator = app('migrator');
+            $repository = $migrator->getRepository();
+
+            if (! $repository->repositoryExists()) {
+                $repository->createRepository();
+            }
+
+            $ran = $repository->getRan();
+            $files = array_keys($migrator->getMigrationFiles(database_path('migrations')));
+
+            $pending = array_filter($files, fn ($name) => ! in_array($name, $ran, true));
+
+            // Next batch number, so these records group together and can be
+            // identified/rolled back as a unit if ever needed.
+            $batch = $repository->getNextBatchNumber();
+
+            $synced = [];
+            foreach ($pending as $name) {
+                if ($this->migrationTargetExists($name)) {
+                    $repository->log($name, $batch);
+                    $synced[] = $name;
+                }
+            }
+
+            if (empty($synced)) {
+                return back()->with('success', 'Nothing to sync — no pending create-table migrations have an existing table.');
+            }
+
+            return back()->with('success', count($synced) . ' migration(s) marked as already applied (no schema changes made): ' . implode(', ', $synced));
+        } catch (\Throwable $e) {
+            return back()->with('error', 'Sync failed: ' . $e->getMessage());
         }
     }
 
