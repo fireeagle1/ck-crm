@@ -30,7 +30,7 @@ class User extends Authenticatable
      * Attributes that must be set explicitly (not mass-assignable for security).
      * Use $user->is_admin = true, $user->is_locked = true, etc.
      */
-    protected $guarded_note = 'is_admin, is_locked, failed_attempts, lock_until are intentionally excluded from $fillable';
+    protected $guarded_note = 'is_admin, is_login_disabled, is_locked, failed_attempts, lock_until are intentionally excluded from $fillable';
 
     protected $hidden = [
         'password',
@@ -43,6 +43,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'is_admin' => 'boolean',
+            'is_login_disabled' => 'boolean',
             'is_locked' => 'boolean',
             'lock_until' => 'datetime',
             'last_login' => 'datetime',

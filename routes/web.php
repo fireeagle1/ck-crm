@@ -219,6 +219,8 @@ Route::middleware(['auth', 'verified', EnsureIsAdmin::class])->prefix('admin')->
     Route::get('/settings/import', [Admin\SettingsController::class, 'import'])->name('settings.import');
     Route::get('/settings/scheduled-tasks', [Admin\SettingsController::class, 'scheduledTasks'])->name('settings.tasks');
     Route::post('/settings/scheduled-tasks/run', [Admin\SettingsController::class, 'runTask'])->name('settings.tasks.run');
+    Route::get('/settings/maintenance', [Admin\SettingsController::class, 'maintenance'])->name('settings.maintenance');
+    Route::post('/settings/maintenance/run', [Admin\SettingsController::class, 'runMaintenance'])->name('settings.maintenance.run');
     Route::get('/settings/whm', [Admin\WhmConfigController::class, 'edit'])->name('settings.whm');
     Route::post('/settings/whm', [Admin\WhmConfigController::class, 'update'])->name('settings.whm.update');
 
@@ -283,6 +285,10 @@ Route::middleware(['auth', 'verified', EnsureIsAdmin::class])->prefix('admin')->
 
     // Customer Shop & Rental History
     Route::get('/customers/{customer}/shop', [Admin\CustomerShopController::class, 'index'])->name('customers.shop');
+
+    // MCP (ChatGPT) OAuth token management — admin-only, never exposed to the MCP surface
+    Route::get('/mcp/tokens', [Admin\McpTokenController::class, 'index'])->name('mcp.tokens.index');
+    Route::post('/mcp/tokens/{id}/revoke', [Admin\McpTokenController::class, 'revoke'])->name('mcp.tokens.revoke');
 });
 
 /*

@@ -41,6 +41,13 @@ class AuthController extends Controller
             ], 401);
         }
 
+        // Account has login disabled (e.g. system/bot accounts)
+        if ($user->is_login_disabled) {
+            return response()->json([
+                'message' => 'Account is disabled.',
+            ], 403);
+        }
+
         // Account is locked
         if ($user->is_locked) {
             // If lock_until is set and has expired, unlock the account

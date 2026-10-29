@@ -42,6 +42,16 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+
+        // Added for the ChatGPT MCP integration (OAuth 2.1 via Laravel Passport).
+        // This guard is used ONLY by the /mcp route group and Passport's own
+        // /oauth/* endpoints. The existing 'web' guard and Sanctum's token
+        // handling (which rides on the 'web' guard) are intentionally left
+        // untouched so the admin API and portal continue to behave identically.
+        'api' => [
+            'driver' => 'passport',
+            'provider' => 'users',
+        ],
     ],
 
     /*

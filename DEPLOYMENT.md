@@ -57,13 +57,32 @@ Via File Manager:
 - `storage/` → 775 (recursive)
 - `bootstrap/cache/` → 775
 
-### 2. Create the storage symlink
-Since you can't run `php artisan storage:link`, create it manually:
-- In File Manager, go to `public/`
-- Create a symbolic link named `storage` pointing to `../storage/app/public`
-- OR: create a `public/storage/` folder and upload files there directly
+### 2. Rebuild the storage symlink (required after every deploy that touches `public/`)
+Uploaded images (product photos, ticket attachments) live in
+`storage/app/public/` and are referenced as `/storage/...` URLs. That URL only
+resolves if `public/storage` is a symlink to `../storage/app/public`. The
+symlink is **git-ignored** (`/public/storage`), so it never ships with the code
+and a deploy that overwrites `public/` will leave it missing or broken — which
+makes every uploaded image return 404.
 
-**Note:** As of 2024, the `public` disk in `config/filesystems.php` has `'serve' => true`, which means Laravel serves storage files through a PHP route automatically. You do NOT need the symlink at all — product images and uploaded files will work without it. If you've previously created a symlink and it's broken, just delete it.
+The simplest fix: go to **Admin → Settings → Maintenance** and click
+**Rebuild storage link** (and **Clear all caches**). No SSH or File Manager
+needed. Do this after any deploy where images stop loading.
+
+Manual alternatives if you prefer:
+- **cron (one-off):** `cd /home/user/ck-crm && /usr/local/bin/php artisan storage:link`
+- **File Manager:** in `public/`, create a symbolic link named `storage`
+  pointing to `../storage/app/public`.
+
+**If your host blocks symlinks entirely:** the `public` disk in
+`config/filesystems.php` sets `'serve' => true`, which makes Laravel
+auto-register a `GET /storage/{path}` route (named `storage.public`) that
+streams files straight from `storage/app/public`. So images can load without a
+symlink. **Caveat:** that route only exists once config and routes are cached
+fresh — if the route cache was built before `serve => true` was added, the
+route is missing and images 404. Always run **Clear all caches** (below) after
+deploying. The symlink is still faster (the web server serves the file
+directly, bypassing PHP), so prefer it when the host allows it.
 
 ### 3. Run migrations
 Use cPanel's **Cron Jobs** to run a one-off migration:
@@ -71,6 +90,97 @@ Use cPanel's **Cron Jobs** to run a one-off migration:
 cd /home/user/ck-crm && /usr/local/bin/php artisan migrate --force
 ```
 (Set it to run once, then delete the cron)
+
+### 3a. Install Laravel Passport (MCP integration — no SSH)
+
+The ChatGPT MCP integration adds `laravel/passport` as an OAuth 2.1 authorization
+server. It is **additive**: a new `api` guard (`driver => passport`) was added to
+`config/auth.php`; the existing `web` guard and Sanctum's token handling are
+untouched, so the admin API and portal behave exactly as before.
+
+Because cPanel has no SSH, Composer cannot run on the server. Do the install
+locally and ship the result:
+
+1. **Locally**, require the package and commit the lock file + vendor dir:
+   ```bash
+   composer require laravel/passport
+   git add composer.json composer.lock
+   git commit -m "Add laravel/passport"
+   ```
+   Upload the refreshed `vendor/` folder along with `composer.json` and
+   `composer.lock` (same no-SSH rule as the rest of the app — the server never
+   runs `composer install`). If your host provides a Composer UI/terminal, you
+   may instead run `composer install --optimize-autoloader --no-dev` there after
+   uploading the updated `composer.lock`.
+
+2. **Run the Passport migrations** on the server. Passport ships its own
+   migrations (the `oauth_*` tables); they run with the normal migrate command.
+   Use a one-off cPanel cron job (then delete it):
+   ```
+   cd /home/user/ck-crm && /usr/local/bin/php artisan migrate --force
+   ```
+
+3. **Generate the Passport encryption keys** with another one-off cron job:
+   ```
+   cd /home/user/ck-crm && /usr/local/bin/php artisan passport:keys --force
+   ```
+   This writes `storage/oauth-private.key` and `storage/oauth-public.key`.
+   > The `api` guard throws `Invalid key supplied` until these keys exist, so this
+   > step is mandatory before any MCP/OAuth request will authenticate.
+
+4. **Deploy the keys securely.** The `oauth-*.key` files are secrets:
+   - They must be present in `storage/` on the server (the path above).
+   - They must stay **out of version control** — `.gitignore` already excludes
+     `/storage/*.key`. Never commit them.
+   - If you prefer not to generate keys on the server, generate them locally with
+     `php artisan passport:keys`, then upload the two files into the server's
+     `storage/` directory via File Manager (set permissions to 600). Do **not**
+     put them under `public/`.
+   - Alternatively, the keys can be provided via the `PASSPORT_PRIVATE_KEY` /
+     `PASSPORT_PUBLIC_KEY` environment variables in `.env` instead of files.
+
+5. **Clear config cache** after deployment so the new `api` guard is picked up:
+   ```
+   cd /home/user/ck-crm && /usr/local/bin/php artisan config:clear
+   ```
+
+6. **Create the public MCP OAuth client** (the identity OpenAI's connector uses).
+   It is a *public* client: no client secret is generated, so the authorization
+   code flow is protected by PKCE (Requirement 1.2). Run the bundled command via a
+   one-off cPanel cron job (then delete it), passing the OpenAI connector's
+   redirect/callback URL:
+   ```
+   cd /home/user/ck-crm && /usr/local/bin/php artisan mcp:create-client --redirect-uri="https://chat.openai.com/connector_platform_oauth_redirect"
+   ```
+   This prints a **Client ID** and shows `Secret: (none — public client)`. Configure
+   OpenAI's custom MCP connector with that Client ID; do **not** supply a secret.
+   (The command is a pre-named wrapper around the stock
+   `php artisan passport:client --public` — either works; the wrapper names the
+   client `mcp_client`, which is what the admin token-management screen filters on.)
+
+7. **Manage / revoke tokens.** Issued MCP tokens can be reviewed and revoked from
+   the admin area at `/admin/mcp/tokens` (admin login required). The screen lists
+   each token's id, scopes, created/last-used/expiry timestamps — never the token
+   value — and a **Revoke** action that invalidates the token and its refresh token
+   immediately (Requirement 1.5).
+
+6. **Scopes, token lifetimes and PKCE** are configured in code by
+   `App\Providers\PassportServiceProvider` (registered in `bootstrap/providers.php`)
+   — no deployment action is required for these, they apply automatically:
+   - **Scopes** are locked to exactly: `customers:read`, `invoices:read`,
+     `projects:read`, `services:read`, `tickets:read`, `tickets:write`. A token
+     can never carry any other scope.
+   - **Access tokens** expire after **60 minutes**; **refresh tokens** after
+     **14 days**. The connector refreshes rather than holding a long-lived token.
+   - **PKCE** is enforced by creating the MCP connector client as a Passport
+     **public** client (no secret):
+     ```
+     cd /home/user/ck-crm && /usr/local/bin/php artisan passport:client --public
+     ```
+     A public client has no secret to fall back on, so Passport requires a
+     `code_challenge`/`code_verifier` on the authorization-code flow. The
+     implicit and password grants are deliberately left disabled. (Creating the
+     client and admin token management is completed in task 6.3.)
 
 ### 4. Set up the scheduler
 Add this cron job in cPanel → Cron Jobs (every minute):
@@ -119,5 +229,5 @@ Required PHP extensions: `pdo_mysql`, `mbstring`, `openssl`, `tokenizer`, `xml`,
 
 - **500 error**: Check `storage/logs/laravel.log` — most likely a permissions issue
 - **CSS/JS not loading**: Ensure `public/build/` was uploaded and `APP_URL` is correct
-- **Storage links**: If uploads don't show, verify that `storage/app/public/` exists and is writable (775). The `serve => true` config handles serving — no symlink needed. Make sure to clear config cache after deployment: `php artisan config:clear`
+- **Uploaded images 404 / stopped showing after a deploy**: the `public/storage` symlink was almost certainly removed or broken by the deploy (it is git-ignored and does not ship). Go to **Admin → Settings → Maintenance** and click **Rebuild storage link**, then **Clear all caches**. If the host blocks symlinks, the built-in PHP fallback route serves the files instead, so they still load. Also confirm `storage/app/public/` exists and is writable (775).
 - **Artisan commands**: Use cPanel's Terminal (if available) or cron jobs

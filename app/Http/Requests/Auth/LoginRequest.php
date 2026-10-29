@@ -52,7 +52,7 @@ class LoginRequest extends FormRequest
 
         // Check if user is locked/disabled
         $user = Auth::user();
-        if ($user->is_locked) {
+        if ($user->is_locked || $user->is_login_disabled) {
             Auth::logout();
             throw ValidationException::withMessages([
                 'email' => 'Your account has been disabled. Please contact support.',

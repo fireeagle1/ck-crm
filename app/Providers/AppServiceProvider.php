@@ -17,7 +17,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // The MCP tool registry and the dispatch seam are shared singletons so
+        // the same instances back the transport, the scope middleware, and the
+        // handler wiring (task 12.1 binds concrete handlers onto the one
+        // ToolDispatcher instance resolved here).
+        $this->app->singleton(\App\Mcp\Registry\ToolRegistry::class);
+        $this->app->singleton(\App\Mcp\Registry\ToolDispatcher::class);
     }
 
     /**
@@ -33,6 +38,10 @@ class AppServiceProvider extends ServiceProvider
         // Register model observers
         Product::observe(ProductObserver::class);
         Order::observe(OrderObserver::class);
+
+        // The `mcp` named rate limiter (used by the MCP route group's
+        // `throttle:mcp` middleware) is registered in PassportServiceProvider
+        // alongside the other MCP/Passport concerns.
 
         // Share cart item count with all portal views (header cart icon)
         View::composer('layouts.partials.portal-header', function ($view) {

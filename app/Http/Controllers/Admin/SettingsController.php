@@ -135,4 +135,112 @@ class SettingsController extends Controller
 
         return back()->with('success', "Ran '{$command}'. Output: " . trim($output));
     }
+
+    /**
+     * Maintenance panel — for no-SSH (cPanel) deployments. Lets an admin run
+     * the artisan cache/config/route housekeeping and rebuild the storage
+     * symlink from the browser after a deploy.
+     */
+    public function maintenance(): View
+    {
+        $publicLink = public_path('storage');
+        $storageLink = [
+            'exists' => is_link($publicLink) || is_dir($publicLink),
+            'is_symlink' => is_link($publicLink),
+            'target' => is_link($publicLink) ? readlink($publicLink) : null,
+            'expected_target' => storage_path('app/public'),
+        ];
+
+        return view('admin.settings.maintenance', compact('storageLink'));
+    }
+
+    /**
+     * Run a whitelisted maintenance action. Each maps to an artisan command
+     * (or the storage:link rebuild) so nothing arbitrary can be executed.
+     */
+    public function runMaintenance(Request $request)
+    {
+        $request->validate([
+            'action' => 'required|string|in:cache_clear,config_clear,config_cache,route_clear,route_cache,view_clear,storage_link,optimize_clear',
+        ]);
+
+        $action = $request->input('action');
+
+        if ($action === 'storage_link') {
+            return $this->rebuildStorageLink();
+        }
+
+        // "Clear all" runs the deploy-critical clears individually so that a
+        // flaky cache store (e.g. a database cache that's briefly unreachable)
+        // can't stop config/route/view from being cleared.
+        if ($action === 'optimize_clear') {
+            $results = [];
+            foreach (['config:clear', 'route:clear', 'view:clear', 'cache:clear'] as $cmd) {
+                try {
+                    \Illuminate\Support\Facades\Artisan::call($cmd);
+                    $results[] = $cmd . ' ✓';
+                } catch (\Throwable $e) {
+                    $results[] = $cmd . ' ✗ (' . $e->getMessage() . ')';
+                }
+            }
+
+            $failed = collect($results)->contains(fn ($r) => str_contains($r, '✗'));
+
+            return back()->with(
+                $failed ? 'error' : 'success',
+                ($failed ? 'Some caches could not be cleared: ' : 'All caches cleared: ') . implode(', ', $results)
+            );
+        }
+
+        $map = [
+            'cache_clear'    => ['cache:clear',  'Application cache cleared.'],
+            'config_clear'   => ['config:clear', 'Config cache cleared.'],
+            'config_cache'   => ['config:cache', 'Config cached.'],
+            'route_clear'    => ['route:clear',  'Route cache cleared.'],
+            'route_cache'    => ['route:cache',  'Routes cached.'],
+            'view_clear'     => ['view:clear',   'Compiled views cleared.'],
+        ];
+
+        [$command, $message] = $map[$action];
+
+        try {
+            \Illuminate\Support\Facades\Artisan::call($command);
+            $output = trim(\Illuminate\Support\Facades\Artisan::output());
+
+            return back()->with('success', $message . ($output !== '' ? ' ' . $output : ''));
+        } catch (\Throwable $e) {
+            return back()->with('error', "Failed to run '{$command}': " . $e->getMessage());
+        }
+    }
+
+    /**
+     * Rebuild the public/storage symlink. Falls back gracefully when the host
+     * disallows symlink() — a common cPanel restriction — in which case the
+     * PHP storage fallback route keeps images working anyway.
+     */
+    private function rebuildStorageLink()
+    {
+        $link = public_path('storage');
+        $target = storage_path('app/public');
+
+        // Already a valid symlink pointing at the right place — nothing to do.
+        if (is_link($link) && realpath(readlink($link)) === realpath($target)) {
+            return back()->with('success', 'Storage link already present and correct.');
+        }
+
+        // Remove a stale/broken link or an empty directory left by a deploy.
+        if (is_link($link)) {
+            @unlink($link);
+        } elseif (is_dir($link) && count((array) @scandir($link)) <= 2) {
+            @rmdir($link);
+        } elseif (is_dir($link)) {
+            return back()->with('error', 'public/storage exists as a non-empty folder. Remove it manually in File Manager, then retry.');
+        }
+
+        if (@symlink($target, $link)) {
+            return back()->with('success', 'Storage link created successfully.');
+        }
+
+        return back()->with('error', 'Could not create the symlink (the host may block symlink()). Images will still load via the PHP storage fallback route, so no action is strictly required.');
+    }
 }

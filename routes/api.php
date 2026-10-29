@@ -11,6 +11,8 @@ use App\Http\Controllers\Api\Admin\ServiceController;
 use App\Http\Controllers\Api\Admin\ShopOrderController;
 use App\Http\Controllers\Api\Admin\ShopProductController;
 use App\Http\Controllers\Api\Admin\TicketController;
+use App\Http\Controllers\Mcp\McpController;
+use App\Http\Middleware\EnsureHttps;
 use App\Http\Middleware\EnsureIsAdmin;
 use Illuminate\Support\Facades\Route;
 
@@ -81,3 +83,40 @@ Route::prefix('admin')->group(function () {
         Route::get('/scan/{code}', [\App\Http\Controllers\Api\Admin\ScanController::class, 'resolve']);
     });
 });
+
+/*
+|--------------------------------------------------------------------------
+| MCP (Model Context Protocol) route group
+|--------------------------------------------------------------------------
+|
+| Additive route group for the ChatGPT MCP integration. Appended AFTER the
+| admin group above so nothing in the existing `/api/admin/*` Sanctum flow
+| changes (Req 14.1). Served over streamable HTTP so it is compatible with
+| cPanel cron hosting — no long-lived process (Req 14.3).
+|
+| Middleware order (applied outer -> inner, Req 1.6 / design "Middleware order"):
+|   1. EnsureHttps   — reject non-HTTPS before anything else (Req 1.6), honours
+|                      X-Forwarded-Proto behind the cPanel/Cloudflare proxy.
+|   2. throttle:mcp  — named per-token rate limiter (Req 13.2).
+|   3. auth:api      — Passport access-token guard (Req 1.5, 1.7).
+|   4. mcp.scope     — per-tool scope enforcement on `tools/call` (CheckMcpScope,
+|                      Req 1.4, 2.1, 2.4); lifecycle methods pass through.
+|
+| DEPENDENCY: the `mcp` named limiter referenced by `throttle:mcp` is registered
+| by task 11.2. A defensive placeholder is registered in AppServiceProvider so
+| this group resolves and functions until 11.2 supplies the configurable one.
+*/
+Route::prefix('mcp')
+    ->middleware([
+        EnsureHttps::class,
+        'throttle:mcp',
+        'auth:api',
+        'mcp.scope',
+    ])
+    ->group(function () {
+        // JSON-RPC entrypoint: initialize, tools/list, tools/call.
+        Route::post('/', [McpController::class, 'handle']);
+
+        // Streamable HTTP (SSE) channel.
+        Route::get('/', [McpController::class, 'handleStream']);
+    });

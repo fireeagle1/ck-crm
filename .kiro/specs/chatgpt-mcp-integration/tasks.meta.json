@@ -1,0 +1,548 @@
+{
+  "pbtResults": {},
+  "executionHistory": {
+    "1.1 Add `is_login_disabled` to users and enforce it at login": [
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793296657638
+      },
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793296665672
+      },
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793296786603
+      }
+    ],
+    "1.3 Create the `mcp_audit_logs` table and `McpAuditLog` model": [
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793296657677
+      },
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793296667051
+      },
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793296787970
+      }
+    ],
+    "1.4 Add nullable `source` column to ticket_replies and ticket_activities": [
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793296657708
+      },
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793296668532
+      },
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793296789402
+      }
+    ],
+    "1.5 Create the dedicated MCP bot user and a cached resolver": [
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793296657737
+      },
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793296798048
+      },
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793297026891
+      }
+    ],
+    "2.1 Implement read DTO transformer classes": [
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793296657766
+      },
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793296669484
+      },
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793296790798
+      }
+    ],
+    "3.1 Implement a shared pagination/page-size cap helper": [
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793296657792
+      },
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793296670517
+      },
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793296791690
+      }
+    ],
+    "3.2 Implement Customers query service and read tools": [
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793296657816
+      },
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793297044350
+      },
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793297252496
+      }
+    ],
+    "3.3 Implement Invoices query service and read tools": [
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793296657841
+      },
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793297047479
+      },
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793297253963
+      }
+    ],
+    "3.4 Implement Projects query service and read tools (new read surface)": [
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793296657871
+      },
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793297048849
+      },
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793297254849
+      }
+    ],
+    "3.5 Implement Services query service and read tools": [
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793296657893
+      },
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793297050298
+      },
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793297256298
+      }
+    ],
+    "3.6 Implement Tickets read query service and read tools": [
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793296657916
+      },
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793297051253
+      },
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793297257326
+      }
+    ],
+    "4. Checkpoint — data layer, DTOs, and reads": [
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793296657941
+      },
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793297266135
+      },
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793297334951
+      }
+    ],
+    "5.1 Extract write logic into `TicketService`": [
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793296657966
+      },
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793297340220
+      },
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793297599064
+      }
+    ],
+    "5.2 Refactor admin TicketController to delegate to TicketService": [
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793296657986
+      },
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793297604289
+      },
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793297820684
+      }
+    ],
+    "6.1 Install and configure Passport as a new api guard": [
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793296658010
+      },
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793296799166
+      },
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793297025768
+      }
+    ],
+    "6.2 Register MCP scopes and bounded token lifetimes": [
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793296658033
+      },
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793297341167
+      },
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793297598327
+      }
+    ],
+    "6.3 Create the PKCE public client and admin token management": [
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793296658058
+      },
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793297342672
+      },
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793297595533
+      }
+    ],
+    "7.1 Implement the Tool Registry allow-list": [
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793296658084
+      },
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793297343675
+      },
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793297596914
+      }
+    ],
+    "7.2 Implement `CheckMcpScope` middleware": [
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793296658109
+      },
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793297605198
+      },
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793297821726
+      }
+    ],
+    "8.1 Add the MCP route group with the middleware stack": [
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793296658145
+      },
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793297825354
+      },
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793298021336
+      }
+    ],
+    "8.2 Implement McpController transport (streamable HTTP JSON-RPC)": [
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793296658170
+      },
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793298024658
+      },
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793298265396
+      }
+    ],
+    "9. Checkpoint — authorization, transport, and discovery": [
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793296658193
+      },
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793298269603
+      },
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793298277476
+      }
+    ],
+    "10.1 Implement `create_ticket` tool": [
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793296658218
+      },
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793298282388
+      },
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793298575164
+      }
+    ],
+    "10.2 Implement `update_ticket` tool": [
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793296658243
+      },
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793298283764
+      },
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793298576502
+      }
+    ],
+    "10.3 Implement `reply_ticket` tool": [
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793296658268
+      },
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793298284755
+      },
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793298577516
+      }
+    ],
+    "11.1 Implement `McpAuditLogger` and wire it into the request path": [
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793296658293
+      },
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793298287309
+      },
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793298580392
+      }
+    ],
+    "11.2 Register the `mcp` named rate limiter": [
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793296658318
+      },
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793298286147
+      },
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793298578922
+      }
+    ],
+    "12.1 Wire the registry handlers to read query services and write tools": [
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793296658341
+      }
+    ],
+    "12.2 Document cPanel deployment and manual verification": [
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793296658365
+      }
+    ],
+    "13. Final checkpoint — full suite green": [
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793296658391
+      }
+    ],
+    "2. DTO transformers (data-minimisation enforcement point)": [
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793296790832
+      }
+    ],
+    "1. Additive data-layer foundation (migrations, models, bot identity)": [
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793297026928
+      }
+    ],
+    "3. Read query services and read tools (per domain)": [
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793297257357
+      }
+    ],
+    "6. OAuth 2.1 authorization server (Laravel Passport)": [
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793297598361
+      }
+    ],
+    "5. Shared TicketService extraction (behaviour-preserving)": [
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793297820722
+      }
+    ],
+    "7. Tool Registry and scope-checking middleware": [
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793297821761
+      }
+    ],
+    "8. MCP transport, route group, and tool discovery": [
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793298265433
+      }
+    ],
+    "10. Ticket write tools": [
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793298577546
+      }
+    ],
+    "11. Audit logging and rate limiting": [
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793298580421
+      }
+    ]
+  }
+}
