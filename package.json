@@ -20,5 +20,9 @@
         "flatpickr": "^4.6.13",
         "quill": "^2.0.3",
         "signature_pad": "^5.1.4"
+    },
+    "overrides": {
+        "shell-quote": "^1.11.0",
+        "browserslist": "^4.28.7"
     }
 }
