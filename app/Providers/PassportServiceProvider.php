@@ -32,12 +32,12 @@ class PassportServiceProvider extends ServiceProvider
      */
     public const MCP_SCOPES = [
         'customers:read' => 'Read customer records (company and contact details).',
-        'invoices:read'  => 'Read invoices and their status.',
-        'projects:read'  => 'Read projects and their delivery status.',
-        'services:read'  => 'Read the services a customer has.',
-        'tickets:read'   => 'Search and read support tickets, replies and history.',
-        'tickets:write'  => 'Create, update and reply to support tickets.',
-        'apps:write'     => 'Write security findings and package data for a customer app.',
+        'invoices:read' => 'Read invoices and their status.',
+        'projects:read' => 'Read projects and their delivery status.',
+        'services:read' => 'Read the services a customer has.',
+        'tickets:read' => 'Search and read support tickets, replies and history.',
+        'tickets:write' => 'Create, update and reply to support tickets.',
+        'apps:write' => 'Write security findings and package data for a customer app.',
     ];
 
     /**
@@ -77,6 +77,16 @@ class PassportServiceProvider extends ServiceProvider
         // construction for the MCP client — there is no secret to fall back on.
         // We do NOT enable the implicit or password grants, which would bypass
         // the authorization-code + PKCE flow OpenAI's connector uses.
+
+        // Register the authorization (consent) view. Passport 12+ resolves the
+        // AuthorizationController's `AuthorizationViewResponse` dependency from a
+        // container binding that ONLY exists once a view has been registered via
+        // Passport::authorizationView(); Passport's own provider does not call
+        // this and ships no default blade, so without this line the consent
+        // screen throws a BindingResolutionException ("Target
+        // [Laravel\Passport\Contracts\AuthorizationViewResponse] is not
+        // instantiable") — the OAuth flow reaches the consent step and 500s.
+        Passport::authorizationView('oauth.authorize');
 
         $this->registerMcpRateLimiter();
     }

@@ -222,6 +222,15 @@ locally and ship the result:
      `code_challenge`/`code_verifier` on the authorization-code flow. The
      implicit and password grants are deliberately left disabled. (Creating the
      client and admin token management is completed in task 6.3.)
+   - **Consent screen** is registered in the same provider via
+     `Passport::authorizationView('oauth.authorize')`, rendering
+     `resources/views/oauth/authorize.blade.php`. This is **required**: Passport
+     12+ only binds the controller's `AuthorizationViewResponse` dependency once
+     a view is registered, and it ships no default blade. Without it,
+     `GET /oauth/authorize` reaches the consent step and then **500s** with
+     `Target [Laravel\Passport\Contracts\AuthorizationViewResponse] is not
+     instantiable` — distinct from the 404 (routes absent) covered in step 5.
+     No deployment action beyond shipping the provider + blade is required.
 
 ### 3b. Manual verification — MCP is request/response only (no persistent process)
 
