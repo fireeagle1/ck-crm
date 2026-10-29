@@ -19,7 +19,9 @@
                 <ul class="py-1">
                     @foreach ($settingsNav as $item)
                         <li>
-                            <a href="{{ route($item['route']) }}"
+                            {{-- Use Route::has so a stale route cache (missing a newly
+                                 added route) can never 500 this recovery page. --}}
+                            <a href="{{ \Route::has($item['route']) ? route($item['route']) : '#' }}"
                                class="flex items-center gap-3 px-4 py-2.5 text-sm transition
                                       {{ request()->routeIs($item['route']) ? 'bg-blue-50 text-blue-700 font-medium border-r-2 border-blue-600' : 'text-gray-700 hover:bg-gray-50' }}">
                                 <svg class="w-4 h-4 shrink-0 {{ request()->routeIs($item['route']) ? 'text-blue-600' : 'text-gray-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -70,7 +72,7 @@
                     </p>
                 </div>
 
-                <form method="POST" action="{{ route('admin.settings.maintenance.run') }}">
+                <form method="POST" action="{{ url('/admin/settings/maintenance/run') }}">
                     @csrf
                     <input type="hidden" name="action" value="storage_link">
                     <button type="submit" class="inline-flex items-center gap-1.5 px-3 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700 transition">
@@ -119,7 +121,7 @@
                     </div>
                 @endif
 
-                <form method="POST" action="{{ route('admin.settings.maintenance.migrate') }}"
+                <form method="POST" action="{{ url('/admin/settings/maintenance/migrate') }}"
                       onsubmit="return confirm('Run pending database migrations now? This can alter data and is not easily reversible. A database backup is recommended first.');">
                     @csrf
                     <label class="flex items-start gap-2 mb-3 text-xs text-gray-600 max-w-lg">
@@ -156,7 +158,7 @@
 
                 <div class="grid sm:grid-cols-2 gap-3">
                     @foreach ($actions as $a)
-                        <form method="POST" action="{{ route('admin.settings.maintenance.run') }}"
+                        <form method="POST" action="{{ url('/admin/settings/maintenance/run') }}"
                               class="flex items-center justify-between gap-3 border rounded-md px-3 py-2.5 {{ $a['primary'] ? 'border-blue-200 bg-blue-50/40' : 'border-gray-200' }}">
                             @csrf
                             <input type="hidden" name="action" value="{{ $a['action'] }}">

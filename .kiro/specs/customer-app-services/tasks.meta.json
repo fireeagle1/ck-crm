@@ -11,6 +11,11 @@
         "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
         "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
         "timestamp": 1793298998256
+      },
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793299142448
       }
     ],
     "1.2 Create `app_packages` migration": [
@@ -23,6 +28,11 @@
         "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
         "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
         "timestamp": 1793298999639
+      },
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793299143708
       }
     ],
     "1.3 Create `security_findings` migration": [
@@ -35,6 +45,11 @@
         "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
         "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
         "timestamp": 1793299000476
+      },
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793299144544
       }
     ],
     "2.1 Create `App\\Models\\AppPackage` and `App\\Models\\SecurityFinding`": [
@@ -42,6 +57,16 @@
         "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
         "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
         "timestamp": 1793298990622
+      },
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793299152764
+      },
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793299197176
       }
     ],
     "2.2 Create `App\\Models\\CustomerApp`": [
@@ -49,6 +74,11 @@
         "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
         "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
         "timestamp": 1793298990647
+      },
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793299211103
       }
     ],
     "2.3 Add `customerApp(): HasOne` to `App\\Models\\Service`": [
@@ -154,6 +184,13 @@
         "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
         "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
         "timestamp": 1793298990959
+      }
+    ],
+    "1. Create the database schema (three cascading migrations)": [
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793299144570
       }
     ]
   }
