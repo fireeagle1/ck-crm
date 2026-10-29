@@ -164,7 +164,7 @@ locally and ship the result:
    value — and a **Revoke** action that invalidates the token and its refresh token
    immediately (Requirement 1.5).
 
-6. **Scopes, token lifetimes and PKCE** are configured in code by
+8. **Scopes, token lifetimes and PKCE** are configured in code by
    `App\Providers\PassportServiceProvider` (registered in `bootstrap/providers.php`)
    — no deployment action is required for these, they apply automatically:
    - **Scopes** are locked to exactly: `customers:read`, `invoices:read`,
@@ -182,17 +182,136 @@ locally and ship the result:
      implicit and password grants are deliberately left disabled. (Creating the
      client and admin token management is completed in task 6.3.)
 
+### 3b. Manual verification — MCP is request/response only (no persistent process)
+
+The MCP integration is served entirely by the existing Laravel app as an
+ordinary HTTPS route group (`/api/mcp/*`) behind cPanel's normal PHP-FPM/web
+server. There is **no stdio MCP server, no daemon, and no long-lived
+`php artisan` process** — every MCP interaction is a standard request/response
+over HTTPS, handled by the same PHP process model as the rest of the app
+(Requirement 14.3). The only background work is the optional queue worker cron
+in step 5, which itself exits when the queue is empty.
+
+Run these checks from your machine after deploying (replace the host,
+client id and token values). They confirm the integration works **without**
+starting any persistent process on the server:
+
+1. **OAuth endpoints respond over HTTPS.** Hit the authorization server's
+   discovery/authorize and token endpoints:
+   ```bash
+   # Authorization endpoint (should return a login/redirect response, not 404/500)
+   curl -sI "https://your-domain.co.uk/oauth/authorize?response_type=code&client_id=CLIENT_ID&redirect_uri=https%3A%2F%2Fchat.openai.com%2Fconnector_platform_oauth_redirect&scope=tickets:read&code_challenge=CHALLENGE&code_challenge_method=S256"
+   ```
+   Complete the PKCE authorization-code flow (the OpenAI connector does this for
+   you) and exchange the code at `POST /oauth/token` to obtain an access token.
+   A `200` with a bearer token confirms the Passport authorization server is
+   live. No server process had to be started for this to work.
+
+2. **HTTP is rejected, HTTPS is required.** A plain-HTTP request to the MCP
+   endpoint must not be served:
+   ```bash
+   curl -sI "http://your-domain.co.uk/api/mcp"   # expect a redirect to https or a 4xx, never a 200
+   ```
+
+3. **Run the MCP JSON-RPC lifecycle over HTTPS.** Each call below is a single
+   request that returns a single response — nothing stays running afterwards.
+   ```bash
+   TOKEN=... # access token from step 1
+
+   # initialize handshake — returns server capabilities
+   curl -s -X POST "https://your-domain.co.uk/api/mcp" \
+     -H "Authorization: Bearer $TOKEN" \
+     -H "Content-Type: application/json" \
+     -d '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{}}'
+
+   # tools/list — returns only the tools the token's scopes allow
+   curl -s -X POST "https://your-domain.co.uk/api/mcp" \
+     -H "Authorization: Bearer $TOKEN" \
+     -H "Content-Type: application/json" \
+     -d '{"jsonrpc":"2.0","id":2,"method":"tools/list","params":{}}'
+
+   # tools/call — e.g. a read tool the token is scoped for
+   curl -s -X POST "https://your-domain.co.uk/api/mcp" \
+     -H "Authorization: Bearer $TOKEN" \
+     -H "Content-Type: application/json" \
+     -d '{"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"search_tickets","arguments":{"per_page":5}}}'
+   ```
+   Each `curl` returns and the connection closes. Confirm that **no
+   `php artisan` command needs to be left running** for any of these to
+   succeed — they are handled by the web server exactly like any other route.
+
+4. **The SSE/streaming GET endpoint completes (does not hang).** OpenAI's
+   connector may open the MCP endpoint with `GET` and `Accept: text/event-stream`.
+   The server replies with the streamable-HTTP `endpoint` event and then
+   finishes — it must **not** hold the connection open as a long-lived stream:
+   ```bash
+   curl -sN -H "Authorization: Bearer $TOKEN" -H "Accept: text/event-stream" \
+     "https://your-domain.co.uk/api/mcp"
+   ```
+   You should see an `event: endpoint` (with the message endpoint) emitted and
+   the command should **return to your shell promptly** rather than hanging.
+   If it hangs, the deployment is behaving like a persistent stream, which the
+   cPanel model does not support — recheck that buffering/output flushing on the
+   host lets the response complete.
+
+5. **Confirm the process list is clean.** If your host offers a Terminal, run
+   `ps -u $USER | grep artisan` — you should see nothing between cron runs. The
+   only artisan processes that ever appear are the short-lived scheduler
+   (`schedule:run`) and the `queue:work --stop-when-empty` worker, both of which
+   exit on their own. No MCP-specific long-running process exists.
+
+6. **Confirm queued side effects drain.** Create or reply to a ticket via
+   `tools/call` (step 3), then confirm the notification/email is sent: with
+   `QUEUE_CONNECTION=sync` it is sent inline during the request; with
+   `QUEUE_CONNECTION=database` it appears in the `jobs` table and is sent on the
+   next `queue:work` cron run (step 5). Either way the `tools/call` response
+   returns the new `ticket_id` immediately without waiting for delivery
+   (Requirement 14.4).
+
 ### 4. Set up the scheduler
 Add this cron job in cPanel → Cron Jobs (every minute):
 ```
 cd /home/user/ck-crm && /usr/local/bin/php artisan schedule:run >> /dev/null 2>&1
 ```
 
-### 5. Queue worker (optional)
-If using database queue, add a cron that runs every minute:
-```
-cd /home/user/ck-crm && /usr/local/bin/php artisan queue:work --stop-when-empty >> /dev/null 2>&1
-```
+### 5. Queue worker (optional) — also drains MCP ticket side effects
+
+The MCP ticket write tools (`create_ticket`, `update_ticket`, `reply_ticket`)
+reuse the same `TicketService` as the admin API, so they trigger the same
+side effects: `TicketActivity` audit rows, customer email notifications, and
+admin notifications (`NewTicketNotification`, `CriticalTicketNotification`).
+Those notifications/mailables are dispatched to the queue, never sent inline
+by the MCP request. This keeps the MCP write request non-blocking: the tool
+persists the ticket/reply and returns the `ticket_id` + summary straight away,
+and the actual sending happens when the queue drains (Requirement 14.4).
+
+How the queue drains depends on `QUEUE_CONNECTION` in `.env`:
+
+- **`QUEUE_CONNECTION=database` (recommended for real email/notification
+  delivery):** jobs are written to the `jobs` table and sent when a worker
+  runs. On cPanel (no SSH, no long-lived process) drain the queue from cron.
+  Add a cron that runs every minute:
+  ```
+  cd /home/user/ck-crm && /usr/local/bin/php artisan queue:work --stop-when-empty >> /dev/null 2>&1
+  ```
+  `--stop-when-empty` makes the worker process whatever is queued and then
+  exit, so no persistent daemon is required — the cron simply restarts it each
+  minute. This is the same worker that drains every other queued job in the
+  app (ticket emails, etc.); the MCP side effects just join the same queue.
+  The `jobs` and `failed_jobs` tables ship with the app's migrations, so no
+  extra setup is needed beyond running migrations (step 3).
+
+- **`QUEUE_CONNECTION=sync` (default in the sample `.env`):** there is no
+  queue — dispatched notifications/mailables run inline within the request.
+  This matches the existing admin API exactly: MCP ticket writes behave the
+  same way admin ticket writes already do, so no queue worker cron is needed.
+  Side effects complete before the tool response is returned. Use this if you
+  don't want to manage a queue worker on cPanel; use `database` if inline
+  sending makes ticket writes feel slow or risks request timeouts.
+
+Either setting honours Requirement 14.4: the MCP integration uses whatever
+queue configuration is already in place and never introduces its own worker
+process.
 
 ## .env production values
 
@@ -216,7 +335,8 @@ STRIPE_SECRET=sk_live_xxx
 ```
 
 **Key notes:**
-- Use `QUEUE_CONNECTION=sync` if you don't want to deal with queue workers on cPanel
+- Use `QUEUE_CONNECTION=sync` if you don't want to deal with queue workers on cPanel. Ticket notifications/emails (admin API and MCP alike) then send inline during the request.
+- Use `QUEUE_CONNECTION=database` to offload those notifications/emails to the `jobs` table, drained by the `queue:work --stop-when-empty` cron (see step 5). This keeps ticket writes — including MCP ticket writes — non-blocking (Requirement 14.4).
 - Use `CACHE_STORE=file` instead of database for simpler caching
 - Set `SESSION_DRIVER=database` (the table is already migrated)
 

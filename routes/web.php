@@ -221,6 +221,7 @@ Route::middleware(['auth', 'verified', EnsureIsAdmin::class])->prefix('admin')->
     Route::post('/settings/scheduled-tasks/run', [Admin\SettingsController::class, 'runTask'])->name('settings.tasks.run');
     Route::get('/settings/maintenance', [Admin\SettingsController::class, 'maintenance'])->name('settings.maintenance');
     Route::post('/settings/maintenance/run', [Admin\SettingsController::class, 'runMaintenance'])->name('settings.maintenance.run');
+    Route::post('/settings/maintenance/migrate', [Admin\SettingsController::class, 'runMigrations'])->name('settings.maintenance.migrate');
     Route::get('/settings/whm', [Admin\WhmConfigController::class, 'edit'])->name('settings.whm');
     Route::post('/settings/whm', [Admin\WhmConfigController::class, 'update'])->name('settings.whm.update');
 

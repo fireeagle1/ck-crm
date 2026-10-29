@@ -223,16 +223,16 @@ Property-based test sub-tasks and other test sub-tasks are marked optional with 
     - Fire limit+1 requests; assert the final response is `429` with the expected headers
     - _Requirements: 13.2_
 
-- [ ] 12. Final integration and wiring
-  - [~] 12.1 Wire the registry handlers to read query services and write tools
+- [x] 12. Final integration and wiring
+  - [x] 12.1 Wire the registry handlers to read query services and write tools
     - Connect every registered tool name to its concrete handler (read query service or write tool) so `tools/call` dispatches end-to-end through the full middleware stack with no orphaned code
     - _Requirements: 2.3, 3.1, 9.5, 10.2, 11.5_
 
-  - [~] 12.2 Document cPanel deployment and manual verification
+  - [x] 12.2 Document cPanel deployment and manual verification
     - In `DEPLOYMENT.md`: Passport install/keys without SSH, queue (database driver / cron worker), and manual verification that MCP routes are request/response only (no persistent process)
     - _Requirements: 14.3, 14.4_
 
-- [~] 13. Final checkpoint — full suite green
+- [x] 13. Final checkpoint — full suite green
   - Ensure all tests pass, ask the user if questions arise.
 
 ## Notes

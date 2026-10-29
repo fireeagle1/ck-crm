@@ -80,6 +80,63 @@
                 </form>
             </div>
 
+            {{-- Database migrations --}}
+            <div class="bg-white rounded-lg shadow-sm border p-5 mb-6">
+                <h2 class="text-sm font-semibold text-gray-700 mb-1">Database Migrations</h2>
+                <p class="text-xs text-gray-500 mb-4">
+                    Run any pending migrations after deploying new code — the browser equivalent of
+                    <code class="bg-gray-100 px-1 py-0.5 rounded">php artisan migrate --force</code>, so you don't need a cron job or SSH.
+                </p>
+
+                @if (! $migrations['ok'])
+                    <div class="mb-4 text-sm">
+                        <span class="inline-flex items-center gap-1.5 rounded-full bg-red-100 text-red-700 px-2.5 py-1 text-xs font-medium">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            {{ $migrations['note'] }}
+                        </span>
+                    </div>
+                @elseif (count($migrations['pending']) === 0)
+                    <div class="mb-4 text-sm">
+                        <span class="inline-flex items-center gap-1.5 rounded-full bg-green-100 text-green-700 px-2.5 py-1 text-xs font-medium">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                            Up to date — {{ $migrations['ran_count'] }} migration(s) applied, none pending
+                        </span>
+                        @if ($migrations['note'])
+                            <p class="text-xs text-gray-400 mt-2">{{ $migrations['note'] }}</p>
+                        @endif
+                    </div>
+                @else
+                    <div class="mb-4">
+                        <span class="inline-flex items-center gap-1.5 rounded-full bg-amber-100 text-amber-700 px-2.5 py-1 text-xs font-medium">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            {{ count($migrations['pending']) }} pending migration(s)
+                        </span>
+                        <ul class="mt-3 border rounded-md divide-y divide-gray-100 bg-gray-50/60 max-h-48 overflow-y-auto">
+                            @foreach ($migrations['pending'] as $name)
+                                <li class="px-3 py-1.5 font-mono text-xs text-gray-600">{{ $name }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
+                <form method="POST" action="{{ route('admin.settings.maintenance.migrate') }}"
+                      onsubmit="return confirm('Run pending database migrations now? This can alter data and is not easily reversible. A database backup is recommended first.');">
+                    @csrf
+                    <label class="flex items-start gap-2 mb-3 text-xs text-gray-600 max-w-lg">
+                        <input type="checkbox" name="confirm" value="1" required
+                               class="mt-0.5 rounded border-gray-300 text-amber-600 focus:ring-amber-500">
+                        <span>I understand migrations change the database schema/data and can't be trivially undone. I have a recent backup.</span>
+                    </label>
+                    @error('confirm') <p class="text-red-600 text-xs mb-2">You must confirm before running migrations.</p> @enderror
+                    <button type="submit"
+                            class="inline-flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium transition
+                                   {{ ($migrations['ok'] && count($migrations['pending']) === 0) ? 'bg-amber-100 text-amber-700 hover:bg-amber-200' : 'bg-amber-600 text-white hover:bg-amber-700' }}">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 7v10c0 2 1.5 3 4 3h8c2.5 0 4-1 4-3V7M4 7c0-2 1.5-3 4-3h8c2.5 0 4 1 4 3M4 7c0 2 1.5 3 4 3h8c2.5 0 4-1 4-3"/></svg>
+                        Run migrations
+                    </button>
+                </form>
+            </div>
+
             {{-- Cache maintenance --}}
             <div class="bg-white rounded-lg shadow-sm border p-5">
                 <h2 class="text-sm font-semibold text-gray-700 mb-1">Caches</h2>

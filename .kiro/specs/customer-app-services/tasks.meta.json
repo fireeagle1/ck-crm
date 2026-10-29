@@ -1,0 +1,160 @@
+{
+  "pbtResults": {},
+  "executionHistory": {
+    "1.1 Create `customer_apps` migration": [
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793298990527
+      },
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793298998256
+      }
+    ],
+    "1.2 Create `app_packages` migration": [
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793298990566
+      },
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793298999639
+      }
+    ],
+    "1.3 Create `security_findings` migration": [
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793298990593
+      },
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793299000476
+      }
+    ],
+    "2.1 Create `App\\Models\\AppPackage` and `App\\Models\\SecurityFinding`": [
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793298990622
+      }
+    ],
+    "2.2 Create `App\\Models\\CustomerApp`": [
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793298990647
+      }
+    ],
+    "2.3 Add `customerApp(): HasOne` to `App\\Models\\Service`": [
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793298990667
+      }
+    ],
+    "3. Checkpoint - schema and models": [
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793298990689
+      }
+    ],
+    "4.1 Implement `App\\Support\\SecuritySummaryService`": [
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793298990707
+      }
+    ],
+    "4.4 Implement `App\\Support\\Dto\\CustomerAppSummaryDto`": [
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793298990731
+      }
+    ],
+    "5.1 Implement `App\\Services\\FindingsIngestService`": [
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793298990761
+      }
+    ],
+    "6. Checkpoint - summary, DTO, and ingestion service": [
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793298990778
+      }
+    ],
+    "7.1 Register the `apps:write` scope": [
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793298990795
+      }
+    ],
+    "7.2 Implement `App\\Http\\Controllers\\Api\\FindingsController` and route": [
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793298990814
+      }
+    ],
+    "7.3 Implement `App\\Console\\Commands\\IngestAppFindings` stub": [
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793298990832
+      }
+    ],
+    "8. Checkpoint - findings endpoint and command": [
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793298990854
+      }
+    ],
+    "9.1 Implement web `App\\Http\\Controllers\\Admin\\CustomerAppController`": [
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793298990875
+      }
+    ],
+    "9.2 Create `admin.customer-apps.*` Blade views": [
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793298990896
+      }
+    ],
+    "9.3 Implement API `App\\Http\\Controllers\\Api\\Admin\\CustomerAppController`": [
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793298990917
+      }
+    ],
+    "10.1 Wire the portal app summary into the `Portal\\ServiceController` pattern": [
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793298990939
+      }
+    ],
+    "11. Final checkpoint - full integration": [
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793298990959
+      }
+    ]
+  }
+}

@@ -151,7 +151,67 @@ class SettingsController extends Controller
             'expected_target' => storage_path('app/public'),
         ];
 
-        return view('admin.settings.maintenance', compact('storageLink'));
+        $migrations = $this->migrationStatus();
+
+        return view('admin.settings.maintenance', compact('storageLink', 'migrations'));
+    }
+
+    /**
+     * Summarise migration state for the panel: how many have run, and the
+     * names of any that are still pending. Degrades gracefully if the DB or
+     * migrations table isn't reachable.
+     */
+    private function migrationStatus(): array
+    {
+        try {
+            $migrator = app('migrator');
+            $repository = $migrator->getRepository();
+
+            if (! $repository->repositoryExists()) {
+                return ['ok' => true, 'ran_count' => 0, 'pending' => [], 'note' => 'Migrations table not created yet — running will initialise it.'];
+            }
+
+            $ran = $repository->getRan();
+
+            $files = $migrator->getMigrationFiles(database_path('migrations'));
+            $pending = array_values(array_filter(
+                array_keys($files),
+                fn ($name) => ! in_array($name, $ran, true)
+            ));
+
+            return [
+                'ok' => true,
+                'ran_count' => count($ran),
+                'pending' => $pending,
+                'note' => null,
+            ];
+        } catch (\Throwable $e) {
+            return ['ok' => false, 'ran_count' => 0, 'pending' => [], 'note' => 'Could not read migration status: ' . $e->getMessage()];
+        }
+    }
+
+    /**
+     * Run pending migrations with --force (non-interactive). Guarded behind an
+     * explicit confirmation checkbox because migrations can alter data and are
+     * not trivially reversible. Raises the execution time limit for the slow
+     * PHP-CGI defaults common on shared/cPanel hosts.
+     */
+    public function runMigrations(Request $request)
+    {
+        $request->validate([
+            'confirm' => 'accepted',
+        ]);
+
+        @set_time_limit(300);
+
+        try {
+            \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
+            $output = trim(\Illuminate\Support\Facades\Artisan::output());
+
+            return back()->with('success', 'Migrations run. ' . ($output !== '' ? $output : 'Nothing to migrate.'));
+        } catch (\Throwable $e) {
+            return back()->with('error', 'Migration failed: ' . $e->getMessage());
+        }
     }
 
     /**

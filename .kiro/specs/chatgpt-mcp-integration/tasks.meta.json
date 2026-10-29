@@ -465,6 +465,16 @@
         "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
         "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
         "timestamp": 1793296658341
+      },
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793298587727
+      },
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793298871246
       }
     ],
     "12.2 Document cPanel deployment and manual verification": [
@@ -472,6 +482,16 @@
         "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
         "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
         "timestamp": 1793296658365
+      },
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793298588783
+      },
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793298870331
       }
     ],
     "13. Final checkpoint — full suite green": [
@@ -479,6 +499,16 @@
         "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
         "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
         "timestamp": 1793296658391
+      },
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793298875162
+      },
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793298966326
       }
     ],
     "2. DTO transformers (data-minimisation enforcement point)": [
@@ -542,6 +572,13 @@
         "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
         "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
         "timestamp": 1793298580421
+      }
+    ],
+    "12. Final integration and wiring": [
+      {
+        "executionId": "a83a211a-d5fd-4c04-8fd1-36f1510451fd",
+        "chatSessionId": "sess_33f8379d-4449-40f3-8539-990deb86977d",
+        "timestamp": 1793298871279
       }
     ]
   }
