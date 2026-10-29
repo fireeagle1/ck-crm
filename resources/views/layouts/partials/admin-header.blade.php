@@ -32,6 +32,7 @@
         ['route' => 'admin.settings.tasks', 'label' => 'Scheduled Tasks'],
         ['route' => 'admin.settings.maintenance', 'label' => 'Maintenance'],
         ['route' => 'admin.mcp.tokens.index', 'label' => 'MCP Tokens'],
+        ['route' => 'admin.mcp.audit.index', 'label' => 'MCP Audit Log'],
         ['route' => 'admin.settings.index', 'label' => 'Settings'],
     ];
 @endphp

@@ -321,6 +321,9 @@ Route::middleware(['auth', 'verified', EnsureIsAdmin::class])->prefix('admin')->
     // MCP (ChatGPT) OAuth token management — admin-only, never exposed to the MCP surface
     Route::get('/mcp/tokens', [Admin\McpTokenController::class, 'index'])->name('mcp.tokens.index');
     Route::post('/mcp/tokens/{id}/revoke', [Admin\McpTokenController::class, 'revoke'])->name('mcp.tokens.revoke');
+
+    // MCP audit trail — read-only list of every tools/call and denied attempt
+    Route::get('/mcp/audit', [Admin\McpAuditLogController::class, 'index'])->name('mcp.audit.index');
 });
 
 /*
