@@ -11,6 +11,50 @@ use Illuminate\View\View;
 class CustomerAppController extends Controller
 {
     /**
+     * List every CustomerApp (the "Web App register") with its linked service,
+     * customer, and child counts. This is the standalone register view, as
+     * opposed to the per-service create flow.
+     */
+    public function index(Request $request): View
+    {
+        $search = trim((string) $request->query('q', ''));
+
+        $customerApps = CustomerApp::query()
+            ->with(['service.customer'])
+            ->withCount(['packages', 'findings', 'openFindings'])
+            ->when($search !== '', function ($query) use ($search) {
+                $query->where(function ($inner) use ($search) {
+                    $inner->where('repo_url', 'like', "%{$search}%")
+                        ->orWhere('hosting_location', 'like', "%{$search}%")
+                        ->orWhereHas('service', function ($service) use ($search) {
+                            $service->where('service_short', 'like', "%{$search}%")
+                                ->orWhereHas('customer', fn ($c) => $c->where('company_name', 'like', "%{$search}%"));
+                        });
+                });
+            })
+            ->orderByDesc('id')
+            ->paginate(15)
+            ->withQueryString();
+
+        return view('admin.customer-apps.index', compact('customerApps', 'search'));
+    }
+
+    /**
+     * Pick a service to attach a new app to. Only services without an existing
+     * app are selectable, since the link is 1:1 (Req 1.4).
+     */
+    public function pick(): View
+    {
+        $services = Service::query()
+            ->whereDoesntHave('customerApp')
+            ->with('customer')
+            ->orderByDesc('service_id')
+            ->get();
+
+        return view('admin.customer-apps.pick', compact('services'));
+    }
+
+    /**
      * Show the form for creating a CustomerApp against an existing Service.
      */
     public function create(Service $service): View

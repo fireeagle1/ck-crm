@@ -4,6 +4,7 @@
         ['route' => 'admin.customers.index', 'label' => 'Customers'],
         ['route' => 'admin.tickets.index', 'label' => 'Tickets'],
         ['route' => 'admin.services.index', 'label' => 'Services'],
+        ['route' => 'admin.customer-apps.index', 'label' => 'Web Apps'],
         ['route' => 'admin.projects.index', 'label' => 'Projects'],
         ['route' => 'admin.invoices.index', 'label' => 'Invoices'],
         ['route' => 'admin.domains.index', 'label' => 'Domains'],

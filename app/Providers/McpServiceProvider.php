@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Mcp\Query\CustomerAppQueryService;
 use App\Mcp\Query\CustomerQueryService;
 use App\Mcp\Query\InvoiceQueryService;
 use App\Mcp\Query\ProjectsQueryService;
@@ -10,6 +11,7 @@ use App\Mcp\Query\TicketQueryService;
 use App\Mcp\Registry\ToolDispatcher;
 use App\Mcp\Tools\CreateTicketTool;
 use App\Mcp\Tools\ReplyTicketTool;
+use App\Mcp\Tools\UpdateCustomerAppTool;
 use App\Mcp\Tools\UpdateTicketTool;
 use Illuminate\Support\ServiceProvider;
 
@@ -21,7 +23,7 @@ use Illuminate\Support\ServiceProvider;
  * each to a stable handler key ({@see \App\Mcp\Registry\ToolDefinition::$handler}).
  * The {@see ToolDispatcher} is the dispatch seam that resolves a handler key to
  * the concrete callable that actually runs the tool. This provider binds every
- * one of the 13 registered handler keys onto the shared {@see ToolDispatcher}
+ * one of the 16 registered handler keys onto the shared {@see ToolDispatcher}
  * singleton so that a `tools/call` for any tool dispatches end-to-end through
  * the full middleware stack with no orphaned code and no
  * {@see \App\Mcp\Registry\HandlerNotWiredException} in normal operation
@@ -141,6 +143,23 @@ class McpServiceProvider extends ServiceProvider
                 $this->intOrNull($args['per_page'] ?? null),
             ));
 
+        // --- Web Apps (apps:read) --------------------------------------------
+        $dispatcher->register('apps.get', function (array $args) {
+            $result = $this->app->make(CustomerAppQueryService::class)
+                ->getCustomerApp($args['id']);
+
+            return $result ?? $this->notFound('web app', 'id', $args['id'] ?? null);
+        });
+
+        $dispatcher->register('apps.list', fn (array $args) => $this->app
+            ->make(CustomerAppQueryService::class)
+            ->listCustomerApps(
+                $this->intOrNull($args['service_id'] ?? null),
+                $this->intOrNull($args['company_id'] ?? null),
+                $this->intOrNull($args['page'] ?? null),
+                $this->intOrNull($args['per_page'] ?? null),
+            ));
+
         // --- Tickets (tickets:read) ------------------------------------------
         $dispatcher->register('tickets.get', function (array $args) {
             $result = $this->app->make(TicketQueryService::class)
@@ -176,6 +195,10 @@ class McpServiceProvider extends ServiceProvider
 
         $dispatcher->register('tickets.reply', fn (array $args) => $this->app
             ->make(ReplyTicketTool::class)
+            ->handle($args));
+
+        $dispatcher->register('apps.update', fn (array $args) => $this->app
+            ->make(UpdateCustomerAppTool::class)
             ->handle($args));
     }
 

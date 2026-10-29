@@ -158,7 +158,9 @@ Route::middleware(['auth', 'verified', EnsureIsAdmin::class])->prefix('admin')->
     Route::put('/services/{service}', [Admin\ServiceController::class, 'update'])->name('services.update');
     Route::delete('/services/{service}', [Admin\ServiceController::class, 'destroy'])->name('services.destroy');
 
-    // Customer Apps (technical records linked 1:1 to a Service)
+    // Customer Apps (technical records linked 1:1 to a Service) — the Web App register
+    Route::get('/customer-apps', [Admin\CustomerAppController::class, 'index'])->name('customer-apps.index');
+    Route::get('/customer-apps/new', [Admin\CustomerAppController::class, 'pick'])->name('customer-apps.pick');
     Route::get('/services/{service}/customer-app/create', [Admin\CustomerAppController::class, 'create'])->name('customer-apps.create');
     Route::post('/services/{service}/customer-app', [Admin\CustomerAppController::class, 'store'])->name('customer-apps.store');
     Route::get('/customer-apps/{customerApp}', [Admin\CustomerAppController::class, 'show'])->name('customer-apps.show');

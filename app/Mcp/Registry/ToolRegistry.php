@@ -44,6 +44,10 @@ final class ToolRegistry
 
     public const SCOPE_TICKETS_WRITE = 'tickets:write';
 
+    public const SCOPE_APPS_READ = 'apps:read';
+
+    public const SCOPE_APPS_WRITE = 'apps:write';
+
     /**
      * The registered tools, keyed by tool name.
      *
@@ -229,6 +233,61 @@ final class ToolRegistry
                 requiredScope: self::SCOPE_SERVICES_READ,
                 kind: ToolDefinition::KIND_READ,
                 handler: 'services.list',
+            ),
+
+            // --- Web Apps (read) --------------------------------------------
+            new ToolDefinition(
+                name: 'get_app',
+                description: 'Read-only. Fetch a single web app by id, returning its technical '
+                    .'metadata (repo_url, hosting_location, codebase_info) and the linked '
+                    .'service/customer identifiers. Does not modify any data.',
+                inputSchema: $this->object(
+                    properties: [
+                        'id' => $this->integer('The web app primary key (id).'),
+                    ],
+                    required: ['id'],
+                ),
+                requiredScope: self::SCOPE_APPS_READ,
+                kind: ToolDefinition::KIND_READ,
+                handler: 'apps.get',
+            ),
+            new ToolDefinition(
+                name: 'list_apps',
+                description: 'Read-only. List web apps, optionally filtered by service_id and/or '
+                    .'company_id (the owning customer), returning paginated technical metadata. '
+                    .'Does not modify any data.',
+                inputSchema: $this->object(
+                    properties: [
+                        'service_id' => $this->integer('Optional filter: the app on a single service (service_id).'),
+                        'company_id' => $this->integer('Optional customer filter (company_id).'),
+                        'page' => $this->page(),
+                        'per_page' => $this->perPage(),
+                    ],
+                ),
+                requiredScope: self::SCOPE_APPS_READ,
+                kind: ToolDefinition::KIND_READ,
+                handler: 'apps.list',
+            ),
+
+            // --- Web Apps (write) -------------------------------------------
+            new ToolDefinition(
+                name: 'update_app',
+                description: 'WRITE operation. Updates a web app\'s technical metadata. Only the '
+                    .'provided fields are changed; omitted fields are left untouched. Billing, '
+                    .'status, and the customer-facing name live on the linked service and are '
+                    .'never changed here. This changes CRM data. Requires the apps:write scope.',
+                inputSchema: $this->object(
+                    properties: [
+                        'id' => $this->integer('The web app to update (id). Must exist.'),
+                        'repo_url' => $this->string('Optional repository URL (http/https).'),
+                        'hosting_location' => $this->string('Optional hosting/storage location.'),
+                        'codebase_info' => $this->string('Optional free-text codebase notes (framework, language, architecture).'),
+                    ],
+                    required: ['id'],
+                ),
+                requiredScope: self::SCOPE_APPS_WRITE,
+                kind: ToolDefinition::KIND_WRITE,
+                handler: 'apps.update',
             ),
 
             // --- Tickets (read) ---------------------------------------------
