@@ -307,22 +307,34 @@ class SettingsController extends Controller
     {
         $force = $request->boolean('force');
 
-        $private = storage_path('oauth-private.key');
-        $public = storage_path('oauth-public.key');
+        // Resolve the exact paths Passport reads from at runtime, so generated
+        // keys land where the auth server expects them.
+        $publicKey = \Laravel\Passport\Passport::keyPath('oauth-public.key');
+        $privateKey = \Laravel\Passport\Passport::keyPath('oauth-private.key');
 
-        if ((file_exists($private) || file_exists($public)) && ! $force) {
+        if ((file_exists($publicKey) || file_exists($privateKey)) && ! $force) {
             return back()->with('error', 'Passport keys already exist. Tick "overwrite" only if you intend to regenerate them — doing so invalidates every issued token.');
         }
 
+        // Generate directly rather than calling the passport:keys artisan
+        // command: Passport only registers that command when runningInConsole(),
+        // so it does not exist inside a web request. This mirrors KeysCommand.
         try {
-            \Illuminate\Support\Facades\Artisan::call('passport:keys', $force ? ['--force' => true] : []);
+            @set_time_limit(120); // 4096-bit RSA generation can be slow on shared hosts.
 
-            // Lock the private key down; it is a secret.
-            if (file_exists($private)) {
-                @chmod($private, 0600);
+            $key = \phpseclib4\Crypt\RSA::createKey(4096);
+
+            if (file_put_contents($publicKey, (string) $key->getPublicKey()) === false
+                || file_put_contents($privateKey, (string) $key) === false) {
+                return back()->with('error', 'Could not write key files to storage/. Check that storage/ is writable (775).');
             }
 
-            return back()->with('success', 'Passport keys generated in storage/. Keep them out of version control.');
+            if (! windows_os()) {
+                @chmod($publicKey, 0660);
+                @chmod($privateKey, 0600);
+            }
+
+            return back()->with('success', 'Passport keys generated in storage/. Keep them out of version control (.gitignore already excludes /storage/*.key).');
         } catch (\Throwable $e) {
             return back()->with('error', 'Key generation failed: ' . $e->getMessage());
         }
