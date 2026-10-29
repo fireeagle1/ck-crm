@@ -146,19 +146,44 @@ locally and ship the result:
    cd /home/user/ck-crm && /usr/local/bin/php artisan config:clear
    cd /home/user/ck-crm && /usr/local/bin/php artisan route:clear
    ```
-   > **Critical for the 404-at-`/oauth/authorize` symptom.** Passport registers
-   > its `/oauth/*` routes automatically at boot (Laravel 11+/Passport 12+; there
-   > is no `Passport::routes()` call). If the server has a **stale route cache**
-   > built *before* Passport was deployed, that cached table has no `/oauth/*`
-   > entries and every authorize/token request returns the app's generic **404**
-   > — even though the code is correct. `route:clear` drops the stale table so the
-   > routes resolve again. A *missing key* or *un-migrated `oauth_*` table* shows
-   > up as a **500**, not a 404, so a 404 specifically points at the route cache.
+   > **The 404-at-`/oauth/authorize` symptom has TWO possible causes — check in
+   > order.** Passport registers its `/oauth/*` routes automatically at boot
+   > (Laravel 11+/Passport 12+; there is no `Passport::routes()` call).
    >
-   > **No SSH?** The same clears are exposed in the admin UI at
-   > **Settings → Maintenance**: click **"Clear all caches"** (runs
-   > `config:clear`, `route:clear`, `view:clear`, `cache:clear`) or the
-   > individual **"Clear routes"** button. Do this after every deploy.
+   > 1. **Stale route cache.** A cached route table built *before* Passport was
+   >    deployed has no `/oauth/*` entries. Fix: `route:clear`.
+   >
+   > 2. **Passport provider not discovered (the deeper cause).** If `route:clear`
+   >    does NOT fix it, the Passport *service provider itself isn't booting*, so
+   >    the routes are never created to begin with — `route:clear` can't restore
+   >    routes that were never registered. This happens on a no-SSH deploy when
+   >    the **cached package manifest** (`bootstrap/cache/packages.php` /
+   >    `services.php`) was written *before* `vendor/laravel/passport` was
+   >    uploaded, so Laravel's auto-discovery list omits Passport. It can also
+   >    mean `vendor/laravel/passport` is simply not on the server. Fix: delete
+   >    the two cached manifests and re-run discovery:
+   >    ```
+   >    cd /home/user/ck-crm && rm -f bootstrap/cache/packages.php bootstrap/cache/services.php
+   >    cd /home/user/ck-crm && /usr/local/bin/php artisan package:discover
+   >    cd /home/user/ck-crm && /usr/local/bin/php artisan route:clear
+   >    ```
+   >
+   > A *missing key* or *un-migrated `oauth_*` table* shows up as a **500**, not a
+   > 404, so a 404 specifically means the routes are absent (cause 1 or 2 above).
+   >
+   > **No SSH?** Both fixes are in the admin UI at **Settings → Maintenance**:
+   > - **"Clear all caches"** (runs `config:clear`, `route:clear`, `view:clear`,
+   >   `cache:clear`) — fixes cause 1.
+   > - **"Rebuild package discovery"** (deletes the cached manifests, re-runs
+   >   `package:discover`, then `route:clear`) — fixes cause 2.
+   >
+   > The Maintenance screen also shows an **"OAuth route registration"** panel
+   > that reports, from inside the live app, whether the Passport package is
+   > present in `vendor/`, whether its provider booted, and whether the
+   > `/oauth/authorize` + `/oauth/token` routes are actually registered. Use it to
+   > confirm the fix: all three must be ✅ before the 404 clears. (If it says
+   > `vendor/laravel/passport` is missing, upload the vendor directory first — no
+   > cache action can register routes for a package that isn't there.)
 
 6. **Create the public MCP OAuth client** (the identity OpenAI's connector uses).
    It is a *public* client: no client secret is generated, so the authorization

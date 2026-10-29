@@ -3,10 +3,19 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\ScheduledTaskLog;
 use App\Models\Setting;
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
+use Laravel\Passport\ClientRepository;
+use Laravel\Passport\Passport;
+use Laravel\Passport\PassportServiceProvider;
+use phpseclib4\Crypt\RSA;
 
 class SettingsController extends Controller
 {
@@ -44,9 +53,9 @@ class SettingsController extends Controller
             }
 
             $file = $request->file('logo');
-            $filename = 'logo-' . time() . '.' . $file->getClientOriginalExtension();
+            $filename = 'logo-'.time().'.'.$file->getClientOriginalExtension();
             $file->move(public_path('branding'), $filename);
-            Setting::set('logo_path', 'branding/' . $filename);
+            Setting::set('logo_path', 'branding/'.$filename);
         }
 
         // Dark logo (for light backgrounds — login page, emails)
@@ -57,9 +66,9 @@ class SettingsController extends Controller
             }
 
             $file = $request->file('logo_dark');
-            $filename = 'logo-dark-' . time() . '.' . $file->getClientOriginalExtension();
+            $filename = 'logo-dark-'.time().'.'.$file->getClientOriginalExtension();
             $file->move(public_path('branding'), $filename);
-            Setting::set('logo_dark_path', 'branding/' . $filename);
+            Setting::set('logo_dark_path', 'branding/'.$filename);
         }
 
         // Favicon
@@ -70,9 +79,9 @@ class SettingsController extends Controller
             }
 
             $file = $request->file('favicon');
-            $filename = 'favicon-' . time() . '.' . $file->getClientOriginalExtension();
+            $filename = 'favicon-'.time().'.'.$file->getClientOriginalExtension();
             $file->move(public_path('branding'), $filename);
-            Setting::set('favicon_path', 'branding/' . $filename);
+            Setting::set('favicon_path', 'branding/'.$filename);
         }
 
         return back()->with('success', 'Settings saved.');
@@ -98,10 +107,10 @@ class SettingsController extends Controller
 
     public function scheduledTasks(): View
     {
-        $logs = \App\Models\ScheduledTaskLog::orderByDesc('created_at')->paginate(30);
+        $logs = ScheduledTaskLog::orderByDesc('created_at')->paginate(30);
 
         // Get the defined schedule
-        $schedule = app(\Illuminate\Console\Scheduling\Schedule::class);
+        $schedule = app(Schedule::class);
         $events = collect($schedule->events())->map(function ($event) {
             return [
                 'command' => $event->command ?? $event->description ?? 'Closure',
@@ -130,10 +139,10 @@ class SettingsController extends Controller
         // Run with --debug for enom to capture response info
         $params = $command === 'enom:sync' ? ['--debug' => true] : [];
 
-        \Illuminate\Support\Facades\Artisan::call($command, $params);
-        $output = \Illuminate\Support\Facades\Artisan::output();
+        Artisan::call($command, $params);
+        $output = Artisan::output();
 
-        return back()->with('success', "Ran '{$command}'. Output: " . trim($output));
+        return back()->with('success', "Ran '{$command}'. Output: ".trim($output));
     }
 
     /**
@@ -169,11 +178,11 @@ class SettingsController extends Controller
         $client = null;
 
         try {
-            $tablesExist = \Illuminate\Support\Facades\Schema::hasTable('oauth_clients')
-                && \Illuminate\Support\Facades\Schema::hasTable('oauth_access_tokens');
+            $tablesExist = Schema::hasTable('oauth_clients')
+                && Schema::hasTable('oauth_access_tokens');
 
             if ($tablesExist) {
-                $row = \Illuminate\Support\Facades\DB::table('oauth_clients')
+                $row = DB::table('oauth_clients')
                     ->where('name', 'mcp_client')
                     ->first();
 
@@ -185,9 +194,9 @@ class SettingsController extends Controller
                     }
 
                     $client = [
-                        'id'        => $row->id,
+                        'id' => $row->id,
                         'redirects' => array_values($redirects),
-                        'revoked'   => (bool) ($row->revoked ?? false),
+                        'revoked' => (bool) ($row->revoked ?? false),
                     ];
                 }
             }
@@ -195,12 +204,81 @@ class SettingsController extends Controller
             // leave defaults
         }
 
-        return [
-            'tables_exist'  => $tablesExist,
-            'keys_exist'    => file_exists(storage_path('oauth-private.key'))
+        return array_merge([
+            'tables_exist' => $tablesExist,
+            'keys_exist' => file_exists(storage_path('oauth-private.key'))
                 && file_exists(storage_path('oauth-public.key')),
             'client_exists' => $client !== null,
-            'client'        => $client,
+            'client' => $client,
+        ], $this->passportRuntimeStatus());
+    }
+
+    /**
+     * Diagnose whether Passport is actually LOADED and its /oauth/* routes are
+     * REGISTERED in this running process — the piece the tables/keys/client
+     * checks above cannot see.
+     *
+     * A 404 at /oauth/authorize while tables+keys+client are all present means
+     * the Passport routes never got into the router. That happens when the
+     * Passport package isn't discovered on the server: either the
+     * vendor/laravel/passport directory wasn't uploaded, or the cached package
+     * manifest (bootstrap/cache/packages.php) predates the upload and omits the
+     * provider. This surfaces each of those as a concrete yes/no so the admin
+     * can see the real cause rather than guessing.
+     *
+     * @return array<string, mixed>
+     */
+    private function passportRuntimeStatus(): array
+    {
+        // 1. Is the Passport package physically present in vendor/?
+        $vendorPresent = is_dir(base_path('vendor/laravel/passport'))
+            && class_exists(PassportServiceProvider::class);
+
+        // 2. Did the Passport service provider actually boot in this process?
+        $providerLoaded = false;
+        try {
+            $providerLoaded = collect(app()->getLoadedProviders())
+                ->keys()
+                ->contains(PassportServiceProvider::class);
+        } catch (\Throwable) {
+            // leave false
+        }
+
+        // 3. Is the cached package manifest stale — i.e. does the on-disk
+        //    bootstrap/cache/packages.php omit Passport even though vendor has
+        //    it? That stale manifest is the classic no-SSH-deploy 404 cause.
+        $manifestHasPassport = null; // null = no cached manifest on disk
+        $manifestPath = base_path('bootstrap/cache/packages.php');
+        if (file_exists($manifestPath)) {
+            try {
+                $manifest = require $manifestPath;
+                $manifestHasPassport = is_array($manifest)
+                    && array_key_exists('laravel/passport', $manifest);
+            } catch (\Throwable) {
+                $manifestHasPassport = false;
+            }
+        }
+
+        // 4. The decisive check: are the /oauth/* routes actually registered in
+        //    THIS running router? This is the exact thing a production HTTP
+        //    request sees, so it is the ground truth for the 404.
+        $authorizeRegistered = false;
+        $tokenRegistered = false;
+        try {
+            $routes = app('router')->getRoutes();
+            $authorizeRegistered = $routes->getByName('passport.authorizations.authorize') !== null;
+            $tokenRegistered = $routes->getByName('passport.token') !== null;
+        } catch (\Throwable) {
+            // leave false
+        }
+
+        return [
+            'vendor_present' => $vendorPresent,
+            'provider_loaded' => $providerLoaded,
+            'manifest_has_passport' => $manifestHasPassport,
+            'routes_registered' => $authorizeRegistered && $tokenRegistered,
+            'authorize_registered' => $authorizeRegistered,
+            'token_registered' => $tokenRegistered,
         ];
     }
 
@@ -244,7 +322,7 @@ class SettingsController extends Controller
                 'note' => null,
             ];
         } catch (\Throwable $e) {
-            return ['ok' => false, 'ran_count' => 0, 'pending' => [], 'already_applied' => [], 'note' => 'Could not read migration status: ' . $e->getMessage()];
+            return ['ok' => false, 'ran_count' => 0, 'pending' => [], 'already_applied' => [], 'note' => 'Could not read migration status: '.$e->getMessage()];
         }
     }
 
@@ -261,7 +339,7 @@ class SettingsController extends Controller
         }
 
         try {
-            return \Illuminate\Support\Facades\Schema::hasTable($m[1]);
+            return Schema::hasTable($m[1]);
         } catch (\Throwable) {
             return false;
         }
@@ -282,12 +360,12 @@ class SettingsController extends Controller
         @set_time_limit(300);
 
         try {
-            \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
-            $output = trim(\Illuminate\Support\Facades\Artisan::output());
+            Artisan::call('migrate', ['--force' => true]);
+            $output = trim(Artisan::output());
 
-            return back()->with('success', 'Migrations run. ' . ($output !== '' ? $output : 'Nothing to migrate.'));
+            return back()->with('success', 'Migrations run. '.($output !== '' ? $output : 'Nothing to migrate.'));
         } catch (\Throwable $e) {
-            return back()->with('error', 'Migration failed: ' . $e->getMessage());
+            return back()->with('error', 'Migration failed: '.$e->getMessage());
         }
     }
 
@@ -302,12 +380,12 @@ class SettingsController extends Controller
         @set_time_limit(120);
 
         try {
-            \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true, '--pretend' => true]);
-            $output = trim(\Illuminate\Support\Facades\Artisan::output());
+            Artisan::call('migrate', ['--force' => true, '--pretend' => true]);
+            $output = trim(Artisan::output());
 
             return back()->with('migration_preview', $output !== '' ? $output : 'Nothing pending — no SQL would run.');
         } catch (\Throwable $e) {
-            return back()->with('error', 'Preview failed: ' . $e->getMessage());
+            return back()->with('error', 'Preview failed: '.$e->getMessage());
         }
     }
 
@@ -324,8 +402,8 @@ class SettingsController extends Controller
 
         // Resolve the exact paths Passport reads from at runtime, so generated
         // keys land where the auth server expects them.
-        $publicKey = \Laravel\Passport\Passport::keyPath('oauth-public.key');
-        $privateKey = \Laravel\Passport\Passport::keyPath('oauth-private.key');
+        $publicKey = Passport::keyPath('oauth-public.key');
+        $privateKey = Passport::keyPath('oauth-private.key');
 
         if ((file_exists($publicKey) || file_exists($privateKey)) && ! $force) {
             return back()->with('error', 'Passport keys already exist. Tick "overwrite" only if you intend to regenerate them — doing so invalidates every issued token.');
@@ -337,7 +415,7 @@ class SettingsController extends Controller
         try {
             @set_time_limit(120); // 4096-bit RSA generation can be slow on shared hosts.
 
-            $key = \phpseclib4\Crypt\RSA::createKey(4096);
+            $key = RSA::createKey(4096);
 
             if (file_put_contents($publicKey, (string) $key->getPublicKey()) === false
                 || file_put_contents($privateKey, (string) $key) === false) {
@@ -351,7 +429,7 @@ class SettingsController extends Controller
 
             return back()->with('success', 'Passport keys generated in storage/. Keep them out of version control (.gitignore already excludes /storage/*.key).');
         } catch (\Throwable $e) {
-            return back()->with('error', 'Key generation failed: ' . $e->getMessage());
+            return back()->with('error', 'Key generation failed: '.$e->getMessage());
         }
     }
 
@@ -368,25 +446,25 @@ class SettingsController extends Controller
         ]);
 
         try {
-            if (! \Illuminate\Support\Facades\Schema::hasTable('oauth_clients')) {
+            if (! Schema::hasTable('oauth_clients')) {
                 return back()->with('error', 'The oauth_clients table does not exist yet — run migrations first.');
             }
 
-            $exists = \Illuminate\Support\Facades\DB::table('oauth_clients')->where('name', 'mcp_client')->exists();
+            $exists = DB::table('oauth_clients')->where('name', 'mcp_client')->exists();
             if ($exists) {
                 return back()->with('error', 'An "mcp_client" already exists. Delete it first if you need to recreate it.');
             }
 
-            $clients = app(\Laravel\Passport\ClientRepository::class);
+            $clients = app(ClientRepository::class);
             $client = $clients->createAuthorizationCodeGrantClient(
                 name: 'mcp_client',
                 redirectUris: [trim($request->input('redirect_uri'))],
                 confidential: false,
             );
 
-            return back()->with('success', 'MCP client created. Client ID: ' . $client->getKey() . ' — configure OpenAI\'s connector with this ID (public client, no secret, PKCE required).');
+            return back()->with('success', 'MCP client created. Client ID: '.$client->getKey().' — configure OpenAI\'s connector with this ID (public client, no secret, PKCE required).');
         } catch (\Throwable $e) {
-            return back()->with('error', 'Client creation failed: ' . $e->getMessage());
+            return back()->with('error', 'Client creation failed: '.$e->getMessage());
         }
     }
 
@@ -401,44 +479,44 @@ class SettingsController extends Controller
     {
         $request->validate([
             'redirect_uri' => 'required|url',
-            'confirm'      => 'accepted',
+            'confirm' => 'accepted',
         ]);
 
         try {
-            if (! \Illuminate\Support\Facades\Schema::hasTable('oauth_clients')) {
+            if (! Schema::hasTable('oauth_clients')) {
                 return back()->with('error', 'The oauth_clients table does not exist yet — run migrations first.');
             }
 
-            $clientIds = \Illuminate\Support\Facades\DB::table('oauth_clients')
+            $clientIds = DB::table('oauth_clients')
                 ->where('name', 'mcp_client')
                 ->pluck('id');
 
-            \Illuminate\Support\Facades\DB::transaction(function () use ($clientIds) {
+            DB::transaction(function () use ($clientIds) {
                 if ($clientIds->isNotEmpty()) {
                     // Revoke/remove tokens tied to the old client(s) first.
-                    if (\Illuminate\Support\Facades\Schema::hasTable('oauth_access_tokens')) {
-                        \Illuminate\Support\Facades\DB::table('oauth_access_tokens')
+                    if (Schema::hasTable('oauth_access_tokens')) {
+                        DB::table('oauth_access_tokens')
                             ->whereIn('client_id', $clientIds)->delete();
                     }
-                    if (\Illuminate\Support\Facades\Schema::hasTable('oauth_auth_codes')) {
-                        \Illuminate\Support\Facades\DB::table('oauth_auth_codes')
+                    if (Schema::hasTable('oauth_auth_codes')) {
+                        DB::table('oauth_auth_codes')
                             ->whereIn('client_id', $clientIds)->delete();
                     }
-                    \Illuminate\Support\Facades\DB::table('oauth_clients')
+                    DB::table('oauth_clients')
                         ->whereIn('id', $clientIds)->delete();
                 }
             });
 
-            $clients = app(\Laravel\Passport\ClientRepository::class);
+            $clients = app(ClientRepository::class);
             $client = $clients->createAuthorizationCodeGrantClient(
                 name: 'mcp_client',
                 redirectUris: [trim($request->input('redirect_uri'))],
                 confidential: false,
             );
 
-            return back()->with('success', 'MCP client reset. New Client ID: ' . $client->getKey() . ' — reconfigure OpenAI\'s connector with this ID. The previous client and its tokens were removed.');
+            return back()->with('success', 'MCP client reset. New Client ID: '.$client->getKey().' — reconfigure OpenAI\'s connector with this ID. The previous client and its tokens were removed.');
         } catch (\Throwable $e) {
-            return back()->with('error', 'Client reset failed: ' . $e->getMessage());
+            return back()->with('error', 'Client reset failed: '.$e->getMessage());
         }
     }
 
@@ -488,9 +566,9 @@ class SettingsController extends Controller
                 return back()->with('success', 'Nothing to sync — no pending create-table migrations have an existing table.');
             }
 
-            return back()->with('success', count($synced) . ' migration(s) marked as already applied (no schema changes made): ' . implode(', ', $synced));
+            return back()->with('success', count($synced).' migration(s) marked as already applied (no schema changes made): '.implode(', ', $synced));
         } catch (\Throwable $e) {
-            return back()->with('error', 'Sync failed: ' . $e->getMessage());
+            return back()->with('error', 'Sync failed: '.$e->getMessage());
         }
     }
 
@@ -501,13 +579,17 @@ class SettingsController extends Controller
     public function runMaintenance(Request $request)
     {
         $request->validate([
-            'action' => 'required|string|in:cache_clear,config_clear,config_cache,route_clear,route_cache,view_clear,storage_link,optimize_clear',
+            'action' => 'required|string|in:cache_clear,config_clear,config_cache,route_clear,route_cache,view_clear,storage_link,optimize_clear,package_discover',
         ]);
 
         $action = $request->input('action');
 
         if ($action === 'storage_link') {
             return $this->rebuildStorageLink();
+        }
+
+        if ($action === 'package_discover') {
+            return $this->rebuildPackageDiscovery();
         }
 
         // "Clear all" runs the deploy-critical clears individually so that a
@@ -517,10 +599,10 @@ class SettingsController extends Controller
             $results = [];
             foreach (['config:clear', 'route:clear', 'view:clear', 'cache:clear'] as $cmd) {
                 try {
-                    \Illuminate\Support\Facades\Artisan::call($cmd);
-                    $results[] = $cmd . ' ✓';
+                    Artisan::call($cmd);
+                    $results[] = $cmd.' ✓';
                 } catch (\Throwable $e) {
-                    $results[] = $cmd . ' ✗ (' . $e->getMessage() . ')';
+                    $results[] = $cmd.' ✗ ('.$e->getMessage().')';
                 }
             }
 
@@ -528,28 +610,28 @@ class SettingsController extends Controller
 
             return back()->with(
                 $failed ? 'error' : 'success',
-                ($failed ? 'Some caches could not be cleared: ' : 'All caches cleared: ') . implode(', ', $results)
+                ($failed ? 'Some caches could not be cleared: ' : 'All caches cleared: ').implode(', ', $results)
             );
         }
 
         $map = [
-            'cache_clear'    => ['cache:clear',  'Application cache cleared.'],
-            'config_clear'   => ['config:clear', 'Config cache cleared.'],
-            'config_cache'   => ['config:cache', 'Config cached.'],
-            'route_clear'    => ['route:clear',  'Route cache cleared.'],
-            'route_cache'    => ['route:cache',  'Routes cached.'],
-            'view_clear'     => ['view:clear',   'Compiled views cleared.'],
+            'cache_clear' => ['cache:clear',  'Application cache cleared.'],
+            'config_clear' => ['config:clear', 'Config cache cleared.'],
+            'config_cache' => ['config:cache', 'Config cached.'],
+            'route_clear' => ['route:clear',  'Route cache cleared.'],
+            'route_cache' => ['route:cache',  'Routes cached.'],
+            'view_clear' => ['view:clear',   'Compiled views cleared.'],
         ];
 
         [$command, $message] = $map[$action];
 
         try {
-            \Illuminate\Support\Facades\Artisan::call($command);
-            $output = trim(\Illuminate\Support\Facades\Artisan::output());
+            Artisan::call($command);
+            $output = trim(Artisan::output());
 
-            return back()->with('success', $message . ($output !== '' ? ' ' . $output : ''));
+            return back()->with('success', $message.($output !== '' ? ' '.$output : ''));
         } catch (\Throwable $e) {
-            return back()->with('error', "Failed to run '{$command}': " . $e->getMessage());
+            return back()->with('error', "Failed to run '{$command}': ".$e->getMessage());
         }
     }
 
@@ -582,5 +664,60 @@ class SettingsController extends Controller
         }
 
         return back()->with('error', 'Could not create the symlink (the host may block symlink()). Images will still load via the PHP storage fallback route, so no action is strictly required.');
+    }
+
+    /**
+     * Rebuild Laravel's package-discovery manifest.
+     *
+     * A stale bootstrap/cache/packages.php (cached BEFORE Passport was uploaded)
+     * is the classic no-SSH cause of a persistent /oauth/authorize 404: the
+     * manifest tells Laravel which package providers to boot, so if Passport is
+     * absent from it, its routes are never registered — and `route:clear`
+     * cannot fix that because the routes were never there to cache.
+     *
+     * This deletes the cached manifests and re-runs `package:discover`, which
+     * rescans vendor/ (where Passport must already be present) and rebuilds
+     * them. We delete first so a rebuild still happens even if discover itself
+     * reads a partially-stale file.
+     */
+    private function rebuildPackageDiscovery()
+    {
+        $results = [];
+
+        foreach (['bootstrap/cache/packages.php', 'bootstrap/cache/services.php'] as $rel) {
+            $path = base_path($rel);
+            if (file_exists($path)) {
+                $results[] = (@unlink($path) ? 'deleted ' : 'could NOT delete ').$rel;
+            } else {
+                $results[] = $rel.' (none)';
+            }
+        }
+
+        try {
+            Artisan::call('package:discover');
+            $results[] = 'package:discover ✓';
+        } catch (\Throwable $e) {
+            return back()->with('error', 'Deleted manifests but package:discover failed: '.$e->getMessage()
+                .' — '.implode(', ', $results));
+        }
+
+        // Clear the route cache too: a rebuilt provider list only takes effect
+        // in the routing table once any stale cached routes are dropped.
+        try {
+            Artisan::call('route:clear');
+            $results[] = 'route:clear ✓';
+        } catch (\Throwable $e) {
+            $results[] = 'route:clear ✗ ('.$e->getMessage().')';
+        }
+
+        $passportFound = is_dir(base_path('vendor/laravel/passport'));
+
+        return back()->with(
+            $passportFound ? 'success' : 'error',
+            ($passportFound
+                ? 'Package discovery rebuilt. Reload this page and check the OAuth route registration box — all three should now be ✅. '
+                : 'WARNING: vendor/laravel/passport is NOT on the server, so discovery cannot register its routes. Upload the vendor directory first. ')
+            .implode(', ', $results)
+        );
     }
 }

@@ -215,6 +215,55 @@
                     @endforeach
                 </ol>
 
+                {{-- Runtime diagnostics: is Passport actually loaded and are its
+                     /oauth/* routes registered in THIS process? A 404 at
+                     /oauth/authorize with the checklist all-green points here. --}}
+                @php
+                    $routesOk = $passport['routes_registered'] ?? false;
+                    $diag = [
+                        ['ok' => $passport['vendor_present'] ?? false,  'label' => 'Passport package present in vendor/', 'bad' => 'vendor/laravel/passport is missing — upload the vendor directory.'],
+                        ['ok' => $passport['provider_loaded'] ?? false, 'label' => 'Passport service provider booted', 'bad' => 'Provider not loaded — package not discovered this request.'],
+                        ['ok' => $routesOk, 'label' => '/oauth/authorize and /oauth/token routes registered', 'bad' => 'Routes NOT in the router — this is the direct cause of the 404.'],
+                    ];
+                    $manifestFlag = $passport['manifest_has_passport'] ?? null;
+                @endphp
+                <div class="mb-5 rounded-md border {{ $routesOk ? 'border-green-200 bg-green-50' : 'border-red-200 bg-red-50' }} p-3">
+                    <div class="text-sm font-medium {{ $routesOk ? 'text-green-800' : 'text-red-800' }} mb-2">
+                        OAuth route registration {{ $routesOk ? '— OK' : '— PROBLEM' }}
+                    </div>
+                    <ul class="space-y-1.5 text-xs">
+                        @foreach ($diag as $d)
+                            <li class="flex items-start gap-2">
+                                <span class="mt-0.5">{{ $d['ok'] ? '✅' : '❌' }}</span>
+                                <span class="{{ $d['ok'] ? 'text-gray-700' : 'text-red-700' }}">
+                                    {{ $d['label'] }}
+                                    @unless ($d['ok']) <span class="block text-red-600">{{ $d['bad'] }}</span> @endunless
+                                </span>
+                            </li>
+                        @endforeach
+                        <li class="flex items-start gap-2">
+                            @if ($manifestFlag === null)
+                                <span class="mt-0.5">ℹ️</span>
+                                <span class="text-gray-600">No cached package manifest on disk (<span class="font-mono">bootstrap/cache/packages.php</span>) — discovery runs fresh each request.</span>
+                            @elseif ($manifestFlag)
+                                <span class="mt-0.5">✅</span>
+                                <span class="text-gray-700">Cached package manifest lists <span class="font-mono">laravel/passport</span>.</span>
+                            @else
+                                <span class="mt-0.5">❌</span>
+                                <span class="text-red-700">Cached package manifest is STALE — it does not list <span class="font-mono">laravel/passport</span>. Delete <span class="font-mono">bootstrap/cache/packages.php</span> &amp; <span class="font-mono">services.php</span> (or run <span class="font-mono">php artisan package:discover</span>), then Clear all caches.</span>
+                            @endif
+                        </li>
+                    </ul>
+                    @unless ($routesOk)
+                        <p class="mt-3 text-xs text-red-700">
+                            Fix: ensure <span class="font-mono">vendor/laravel/passport</span> is uploaded, delete the stale
+                            <span class="font-mono">bootstrap/cache/packages.php</span> and <span class="font-mono">services.php</span>,
+                            then use <strong>Clear all caches</strong> below. Reload this page — all three must be ✅ before
+                            <span class="font-mono">/oauth/authorize</span> will stop 404ing.
+                        </p>
+                    @endunless
+                </div>
+
                 <div class="space-y-4">
                     {{-- Generate keys --}}
                     <div class="border rounded-md p-3">
@@ -316,7 +365,8 @@
 
                 @php
                     $actions = [
-                        ['action' => 'optimize_clear', 'label' => 'Clear all caches', 'primary' => true,  'desc' => 'config, route, view & app cache'],
+                        ['action' => 'optimize_clear',   'label' => 'Clear all caches',      'primary' => true,  'desc' => 'config, route, view & app cache'],
+                        ['action' => 'package_discover', 'label' => 'Rebuild package discovery', 'primary' => true, 'desc' => 'fixes /oauth 404: re-detect Passport'],
                         ['action' => 'config_clear',   'label' => 'Clear config',     'primary' => false, 'desc' => 'reload .env / config changes'],
                         ['action' => 'config_cache',   'label' => 'Cache config',     'primary' => false, 'desc' => 'rebuild cached config'],
                         ['action' => 'route_clear',    'label' => 'Clear routes',     'primary' => false, 'desc' => 'drop cached route table'],

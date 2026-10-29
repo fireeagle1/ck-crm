@@ -3,6 +3,7 @@
 namespace Tests\Feature\Mcp;
 
 use App\Providers\PassportServiceProvider;
+use Illuminate\Routing\RouteCollection;
 use Tests\TestCase;
 
 /**
@@ -24,18 +25,47 @@ class OAuthDiscoveryTest extends TestCase
 
         $response->assertJson([
             'issuer' => $base,
-            'authorization_endpoint' => $base . '/oauth/authorize',
-            'token_endpoint' => $base . '/oauth/token',
+            'authorization_endpoint' => $base.'/oauth/authorize',
+            'token_endpoint' => $base.'/oauth/token',
             'response_types_supported' => ['code'],
             'grant_types_supported' => ['authorization_code', 'refresh_token'],
             'token_endpoint_auth_methods_supported' => ['none'],
             'code_challenge_methods_supported' => ['S256'],
         ]);
 
-        // Advertised scopes must be exactly the locked MCP scope set.
-        $response->assertExactJson(array_merge($response->json(), [
+        $response->assertJsonFragment([
             'scopes_supported' => array_keys(PassportServiceProvider::MCP_SCOPES),
-        ]));
+        ]);
+
+        // Passport is loaded in tests, so the healthy document must NOT carry
+        // the diagnostic flag.
+        $response->assertJsonMissing(['passport_routes_registered' => false]);
+    }
+
+    public function test_authorization_server_metadata_degrades_to_200_with_a_flag_when_passport_routes_are_missing(): void
+    {
+        // Simulate the production failure: Passport's routes are not registered.
+        // The endpoint must still return 200 (never 500) with conventional
+        // fallback URLs and the diagnostic flag, rather than throwing on a
+        // missing route() name.
+        $routes = new RouteCollection;
+        foreach (app('router')->getRoutes() as $route) {
+            if (! in_array($route->getName(), ['passport.authorizations.authorize', 'passport.token'], true)) {
+                $routes->add($route);
+            }
+        }
+        app('router')->setRoutes($routes);
+
+        $base = rtrim(url('/'), '/');
+
+        $response = $this->getJson('/.well-known/oauth-authorization-server');
+
+        $response->assertOk();
+        $response->assertJson([
+            'authorization_endpoint' => $base.'/oauth/authorize',
+            'token_endpoint' => $base.'/oauth/token',
+            'passport_routes_registered' => false,
+        ]);
     }
 
     public function test_protected_resource_metadata_points_at_the_authorization_server(): void
@@ -46,7 +76,7 @@ class OAuthDiscoveryTest extends TestCase
 
         $response->assertOk();
         $response->assertJson([
-            'resource' => $base . '/api/mcp',
+            'resource' => $base.'/api/mcp',
             'authorization_servers' => [$base],
             'bearer_methods_supported' => ['header'],
             'scopes_supported' => array_keys(PassportServiceProvider::MCP_SCOPES),
