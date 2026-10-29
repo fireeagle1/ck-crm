@@ -139,10 +139,26 @@ locally and ship the result:
    - Alternatively, the keys can be provided via the `PASSPORT_PRIVATE_KEY` /
      `PASSPORT_PUBLIC_KEY` environment variables in `.env` instead of files.
 
-5. **Clear config cache** after deployment so the new `api` guard is picked up:
+5. **Clear the config AND route caches** after deployment so the new `api`
+   guard and the auto-registered `/oauth/*` + `/.well-known/*` routes are picked
+   up:
    ```
    cd /home/user/ck-crm && /usr/local/bin/php artisan config:clear
+   cd /home/user/ck-crm && /usr/local/bin/php artisan route:clear
    ```
+   > **Critical for the 404-at-`/oauth/authorize` symptom.** Passport registers
+   > its `/oauth/*` routes automatically at boot (Laravel 11+/Passport 12+; there
+   > is no `Passport::routes()` call). If the server has a **stale route cache**
+   > built *before* Passport was deployed, that cached table has no `/oauth/*`
+   > entries and every authorize/token request returns the app's generic **404**
+   > — even though the code is correct. `route:clear` drops the stale table so the
+   > routes resolve again. A *missing key* or *un-migrated `oauth_*` table* shows
+   > up as a **500**, not a 404, so a 404 specifically points at the route cache.
+   >
+   > **No SSH?** The same clears are exposed in the admin UI at
+   > **Settings → Maintenance**: click **"Clear all caches"** (runs
+   > `config:clear`, `route:clear`, `view:clear`, `cache:clear`) or the
+   > individual **"Clear routes"** button. Do this after every deploy.
 
 6. **Create the public MCP OAuth client** (the identity OpenAI's connector uses).
    It is a *public* client: no client secret is generated, so the authorization
@@ -196,27 +212,46 @@ Run these checks from your machine after deploying (replace the host,
 client id and token values). They confirm the integration works **without**
 starting any persistent process on the server:
 
-1. **OAuth endpoints respond over HTTPS.** Hit the authorization server's
-   discovery/authorize and token endpoints:
+1. **OAuth discovery metadata resolves (fixes ChatGPT automatic discovery).**
+   ChatGPT's connector discovers the authorization server *automatically* by
+   reading these well-known documents before it ever calls `/oauth/authorize`.
+   They must return **200 with JSON**, not 404:
+   ```bash
+   curl -s "https://app.ckenterprises.co.uk/.well-known/oauth-authorization-server"
+   curl -s "https://app.ckenterprises.co.uk/.well-known/oauth-protected-resource"
+   ```
+   The first must list `authorization_endpoint`, `token_endpoint`,
+   `grant_types_supported` (`authorization_code`, `refresh_token`),
+   `code_challenge_methods_supported` (`S256`) and
+   `token_endpoint_auth_methods_supported` (`none`, i.e. public client). If
+   either 404s, the route cache is stale — run the `route:clear` from step 5
+   (or "Clear all caches" in the admin Maintenance screen). With these live, the
+   endpoints no longer have to be entered manually in the connector config.
+
+2. **OAuth endpoints respond over HTTPS.** Hit the authorization server's
+   authorize and token endpoints directly:
    ```bash
    # Authorization endpoint (should return a login/redirect response, not 404/500)
-   curl -sI "https://your-domain.co.uk/oauth/authorize?response_type=code&client_id=CLIENT_ID&redirect_uri=https%3A%2F%2Fchat.openai.com%2Fconnector_platform_oauth_redirect&scope=tickets:read&code_challenge=CHALLENGE&code_challenge_method=S256"
+   curl -sI "https://app.ckenterprises.co.uk/oauth/authorize?response_type=code&client_id=01a18919-69df-734f-940a-7bc98b7790a4&redirect_uri=https%3A%2F%2Fchatgpt.com%2Fconnector%2Foauth%2Fz59Zsl9Jikvy&scope=tickets:read&code_challenge=CHALLENGE&code_challenge_method=S256"
    ```
-   Complete the PKCE authorization-code flow (the OpenAI connector does this for
-   you) and exchange the code at `POST /oauth/token` to obtain an access token.
-   A `200` with a bearer token confirms the Passport authorization server is
-   live. No server process had to be started for this to work.
+   A **404 means a stale route cache** (Passport routes not in the cached table —
+   clear it per step 5). A **500 means the routes resolve but Passport is
+   misconfigured** — typically the `oauth-*.key` files are missing (step 3) or the
+   `oauth_*` migrations have not run (step 2). A login/redirect `200`/`302` is the
+   healthy result. Complete the PKCE authorization-code flow (the connector does
+   this for you) and exchange the code at `POST /oauth/token` for an access token.
+   No server process had to be started for this to work.
 
-2. **HTTP is rejected, HTTPS is required.** A plain-HTTP request to the MCP
+3. **HTTP is rejected, HTTPS is required.** A plain-HTTP request to the MCP
    endpoint must not be served:
    ```bash
    curl -sI "http://your-domain.co.uk/api/mcp"   # expect a redirect to https or a 4xx, never a 200
    ```
 
-3. **Run the MCP JSON-RPC lifecycle over HTTPS.** Each call below is a single
+4. **Run the MCP JSON-RPC lifecycle over HTTPS.** Each call below is a single
    request that returns a single response — nothing stays running afterwards.
    ```bash
-   TOKEN=... # access token from step 1
+   TOKEN=... # access token from step 2
 
    # initialize handshake — returns server capabilities
    curl -s -X POST "https://your-domain.co.uk/api/mcp" \
@@ -240,7 +275,7 @@ starting any persistent process on the server:
    `php artisan` command needs to be left running** for any of these to
    succeed — they are handled by the web server exactly like any other route.
 
-4. **The SSE/streaming GET endpoint completes (does not hang).** OpenAI's
+5. **The SSE/streaming GET endpoint completes (does not hang).** OpenAI's
    connector may open the MCP endpoint with `GET` and `Accept: text/event-stream`.
    The server replies with the streamable-HTTP `endpoint` event and then
    finishes — it must **not** hold the connection open as a long-lived stream:
@@ -254,14 +289,14 @@ starting any persistent process on the server:
    cPanel model does not support — recheck that buffering/output flushing on the
    host lets the response complete.
 
-5. **Confirm the process list is clean.** If your host offers a Terminal, run
+6. **Confirm the process list is clean.** If your host offers a Terminal, run
    `ps -u $USER | grep artisan` — you should see nothing between cron runs. The
    only artisan processes that ever appear are the short-lived scheduler
    (`schedule:run`) and the `queue:work --stop-when-empty` worker, both of which
    exit on their own. No MCP-specific long-running process exists.
 
-6. **Confirm queued side effects drain.** Create or reply to a ticket via
-   `tools/call` (step 3), then confirm the notification/email is sent: with
+7. **Confirm queued side effects drain.** Create or reply to a ticket via
+   `tools/call` (step 4), then confirm the notification/email is sent: with
    `QUEUE_CONNECTION=sync` it is sent inline during the request; with
    `QUEUE_CONNECTION=database` it appears in the `jobs` table and is sent on the
    next `queue:work` cron run (step 5). Either way the `tools/call` response

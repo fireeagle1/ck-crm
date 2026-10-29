@@ -1,10 +1,14 @@
 <?php
 
 use App\Http\Controllers\Admin;
+use App\Http\Controllers\CpanelIntegrationController;
 use App\Http\Controllers\LeadSignupController;
+use App\Http\Controllers\Mcp\OAuthDiscoveryController;
 use App\Http\Controllers\Portal;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\StripeWebhookController;
 use App\Http\Middleware\EnsureIsAdmin;
+use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -34,7 +38,21 @@ Route::middleware('embed')->group(function () {
 | cPanel Integration Redirects (legacy WHMCS links)
 |--------------------------------------------------------------------------
 */
-Route::get('/integration/index.html', [\App\Http\Controllers\CpanelIntegrationController::class, 'redirect'])->name('cpanel.integration');
+Route::get('/integration/index.html', [CpanelIntegrationController::class, 'redirect'])->name('cpanel.integration');
+
+/*
+|--------------------------------------------------------------------------
+| OAuth 2.0 / MCP discovery metadata (public, unauthenticated)
+|--------------------------------------------------------------------------
+| ChatGPT's MCP connector probes these well-known documents to discover the
+| authorization server endpoints automatically. Passport ships the /oauth/*
+| endpoints but no discovery docs, so without these the connector's automatic
+| discovery 404s and endpoints must be entered by hand.
+*/
+Route::get('/.well-known/oauth-authorization-server', [OAuthDiscoveryController::class, 'authorizationServer'])
+    ->name('oauth.discovery.authorization-server');
+Route::get('/.well-known/oauth-protected-resource', [OAuthDiscoveryController::class, 'protectedResource'])
+    ->name('oauth.discovery.protected-resource');
 
 /*
 |--------------------------------------------------------------------------
@@ -316,15 +334,13 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-require __DIR__ . '/auth.php';
+require __DIR__.'/auth.php';
 
 /*
 |--------------------------------------------------------------------------
 | Stripe Webhook (no auth, signature-verified)
 |--------------------------------------------------------------------------
 */
-Route::post('/stripe/webhook', [\App\Http\Controllers\StripeWebhookController::class, 'handle'])
+Route::post('/stripe/webhook', [StripeWebhookController::class, 'handle'])
     ->name('stripe.webhook')
-    ->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
-
-
+    ->withoutMiddleware([VerifyCsrfToken::class]);

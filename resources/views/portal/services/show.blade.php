@@ -96,6 +96,34 @@
                     @endif
                 </dl>
             </div>
+
+            {{-- Managed app summary (customer-safe allow-list only: name, status, billing, security_summary) --}}
+            @if ($appSummary)
+                <div class="bg-white rounded-lg border p-6">
+                    <h2 class="font-bold mb-4">{{ $appSummary['name'] }}</h2>
+                    <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4 text-sm">
+                        <div>
+                            <dt class="text-gray-500 font-medium">Status</dt>
+                            <dd class="mt-1">
+                                <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold
+                                    {{ $appSummary['status'] === 'Active' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700' }}">
+                                    {{ $appSummary['status'] }}
+                                </span>
+                            </dd>
+                        </div>
+
+                        <div>
+                            <dt class="text-gray-500 font-medium">Billing</dt>
+                            <dd class="mt-1 font-medium">{{ $appSummary['billing'] }}</dd>
+                        </div>
+
+                        <div class="sm:col-span-2">
+                            <dt class="text-gray-500 font-medium">Security</dt>
+                            <dd class="mt-1 font-medium text-gray-900">{{ $appSummary['security_summary'] }}</dd>
+                        </div>
+                    </dl>
+                </div>
+            @endif
         </div>
 
         {{-- Sidebar: Quick Access --}}

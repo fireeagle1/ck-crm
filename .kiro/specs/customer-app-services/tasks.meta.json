@@ -323,6 +323,11 @@
         "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
         "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
         "timestamp": 1793300580973
+      },
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793300652529
       }
     ],
     "11. Final checkpoint - full integration": [
@@ -330,6 +335,11 @@
         "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
         "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
         "timestamp": 1793298990959
+      },
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793300797414
       }
     ],
     "1. Create the database schema (three cascading migrations)": [
@@ -576,6 +586,71 @@
         "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
         "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
         "timestamp": 1793300575871
+      }
+    ],
+    "10. Implement the customer portal view and ownership scoping": [
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793300652560
+      }
+    ],
+    "10.2 Write property test for company_id scoping": [
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793300653944
+      },
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793300659486
+      },
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793300765473
+      }
+    ],
+    "10.3 Write portal feature test": [
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793300654806
+      },
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793300658431
+      },
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793300766371
+      }
+    ],
+    "4.5 Write property test for DTO allow-list": [
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793300809762
+      },
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793300919529
+      }
+    ],
+    "4.6 Write unit tests for `CustomerAppSummaryDto`": [
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793300810521
+      },
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793300920383
       }
     ]
   }

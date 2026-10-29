@@ -77,12 +77,12 @@ Nothing in this plan writes GitHub, ChatGPT, or OpenAI scanning logic, and the A
     - Never call `toArray()`; never read `repo_url`/`hosting_location`/`codebase_info`/packages/findings detail
     - _Requirements: 5.1, 5.3, 5.4, 1.5_
 
-  - [ ]* 4.5 Write property test for DTO allow-list
+  - [x]* 4.5 Write property test for DTO allow-list
     - **Property 6: Customer output contains exactly the allow-listed fields and no technical detail**
     - Generate app/service pairs with all technical fields populated; assert DTO keys ⊆ {name, status, billing, security_summary}, forbidden values recursively absent, and the DTO is not produced by model serialisation
     - **Validates: Requirements 5.1, 5.3, 5.4**
 
-  - [ ]* 4.6 Write unit tests for `CustomerAppSummaryDto`
+  - [x]* 4.6 Write unit tests for `CustomerAppSummaryDto`
     - Assert the exact key set for a free service and a Stripe-charged service
     - _Requirements: 5.1_
 
@@ -166,22 +166,22 @@ Nothing in this plan writes GitHub, ChatGPT, or OpenAI scanning logic, and the A
     - Admin show renders repo/hosting/codebase + all packages + all findings + service name/status/billing; create/edit persist the expected fields; duplicate create is rejected
     - _Requirements: 4.1, 4.2, 4.3, 4.4_
 
-- [ ] 10. Implement the customer portal view and ownership scoping
-  - [-] 10.1 Wire the portal app summary into the `Portal\ServiceController` pattern
+- [x] 10. Implement the customer portal view and ownership scoping
+  - [x] 10.1 Wire the portal app summary into the `Portal\ServiceController` pattern
     - Reuse the existing `company_id` ownership guard (`if ($service->company_id !== $request->user()->company_id) abort(403);`)
     - Build the view data via `CustomerAppSummaryDto::fromService($service)` and render a Blade view with only the four DTO keys and no technical slot
     - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5, 5.6_
 
-  - [ ]* 10.2 Write property test for company_id scoping
+  - [x]* 10.2 Write property test for company_id scoping
     - **Property 8: Customer app access is confined to the owning company**
     - Random services and users; assert access iff `company_id` matches, deny otherwise
     - **Validates: Requirements 5.5**
 
-  - [ ]* 10.3 Write portal feature test
+  - [x]* 10.3 Write portal feature test
     - Assert the portal app view renders only name/status/billing/summary and exposes no technical field
     - _Requirements: 5.1, 5.6_
 
-- [~] 11. Final checkpoint - full integration
+- [x] 11. Final checkpoint - full integration
   - Ensure all tests pass, ask the user if questions arise.
 
 ## Notes

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Portal;
 use App\Http\Controllers\Controller;
 use App\Models\Domain;
 use App\Models\Service;
+use App\Support\Dto\CustomerAppSummaryDto;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -45,6 +46,14 @@ class ServiceController extends Controller
                 ->first()
             : null;
 
-        return view('portal.services.show', compact('service', 'managedDomain'));
+        // When the service has a linked managed app, surface the customer-safe
+        // summary built from an explicit allow-list (name, status, billing,
+        // security_summary). Never serialises the model, so repo/hosting/
+        // codebase/packages/findings detail is structurally absent (Req 5.3, 5.4).
+        $appSummary = $service->customerApp
+            ? CustomerAppSummaryDto::fromService($service)
+            : null;
+
+        return view('portal.services.show', compact('service', 'managedDomain', 'appSummary'));
     }
 }
