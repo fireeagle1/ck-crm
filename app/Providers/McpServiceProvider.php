@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Mcp\Query\CustomerAppQueryService;
 use App\Mcp\Query\CustomerQueryService;
 use App\Mcp\Query\InvoiceQueryService;
+use App\Mcp\Query\KnowledgeQueryService;
 use App\Mcp\Query\ProjectsQueryService;
 use App\Mcp\Query\ServicesQueryService;
 use App\Mcp\Query\TicketQueryService;
@@ -23,7 +24,7 @@ use Illuminate\Support\ServiceProvider;
  * each to a stable handler key ({@see \App\Mcp\Registry\ToolDefinition::$handler}).
  * The {@see ToolDispatcher} is the dispatch seam that resolves a handler key to
  * the concrete callable that actually runs the tool. This provider binds every
- * one of the 16 registered handler keys onto the shared {@see ToolDispatcher}
+ * one of the registered handler keys onto the shared {@see ToolDispatcher}
  * singleton so that a `tools/call` for any tool dispatches end-to-end through
  * the full middleware stack with no orphaned code and no
  * {@see \App\Mcp\Registry\HandlerNotWiredException} in normal operation
@@ -72,7 +73,7 @@ class McpServiceProvider extends ServiceProvider
     }
 
     /**
-     * Wire the ten read tools to their query services.
+     * Wire the read tools to their query services.
      */
     private function wireReadHandlers(ToolDispatcher $dispatcher): void
     {
@@ -175,6 +176,24 @@ class McpServiceProvider extends ServiceProvider
                 $args['priority'] ?? null,
                 $this->intOrNull($args['company_id'] ?? null),
                 $args['search'] ?? null,
+                $this->intOrNull($args['page'] ?? null),
+                $this->intOrNull($args['per_page'] ?? null),
+            ));
+
+        // --- Knowledgebase (knowledge:read) ----------------------------------
+        $dispatcher->register('knowledge.get', function (array $args) {
+            $result = $this->app->make(KnowledgeQueryService::class)
+                ->getArticle($args['article_id']);
+
+            return $result ?? $this->notFound('knowledgebase article', 'article_id', $args['article_id'] ?? null);
+        });
+
+        $dispatcher->register('knowledge.search', fn (array $args) => $this->app
+            ->make(KnowledgeQueryService::class)
+            ->searchArticles(
+                $args['search'] ?? null,
+                $args['category'] ?? null,
+                $this->intOrNull($args['company_id'] ?? null),
                 $this->intOrNull($args['page'] ?? null),
                 $this->intOrNull($args['per_page'] ?? null),
             ));

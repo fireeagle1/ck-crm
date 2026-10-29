@@ -48,6 +48,8 @@ final class ToolRegistry
 
     public const SCOPE_APPS_WRITE = 'apps:write';
 
+    public const SCOPE_KNOWLEDGE_READ = 'knowledge:read';
+
     /**
      * The registered tools, keyed by tool name.
      *
@@ -323,6 +325,41 @@ final class ToolRegistry
                 requiredScope: self::SCOPE_TICKETS_READ,
                 kind: ToolDefinition::KIND_READ,
                 handler: 'tickets.search',
+            ),
+
+            // --- Knowledgebase (read) ---------------------------------------
+            new ToolDefinition(
+                name: 'get_article',
+                description: 'Read-only. Fetch a single knowledgebase article by article_id, '
+                    .'including its full content body. Does not modify any data.',
+                inputSchema: $this->object(
+                    properties: [
+                        'article_id' => $this->integer('The knowledgebase article primary key (article_id).'),
+                    ],
+                    required: ['article_id'],
+                ),
+                requiredScope: self::SCOPE_KNOWLEDGE_READ,
+                kind: ToolDefinition::KIND_READ,
+                handler: 'knowledge.get',
+            ),
+            new ToolDefinition(
+                name: 'search_articles',
+                description: 'Read-only. Search knowledgebase articles by a free-text term '
+                    .'(matched against title and content), optionally filtered by category and '
+                    .'company_id, returning paginated summaries (without the full body). Does '
+                    .'not modify any data.',
+                inputSchema: $this->object(
+                    properties: [
+                        'search' => $this->string('Optional free-text term matched against the article title and content.'),
+                        'category' => $this->string('Optional category filter (exact match).'),
+                        'company_id' => $this->integer('Optional customer filter (company_id) for company-specific articles.'),
+                        'page' => $this->page(),
+                        'per_page' => $this->perPage(),
+                    ],
+                ),
+                requiredScope: self::SCOPE_KNOWLEDGE_READ,
+                kind: ToolDefinition::KIND_READ,
+                handler: 'knowledge.search',
             ),
 
             // --- Tickets (write) --------------------------------------------
