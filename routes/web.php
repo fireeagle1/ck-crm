@@ -223,6 +223,7 @@ Route::middleware(['auth', 'verified', EnsureIsAdmin::class])->prefix('admin')->
     Route::post('/settings/maintenance/run', [Admin\SettingsController::class, 'runMaintenance'])->name('settings.maintenance.run');
     Route::post('/settings/maintenance/migrate', [Admin\SettingsController::class, 'runMigrations'])->name('settings.maintenance.migrate');
     Route::post('/settings/maintenance/migrate-sync', [Admin\SettingsController::class, 'syncMigrationHistory'])->name('settings.maintenance.migrate-sync');
+    Route::post('/settings/maintenance/migrate-preview', [Admin\SettingsController::class, 'previewMigrations'])->name('settings.maintenance.migrate-preview');
     Route::get('/settings/whm', [Admin\WhmConfigController::class, 'edit'])->name('settings.whm');
     Route::post('/settings/whm', [Admin\WhmConfigController::class, 'update'])->name('settings.whm.update');
 

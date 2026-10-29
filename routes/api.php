@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\Admin\ServiceController;
 use App\Http\Controllers\Api\Admin\ShopOrderController;
 use App\Http\Controllers\Api\Admin\ShopProductController;
 use App\Http\Controllers\Api\Admin\TicketController;
+use App\Http\Controllers\Api\FindingsController;
 use App\Http\Controllers\Mcp\McpController;
 use App\Http\Middleware\EnsureHttps;
 use App\Http\Middleware\EnsureIsAdmin;
@@ -119,4 +120,11 @@ Route::prefix('mcp')
 
         // Streamable HTTP (SSE) channel.
         Route::get('/', [McpController::class, 'handleStream']);
+
+        // Findings receiving endpoint stub (Req 3.1–3.5, 3.7). Inherits
+        // EnsureHttps + throttle:mcp + auth:api from this group. NOTE: the
+        // group's `mcp.scope` (CheckMcpScope) only gates JSON-RPC `tools/call`
+        // bodies and passes through this plain REST POST, so FindingsController
+        // enforces the `apps:write` scope explicitly (Req 3.5).
+        Route::post('/apps/{identifier}/findings', [FindingsController::class, 'store']);
     });

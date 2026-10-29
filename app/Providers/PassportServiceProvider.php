@@ -23,9 +23,10 @@ class PassportServiceProvider extends ServiceProvider
     /**
      * The exhaustive set of MCP scopes an access token may ever carry.
      *
-     * Least privilege (Req 1.3): read-only access to five domains plus
-     * read/write on tickets. No scope outside this set can be granted, so a
-     * leaked token can never mutate customers, invoices, projects or services.
+     * Least privilege (Req 1.3): read-only access to five domains, read/write
+     * on tickets, and a dedicated write scope for customer-app findings. No
+     * scope outside this set can be granted, so a leaked token can never mutate
+     * customers, invoices, projects or services.
      *
      * @var array<string, string>
      */
@@ -36,6 +37,7 @@ class PassportServiceProvider extends ServiceProvider
         'services:read'  => 'Read the services a customer has.',
         'tickets:read'   => 'Search and read support tickets, replies and history.',
         'tickets:write'  => 'Create, update and reply to support tickets.',
+        'apps:write'     => 'Write security findings and package data for a customer app.',
     ];
 
     /**

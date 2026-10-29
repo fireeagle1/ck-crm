@@ -27,8 +27,13 @@ class FindingsIngestServiceTest extends TestCase
 
     private function makeApp(): CustomerApp
     {
+        $customer = Customer::create([
+            'company_name' => 'Acme Ltd',
+            'customer_name' => 'Acme Owner',
+        ]);
+
         $service = Service::create([
-            'company_id' => 1,
+            'company_id' => $customer->company_id,
             'service_short' => 'Test App',
             'status' => 'active',
         ]);

@@ -7,6 +7,14 @@
     "4.2 Write property test for the security summary": {
       "status": "passed",
       "lastRunTimestamp": 1793299629102
+    },
+    "5.2 Write property test for bulk-replace idempotence": {
+      "status": "passed",
+      "lastRunTimestamp": 1793299658449
+    },
+    "5.3 Write property test for rejection without mutation": {
+      "status": "passed",
+      "lastRunTimestamp": 1793299666897
     }
   },
   "executionHistory": {
@@ -151,6 +159,11 @@
         "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
         "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
         "timestamp": 1793299560162
+      },
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793299685366
       }
     ],
     "5.1 Implement `App\\Services\\FindingsIngestService`": [
@@ -175,6 +188,11 @@
         "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
         "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
         "timestamp": 1793298990778
+      },
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793299754026
       }
     ],
     "7.1 Register the `apps:write` scope": [
@@ -182,6 +200,16 @@
         "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
         "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
         "timestamp": 1793298990795
+      },
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793299786476
+      },
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793299832801
       }
     ],
     "7.2 Implement `App\\Http\\Controllers\\Api\\FindingsController` and route": [
@@ -189,6 +217,16 @@
         "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
         "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
         "timestamp": 1793298990814
+      },
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793299834247
+      },
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793299946175
       }
     ],
     "7.3 Implement `App\\Console\\Commands\\IngestAppFindings` stub": [
@@ -196,6 +234,16 @@
         "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
         "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
         "timestamp": 1793298990832
+      },
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793299835179
+      },
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793299947014
       }
     ],
     "8. Checkpoint - findings endpoint and command": [
@@ -322,6 +370,11 @@
         "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
         "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
         "timestamp": 1793299561574
+      },
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793299680882
       }
     ],
     "4.3 Write unit tests for `SecuritySummaryService` branches": [
@@ -329,6 +382,16 @@
         "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
         "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
         "timestamp": 1793299551438
+      },
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793299689265
+      },
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793299753276
       }
     ],
     "5.2 Write property test for bulk-replace idempotence": [
@@ -341,6 +404,11 @@
         "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
         "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
         "timestamp": 1793299562981
+      },
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793299681793
       }
     ],
     "5.3 Write property test for rejection without mutation": [
@@ -353,6 +421,11 @@
         "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
         "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
         "timestamp": 1793299563940
+      },
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793299683176
       }
     ],
     "5.4 Write unit tests for `FindingsIngestService`": [
@@ -365,6 +438,49 @@
         "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
         "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
         "timestamp": 1793299565199
+      },
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793299684588
+      }
+    ],
+    "4. Implement the security summary and customer DTO": [
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793299685396
+      }
+    ],
+    "7. Implement the findings receiving endpoint and command stub": [
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793299947036
+      }
+    ],
+    "7.4 Write property test for endpoint authorization and audit": [
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793299951587
+      },
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793299955683
+      }
+    ],
+    "7.5 Write smoke/structural tests for scope and no-scan guarantees": [
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793299952475
+      },
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793299956682
       }
     ]
   }

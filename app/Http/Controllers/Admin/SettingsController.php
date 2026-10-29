@@ -244,6 +244,26 @@ class SettingsController extends Controller
     }
 
     /**
+     * Dry-run: show the exact SQL that pending migrations WOULD execute,
+     * without touching the database (artisan `migrate --pretend`). Lets an
+     * admin spot "table/column already exists" collisions before running for
+     * real — essential when a copied/restored DB has drifted from its ledger.
+     */
+    public function previewMigrations()
+    {
+        @set_time_limit(120);
+
+        try {
+            \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true, '--pretend' => true]);
+            $output = trim(\Illuminate\Support\Facades\Artisan::output());
+
+            return back()->with('migration_preview', $output !== '' ? $output : 'Nothing pending — no SQL would run.');
+        } catch (\Throwable $e) {
+            return back()->with('error', 'Preview failed: ' . $e->getMessage());
+        }
+    }
+
+    /**
      * Reconcile the migrations history for a database whose tables already
      * exist but whose `migrations` table doesn't record them (e.g. after a DB
      * copy/restore). For each pending "create_<table>_table" migration whose
