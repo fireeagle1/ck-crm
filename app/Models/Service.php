@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Service extends Model
 {
@@ -37,5 +38,10 @@ class Service extends Model
     public function customer(): BelongsTo
     {
         return $this->belongsTo(Customer::class, 'company_id', 'company_id');
+    }
+
+    public function customerApp(): HasOne
+    {
+        return $this->hasOne(CustomerApp::class, 'service_id', 'service_id');
     }
 }

@@ -25,39 +25,39 @@ Nothing in this plan writes GitHub, ChatGPT, or OpenAI scanning logic, and the A
     - Columns: `id`, `customer_app_id` (bigint, FK → `customer_apps.id`, `onDelete('cascade')`), `severity` (string), `description` (text), `status` (string, default `'open'`), `synced_at` (timestamp, nullable), `timestamps`
     - _Requirements: 2.2, 2.3, 2.4, 1.6_
 
-  - [ ]* 1.4 Write schema example tests
+  - [x]* 1.4 Write schema example tests
     - Assert the three tables and their columns exist, `service_id` is a unique index, FKs cascade, and `customer_apps` has no billing column
     - _Requirements: 1.1, 1.2, 1.5, 2.1_
 
-- [ ] 2. Implement Eloquent models and the Service relationship
+- [x] 2. Implement Eloquent models and the Service relationship
   - [x] 2.1 Create `App\Models\AppPackage` and `App\Models\SecurityFinding`
     - `AppPackage`: `$fillable = ['customer_app_id', 'name', 'version', 'synced_at']`, `synced_at` cast to datetime, `belongsTo(CustomerApp::class)`
     - `SecurityFinding`: `$fillable = ['customer_app_id', 'severity', 'description', 'status', 'synced_at']`, `synced_at` cast to datetime, `belongsTo(CustomerApp::class)`, and the status constants `STATUS_OPEN`, `STATUS_RESOLVED`, `STATUS_DISMISSED`, `STATUSES`
     - _Requirements: 2.1, 2.2, 2.3_
 
-  - [-] 2.2 Create `App\Models\CustomerApp`
+  - [x] 2.2 Create `App\Models\CustomerApp`
     - `$fillable = ['service_id', 'repo_url', 'hosting_location', 'codebase_info']`
     - Relationships: `service(): BelongsTo` (on `service_id`/`service_id`), `packages(): HasMany`, `findings(): HasMany`, `openFindings(): HasMany` filtered to `SecurityFinding::STATUS_OPEN`
     - _Requirements: 1.1, 1.2, 2.4_
 
-  - [~] 2.3 Add `customerApp(): HasOne` to `App\Models\Service`
+  - [x] 2.3 Add `customerApp(): HasOne` to `App\Models\Service`
     - Add only the `hasOne(CustomerApp::class, 'service_id', 'service_id')` relationship; leave `$fillable`/`$casts` untouched
     - _Requirements: 1.3_
 
-  - [ ]* 2.4 Write relationship example tests
+  - [x]* 2.4 Write relationship example tests
     - Assert `Service::customerApp`, `CustomerApp::service/packages/findings/openFindings` resolve, and an app with zero packages/findings is valid
     - _Requirements: 1.2, 1.3, 2.4_
 
-  - [ ]* 2.5 Write property test for service deletion cascade
+  - [x]* 2.5 Write property test for service deletion cascade
     - **Property 2: Service deletion removes the whole technical subtree**
     - Generate apps with random N packages / M findings, delete the service, assert zero `customer_apps`/`app_packages`/`security_findings` rows remain
     - **Validates: Requirements 1.6, 2.4**
 
-- [~] 3. Checkpoint - schema and models
+- [x] 3. Checkpoint - schema and models
   - Ensure all tests pass, ask the user if questions arise.
 
 - [ ] 4. Implement the security summary and customer DTO
-  - [~] 4.1 Implement `App\Support\SecuritySummaryService`
+  - [-] 4.1 Implement `App\Support\SecuritySummaryService`
     - Static `for(?CustomerApp $app): string` deriving the string from open-finding count alone: 0 → "Security checks passing", 1 → "1 issue being addressed", N → "{N} issues being addressed"
     - Read only `status`; never touch severity/description/packages
     - _Requirements: 6.1, 6.2, 6.3, 5.2_
@@ -87,7 +87,7 @@ Nothing in this plan writes GitHub, ChatGPT, or OpenAI scanning logic, and the A
     - _Requirements: 5.1_
 
 - [ ] 5. Implement the findings ingestion service
-  - [~] 5.1 Implement `App\Services\FindingsIngestService`
+  - [-] 5.1 Implement `App\Services\FindingsIngestService`
     - `ingest(string $appIdentifier, array $packages, array $findings): array` returning `{packages:int, findings:int}`
     - Resolve the `CustomerApp` by identifier; throw a domain exception naming the unknown identifier and persist nothing if none matches
     - Validate payload against an explicit allow-list (package: `name`+`version`; finding: `severity`+`description`+`status ∈ SecurityFinding::STATUSES`); persist nothing on failure

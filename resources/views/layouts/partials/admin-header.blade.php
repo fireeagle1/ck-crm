@@ -31,6 +31,7 @@
         ['route' => 'admin.cleanup.review', 'label' => 'Service Review'],
         ['route' => 'admin.settings.tasks', 'label' => 'Scheduled Tasks'],
         ['route' => 'admin.settings.maintenance', 'label' => 'Maintenance'],
+        ['route' => 'admin.mcp.tokens.index', 'label' => 'MCP Tokens'],
         ['route' => 'admin.settings.index', 'label' => 'Settings'],
     ];
 @endphp

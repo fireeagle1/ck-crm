@@ -1,5 +1,10 @@
 {
-  "pbtResults": {},
+  "pbtResults": {
+    "2.5 Write property test for service deletion cascade": {
+      "status": "passed",
+      "lastRunTimestamp": 1793299365323
+    }
+  },
   "executionHistory": {
     "1.1 Create `customer_apps` migration": [
       {
@@ -79,6 +84,11 @@
         "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
         "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
         "timestamp": 1793299211103
+      },
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793299245837
       }
     ],
     "2.3 Add `customerApp(): HasOne` to `App\\Models\\Service`": [
@@ -86,6 +96,16 @@
         "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
         "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
         "timestamp": 1793298990667
+      },
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793299269155
+      },
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793299440901
       }
     ],
     "3. Checkpoint - schema and models": [
@@ -93,6 +113,11 @@
         "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
         "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
         "timestamp": 1793298990689
+      },
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793299452830
       }
     ],
     "4.1 Implement `App\\Support\\SecuritySummaryService`": [
@@ -100,6 +125,11 @@
         "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
         "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
         "timestamp": 1793298990707
+      },
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793299456010
       }
     ],
     "4.4 Implement `App\\Support\\Dto\\CustomerAppSummaryDto`": [
@@ -114,6 +144,11 @@
         "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
         "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
         "timestamp": 1793298990761
+      },
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793299457009
       }
     ],
     "6. Checkpoint - summary, DTO, and ingestion service": [
@@ -191,6 +226,64 @@
         "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
         "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
         "timestamp": 1793299144570
+      }
+    ],
+    "1.4 Write schema example tests": [
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793299259128
+      },
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793299270557
+      },
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793299441832
+      }
+    ],
+    "2.4 Write relationship example tests": [
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793299260096
+      },
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793299271941
+      },
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793299443237
+      }
+    ],
+    "2.5 Write property test for service deletion cascade": [
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793299261305
+      },
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793299272653
+      },
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793299444015
+      }
+    ],
+    "2. Implement Eloquent models and the Service relationship": [
+      {
+        "executionId": "b5d8144f-7ad2-4bd1-ad75-9a87575724d9",
+        "chatSessionId": "sess_2c615564-7a83-492c-9ab0-a64ed7b8ff7e",
+        "timestamp": 1793299440927
       }
     ]
   }
