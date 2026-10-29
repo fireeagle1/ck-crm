@@ -103,6 +103,10 @@ class OneToOneInvariantPropertyTest extends TestCase
             $rejectedReports = 0;
 
             for ($attempt = 0; $attempt < $attempts; $attempt++) {
+                // Flush any flash state from a prior attempt/case so each response's session
+                // reflects only this store() call (the controller flashes onto the active session).
+                session()->flush();
+
                 $request = Request::create('/admin/services/'.$service->service_id.'/apps', 'POST', [
                     'repo_url' => 'https://git.example.test/app-'.$attempt.'.git',
                     'hosting_location' => 'cpanel://host/app-'.$attempt,

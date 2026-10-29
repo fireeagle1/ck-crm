@@ -237,12 +237,60 @@
                         </form>
                     </div>
 
-                    {{-- Create client --}}
+                    {{-- Create / recover / reset client --}}
                     <div class="border rounded-md p-3">
-                        <div class="text-sm font-medium text-gray-800 mb-1">Create MCP client</div>
+                        <div class="text-sm font-medium text-gray-800 mb-1">MCP client</div>
                         @if ($passport['client_exists'])
-                            <p class="text-xs text-green-600">An <span class="font-mono">mcp_client</span> already exists. Manage/revoke tokens at
-                                <a href="{{ url('/admin/mcp/tokens') }}" class="underline">MCP tokens</a>.</p>
+                            @php $c = $passport['client']; @endphp
+                            <p class="text-xs text-gray-500 mb-2">An <span class="font-mono">mcp_client</span> already exists. Its details are below — copy the Client ID into OpenAI's connector (no secret).</p>
+
+                            {{-- Recover the existing details --}}
+                            <div class="rounded-md bg-gray-50 border p-3 mb-3 text-xs space-y-1.5">
+                                <div class="flex gap-2">
+                                    <span class="w-24 shrink-0 text-gray-400">Client ID</span>
+                                    <span class="font-mono text-gray-800 break-all select-all">{{ $c['id'] }}</span>
+                                </div>
+                                <div class="flex gap-2">
+                                    <span class="w-24 shrink-0 text-gray-400">Redirect URI(s)</span>
+                                    <span class="font-mono text-gray-700 break-all">{{ implode(', ', $c['redirects']) ?: '—' }}</span>
+                                </div>
+                                <div class="flex gap-2">
+                                    <span class="w-24 shrink-0 text-gray-400">Secret</span>
+                                    <span class="text-gray-500">(none — public client, PKCE)</span>
+                                </div>
+                                @if ($c['revoked'])
+                                    <div class="text-red-600 font-medium">This client is revoked — reset it below to issue a working one.</div>
+                                @endif
+                            </div>
+                            <p class="text-xs text-gray-400 mb-3">
+                                Manage/revoke issued tokens at <a href="{{ url('/admin/mcp/tokens') }}" class="underline">MCP tokens</a>.
+                                (That page only lists tokens created after a user authorizes — it won't show the client itself.)
+                            </p>
+
+                            {{-- Reset: delete + recreate --}}
+                            <details class="mt-2">
+                                <summary class="cursor-pointer text-xs font-medium text-red-600">Reset client (lost ID or need a fresh one)</summary>
+                                <div class="mt-3 rounded-md border border-red-200 bg-red-50 p-3">
+                                    <p class="text-xs text-red-700 mb-3">
+                                        Deletes the current <span class="font-mono">mcp_client</span> and its tokens, then creates a new one with a new Client ID.
+                                        <strong>OpenAI's connector must be reconfigured</strong> with the new ID afterwards.
+                                    </p>
+                                    <form method="POST" action="{{ url('/admin/settings/maintenance/mcp-client-reset') }}"
+                                          onsubmit="return confirm('Reset the MCP client? The current Client ID and all its tokens will stop working, and you must reconfigure OpenAI with the new ID.');">
+                                        @csrf
+                                        <input type="url" name="redirect_uri" required
+                                               value="{{ $c['redirects'][0] ?? 'https://chat.openai.com/connector_platform_oauth_redirect' }}"
+                                               class="block w-full mb-2 rounded-md border-gray-300 shadow-sm text-sm focus:ring-red-500 focus:border-red-500">
+                                        <label class="flex items-start gap-2 mb-2 text-xs text-red-700">
+                                            <input type="checkbox" name="confirm" value="1" required class="mt-0.5 rounded border-red-400 text-red-600 focus:ring-red-500">
+                                            <span>I understand this invalidates the existing client and tokens.</span>
+                                        </label>
+                                        <button type="submit" class="px-3 py-1.5 rounded-md text-sm font-medium bg-red-600 text-white hover:bg-red-700 transition">
+                                            Reset client
+                                        </button>
+                                    </form>
+                                </div>
+                            </details>
                         @else
                             <p class="text-xs text-gray-400 mb-2">Creates the public (PKCE, no-secret) client. Paste the OpenAI connector's callback URL.</p>
                             <form method="POST" action="{{ url('/admin/settings/maintenance/mcp-client') }}" class="flex flex-wrap items-center gap-2">

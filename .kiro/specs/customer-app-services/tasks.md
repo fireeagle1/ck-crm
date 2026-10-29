@@ -140,7 +140,7 @@ Nothing in this plan writes GitHub, ChatGPT, or OpenAI scanning logic, and the A
 - [x] 8. Checkpoint - findings endpoint and command
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 9. Implement the admin technical view
+- [x] 9. Implement the admin technical view
   - [x] 9.1 Implement web `App\Http\Controllers\Admin\CustomerAppController`
     - Resourceful controller mirroring `Admin\ServiceController`: route-model binding, `admin.customer-apps.*` Blade views, redirect-with-flash, admin middleware group
     - `create`/`store(Service)` build a `CustomerApp` against an existing Service; reject with a "service already has a linked app" message when `$service->customerApp()->exists()`; validate `repo_url` (nullable URL), `hosting_location`, `codebase_info`
@@ -148,7 +148,7 @@ Nothing in this plan writes GitHub, ChatGPT, or OpenAI scanning logic, and the A
     - `edit`/`update` edit only `repo_url`, `hosting_location`, `codebase_info`
     - _Requirements: 4.1, 4.2, 4.3, 4.4, 1.4_
 
-  - [-] 9.2 Create `admin.customer-apps.*` Blade views
+  - [x] 9.2 Create `admin.customer-apps.*` Blade views
     - Show view renders repo/hosting/codebase + all packages + all findings + service name/status/billing; create/edit forms for the three editable fields
     - _Requirements: 4.1, 4.2, 4.3_
 
@@ -157,17 +157,17 @@ Nothing in this plan writes GitHub, ChatGPT, or OpenAI scanning logic, and the A
     - Build an explicit array in `show()` rather than `$model->toArray()`
     - _Requirements: 4.1, 4.4_
 
-  - [-]* 9.4 Write property test for one-to-one invariant
+  - [x]* 9.4 Write property test for one-to-one invariant
     - **Property 1: At most one CustomerApp per Service**
     - Random sequences of create attempts against a service; assert at most one app persists, first wins, subsequent creates rejected and reported
     - **Validates: Requirements 1.3, 1.4**
 
-  - [-]* 9.5 Write admin feature tests
+  - [x]* 9.5 Write admin feature tests
     - Admin show renders repo/hosting/codebase + all packages + all findings + service name/status/billing; create/edit persist the expected fields; duplicate create is rejected
     - _Requirements: 4.1, 4.2, 4.3, 4.4_
 
 - [ ] 10. Implement the customer portal view and ownership scoping
-  - [~] 10.1 Wire the portal app summary into the `Portal\ServiceController` pattern
+  - [-] 10.1 Wire the portal app summary into the `Portal\ServiceController` pattern
     - Reuse the existing `company_id` ownership guard (`if ($service->company_id !== $request->user()->company_id) abort(403);`)
     - Build the view data via `CustomerAppSummaryDto::fromService($service)` and render a Blade view with only the four DTO keys and no technical slot
     - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5, 5.6_

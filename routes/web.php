@@ -234,6 +234,7 @@ Route::middleware(['auth', 'verified', EnsureIsAdmin::class])->prefix('admin')->
     Route::post('/settings/maintenance/migrate-preview', [Admin\SettingsController::class, 'previewMigrations'])->name('settings.maintenance.migrate-preview');
     Route::post('/settings/maintenance/passport-keys', [Admin\SettingsController::class, 'generatePassportKeys'])->name('settings.maintenance.passport-keys');
     Route::post('/settings/maintenance/mcp-client', [Admin\SettingsController::class, 'createMcpClient'])->name('settings.maintenance.mcp-client');
+    Route::post('/settings/maintenance/mcp-client-reset', [Admin\SettingsController::class, 'resetMcpClient'])->name('settings.maintenance.mcp-client-reset');
     Route::get('/settings/whm', [Admin\WhmConfigController::class, 'edit'])->name('settings.whm');
     Route::post('/settings/whm', [Admin\WhmConfigController::class, 'update'])->name('settings.whm.update');
 

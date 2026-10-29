@@ -166,26 +166,41 @@ class SettingsController extends Controller
     private function passportStatus(): array
     {
         $tablesExist = false;
-        $clientExists = false;
+        $client = null;
 
         try {
             $tablesExist = \Illuminate\Support\Facades\Schema::hasTable('oauth_clients')
                 && \Illuminate\Support\Facades\Schema::hasTable('oauth_access_tokens');
 
             if ($tablesExist) {
-                $clientExists = \Illuminate\Support\Facades\DB::table('oauth_clients')
+                $row = \Illuminate\Support\Facades\DB::table('oauth_clients')
                     ->where('name', 'mcp_client')
-                    ->exists();
+                    ->first();
+
+                if ($row) {
+                    // redirect_uris is stored as JSON (or legacy comma list).
+                    $redirects = json_decode($row->redirect_uris ?? '[]', true);
+                    if (! is_array($redirects)) {
+                        $redirects = array_filter(array_map('trim', explode(',', (string) $row->redirect_uris)));
+                    }
+
+                    $client = [
+                        'id'        => $row->id,
+                        'redirects' => array_values($redirects),
+                        'revoked'   => (bool) ($row->revoked ?? false),
+                    ];
+                }
             }
         } catch (\Throwable) {
             // leave defaults
         }
 
         return [
-            'tables_exist' => $tablesExist,
-            'keys_exist'   => file_exists(storage_path('oauth-private.key'))
+            'tables_exist'  => $tablesExist,
+            'keys_exist'    => file_exists(storage_path('oauth-private.key'))
                 && file_exists(storage_path('oauth-public.key')),
-            'client_exists' => $clientExists,
+            'client_exists' => $client !== null,
+            'client'        => $client,
         ];
     }
 
@@ -372,6 +387,58 @@ class SettingsController extends Controller
             return back()->with('success', 'MCP client created. Client ID: ' . $client->getKey() . ' — configure OpenAI\'s connector with this ID (public client, no secret, PKCE required).');
         } catch (\Throwable $e) {
             return back()->with('error', 'Client creation failed: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Reset the MCP client: delete the existing mcp_client (and any tokens
+     * issued to it) and create a fresh one. Use this when the Client ID has
+     * been lost and needs regenerating. Guarded by a confirmation checkbox
+     * because it invalidates the old client — OpenAI's connector must be
+     * reconfigured with the new Client ID afterwards.
+     */
+    public function resetMcpClient(Request $request)
+    {
+        $request->validate([
+            'redirect_uri' => 'required|url',
+            'confirm'      => 'accepted',
+        ]);
+
+        try {
+            if (! \Illuminate\Support\Facades\Schema::hasTable('oauth_clients')) {
+                return back()->with('error', 'The oauth_clients table does not exist yet — run migrations first.');
+            }
+
+            $clientIds = \Illuminate\Support\Facades\DB::table('oauth_clients')
+                ->where('name', 'mcp_client')
+                ->pluck('id');
+
+            \Illuminate\Support\Facades\DB::transaction(function () use ($clientIds) {
+                if ($clientIds->isNotEmpty()) {
+                    // Revoke/remove tokens tied to the old client(s) first.
+                    if (\Illuminate\Support\Facades\Schema::hasTable('oauth_access_tokens')) {
+                        \Illuminate\Support\Facades\DB::table('oauth_access_tokens')
+                            ->whereIn('client_id', $clientIds)->delete();
+                    }
+                    if (\Illuminate\Support\Facades\Schema::hasTable('oauth_auth_codes')) {
+                        \Illuminate\Support\Facades\DB::table('oauth_auth_codes')
+                            ->whereIn('client_id', $clientIds)->delete();
+                    }
+                    \Illuminate\Support\Facades\DB::table('oauth_clients')
+                        ->whereIn('id', $clientIds)->delete();
+                }
+            });
+
+            $clients = app(\Laravel\Passport\ClientRepository::class);
+            $client = $clients->createAuthorizationCodeGrantClient(
+                name: 'mcp_client',
+                redirectUris: [trim($request->input('redirect_uri'))],
+                confidential: false,
+            );
+
+            return back()->with('success', 'MCP client reset. New Client ID: ' . $client->getKey() . ' — reconfigure OpenAI\'s connector with this ID. The previous client and its tokens were removed.');
+        } catch (\Throwable $e) {
+            return back()->with('error', 'Client reset failed: ' . $e->getMessage());
         }
     }
 
