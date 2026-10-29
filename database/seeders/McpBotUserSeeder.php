@@ -30,16 +30,30 @@ class McpBotUserSeeder extends Seeder
      */
     public function run(): void
     {
+        $displayName = trim(McpBotUserResolver::BOT_FIRST_NAME . ' ' . McpBotUserResolver::BOT_LAST_NAME);
+
         $user = User::firstOrNew(
             ['email' => McpBotUserResolver::BOT_EMAIL],
             [
-                'name' => McpBotUserResolver::BOT_FIRST_NAME . ' ' . McpBotUserResolver::BOT_LAST_NAME,
+                'name' => $displayName,
                 'first_name' => McpBotUserResolver::BOT_FIRST_NAME,
                 'last_name' => McpBotUserResolver::BOT_LAST_NAME,
             ]
         );
 
         if ($user->exists) {
+            // Keep an already-seeded row's display identity current when the
+            // configured name changes (e.g. the "MCP Assistant" -> "Gordon"
+            // rename). Security flags are left untouched.
+            if ($user->name !== $displayName
+                || $user->first_name !== McpBotUserResolver::BOT_FIRST_NAME
+                || $user->last_name !== McpBotUserResolver::BOT_LAST_NAME) {
+                $user->name = $displayName;
+                $user->first_name = McpBotUserResolver::BOT_FIRST_NAME;
+                $user->last_name = McpBotUserResolver::BOT_LAST_NAME;
+                $user->save();
+            }
+
             return;
         }
 
