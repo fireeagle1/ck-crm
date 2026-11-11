@@ -1,0 +1,8 @@
+version: v1.25.0
+ignore: {}
+patch: {}
+# Mockery's docs requirements.txt is only used to build Sphinx docs.
+# It is never installed or run by the app.
+exclude:
+  global:
+    - vendor/mockery/mockery/docs/**
