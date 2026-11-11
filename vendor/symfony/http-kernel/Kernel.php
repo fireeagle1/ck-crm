@@ -45,11 +45,11 @@ abstract class Kernel extends AbstractKernel implements KernelInterface, Reboota
     private bool $resetServices = false;
     private bool $handlingHttpCache = false;
 
-    public const VERSION = '8.1.10';
-    public const VERSION_ID = 80110;
+    public const VERSION = '8.1.11';
+    public const VERSION_ID = 80111;
     public const MAJOR_VERSION = 8;
     public const MINOR_VERSION = 1;
-    public const RELEASE_VERSION = 10;
+    public const RELEASE_VERSION = 11;
     public const EXTRA_VERSION = '';
 
     public const END_OF_MAINTENANCE = '01/2027';

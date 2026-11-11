@@ -8556,6 +8556,7 @@ return array(
     'Symfony\\Component\\VarDumper\\VarDumper' => $vendorDir . '/symfony/var-dumper/VarDumper.php',
     'Symfony\\Contracts\\EventDispatcher\\Event' => $vendorDir . '/symfony/event-dispatcher-contracts/Event.php',
     'Symfony\\Contracts\\EventDispatcher\\EventDispatcherInterface' => $vendorDir . '/symfony/event-dispatcher-contracts/EventDispatcherInterface.php',
+    'Symfony\\Contracts\\EventDispatcher\\ListenerIntrospectionInterface' => $vendorDir . '/symfony/event-dispatcher-contracts/ListenerIntrospectionInterface.php',
     'Symfony\\Contracts\\Service\\Attribute\\Required' => $vendorDir . '/symfony/service-contracts/Attribute/Required.php',
     'Symfony\\Contracts\\Service\\Attribute\\SubscribedService' => $vendorDir . '/symfony/service-contracts/Attribute/SubscribedService.php',
     'Symfony\\Contracts\\Service\\ContainerAwareInterface' => $vendorDir . '/symfony/service-contracts/ContainerAwareInterface.php',
