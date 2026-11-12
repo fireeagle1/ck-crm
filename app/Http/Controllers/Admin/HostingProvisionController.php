@@ -2,89 +2,98 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Exceptions\WhmProvisioningException;
 use App\Http\Controllers\Controller;
 use App\Models\OrderItem;
 use App\Models\Service;
-use App\Models\Setting;
-use App\Services\NotificationService;
-use App\Services\WhmService;
+use App\Services\ProvisioningDispatcher;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
+/**
+ * Admin hosting provisioning queue.
+ *
+ * The controller never talks to WHM. It only hands the service to
+ * ProvisioningDispatcher; ProvisionHostingJob / HostingProvisioner do the work
+ * (resolving the product's whm_package and sending the customer notification
+ * after commit).
+ *
+ * Requirements: 9.11, 9.12, 9.13, 22.2
+ */
 class HostingProvisionController extends Controller
 {
     public function __construct(
-        private WhmService $whmService,
-        private NotificationService $notificationService
+        private ProvisioningDispatcher $dispatcher
     ) {
     }
 
-    /**
-     * Display pending hosting services in the provisioning queue.
-     *
-     * Requirements: 3.2
-     */
-    public function index(): View
-    {
-        $pendingServices = Service::with('customer')
-            ->where('status', 'pending')
-            ->where('service_type', 'Web Hosting')
-            ->whereNotNull('domain_name')
-            ->orderBy('created_at', 'asc')
-            ->get();
+    /** Valid values for the status filter; 'none' means provisioning_status IS NULL. */
+    public const STATUS_FILTERS = ['queued', 'running', 'succeeded', 'failed', 'none'];
 
-        return view('admin.hosting.provision.index', compact('pendingServices'));
+    /**
+     * Display every Web Hosting service in the provisioning queue, optionally
+     * filtered by provisioning status (Requirements 19.1, 19.2, 19.3).
+     */
+    public function index(Request $request): View
+    {
+        $status = $request->query('status');
+        $status = is_string($status) && in_array($status, self::STATUS_FILTERS, true) ? $status : null;
+
+        $query = Service::with(['customer', 'domain' => fn ($q) => $q->withTrashed()])
+            ->where('service_type', 'Web Hosting');
+
+        if ($status === 'none') {
+            $query->whereNull('provisioning_status');
+        } elseif ($status !== null) {
+            $query->where('provisioning_status', $status);
+        }
+
+        $services = $query->orderBy('created_at', 'desc')
+            ->orderBy('service_id', 'desc')
+            ->paginate(25)
+            ->withQueryString();
+
+        // Product comes from the order item that created the service (shop-bought only).
+        $itemIds = $services->getCollection()->pluck('order_item_id')->filter()->unique()->all();
+        $orderItems = $itemIds === []
+            ? collect()
+            : OrderItem::with('product')->whereIn('id', $itemIds)->get()->keyBy('id');
+
+        return view('admin.hosting.provision.index', [
+            'services' => $services,
+            'orderItems' => $orderItems,
+            'status' => $status,
+        ]);
     }
 
     /**
-     * Provision a pending hosting service via WHM API.
-     *
-     * On success: update Service status to 'Active', store cpanel_username,
-     * update associated Order fulfilment_status to 'completed', trigger notification.
-     * On failure: redirect back with error message.
-     *
-     * Requirements: 3.3, 3.4, 3.5, 3.6
+     * Queue provisioning for a service that has not been provisioned yet.
      */
     public function provision(Service $service): RedirectResponse
     {
-        // Ensure service is still pending
-        if ($service->status !== 'pending') {
-            return redirect()->route('admin.hosting.provision.index')
-                ->with('error', 'This service has already been provisioned.');
+        $queued = $this->dispatcher->dispatch($service, null, ProvisioningDispatcher::CONTEXT_ADMIN);
+
+        return $this->respond($service, $queued, 'queued for provisioning', 'This service is already queued, running or provisioned.');
+    }
+
+    /**
+     * Retry provisioning; only accepted for services in the 'failed' state.
+     */
+    public function retry(Service $service): RedirectResponse
+    {
+        $queued = $this->dispatcher->retry($service, null, ProvisioningDispatcher::CONTEXT_ADMIN);
+
+        return $this->respond($service, $queued, 'queued for a provisioning retry', 'Only services whose provisioning failed can be retried.');
+    }
+
+    private function respond(Service $service, bool $queued, string $successText, string $failureText): RedirectResponse
+    {
+        $redirect = redirect()->route('admin.hosting.provision.index');
+
+        if (! $queued) {
+            return $redirect->with('error', $failureText);
         }
 
-        $package = Setting::get('whm_default_package', 'default');
-        $email = $service->customer->users()->first()?->email ?? '';
-
-        try {
-            $result = $this->whmService->createAccount(
-                $service->domain_name,
-                $package,
-                $email
-            );
-
-            // Update service status and store cPanel username
-            $service->update([
-                'status' => 'Active',
-                'cpanel_username' => $result['username'],
-            ]);
-
-            // Find the related Order through OrderItem and mark fulfilment as completed
-            $orderItem = OrderItem::where('service_id', $service->service_id)->first();
-            if ($orderItem && $orderItem->order) {
-                $orderItem->order->update(['fulfilment_status' => 'completed']);
-            }
-
-            // Send provisioned notification to the customer (Req 3.6)
-            $this->notificationService->notifyCustomerHostingProvisioned($service);
-
-            return redirect()->route('admin.hosting.provision.index')
-                ->with('success', "Hosting account provisioned successfully for {$service->domain_name} (username: {$result['username']}).");
-
-        } catch (WhmProvisioningException $e) {
-            return redirect()->route('admin.hosting.provision.index')
-                ->with('error', "Provisioning failed for {$service->domain_name}: {$e->getMessage()}");
-        }
+        return $redirect->with('success', "Hosting for {$service->domain_name} {$successText}.");
     }
 }

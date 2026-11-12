@@ -25,6 +25,7 @@ class OrderItem extends Model
         'rental_start_date',
         'rental_end_date',
         'booking_id',
+        'stock_reserved_quantity',
     ];
 
     protected $casts = [

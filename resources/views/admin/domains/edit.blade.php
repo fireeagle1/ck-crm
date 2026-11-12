@@ -6,6 +6,61 @@
         <a href="{{ route('admin.domains.index') }}" class="text-sm text-blue-600 hover:underline">&larr; Domains</a>
     </div>
 
+    <div class="bg-white rounded-lg shadow-sm border p-6 max-w-2xl mb-4" id="domain-sync-panel">
+        <h2 class="text-sm font-semibold text-gray-700 mb-3">eNom sync</h2>
+        <dl class="grid grid-cols-2 gap-4 text-sm">
+            <div>
+                <dt class="text-gray-500">Status</dt>
+                <dd class="mt-1"><x-status-badge :status="$domain->status" type="domain-sync" /></dd>
+            </div>
+            <div>
+                <dt class="text-gray-500">Last synced</dt>
+                <dd class="mt-1">{{ $domain->last_synced_at?->format('d M Y H:i') ?? 'Never' }}</dd>
+            </div>
+            <div>
+                <dt class="text-gray-500">Linked service</dt>
+                <dd class="mt-1">
+                    @forelse ($domain->services as $linkedService)
+                        <a href="{{ route('admin.services.show', $linkedService) }}" class="text-blue-600 hover:underline">{{ $linkedService->service_short }}</a>@if (! $loop->last), @endif
+                    @empty
+                        <span class="text-gray-500">None</span>
+                    @endforelse
+                </dd>
+            </div>
+            <div>
+                <dt class="text-gray-500">Admin-edited fields</dt>
+                <dd class="mt-1 flex flex-wrap gap-1">
+                    @forelse ($domain->admin_edited_fields ?? [] as $editedField)
+                        <span class="inline-flex items-center px-2 py-0.5 rounded bg-amber-100 text-amber-800 text-xs">Edited: {{ str_replace('_', ' ', $editedField) }}</span>
+                    @empty
+                        <span class="text-gray-500">None</span>
+                    @endforelse
+                </dd>
+            </div>
+        </dl>
+        @if (! empty($domain->admin_edited_fields))
+            <form method="POST" action="{{ route('admin.domains.reset-edits', $domain) }}" class="mt-4">
+                @csrf
+                <button type="submit" class="px-3 py-1.5 border rounded-md text-sm font-medium hover:bg-gray-50">Reset to eNom control</button>
+            </form>
+        @endif
+    </div>
+
+    <div class="bg-white rounded-lg shadow-sm border p-6 max-w-2xl mb-4" id="domain-link-service-panel">
+        <h2 class="text-sm font-semibold text-gray-700 mb-3">Link service</h2>
+        <form method="POST" action="{{ route('admin.domains.link-service', $domain) }}" class="flex items-end gap-3">
+            @csrf
+            <div>
+                <label for="service_id" class="block text-sm font-medium text-gray-700">Service ID</label>
+                <input type="number" min="1" name="service_id" id="service_id" required
+                       value="{{ old('service_id') }}"
+                       class="mt-1 block rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                @error('service_id') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
+            </div>
+            <button type="submit" class="px-3 py-2 border rounded-md text-sm font-medium hover:bg-gray-50">Link service</button>
+        </form>
+    </div>
+
     <div class="bg-white rounded-lg shadow-sm border p-6 max-w-2xl">
         <form method="POST" action="{{ route('admin.domains.update', $domain) }}">
             @csrf
@@ -17,19 +72,14 @@
                            value="{{ old('domain_name', $domain->domain_name) }}"
                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
                     @error('domain_name') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
+                    @if (session('trashed_domain_id'))
+                        <button type="submit" form="restore-domain-form" class="mt-2 px-3 py-1.5 border rounded-md text-sm font-medium hover:bg-gray-50">Restore deleted domain</button>
+                    @endif
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label for="company_id" class="block text-sm font-medium text-gray-700">Customer</label>
-                        <select name="company_id" id="company_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                            <option value="">Unassigned</option>
-                            @foreach ($customers as $customer)
-                                <option value="{{ $customer->company_id }}" {{ old('company_id', $domain->company_id) == $customer->company_id ? 'selected' : '' }}>
-                                    {{ $customer->company_name }}
-                                </option>
-                            @endforeach
-                        </select>
+                        <x-customer-picker :selected="$selectedCustomer" />
                     </div>
                     <div>
                         <label for="registrar" class="block text-sm font-medium text-gray-700">Registrar</label>
@@ -91,4 +141,10 @@
             </div>
         </form>
     </div>
+
+    @if (session('trashed_domain_id'))
+        <form id="restore-domain-form" method="POST" action="{{ route('admin.domains.restore', session('trashed_domain_id')) }}">
+            @csrf
+        </form>
+    @endif
 </x-admin-layout>

@@ -4,9 +4,14 @@ namespace Tests\Unit\Services;
 
 use App\Models\Customer;
 use App\Models\Product;
+use App\Services\AssetAssignmentService;
 use App\Services\BookingService;
+use App\Services\CartService;
 use App\Services\CheckoutService;
+use App\Services\HostingServiceCreator;
 use App\Services\NotificationService;
+use App\Services\OrderCancellationService;
+use App\Services\StockService;
 use App\Services\StripeService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Mockery;
@@ -47,7 +52,7 @@ class CheckoutServiceTest extends TestCase
         $this->stripeService = Mockery::mock(StripeService::class);
         $this->bookingService = Mockery::mock(BookingService::class);
         $this->notificationService = Mockery::mock(NotificationService::class);
-        $this->checkoutService = new CheckoutService(
+        $this->checkoutService = $this->makeCheckoutService(
             $this->stripeService,
             $this->bookingService,
             $this->notificationService,
@@ -66,6 +71,47 @@ class CheckoutServiceTest extends TestCase
     }
 
     // ─── Helper Methods ──────────────────────────────────────────────────
+
+    private function makeCheckoutService(
+        StripeService $stripe,
+        BookingService $booking,
+        NotificationService $notification,
+    ): CheckoutService {
+        $assetAssignment = Mockery::mock(AssetAssignmentService::class);
+        $assetAssignment->shouldReceive('autoAssign')->andReturn(0);
+
+        return new CheckoutService(
+            $stripe,
+            $booking,
+            $notification,
+            $assetAssignment,
+            $this->app->make(StockService::class),
+            $this->app->make(HostingServiceCreator::class),
+            Mockery::mock(OrderCancellationService::class),
+        );
+    }
+
+    /**
+     * Build a stubbed CartService returning the given items.
+     */
+    private function cartFor(array $items): CartService
+    {
+        $hasOnlyHosting = !empty($items)
+            && count(array_filter($items, fn ($i) => $i['product_type'] !== 'hosting')) === 0;
+
+        $cart = Mockery::mock(CartService::class);
+        $cart->shouldReceive('getItems')->andReturn($items);
+        $cart->shouldReceive('hasOnlyHostingItems')->andReturn($hasOnlyHosting);
+        $cart->shouldReceive('getDeliveryTotal')->andReturn(0.0);
+        $cart->shouldReceive('clear');
+
+        return $cart;
+    }
+
+    private function checkout(CheckoutService $service, array $items): \App\ValueObjects\CheckoutResult
+    {
+        return $service->processCheckout($this->customer, $this->cartFor($items));
+    }
 
     private function createOneOffProduct(string $name = 'Widget', float $price = 29.99): Product
     {
@@ -100,6 +146,10 @@ class CheckoutServiceTest extends TestCase
             'product_type' => $product->product_type,
             'billing_frequency' => $product->billing_frequency,
         ];
+
+        if ($product->product_type === 'hosting') {
+            $item['domain_name'] = 'www.Example' . $product->id . '.com';
+        }
 
         if ($stripePriceId) {
             $item['stripe_price_id'] = $stripePriceId;
@@ -144,18 +194,20 @@ class CheckoutServiceTest extends TestCase
             ->andReturn('cus_test_123');
 
         $this->stripeService
-            ->shouldReceive('createCheckoutSession')
+            ->shouldReceive('createCheckoutSessionWithParams')
             ->once()
-            ->withArgs(function ($customerId, $lineItems, $successUrl, $cancelUrl) {
-                return $customerId === 'cus_test_123'
-                    && count($lineItems) === 2;
+            ->withArgs(function (array $params) {
+                return $params['customer'] === 'cus_test_123'
+                    && count($params['line_items']) === 2;
             })
             ->andReturn($this->makeFakeStripeSession());
 
         $this->stripeService
             ->shouldNotReceive('createSubscription');
 
-        $result = $this->checkoutService->processCheckoutFromArray($this->customer, $cartItems);
+        $this->notificationService->shouldReceive('notifyAdminNewOrder')->once();
+
+        $result = $this->checkout($this->checkoutService, $cartItems);
 
         $this->assertTrue($result->success, 'Checkout failed: ' . ($result->errorMessage ?? 'unknown'));
         $this->assertEquals('https://checkout.stripe.com/test', $result->checkoutSessionUrl);
@@ -163,18 +215,20 @@ class CheckoutServiceTest extends TestCase
     }
 
     /**
-     * Test 2: Cart with only recurring items calls createSubscription for each, not createCheckoutSession.
+     * Test 2: Cart with only hosting items calls createSubscription for each, not a checkout session.
+     *
+     * Rentals are no longer subscriptions: they are charged once via the checkout session.
      *
      * **Validates: Requirements 4.5**
      */
-    public function test_only_recurring_items_creates_subscriptions_not_checkout_session(): void
+    public function test_only_hosting_items_creates_subscriptions_not_checkout_session(): void
     {
-        $hosting = $this->createHostingProduct('Hosting Plan A', 9.99);
-        $rental = $this->createEquipmentRentalProduct('Router', 15.00);
+        $hostingA = $this->createHostingProduct('Hosting Plan A', 9.99);
+        $hostingB = $this->createHostingProduct('Hosting Plan B', 14.99);
 
         $cartItems = [
-            $this->productToCartItem($hosting),
-            $this->productToCartItem($rental),
+            $this->productToCartItem($hostingA),
+            $this->productToCartItem($hostingB),
         ];
 
         $this->stripeService
@@ -184,22 +238,23 @@ class CheckoutServiceTest extends TestCase
             ->andReturn('cus_test_123');
 
         $this->stripeService
-            ->shouldNotReceive('createCheckoutSession');
+            ->shouldNotReceive('createCheckoutSessionWithParams');
 
         $this->stripeService
             ->shouldReceive('createSubscription')
             ->twice()
             ->andReturn(
                 $this->makeFakeStripeSubscription('sub_hosting_1'),
-                $this->makeFakeStripeSubscription('sub_rental_1'),
+                $this->makeFakeStripeSubscription('sub_hosting_2'),
             );
 
-        $result = $this->checkoutService->processCheckoutFromArray($this->customer, $cartItems);
+        $this->notificationService->shouldReceive('notifyAdminNewOrder')->once();
+
+        $result = $this->checkout($this->checkoutService, $cartItems);
 
         $this->assertTrue($result->success, 'Checkout failed: ' . ($result->errorMessage ?? 'unknown'));
         $this->assertNull($result->checkoutSessionUrl);
-        $this->assertCount(2, $result->subscriptionIds);
-        $this->assertEquals(['sub_hosting_1', 'sub_rental_1'], $result->subscriptionIds);
+        $this->assertEquals(['sub_hosting_1', 'sub_hosting_2'], $result->subscriptionIds);
     }
 
     /**
@@ -226,29 +281,29 @@ class CheckoutServiceTest extends TestCase
             ->andReturn('cus_test_123');
 
         $this->stripeService
-            ->shouldReceive('createCheckoutSession')
+            ->shouldReceive('createCheckoutSessionWithParams')
             ->once()
-            ->withArgs(function ($customerId, $lineItems, $successUrl, $cancelUrl) {
-                // Only the one-off item should be in the checkout session
-                return $customerId === 'cus_test_123'
-                    && count($lineItems) === 1
-                    && $lineItems[0]['price_data']['product_data']['name'] === 'One-Off Widget';
+            ->withArgs(function (array $params) {
+                // One-off and rental go in the session; hosting does not
+                $names = array_map(fn ($l) => $l['price_data']['product_data']['name'], $params['line_items']);
+
+                return $params['customer'] === 'cus_test_123'
+                    && $names === ['One-Off Widget', 'Managed Switch (Rental)'];
             })
             ->andReturn($this->makeFakeStripeSession('cs_mixed_test'));
 
         $this->stripeService
             ->shouldReceive('createSubscription')
-            ->twice()
-            ->andReturn(
-                $this->makeFakeStripeSubscription('sub_hosting_mixed'),
-                $this->makeFakeStripeSubscription('sub_rental_mixed'),
-            );
+            ->once()
+            ->andReturn($this->makeFakeStripeSubscription('sub_hosting_mixed'));
 
-        $result = $this->checkoutService->processCheckoutFromArray($this->customer, $cartItems);
+        $this->notificationService->shouldReceive('notifyAdminNewOrder')->once();
+
+        $result = $this->checkout($this->checkoutService, $cartItems);
 
         $this->assertTrue($result->success, 'Checkout failed: ' . ($result->errorMessage ?? 'unknown'));
         $this->assertNotNull($result->checkoutSessionUrl);
-        $this->assertCount(2, $result->subscriptionIds);
+        $this->assertEquals(['sub_hosting_mixed'], $result->subscriptionIds);
     }
 
     /**
@@ -260,19 +315,16 @@ class CheckoutServiceTest extends TestCase
     {
         $cartItems = [];
 
-        $this->stripeService
-            ->shouldReceive('ensureCustomer')
-            ->once()
-            ->with($this->customer)
-            ->andReturn('cus_test_123');
+        // processCheckout returns early for an empty cart, before touching Stripe
+        $this->stripeService->shouldNotReceive('ensureCustomer');
 
         $this->stripeService
-            ->shouldNotReceive('createCheckoutSession');
+            ->shouldNotReceive('createCheckoutSessionWithParams');
 
         $this->stripeService
             ->shouldNotReceive('createSubscription');
 
-        $result = $this->checkoutService->processCheckoutFromArray($this->customer, $cartItems);
+        $result = $this->checkout($this->checkoutService, $cartItems);
 
         $this->assertTrue($result->success, 'Checkout failed: ' . ($result->errorMessage ?? 'unknown'));
         $this->assertNull($result->checkoutSessionUrl);
@@ -318,13 +370,16 @@ class CheckoutServiceTest extends TestCase
                 $cartItems[] = $this->productToCartItem($product);
             }
 
-            $recurringCount = $hostingCount + $rentalCount;
+            // Hosting is subscribed individually; one-off and rental go in the session
+            $recurringCount = $hostingCount;
+            $sessionItemCount = $oneOffCount + $rentalCount;
 
             // Reset mock expectations for each iteration
             $stripeService = Mockery::mock(StripeService::class);
             $bookingService = Mockery::mock(BookingService::class);
             $notificationService = Mockery::mock(NotificationService::class);
-            $checkoutService = new CheckoutService($stripeService, $bookingService, $notificationService);
+            $notificationService->shouldReceive('notifyAdminNewOrder')->once();
+            $checkoutService = $this->makeCheckoutService($stripeService, $bookingService, $notificationService);
 
             $stripeService
                 ->shouldReceive('ensureCustomer')
@@ -333,18 +388,18 @@ class CheckoutServiceTest extends TestCase
 
             // Track how many line items go to checkout session
             $capturedLineItemCount = null;
-            if ($oneOffCount > 0) {
+            if ($sessionItemCount > 0) {
                 $stripeService
-                    ->shouldReceive('createCheckoutSession')
+                    ->shouldReceive('createCheckoutSessionWithParams')
                     ->once()
-                    ->withArgs(function ($customerId, $lineItems) use (&$capturedLineItemCount) {
-                        $capturedLineItemCount = count($lineItems);
+                    ->withArgs(function (array $params) use (&$capturedLineItemCount) {
+                        $capturedLineItemCount = count($params['line_items']);
                         return true;
                     })
                     ->andReturn($this->makeFakeStripeSession('cs_test_' . $compIndex));
             } else {
                 $stripeService
-                    ->shouldNotReceive('createCheckoutSession');
+                    ->shouldNotReceive('createCheckoutSessionWithParams');
             }
 
             // Each recurring item should produce one subscription call
@@ -362,17 +417,17 @@ class CheckoutServiceTest extends TestCase
                     ->shouldNotReceive('createSubscription');
             }
 
-            $result = $checkoutService->processCheckoutFromArray($this->customer, $cartItems);
+            $result = $this->checkout($checkoutService, $cartItems);
 
             $description = "Composition: one_off={$oneOffCount}, hosting={$hostingCount}, rental={$rentalCount}";
             $this->assertTrue($result->success, "Checkout should succeed for {$description}. Error: " . ($result->errorMessage ?? 'none'));
 
-            // Verify one-off items count in checkout session
-            if ($oneOffCount > 0) {
+            // Verify one-off + rental items count in checkout session
+            if ($sessionItemCount > 0) {
                 $this->assertEquals(
-                    $oneOffCount,
+                    $sessionItemCount,
                     $capturedLineItemCount,
-                    "Checkout session should contain exactly {$oneOffCount} line items for {$description}"
+                    "Checkout session should contain exactly {$sessionItemCount} line items for {$description}"
                 );
             }
 
@@ -411,10 +466,10 @@ class CheckoutServiceTest extends TestCase
             ->andReturn('cus_test_123');
 
         $this->stripeService
-            ->shouldReceive('createCheckoutSession')
+            ->shouldReceive('createCheckoutSessionWithParams')
             ->once()
-            ->withArgs(function ($customerId, $lineItems) use (&$capturedLineItems) {
-                $capturedLineItems = $lineItems;
+            ->withArgs(function (array $params) use (&$capturedLineItems) {
+                $capturedLineItems = $params['line_items'];
                 return true;
             })
             ->andReturn($this->makeFakeStripeSession());
@@ -422,7 +477,9 @@ class CheckoutServiceTest extends TestCase
         $this->stripeService
             ->shouldNotReceive('createSubscription');
 
-        $result = $this->checkoutService->processCheckoutFromArray($this->customer, $cartItems);
+        $this->notificationService->shouldReceive('notifyAdminNewOrder')->once();
+
+        $result = $this->checkout($this->checkoutService, $cartItems);
 
         $this->assertTrue($result->success, 'Checkout failed: ' . ($result->errorMessage ?? 'unknown'));
 
@@ -438,19 +495,19 @@ class CheckoutServiceTest extends TestCase
     }
 
     /**
-     * Verify that each recurring item gets its own createSubscription call
+     * Verify that each hosting item gets its own createSubscription call
      * with correct stripe_price_id and metadata.
      *
      * **Validates: Requirements 4.5**
      */
-    public function test_recurring_items_each_create_individual_subscription_with_metadata(): void
+    public function test_hosting_items_each_create_individual_subscription_with_metadata(): void
     {
         $hosting = $this->createHostingProduct('Pro Hosting', 29.99);
-        $rental = $this->createEquipmentRentalProduct('Managed Router', 12.50);
+        $hosting2 = $this->createHostingProduct('Business Hosting', 12.50);
 
         $cartItems = [
             $this->productToCartItem($hosting, 'price_hosting_custom'),
-            $this->productToCartItem($rental, 'price_rental_custom'),
+            $this->productToCartItem($hosting2, 'price_hosting_custom_2'),
         ];
 
         $capturedCalls = [];
@@ -461,7 +518,9 @@ class CheckoutServiceTest extends TestCase
             ->andReturn('cus_test_123');
 
         $this->stripeService
-            ->shouldNotReceive('createCheckoutSession');
+            ->shouldNotReceive('createCheckoutSessionWithParams');
+
+        $this->notificationService->shouldReceive('notifyAdminNewOrder')->once();
 
         $this->stripeService
             ->shouldReceive('createSubscription')
@@ -479,7 +538,7 @@ class CheckoutServiceTest extends TestCase
                 $this->makeFakeStripeSubscription('sub_2'),
             );
 
-        $result = $this->checkoutService->processCheckoutFromArray($this->customer, $cartItems);
+        $result = $this->checkout($this->checkoutService, $cartItems);
 
         $this->assertTrue($result->success, 'Checkout failed: ' . ($result->errorMessage ?? 'unknown'));
 
@@ -491,12 +550,12 @@ class CheckoutServiceTest extends TestCase
         $this->assertEquals('hosting', $capturedCalls[0]['metadata']['product_type']);
         $this->assertEquals($this->customer->company_id, $capturedCalls[0]['metadata']['company_id']);
 
-        // Verify second subscription call (equipment rental)
+        // Verify second subscription call (second hosting item)
         $this->assertEquals('cus_test_123', $capturedCalls[1]['customer_id']);
-        $this->assertEquals('price_rental_custom', $capturedCalls[1]['price_id']);
-        $this->assertEquals($rental->id, $capturedCalls[1]['metadata']['product_id']);
-        $this->assertEquals('Managed Router', $capturedCalls[1]['metadata']['product_name']);
-        $this->assertEquals('equipment_rental', $capturedCalls[1]['metadata']['product_type']);
+        $this->assertEquals('price_hosting_custom_2', $capturedCalls[1]['price_id']);
+        $this->assertEquals($hosting2->id, $capturedCalls[1]['metadata']['product_id']);
+        $this->assertEquals('Business Hosting', $capturedCalls[1]['metadata']['product_name']);
+        $this->assertEquals('hosting', $capturedCalls[1]['metadata']['product_type']);
     }
 
     /**
@@ -510,13 +569,14 @@ class CheckoutServiceTest extends TestCase
         $cartItems = [$this->productToCartItem($product)];
 
         $this->stripeService->shouldReceive('ensureCustomer')->once()->andReturn('cus_test_123');
-        $this->stripeService->shouldNotReceive('createCheckoutSession');
+        $this->stripeService->shouldNotReceive('createCheckoutSessionWithParams');
         $this->stripeService
             ->shouldReceive('createSubscription')
             ->once()
             ->andReturn($this->makeFakeStripeSubscription('sub_hosting'));
+        $this->notificationService->shouldReceive('notifyAdminNewOrder')->once();
 
-        $result = $this->checkoutService->processCheckoutFromArray($this->customer, $cartItems);
+        $result = $this->checkout($this->checkoutService, $cartItems);
 
         $this->assertTrue($result->success, 'Checkout failed: ' . ($result->errorMessage ?? 'unknown'));
         $this->assertNull($result->checkoutSessionUrl);
@@ -524,27 +584,29 @@ class CheckoutServiceTest extends TestCase
     }
 
     /**
-     * Verify that equipment_rental items are treated as recurring.
+     * Verify that equipment_rental items are charged once via the checkout session,
+     * not as subscriptions.
      *
      * **Validates: Requirements 4.5**
      */
-    public function test_equipment_rental_items_are_treated_as_recurring(): void
+    public function test_equipment_rental_items_are_charged_via_checkout_session(): void
     {
         $product = $this->createEquipmentRentalProduct('Firewall Appliance', 45.00);
         $cartItems = [$this->productToCartItem($product)];
 
         $this->stripeService->shouldReceive('ensureCustomer')->once()->andReturn('cus_test_123');
-        $this->stripeService->shouldNotReceive('createCheckoutSession');
+        $this->stripeService->shouldNotReceive('createSubscription');
         $this->stripeService
-            ->shouldReceive('createSubscription')
+            ->shouldReceive('createCheckoutSessionWithParams')
             ->once()
-            ->andReturn($this->makeFakeStripeSubscription('sub_rental'));
+            ->andReturn($this->makeFakeStripeSession('cs_rental'));
+        $this->notificationService->shouldReceive('notifyAdminNewOrder')->once();
 
-        $result = $this->checkoutService->processCheckoutFromArray($this->customer, $cartItems);
+        $result = $this->checkout($this->checkoutService, $cartItems);
 
         $this->assertTrue($result->success, 'Checkout failed: ' . ($result->errorMessage ?? 'unknown'));
-        $this->assertNull($result->checkoutSessionUrl);
-        $this->assertEquals(['sub_rental'], $result->subscriptionIds);
+        $this->assertNotNull($result->checkoutSessionUrl);
+        $this->assertEmpty($result->subscriptionIds);
     }
 
     // ─── Stock Decrement Tests (processCheckout) ─────────────────────────
@@ -752,6 +814,11 @@ class CheckoutServiceTest extends TestCase
 
         $this->bookingService->shouldReceive('createBooking')->once()
             ->andReturn(new \App\Models\Booking(['id' => 1]));
+
+        // PDF generation is resolved from the container; stub it out here
+        $pdfService = Mockery::mock(\App\Services\BookingConfirmationPdfService::class);
+        $pdfService->shouldReceive('generate')->once();
+        $this->app->instance(\App\Services\BookingConfirmationPdfService::class, $pdfService);
 
         $this->notificationService->shouldReceive('notifyAdminNewOrder')->once();
 

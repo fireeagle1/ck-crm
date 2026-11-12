@@ -2,11 +2,11 @@
 
 namespace App\Services;
 
+use App\Exceptions\DomainAlreadyInUseException;
 use App\Models\Booking;
 use App\Models\Customer;
 use App\Models\Order;
 use App\Models\OrderItem;
-use App\Models\Product;
 use App\Models\Service;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -17,36 +17,38 @@ class FulfilmentService
     public function __construct(
         protected BookingService $bookingService,
         protected NotificationService $notificationService,
+        protected HostingServiceCreator $hostingServiceCreator,
+        protected ProvisioningDispatcher $provisioningDispatcher,
     ) {}
 
     /**
-     * Handle hosting purchase: create a pending Service record with domain_name and service_type 'hosting'.
-     * The admin will later approve and provision via WHM.
+     * Handle hosting purchase through HostingServiceCreator (idempotent per order item).
+     * Returns null when the order is held because the domain is already in use.
      *
-     * Requirements: 3.1, 10.1, 10.2, 10.3
+     * Requirements: 3.3, 3.4, 3.5
      */
-    public function handleHostingPurchase(OrderItem $item, Customer $customer): Service
+    public function handleHostingPurchase(OrderItem $item, Customer $customer): ?Service
     {
         try {
             return DB::transaction(function () use ($item, $customer) {
-                $service = Service::create([
-                    'company_id' => $customer->company_id,
-                    'service_short' => $item->product_name,
-                    'service_type' => 'hosting',
-                    'status' => 'pending',
-                    'domain_name' => $item->domain_name,
-                    'start_date' => now(),
-                    'service_monthly_charge' => $item->price,
-                    'service_payment_frequency' => $item->billing_frequency,
-                    'stripe_subscription_id' => $item->stripe_subscription_id,
-                ]);
-
-                $item->update(['service_id' => $service->service_id]);
+                $service = $this->hostingServiceCreator->forOrderItem($item, $customer);
 
                 $item->order->update(['fulfilment_status' => 'awaiting_fulfilment']);
 
+                // Dispatch only once the commit lands. The dispatcher's atomic guard
+                // makes repeat deliveries a no-op.
+                DB::afterCommit(fn () => $this->provisioningDispatcher->dispatch(
+                    $service,
+                    null,
+                    ProvisioningDispatcher::CONTEXT_WEBHOOK,
+                ));
+
                 return $service;
             });
+        } catch (DomainAlreadyInUseException $e) {
+            $this->holdOrderForDomainConflict($item->order, $e);
+
+            return null;
         } catch (\Throwable $e) {
             Log::error('FulfilmentService: handleHostingPurchase transaction failed — full rollback', [
                 'order_id' => $item->order_id,
@@ -60,6 +62,32 @@ class FulfilmentService
 
             throw $e;
         }
+    }
+
+    /**
+     * Leave the order unfulfilled, record why, and tell admins. Repeat deliveries add the note once.
+     */
+    protected function holdOrderForDomainConflict(Order $order, DomainAlreadyInUseException $e): void
+    {
+        $line = "Held: domain {$e->domain} already in use"
+            . ($e->existingServiceId !== null ? " by service #{$e->existingServiceId}" : '') . '.';
+
+        $order->refresh();
+        $notes = (string) $order->admin_notes;
+
+        if (str_contains($notes, $line)) {
+            return;
+        }
+
+        $order->update(['admin_notes' => trim($notes . "\n" . $line)]);
+
+        Log::warning('FulfilmentService: hosting order held, domain already in use', [
+            'order_id' => $order->id,
+            'domain' => $e->domain,
+            'existing_service_id' => $e->existingServiceId,
+        ]);
+
+        $this->notificationService->notifyAdminHostingDomainConflict($order, $e->domain, $e->existingServiceId);
     }
 
     /**
@@ -147,22 +175,23 @@ class FulfilmentService
     }
 
     /**
-     * Handle one-off purchase: decrement stock. The order's fulfilment_status stays "pending".
+     * Handle one-off purchase: no stock handling (stock is not tracked here).
+     * The order's fulfilment_status stays "pending".
      *
-     * Requirements: 5.1, 5.4, 10.1
+     * Requirements: 4.2, 4.3
      */
     public function handleOneOffPurchase(OrderItem $item): void
     {
-        DB::transaction(function () use ($item) {
-            if ($item->product) {
-                $this->decrementStock($item->product);
-            }
-        });
+        Log::info('FulfilmentService: one-off purchase recorded, no stock handling', [
+            'order_id' => $item->order_id,
+            'order_item_id' => $item->id,
+            'product_id' => $item->product_id,
+        ]);
     }
 
     /**
      * Mark an order as fulfilled: set fulfilment_status to "completed", record timestamp,
-     * and activate any associated pending services. Sends fulfilment notification to customer.
+     * and activate confirmed bookings. Hosting services are not touched. Sends fulfilment notification to customer.
      *
      * Wrapped in DB::transaction for atomicity. On failure, full rollback occurs
      * and details are logged with event context.
@@ -178,13 +207,8 @@ class FulfilmentService
                     'fulfilled_at' => now(),
                 ]);
 
-                // Activate any pending services associated with this order's items
-                $order->items()->whereNotNull('service_id')->each(function (OrderItem $item) {
-                    $service = $item->service;
-                    if ($service && $service->status === 'pending') {
-                        $service->update(['status' => 'Active']);
-                    }
-                });
+                // Hosting service status is owned by provisioning (ServiceStatus::Pending -> Active);
+                // fulfilment never touches it.
 
                 // Activate any confirmed bookings associated with this order's items
                 $order->items()->whereNotNull('booking_id')->each(function (OrderItem $item) {
@@ -207,35 +231,6 @@ class FulfilmentService
             ]);
 
             throw $e;
-        }
-    }
-
-    /**
-     * Atomically decrement a product's stock quantity.
-     * Uses a where guard to prevent going below zero.
-     *
-     * @throws RuntimeException if stock is already at zero.
-     */
-    public function decrementStock(Product $product): void
-    {
-        // stock_quantity of null means unlimited — no decrement needed
-        if ($product->stock_quantity === null) {
-            return;
-        }
-
-        $affected = Product::where('id', $product->id)
-            ->where('stock_quantity', '>', 0)
-            ->decrement('stock_quantity');
-
-        if ($affected === 0) {
-            Log::warning('FulfilmentService: Stock decrement failed — stock already at zero', [
-                'product_id' => $product->id,
-                'product_name' => $product->name,
-            ]);
-
-            throw new RuntimeException(
-                "Product \"{$product->name}\" is out of stock."
-            );
         }
     }
 }

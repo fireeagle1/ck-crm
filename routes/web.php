@@ -155,6 +155,8 @@ Route::middleware(['auth', 'verified', EnsureIsAdmin::class])->prefix('admin')->
     Route::post('/services', [Admin\ServiceController::class, 'store'])->name('services.store');
     Route::get('/services/{service}', [Admin\ServiceController::class, 'show'])->name('services.show');
     Route::get('/services/{service}/edit', [Admin\ServiceController::class, 'edit'])->name('services.edit');
+    Route::post('/services/{service}/refresh-whm', [Admin\ServiceController::class, 'refreshWhm'])->name('services.refresh-whm');
+    Route::post('/services/{service}/retry-billing', [Admin\ServiceController::class, 'retryBilling'])->name('services.retry-billing');
     Route::put('/services/{service}', [Admin\ServiceController::class, 'update'])->name('services.update');
     Route::delete('/services/{service}', [Admin\ServiceController::class, 'destroy'])->name('services.destroy');
 
@@ -208,10 +210,15 @@ Route::middleware(['auth', 'verified', EnsureIsAdmin::class])->prefix('admin')->
 
     // Domains
     Route::get('/domains', [Admin\DomainController::class, 'index'])->name('domains.index');
+    Route::get('/domains/customer-search', [Admin\DomainController::class, 'customerSearch'])->name('domains.customer-search');
     Route::get('/domains/create', [Admin\DomainController::class, 'create'])->name('domains.create');
     Route::post('/domains', [Admin\DomainController::class, 'store'])->name('domains.store');
     Route::get('/domains/{domain}/edit', [Admin\DomainController::class, 'edit'])->name('domains.edit');
     Route::put('/domains/{domain}', [Admin\DomainController::class, 'update'])->name('domains.update');
+    Route::post('/domains/{domain}/reset-edits', [Admin\DomainController::class, 'resetEdits'])->name('domains.reset-edits');
+    Route::post('/domains/{domain}/assign', [Admin\DomainController::class, 'assign'])->name('domains.assign');
+    Route::post('/domains/{domain}/link-service', [Admin\DomainController::class, 'linkService'])->name('domains.link-service');
+    Route::post('/domains/{id}/restore', [Admin\DomainController::class, 'restore'])->whereNumber('id')->name('domains.restore');
     Route::delete('/domains/{domain}', [Admin\DomainController::class, 'destroy'])->name('domains.destroy');
 
     // Knowledgebase Articles
@@ -261,6 +268,7 @@ Route::middleware(['auth', 'verified', EnsureIsAdmin::class])->prefix('admin')->
     // Hosting Provisioning
     Route::get('/hosting/provisioning', [Admin\HostingProvisionController::class, 'index'])->name('hosting.provision.index');
     Route::post('/hosting/provisioning/{service}/provision', [Admin\HostingProvisionController::class, 'provision'])->name('hosting.provision.provision');
+    Route::post('/hosting/provisioning/{service}/retry', [Admin\HostingProvisionController::class, 'retry'])->name('hosting.provision.retry');
 
     // Canned Responses
     Route::resource('canned-responses', Admin\CannedResponseController::class)->except(['show']);

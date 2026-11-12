@@ -8,8 +8,13 @@ use App\Models\OrderItem;
 use App\Models\ProcessedWebhookEvent;
 use App\Models\Product;
 use App\Models\Service;
+use App\Models\User;
+use App\Mail\PaymentFailedAdmin;
+use App\Services\FulfilmentService;
+use App\Services\NotificationService;
 use App\Services\StripeService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Mail;
 use Mockery;
 use Stripe\Event;
 use Stripe\StripeObject;
@@ -118,10 +123,10 @@ class StripeWebhookControllerTest extends TestCase
 
         $response->assertStatus(200);
 
-        // Stock should be decremented by the fulfilment service
+        // Fulfilment no longer decrements stock
         $this->assertDatabaseHas('products', [
             'id' => $product->id,
-            'stock_quantity' => 9,
+            'stock_quantity' => 10,
         ]);
     }
 
@@ -169,8 +174,57 @@ class StripeWebhookControllerTest extends TestCase
         $response->assertStatus(200);
         $this->assertDatabaseHas('services', [
             'service_id' => $service->service_id,
-            'status' => 'payment_failed',
+            'status' => 'Suspended',
         ]);
+    }
+
+    public function test_invoice_payment_failed_never_changes_cancelled_service(): void
+    {
+        $customer = Customer::factory()->create();
+        $service = Service::create([
+            'company_id' => $customer->company_id,
+            'service_short' => 'Hosting Plan',
+            'status' => 'Cancelled',
+            'start_date' => now(),
+            'service_monthly_charge' => 9.99,
+            'service_payment_frequency' => 'monthly',
+            'stripe_subscription_id' => 'sub_test_cxl',
+        ]);
+
+        $this->mockStripeEvent('invoice.payment_failed', ['id' => 'inv_cxl', 'subscription' => 'sub_test_cxl']);
+
+        $this->postJson('/stripe/webhook', [], ['HTTP_STRIPE_SIGNATURE' => 'valid_sig'])->assertStatus(200);
+        $this->assertDatabaseHas('services', ['service_id' => $service->service_id, 'status' => 'Cancelled']);
+    }
+
+    public function test_checkout_session_completed_falls_back_to_client_reference_id(): void
+    {
+        $customer = Customer::factory()->create();
+        $order = Order::create([
+            'company_id' => $customer->company_id,
+            'payment_status' => 'pending',
+            'fulfilment_status' => 'pending',
+            'total_amount' => 29.99,
+        ]);
+
+        $this->mockStripeEvent('checkout.session.completed', [
+            'id' => 'cs_ref_1',
+            'client_reference_id' => (string) $order->id,
+        ]);
+
+        $this->postJson('/stripe/webhook', [], ['HTTP_STRIPE_SIGNATURE' => 'valid_sig'])->assertStatus(200);
+        $this->assertDatabaseHas('orders', ['id' => $order->id, 'payment_status' => 'paid']);
+    }
+
+    public function test_checkout_session_with_metadata_for_missing_order_returns_500_and_rolls_back_marker(): void
+    {
+        $this->mockStripeEvent('checkout.session.completed', [
+            'id' => 'cs_meta_1',
+            'metadata' => ['order_id' => '999999'],
+        ], 'evt_meta_001');
+
+        $this->postJson('/stripe/webhook', [], ['HTTP_STRIPE_SIGNATURE' => 'valid_sig'])->assertStatus(500);
+        $this->assertDatabaseMissing('processed_webhook_events', ['stripe_event_id' => 'evt_meta_001']);
     }
 
     public function test_invoice_payment_failed_returns_200_for_nonexistent_service(): void
@@ -185,6 +239,138 @@ class StripeWebhookControllerTest extends TestCase
         ]);
 
         $response->assertStatus(200);
+    }
+
+    // ──────────────────────────────────────────────────────────────────
+    // Requirements 3.4, 6.2: invoice.paid
+    // ──────────────────────────────────────────────────────────────────
+
+    private function hostingOrderWithSubscription(string $subId, ?string $sessionId = null): Order
+    {
+        $customer = Customer::factory()->create();
+        $order = Order::create([
+            'company_id' => $customer->company_id,
+            'payment_status' => 'pending',
+            'fulfilment_status' => 'pending',
+            'stripe_checkout_session_id' => $sessionId,
+            'total_amount' => 9.99,
+        ]);
+        OrderItem::create([
+            'order_id' => $order->id,
+            'product_name' => 'Hosting',
+            'product_type' => 'hosting',
+            'price' => 9.99,
+            'stripe_subscription_id' => $subId,
+        ]);
+
+        return $order;
+    }
+
+    private function fulfilmentExpecting(int $times): void
+    {
+        $fulfilment = Mockery::mock(FulfilmentService::class);
+        $fulfilment->shouldReceive('handleHostingPurchase')->times($times)->andReturn(null);
+        $this->app->instance(FulfilmentService::class, $fulfilment);
+    }
+
+    public function test_invoice_paid_subscription_create_marks_order_paid_and_provisions_hosting(): void
+    {
+        $order = $this->hostingOrderWithSubscription('sub_paid_001');
+        $this->fulfilmentExpecting(1);
+
+        $this->mockStripeEvent('invoice.paid', [
+            'id' => 'in_paid_1',
+            'billing_reason' => 'subscription_create',
+            'subscription' => 'sub_paid_001',
+        ]);
+
+        $this->postJson('/stripe/webhook', [], ['HTTP_STRIPE_SIGNATURE' => 'valid_sig'])->assertStatus(200);
+        $this->assertDatabaseHas('orders', ['id' => $order->id, 'payment_status' => 'paid']);
+    }
+
+    public function test_invoice_paid_finds_order_via_subscription_metadata(): void
+    {
+        $order = $this->hostingOrderWithSubscription('sub_other');
+        $this->fulfilmentExpecting(1);
+
+        $this->mockStripeEvent('invoice.paid', [
+            'id' => 'in_paid_2',
+            'billing_reason' => 'subscription_create',
+            'subscription' => 'sub_unknown',
+            'subscription_details' => ['metadata' => ['order_id' => (string) $order->id]],
+        ]);
+
+        $this->postJson('/stripe/webhook', [], ['HTTP_STRIPE_SIGNATURE' => 'valid_sig'])->assertStatus(200);
+        $this->assertDatabaseHas('orders', ['id' => $order->id, 'payment_status' => 'paid']);
+    }
+
+    public function test_invoice_paid_with_other_billing_reason_is_ignored(): void
+    {
+        $order = $this->hostingOrderWithSubscription('sub_paid_003');
+        $this->fulfilmentExpecting(0);
+
+        $this->mockStripeEvent('invoice.paid', [
+            'id' => 'in_paid_3',
+            'billing_reason' => 'subscription_cycle',
+            'subscription' => 'sub_paid_003',
+        ]);
+
+        $this->postJson('/stripe/webhook', [], ['HTTP_STRIPE_SIGNATURE' => 'valid_sig'])->assertStatus(200);
+        $this->assertDatabaseHas('orders', ['id' => $order->id, 'payment_status' => 'pending']);
+    }
+
+    public function test_invoice_paid_for_checkout_backed_order_is_ignored(): void
+    {
+        $order = $this->hostingOrderWithSubscription('sub_paid_004', 'cs_has_session');
+        $this->fulfilmentExpecting(0);
+
+        $this->mockStripeEvent('invoice.paid', [
+            'id' => 'in_paid_4',
+            'billing_reason' => 'subscription_create',
+            'subscription' => 'sub_paid_004',
+        ]);
+
+        $this->postJson('/stripe/webhook', [], ['HTTP_STRIPE_SIGNATURE' => 'valid_sig'])->assertStatus(200);
+        $this->assertDatabaseHas('orders', ['id' => $order->id, 'payment_status' => 'pending']);
+    }
+
+    public function test_invoice_paid_with_no_matching_order_returns_200(): void
+    {
+        $this->fulfilmentExpecting(0);
+
+        $this->mockStripeEvent('invoice.paid', [
+            'id' => 'in_paid_5',
+            'billing_reason' => 'subscription_create',
+            'subscription' => 'sub_nobody',
+        ]);
+
+        $this->postJson('/stripe/webhook', [], ['HTTP_STRIPE_SIGNATURE' => 'valid_sig'])->assertStatus(200);
+    }
+
+    public function test_invoice_paid_redelivery_has_no_further_effect(): void
+    {
+        $order = $this->hostingOrderWithSubscription('sub_paid_006');
+        $this->fulfilmentExpecting(1);
+
+        $event = Event::constructFrom([
+            'id' => 'evt_paid_006',
+            'type' => 'invoice.paid',
+            'data' => ['object' => ['id' => 'in_paid_6']],
+        ]);
+        $event->data->object = StripeObject::constructFrom([
+            'id' => 'in_paid_6',
+            'billing_reason' => 'subscription_create',
+            'subscription' => 'sub_paid_006',
+        ]);
+        $stripeService = Mockery::mock(StripeService::class);
+        $stripeService->shouldReceive('verifyWebhookSignature')->twice()->andReturn($event);
+        $this->app->instance(StripeService::class, $stripeService);
+
+        $this->postJson('/stripe/webhook', [], ['HTTP_STRIPE_SIGNATURE' => 'valid_sig'])->assertStatus(200);
+        $this->postJson('/stripe/webhook', [], ['HTTP_STRIPE_SIGNATURE' => 'valid_sig'])->assertStatus(200);
+
+        $this->assertDatabaseHas('orders', ['id' => $order->id, 'payment_status' => 'paid']);
+        $this->assertSame(1, ProcessedWebhookEvent::where('stripe_event_id', 'evt_paid_006')->count());
     }
 
     // ──────────────────────────────────────────────────────────────────
@@ -215,7 +401,7 @@ class StripeWebhookControllerTest extends TestCase
         $response->assertStatus(200);
         $this->assertDatabaseHas('services', [
             'service_id' => $service->service_id,
-            'status' => 'cancelled',
+            'status' => 'Cancelled',
         ]);
     }
 
@@ -309,10 +495,10 @@ class StripeWebhookControllerTest extends TestCase
         ]);
         $response->assertStatus(200);
 
-        // Stock decremented once
+        // Stock unchanged by fulfilment
         $this->assertDatabaseHas('products', [
             'id' => $product->id,
-            'stock_quantity' => 9,
+            'stock_quantity' => 10,
         ]);
 
         // Second processing with same event_id — should be skipped
@@ -321,10 +507,10 @@ class StripeWebhookControllerTest extends TestCase
         ]);
         $response->assertStatus(200);
 
-        // Stock should NOT be decremented again
+        // Still unchanged after the duplicate delivery
         $this->assertDatabaseHas('products', [
             'id' => $product->id,
-            'stock_quantity' => 9,
+            'stock_quantity' => 10,
         ]);
     }
 
@@ -347,16 +533,29 @@ class StripeWebhookControllerTest extends TestCase
     }
 
     // ──────────────────────────────────────────────────────────────────
-    // Requirement 10.2, 10.3: Transaction failure removes event_id
+    // Requirements 6.1-6.6: transactional, exactly-once processing
     // ──────────────────────────────────────────────────────────────────
 
-    public function test_transaction_failure_removes_event_id_for_retry(): void
+    public function test_stripe_event_id_column_is_unique(): void
+    {
+        ProcessedWebhookEvent::create([
+            'stripe_event_id' => 'evt_unique_001',
+            'event_type' => 'x',
+            'processed_at' => now(),
+        ]);
+
+        $this->expectException(\Illuminate\Database\UniqueConstraintViolationException::class);
+
+        ProcessedWebhookEvent::create([
+            'stripe_event_id' => 'evt_unique_001',
+            'event_type' => 'x',
+            'processed_at' => now(),
+        ]);
+    }
+
+    public function test_handler_failure_rolls_back_changes_and_marker_and_returns_500(): void
     {
         $customer = Customer::factory()->create();
-
-        // Create a product with zero stock to trigger a RuntimeException in fulfilment
-        $product = Product::factory()->oneOff()->create(['stock_quantity' => 0]);
-
         $order = Order::create([
             'company_id' => $customer->company_id,
             'payment_status' => 'pending',
@@ -364,27 +563,139 @@ class StripeWebhookControllerTest extends TestCase
             'stripe_checkout_session_id' => 'cs_fail_test',
             'total_amount' => 29.99,
         ]);
-
         OrderItem::create([
             'order_id' => $order->id,
-            'product_id' => $product->id,
-            'product_name' => $product->name,
+            'product_name' => 'Thing',
             'product_type' => 'one_off',
             'price' => 29.99,
         ]);
 
+        $fulfilment = Mockery::mock(FulfilmentService::class);
+        $fulfilment->shouldReceive('handleOneOffPurchase')->andThrow(new \RuntimeException('boom'));
+        $this->app->instance(FulfilmentService::class, $fulfilment);
+
         $this->mockStripeEvent('checkout.session.completed', ['id' => 'cs_fail_test'], 'evt_fail_001');
 
-        // The exception should propagate (Stripe expects non-200 for retry)
-        $response = $this->postJson('/stripe/webhook', [], [
-            'HTTP_STRIPE_SIGNATURE' => 'valid_sig',
+        $this->postJson('/stripe/webhook', [], ['HTTP_STRIPE_SIGNATURE' => 'valid_sig'])
+            ->assertStatus(500);
+
+        // Order update and marker both rolled back so Stripe can retry
+        $this->assertDatabaseHas('orders', ['id' => $order->id, 'payment_status' => 'pending']);
+        $this->assertDatabaseMissing('processed_webhook_events', ['stripe_event_id' => 'evt_fail_001']);
+    }
+
+    public function test_unique_violation_on_marker_returns_200_and_skips_processing(): void
+    {
+        $customer = Customer::factory()->create();
+        $order = Order::create([
+            'company_id' => $customer->company_id,
+            'payment_status' => 'pending',
+            'fulfilment_status' => 'pending',
+            'stripe_checkout_session_id' => 'cs_skip_test',
+            'total_amount' => 29.99,
+        ]);
+        ProcessedWebhookEvent::create([
+            'stripe_event_id' => 'evt_skip_001',
+            'event_type' => 'checkout.session.completed',
+            'processed_at' => now(),
         ]);
 
-        $response->assertStatus(500);
+        $this->mockStripeEvent('checkout.session.completed', ['id' => 'cs_skip_test'], 'evt_skip_001');
 
-        // Event ID should have been removed to allow Stripe to retry
-        $this->assertDatabaseMissing('processed_webhook_events', [
-            'stripe_event_id' => 'evt_fail_001',
+        $this->postJson('/stripe/webhook', [], ['HTTP_STRIPE_SIGNATURE' => 'valid_sig'])
+            ->assertStatus(200);
+
+        $this->assertDatabaseHas('orders', ['id' => $order->id, 'payment_status' => 'pending']);
+        $this->assertSame(1, ProcessedWebhookEvent::where('stripe_event_id', 'evt_skip_001')->count());
+    }
+
+    public function test_payment_failed_email_is_sent_after_commit_once_for_duplicate_delivery(): void
+    {
+        Mail::fake();
+
+        $admin = User::factory()->create(['is_admin' => true]);
+        $customer = Customer::factory()->create();
+        Service::create([
+            'company_id' => $customer->company_id,
+            'service_short' => 'Hosting Plan',
+            'status' => 'Active',
+            'start_date' => now(),
+            'service_monthly_charge' => 9.99,
+            'service_payment_frequency' => 'monthly',
+            'stripe_subscription_id' => 'sub_mail_001',
         ]);
+        $order = Order::create([
+            'company_id' => $customer->company_id,
+            'payment_status' => 'paid',
+            'fulfilment_status' => 'pending',
+            'stripe_checkout_session_id' => 'cs_mail_001',
+            'total_amount' => 9.99,
+        ]);
+        OrderItem::create([
+            'order_id' => $order->id,
+            'product_name' => 'Hosting',
+            'product_type' => 'hosting',
+            'price' => 9.99,
+            'stripe_subscription_id' => 'sub_mail_001',
+        ]);
+
+        $event = Event::constructFrom([
+            'id' => 'evt_mail_001',
+            'type' => 'invoice.payment_failed',
+            'data' => ['object' => ['id' => 'in_1']],
+        ]);
+        $event->data->object = StripeObject::constructFrom(['id' => 'in_1', 'subscription' => 'sub_mail_001']);
+
+        $stripeService = Mockery::mock(StripeService::class);
+        $stripeService->shouldReceive('verifyWebhookSignature')->twice()->andReturn($event);
+        $this->app->instance(StripeService::class, $stripeService);
+
+        $this->postJson('/stripe/webhook', [], ['HTTP_STRIPE_SIGNATURE' => 'valid_sig'])->assertStatus(200);
+        Mail::assertQueued(PaymentFailedAdmin::class, 1);
+
+        $this->postJson('/stripe/webhook', [], ['HTTP_STRIPE_SIGNATURE' => 'valid_sig'])->assertStatus(200);
+        Mail::assertQueued(PaymentFailedAdmin::class, 1);
+    }
+
+    public function test_after_commit_failure_is_isolated_and_keeps_committed_work(): void
+    {
+        Mail::fake();
+
+        User::factory()->create(['is_admin' => true]);
+        $customer = Customer::factory()->create();
+        Service::create([
+            'company_id' => $customer->company_id,
+            'service_short' => 'Hosting Plan',
+            'status' => 'Active',
+            'start_date' => now(),
+            'service_monthly_charge' => 9.99,
+            'service_payment_frequency' => 'monthly',
+            'stripe_subscription_id' => 'sub_mail_002',
+        ]);
+        $order = Order::create([
+            'company_id' => $customer->company_id,
+            'payment_status' => 'paid',
+            'fulfilment_status' => 'pending',
+            'stripe_checkout_session_id' => 'cs_mail_002',
+            'total_amount' => 9.99,
+        ]);
+        OrderItem::create([
+            'order_id' => $order->id,
+            'product_name' => 'Hosting',
+            'product_type' => 'hosting',
+            'price' => 9.99,
+            'stripe_subscription_id' => 'sub_mail_002',
+        ]);
+
+        $notification = Mockery::mock(NotificationService::class);
+        $notification->shouldReceive('notifyPaymentFailure')->once()->andThrow(new \RuntimeException('smtp down'));
+        $this->app->instance(NotificationService::class, $notification);
+
+        $this->mockStripeEvent('invoice.payment_failed', ['id' => 'in_2', 'subscription' => 'sub_mail_002'], 'evt_mail_002');
+
+        // After-commit failure is reported but does not undo the committed work
+        $this->postJson('/stripe/webhook', [], ['HTTP_STRIPE_SIGNATURE' => 'valid_sig'])->assertStatus(200);
+        $this->assertDatabaseHas('processed_webhook_events', ['stripe_event_id' => 'evt_mail_002']);
+        Mail::assertNothingQueued();
     }
 }

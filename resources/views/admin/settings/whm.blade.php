@@ -94,12 +94,12 @@
 
                         {{-- Default Package --}}
                         <div>
-                            <label for="whm_default_package" class="block text-sm font-medium text-gray-700">Default Hosting Package</label>
+                            <label for="whm_default_package" class="block text-sm font-medium text-gray-700">Default Hosting Package (unused)</label>
                             <input type="text" name="whm_default_package" id="whm_default_package"
                                    value="{{ old('whm_default_package', $settings['whm_default_package']) }}"
                                    placeholder="default"
                                    class="mt-1 block w-full max-w-md rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                            <p class="text-xs text-gray-500 mt-1">The cPanel package name to use when provisioning new accounts.</p>
+                            <p class="text-xs text-gray-500 mt-1">Unused for provisioning. Each hosting product's own WHM package is used instead; this stored value is kept for reference only.</p>
                             @error('whm_default_package') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
                         </div>
 

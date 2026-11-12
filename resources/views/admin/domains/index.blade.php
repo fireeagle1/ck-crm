@@ -8,21 +8,42 @@
         </a>
     </div>
 
+    <form method="GET" action="{{ route('admin.domains.index') }}" class="mb-4 max-w-md flex items-end gap-2">
+        <input type="hidden" name="filter" value="{{ $filter }}">
+        <div class="flex-1">
+            <x-customer-picker name="customer" id="customer_filter" label="Filter by customer" empty-label="All customers" :selected="$selectedCustomer" />
+        </div>
+        <button type="submit" class="px-3 py-2 border rounded-md text-sm font-medium hover:bg-gray-50">Apply</button>
+    </form>
+
     {{-- Filter pills --}}
-    <div class="flex gap-2 mb-4">
-        <a href="{{ route('admin.domains.index', ['filter' => 'all']) }}"
+    <nav aria-label="Domain filters" class="flex flex-wrap gap-2 mb-4">
+        <a href="{{ route('admin.domains.index', ['filter' => 'all', 'customer' => $selectedCustomer?->company_id]) }}"
+           @if ($filter === 'all') aria-current="page" @endif
            class="px-3 py-1.5 rounded-md text-sm font-medium {{ $filter === 'all' ? 'bg-blue-600 text-white' : 'border hover:bg-gray-50' }}">
             All ({{ $totalDomains }})
         </a>
-        <a href="{{ route('admin.domains.index', ['filter' => 'expiring']) }}"
+        <a href="{{ route('admin.domains.index', ['filter' => 'expiring', 'customer' => $selectedCustomer?->company_id]) }}"
+           @if ($filter === 'expiring') aria-current="page" @endif
            class="px-3 py-1.5 rounded-md text-sm font-medium {{ $filter === 'expiring' ? 'bg-amber-600 text-white' : 'border hover:bg-gray-50' }}">
             Expiring ({{ $expiringCount }})
         </a>
-        <a href="{{ route('admin.domains.index', ['filter' => 'expired']) }}"
+        <a href="{{ route('admin.domains.index', ['filter' => 'expired', 'customer' => $selectedCustomer?->company_id]) }}"
+           @if ($filter === 'expired') aria-current="page" @endif
            class="px-3 py-1.5 rounded-md text-sm font-medium {{ $filter === 'expired' ? 'bg-red-600 text-white' : 'border hover:bg-gray-50' }}">
             Expired ({{ $expiredCount }})
         </a>
-    </div>
+        <a href="{{ route('admin.domains.index', ['filter' => 'unassigned', 'customer' => $selectedCustomer?->company_id]) }}"
+           @if ($filter === 'unassigned') aria-current="page" @endif
+           class="px-3 py-1.5 rounded-md text-sm font-medium {{ $filter === 'unassigned' ? 'bg-gray-700 text-white' : 'border hover:bg-gray-50' }}">
+            Unassigned ({{ $unassignedCount }})
+        </a>
+        <a href="{{ route('admin.domains.index', ['filter' => 'missing', 'customer' => $selectedCustomer?->company_id]) }}"
+           @if ($filter === 'missing') aria-current="page" @endif
+           class="px-3 py-1.5 rounded-md text-sm font-medium {{ $filter === 'missing' ? 'bg-purple-600 text-white' : 'border hover:bg-gray-50' }}">
+            Missing from eNom ({{ $missingCount }})
+        </a>
+    </nav>
 
     <div class="bg-white rounded-lg shadow-sm border overflow-hidden">
         <table class="min-w-full text-sm">
@@ -43,14 +64,27 @@
                         $daysLeft = $domain->expiry_date ? (int) now()->diffInDays($domain->expiry_date, false) : null;
                     @endphp
                     <tr class="hover:bg-gray-50">
-                        <td class="px-4 py-3 font-medium">{{ $domain->domain_name }}</td>
+                        <td class="px-4 py-3 font-medium">
+                            {{ $domain->domain_name }}
+                            @if ($domain->status === \App\Models\Domain::STATUS_MISSING_FROM_ENOM)
+                                <x-status-badge type="domain-sync" :status="$domain->status" class="ml-2" />
+                            @endif
+                        </td>
                         <td class="px-4 py-3 text-gray-500">
                             @if ($domain->customer)
                                 <a href="{{ route('admin.customers.show', $domain->customer) }}" class="text-blue-600 hover:underline">
                                     {{ $domain->customer->company_name }}
                                 </a>
                             @else
-                                Unassigned
+                                <form method="POST" action="{{ route('admin.domains.assign', $domain) }}" class="flex items-end gap-2">
+                                    @csrf
+                                    <div class="min-w-[12rem]">
+                                        <x-customer-picker name="company_id" :id="'assign_' . $domain->id"
+                                            :label="'Assign ' . $domain->domain_name . ' to customer'" empty-label="Unassigned" />
+                                    </div>
+                                    <button type="submit" class="px-3 py-2 border rounded-md text-sm font-medium hover:bg-gray-50"
+                                            aria-label="Assign {{ $domain->domain_name }}">Assign</button>
+                                </form>
                             @endif
                         </td>
                         <td class="px-4 py-3 text-gray-500">{{ $domain->registrar ?? '—' }}</td>

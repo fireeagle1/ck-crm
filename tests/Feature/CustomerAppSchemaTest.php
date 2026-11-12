@@ -167,4 +167,57 @@ class CustomerAppSchemaTest extends TestCase
         $this->assertSame(0, DB::table('app_packages')->where('customer_app_id', $customerAppId)->count(), 'app_packages row was not cascade-deleted');
         $this->assertSame(0, DB::table('security_findings')->where('customer_app_id', $customerAppId)->count(), 'security_findings row was not cascade-deleted');
     }
+
+    public function test_domain_id_and_public_id_columns_and_indexes_exist(): void
+    {
+        $this->assertTrue(Schema::hasColumns('customer_apps', ['domain_id', 'public_id']));
+
+        $uniquePublicId = collect(Schema::getIndexes('customer_apps'))
+            ->contains(fn (array $i): bool => $i['unique'] && $i['columns'] === ['public_id']);
+        $this->assertTrue($uniquePublicId, 'customer_apps.public_id must be unique');
+    }
+
+    public function test_creating_hook_assigns_public_id_and_domain_relation_resolves(): void
+    {
+        $companyId = DB::table('customers')->insertGetId([
+            'company_name' => 'Acme Ltd', 'created_at' => now(), 'updated_at' => now(),
+        ], 'company_id');
+        $serviceId = DB::table('services')->insertGetId([
+            'company_id' => $companyId, 'service_short' => 'App', 'status' => 'Active',
+            'created_at' => now(), 'updated_at' => now(),
+        ], 'service_id');
+
+        $app = \App\Models\CustomerApp::create(['service_id' => $serviceId]);
+
+        $this->assertSame(26, strlen($app->fresh()->public_id));
+        $this->assertSame(strtolower($app->public_id), $app->public_id);
+        $this->assertNull($app->domain);
+    }
+
+    public function test_migration_backfills_null_public_ids_in_chunks(): void
+    {
+        $companyId = DB::table('customers')->insertGetId([
+            'company_name' => 'Acme Ltd', 'created_at' => now(), 'updated_at' => now(),
+        ], 'company_id');
+        $ids = [];
+        for ($i = 0; $i < 3; $i++) {
+            $sid = DB::table('services')->insertGetId([
+                'company_id' => $companyId, 'service_short' => "App {$i}", 'status' => 'Active',
+                'created_at' => now(), 'updated_at' => now(),
+            ], 'service_id');
+            $ids[] = DB::table('customer_apps')->insertGetId([
+                'service_id' => $sid, 'public_id' => null,
+                'created_at' => now(), 'updated_at' => now(),
+            ]);
+        }
+
+        $migration = require database_path('migrations/2026_10_30_100014_add_domain_and_public_id_to_customer_apps_table.php');
+        $migration->up(); // idempotent; backfills NULL rows
+
+        $values = DB::table('customer_apps')->whereIn('id', $ids)->pluck('public_id')->all();
+        $this->assertCount(3, array_unique($values));
+        foreach ($values as $v) {
+            $this->assertSame(26, strlen($v));
+        }
+    }
 }

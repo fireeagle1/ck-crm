@@ -70,8 +70,8 @@ final class RecordAppFindingsTool
     /**
      * Handle a `record_app_findings` tool call.
      *
-     * Expects the validated `params.arguments` map: a required integer `app_id`
-     * identifying the Web App, plus `packages` and `findings` arrays. Either
+     * Expects the validated `params.arguments` map: a required string `app_id`
+     * (the CustomerApp `public_id`) identifying the Web App, plus `packages` and `findings` arrays. Either
      * array may be empty (an empty `findings` array with packages records a
      * clean review); both default to empty when omitted.
      *
@@ -83,13 +83,13 @@ final class RecordAppFindingsTool
      */
     public function handle(array $arguments): array
     {
-        $appId = (int) ($arguments['app_id'] ?? 0);
+        $appId = trim((string) ($arguments['app_id'] ?? ''));
 
         $packages = array_values((array) ($arguments['packages'] ?? []));
         $findings = array_values((array) ($arguments['findings'] ?? []));
 
         try {
-            $counts = $this->ingestService->ingest((string) $appId, $packages, $findings);
+            $counts = $this->ingestService->ingest($appId, $packages, $findings);
         } catch (UnknownCustomerAppException $e) {
             return $this->notFoundError($appId);
         } catch (InvalidFindingsPayloadException $e) {
@@ -108,12 +108,12 @@ final class RecordAppFindingsTool
      *
      * @return array<string, mixed>
      */
-    private function notFoundError(int $appId): array
+    private function notFoundError(string $appId): array
     {
         return [
             'error' => [
                 'code' => self::ERR_NOT_FOUND,
-                'message' => sprintf('Web app %d does not exist.', $appId),
+                'message' => sprintf('Web app %s does not exist.', $appId),
                 'fields' => [
                     'app_id' => ['The selected app_id does not exist.'],
                 ],

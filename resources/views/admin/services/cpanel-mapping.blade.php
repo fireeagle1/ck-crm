@@ -9,6 +9,10 @@
         <a href="{{ route('admin.services.index') }}" class="text-sm text-blue-600 hover:underline">&larr; Services</a>
     </div>
 
+    @if (!empty($whmError))
+        <div class="bg-amber-50 border border-amber-200 text-amber-900 rounded-lg p-4 mb-6 text-sm" role="alert">{{ $whmError }}</div>
+    @endif
+
     {{-- WHM Accounts available --}}
     @if (!empty($whmAccounts))
         <div class="bg-white rounded-lg border p-5 mb-6">

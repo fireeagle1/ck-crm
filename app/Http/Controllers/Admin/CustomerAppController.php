@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\CustomerApp;
+use App\Models\Domain;
 use App\Models\Service;
+use App\Services\CustomerAppService;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -20,7 +22,7 @@ class CustomerAppController extends Controller
         $search = trim((string) $request->query('q', ''));
 
         $customerApps = CustomerApp::query()
-            ->with(['service.customer'])
+            ->with(['service.customer', 'domain'])
             ->withCount(['packages', 'findings', 'openFindings'])
             ->when($search !== '', function ($query) use ($search) {
                 $query->where(function ($inner) use ($search) {
@@ -61,25 +63,33 @@ class CustomerAppController extends Controller
      */
     public function create(Service $service): View
     {
-        $service->load('customer');
+        $service->load(['customer', 'domain']);
 
-        return view('admin.customer-apps.create', compact('service'));
+        // Prefill from the service's linked Domain (Req 16.6, 21.2).
+        $domain = $service->domain;
+        $domains = Domain::query()
+            ->where('company_id', $service->company_id)
+            ->orderBy('domain_name')
+            ->get();
+        if ($domain && ! $domains->contains('id', $domain->id)) {
+            $domains->push($domain);
+        }
+        $defaultInstallUrl = $domain ? 'https://'.$domain->domain_name : null;
+
+        return view('admin.customer-apps.create', compact('service', 'domain', 'domains', 'defaultInstallUrl'));
     }
 
     /**
      * Persist a new CustomerApp for the given Service.
      *
-     * Rejects the create when the service already has a linked app (Req 1.4);
-     * the DB unique index on customer_apps.service_id is the backstop.
+     * A duplicate create surfaces as a ValidationException on `service_id`
+     * from CustomerAppService (Req 1.4, 16.3); the DB unique index is the
+     * source of truth, so there is no check-then-insert pre-check here.
      */
-    public function store(Request $request, Service $service)
+    public function store(Request $request, Service $service, CustomerAppService $customerApps)
     {
-        if ($service->customerApp()->exists()) {
-            return back()->withInput()
-                ->with('error', 'This service already has a linked app.');
-        }
-
         $validated = $request->validate([
+            'domain_id' => 'nullable|integer|exists:domains,id',
             'display_name' => 'nullable|string|max:255',
             'install_url' => 'nullable|url|max:255',
             'repo_url' => 'nullable|url|max:255',
@@ -87,13 +97,9 @@ class CustomerAppController extends Controller
             'codebase_info' => 'nullable|string',
         ]);
 
-        $customerApp = $service->customerApp()->create([
-            'display_name' => $validated['display_name'] ?? null,
-            'install_url' => $validated['install_url'] ?? null,
-            'repo_url' => $validated['repo_url'] ?? null,
-            'hosting_location' => $validated['hosting_location'] ?? null,
-            'codebase_info' => $validated['codebase_info'] ?? null,
-        ]);
+        $domain = isset($validated['domain_id']) ? Domain::find($validated['domain_id']) : null;
+
+        $customerApp = $customerApps->createForService($service, $validated, $domain);
 
         return redirect()->route('admin.customer-apps.show', $customerApp)
             ->with('success', 'App created.');
@@ -105,13 +111,13 @@ class CustomerAppController extends Controller
      */
     public function show(CustomerApp $customerApp): View
     {
-        $customerApp->load(['service.customer', 'packages', 'findings']);
+        $customerApp->load(['service.customer', 'domain', 'packages', 'findings']);
 
         return view('admin.customer-apps.show', compact('customerApp'));
     }
 
     /**
-     * Show the form for editing the three editable technical fields.
+     * Show the form for editing the editable app fields.
      */
     public function edit(CustomerApp $customerApp): View
     {
@@ -121,7 +127,8 @@ class CustomerAppController extends Controller
     }
 
     /**
-     * Update only repo_url, hosting_location, codebase_info (Req 4.2);
+     * Update only display_name, install_url, repo_url, hosting_location and
+     * codebase_info (Req 4.2);
      * billing and service identity stay on the Service record.
      */
     public function update(Request $request, CustomerApp $customerApp)

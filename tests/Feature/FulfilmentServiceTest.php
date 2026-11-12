@@ -10,7 +10,11 @@ use App\Models\Product;
 use App\Models\Service;
 use App\Services\BookingService;
 use App\Services\FulfilmentService;
+use App\Services\HostingServiceCreator;
+use App\Jobs\ProvisionHostingJob;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Bus;
+use Mockery;
 use RuntimeException;
 use Tests\TestCase;
 
@@ -19,10 +23,8 @@ use Tests\TestCase;
  *
  * **Validates: Requirements 3.1, 5.4, 6.4, 10.1, 10.2, 10.3**
  *
- * Property 13: Stock Decrements by Exactly One Per Stockable Item Ordered
- * For any Order created containing a stockable Product (one_off or equipment_rental),
- * the Product's stock_quantity SHALL decrease by exactly one per OrderItem referencing
- * that Product.
+ * Property 13: Fulfilment Leaves Stock Unchanged
+ * Handling purchases and fulfilling orders SHALL NOT change any Product's stock_quantity.
  *
  * Property 14: Hosting Service Created With Pending Status and Domain Name
  * For any Hosting Product payment completed, the resulting Service record SHALL have
@@ -30,7 +32,7 @@ use Tests\TestCase;
  *
  * Property 15: Equipment Rental Creates Booking via BookingService
  * For any Equipment Rental Product payment completed, a Booking record SHALL be created
- * with status "active", linked to the OrderItem, with correct dates and quantity.
+ * linked to the OrderItem, with correct dates and quantity.
  *
  * Property 6: Transactional Atomicity
  * For any fulfilment operation, if any sub-step fails, then NO records from that
@@ -46,6 +48,8 @@ class FulfilmentServiceTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+
+        Bus::fake([ProvisionHostingJob::class]);
 
         $this->service = app(FulfilmentService::class);
 
@@ -72,76 +76,18 @@ class FulfilmentServiceTest extends TestCase
     }
 
     // ──────────────────────────────────────────────────────────────────
-    // Property 13: Stock Decrements by Exactly One Per Stockable Item Ordered
+    // Property 13: Fulfilment Leaves Stock Unchanged
     // ──────────────────────────────────────────────────────────────────
 
     /**
-     * **Validates: Requirements 5.4**
+     * **Validates: Requirements 4.2, 4.3**
      *
-     * Property 13: One-off purchase decrements stock by exactly one.
+     * One-off purchase handling does not change stock.
      */
-    public function test_property_one_off_purchase_decrements_stock_by_exactly_one(): void
+    public function test_property_fulfilment_leaves_stock_unchanged_for_one_off(): void
     {
-        $product = Product::factory()->oneOff()->create([
-            'stock_quantity' => 10,
-        ]);
-
-        $item = $this->createOrderWithItem([
-            'product_id' => $product->id,
-            'product_name' => $product->name,
-            'product_type' => 'one_off',
-            'price' => $product->price,
-        ]);
-
-        $this->service->handleOneOffPurchase($item);
-
-        $product->refresh();
-        $this->assertEquals(9, $product->stock_quantity);
-    }
-
-    /**
-     * **Validates: Requirements 5.4**
-     *
-     * Property 13: Equipment rental purchase decrements stock by exactly one.
-     */
-    public function test_property_equipment_rental_purchase_decrements_stock_by_exactly_one(): void
-    {
-        $product = Product::factory()->equipmentRental()->create([
-            'stock_quantity' => 10,
-        ]);
-
-        $item = $this->createOrderWithItem([
-            'product_id' => $product->id,
-            'product_name' => $product->name,
-            'product_type' => 'equipment_rental',
-            'price' => $product->price,
-            'billing_frequency' => $product->billing_frequency,
-            'stripe_subscription_id' => 'sub_equip_test',
-            'rental_start_date' => now()->addDay()->toDateString(),
-            'rental_end_date' => now()->addDays(7)->toDateString(),
-            'quantity' => 1,
-        ]);
-
-        $this->service->handleEquipmentRentalPurchase($item, $this->customer);
-
-        $product->refresh();
-        $this->assertEquals(9, $product->stock_quantity);
-    }
-
-    /**
-     * **Validates: Requirements 5.4**
-     *
-     * Property 13 (property-based): For random initial stock quantities,
-     * stock always decrements by exactly 1 after a one-off purchase.
-     */
-    public function test_property_stock_decrements_by_exactly_one_for_various_quantities(): void
-    {
-        $stockQuantities = [1, 2, 5, 10, 25, 50, 99, 100];
-
-        foreach ($stockQuantities as $initialStock) {
-            $product = Product::factory()->oneOff()->create([
-                'stock_quantity' => $initialStock,
-            ]);
+        foreach ([1, 10, 100, null] as $initialStock) {
+            $product = Product::factory()->oneOff()->create(['stock_quantity' => $initialStock]);
 
             $item = $this->createOrderWithItem([
                 'product_id' => $product->id,
@@ -152,90 +98,38 @@ class FulfilmentServiceTest extends TestCase
 
             $this->service->handleOneOffPurchase($item);
 
-            $product->refresh();
-            $this->assertEquals(
-                $initialStock - 1,
-                $product->stock_quantity,
-                "Expected stock to decrement from {$initialStock} to " . ($initialStock - 1)
-            );
+            $this->assertSame($initialStock, $product->fresh()->stock_quantity);
         }
     }
 
     /**
-     * **Validates: Requirements 5.4**
+     * **Validates: Requirements 4.2, 4.3**
      *
-     * Property 13: Product with null stock (unlimited) does NOT get decremented.
+     * Equipment rental handling and fulfilOrder do not change stock.
      */
-    public function test_property_null_stock_product_is_not_decremented(): void
+    public function test_property_fulfilment_leaves_stock_unchanged_for_rental(): void
     {
-        $product = Product::factory()->hosting()->create([
-            'stock_quantity' => null,
-        ]);
+        $product = Product::factory()->equipmentRental()->create(['stock_quantity' => 10]);
 
         $item = $this->createOrderWithItem([
             'product_id' => $product->id,
             'product_name' => $product->name,
-            'product_type' => 'hosting',
+            'product_type' => 'equipment_rental',
             'price' => $product->price,
-            'billing_frequency' => $product->billing_frequency,
-            'stripe_subscription_id' => 'sub_hosting_null_stock',
+            'rental_start_date' => now()->addDay()->toDateString(),
+            'rental_end_date' => now()->addDays(7)->toDateString(),
+            'quantity' => 1,
         ]);
 
-        // Directly call decrementStock to verify null stock is not decremented
-        $this->service->decrementStock($product);
+        $this->service->handleEquipmentRentalPurchase($item, $this->customer);
+        $this->service->fulfilOrder($item->order);
 
-        $product->refresh();
-        $this->assertNull($product->stock_quantity);
+        $this->assertSame(10, $product->fresh()->stock_quantity);
     }
 
-    /**
-     * **Validates: Requirements 5.4**
-     *
-     * Property 13: Product at stock_quantity=0 throws RuntimeException.
-     */
-    public function test_property_zero_stock_throws_runtime_exception(): void
+    public function test_decrement_stock_no_longer_exists(): void
     {
-        $product = Product::factory()->oneOff()->create([
-            'stock_quantity' => 0,
-        ]);
-
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage("Product \"{$product->name}\" is out of stock.");
-
-        $this->service->decrementStock($product);
-    }
-
-    /**
-     * **Validates: Requirements 5.4**
-     *
-     * Property 13 (property-based): For various stockable product types,
-     * stock always decrements by exactly 1.
-     */
-    public function test_property_stock_decrements_for_all_stockable_product_types(): void
-    {
-        $scenarios = [
-            ['factory' => 'oneOff', 'stock' => 15, 'type' => 'one_off'],
-            ['factory' => 'equipmentRental', 'stock' => 8, 'type' => 'equipment_rental'],
-            ['factory' => 'oneOff', 'stock' => 1, 'type' => 'one_off'],
-            ['factory' => 'equipmentRental', 'stock' => 50, 'type' => 'equipment_rental'],
-        ];
-
-        foreach ($scenarios as $scenario) {
-            $product = Product::factory()->{$scenario['factory']}()->create([
-                'stock_quantity' => $scenario['stock'],
-            ]);
-
-            $stockBefore = $product->stock_quantity;
-
-            $this->service->decrementStock($product);
-
-            $product->refresh();
-            $this->assertEquals(
-                $stockBefore - 1,
-                $product->stock_quantity,
-                "Stock decrement failed for {$scenario['type']} product with initial stock {$scenario['stock']}"
-            );
-        }
+        $this->assertFalse(method_exists(FulfilmentService::class, 'decrementStock'));
     }
 
     // ──────────────────────────────────────────────────────────────────
@@ -266,7 +160,8 @@ class FulfilmentServiceTest extends TestCase
 
         $service = $this->service->handleHostingPurchase($item, $this->customer);
 
-        $this->assertEquals('pending', $service->status);
+        $this->assertEquals('Pending', $service->status);
+        $this->assertEquals('Web Hosting', $service->service_type);
         $this->assertEquals('example.com', $service->domain_name);
     }
 
@@ -457,7 +352,8 @@ class FulfilmentServiceTest extends TestCase
             $service = $this->service->handleHostingPurchase($item, $this->customer);
 
             // Verify all fields per Property 14 (updated for pending flow)
-            $this->assertEquals('pending', $service->status, "Service status should be pending for {$config['name']}");
+            $this->assertEquals('Pending', $service->status, "Service status should be Pending for {$config['name']}");
+            $this->assertEquals('Web Hosting', $service->service_type);
             $this->assertEquals($config['domain'], $service->domain_name, "domain_name mismatch for {$config['name']}");
             $this->assertEquals($config['name'], $service->service_short, "service_short mismatch for {$config['name']}");
             $this->assertTrue($service->start_date->isToday(), "start_date should be today for {$config['name']}");
@@ -475,6 +371,65 @@ class FulfilmentServiceTest extends TestCase
         }
     }
 
+    public function test_hosting_purchase_is_idempotent_across_repeated_calls(): void
+    {
+        $item = $this->createOrderWithItem([
+            'product_name' => 'Web Hosting',
+            'product_type' => 'hosting',
+            'billing_frequency' => 'monthly',
+            'domain_name' => 'Repeat-Example.COM',
+        ]);
+
+        $first = $this->service->handleHostingPurchase($item, $this->customer);
+        $second = $this->service->handleHostingPurchase($item->fresh(), $this->customer);
+
+        $this->assertSame($first->service_id, $second->service_id);
+        $this->assertEquals(1, Service::where('order_item_id', $item->id)->count());
+        $this->assertEquals('repeat-example.com', $first->domain_name);
+        $this->assertEquals('awaiting_fulfilment', $item->order->fresh()->fulfilment_status);
+    }
+
+    public function test_hosting_purchase_dispatches_exactly_one_provisioning_job_across_redeliveries(): void
+    {
+        $item = $this->createOrderWithItem(['product_type' => 'hosting', 'domain_name' => 'dispatch-once.com']);
+
+        $first = $this->service->handleHostingPurchase($item, $this->customer);
+        $this->service->handleHostingPurchase($item->fresh(), $this->customer);
+        $this->service->handleHostingPurchase($item->fresh(), $this->customer);
+
+        $this->assertSame('queued', $first->fresh()->provisioning_status);
+        Bus::assertDispatchedTimes(ProvisionHostingJob::class, 1);
+    }
+
+    public function test_domain_conflict_hold_does_not_dispatch_provisioning(): void
+    {
+        $first = $this->createOrderWithItem(['product_type' => 'hosting', 'domain_name' => 'held.com']);
+        $this->service->handleHostingPurchase($first, $this->customer);
+        $second = $this->createOrderWithItem(['product_type' => 'hosting', 'domain_name' => 'held.com']);
+
+        $this->assertNull($this->service->handleHostingPurchase($second, $this->customer));
+
+        Bus::assertDispatchedTimes(ProvisionHostingJob::class, 1);
+    }
+
+    public function test_hosting_purchase_holds_order_when_domain_already_in_use(): void
+    {
+        $first = $this->createOrderWithItem(['product_type' => 'hosting', 'domain_name' => 'taken.com']);
+        $holder = $this->service->handleHostingPurchase($first, $this->customer);
+
+        $second = $this->createOrderWithItem(['product_type' => 'hosting', 'domain_name' => 'TAKEN.com']);
+
+        $this->assertNull($this->service->handleHostingPurchase($second, $this->customer));
+        // Redelivery must not duplicate the note.
+        $this->assertNull($this->service->handleHostingPurchase($second->fresh(), $this->customer));
+
+        $order = $second->order->fresh();
+        $this->assertEquals('pending', $order->fulfilment_status);
+        $this->assertEquals(1, substr_count($order->admin_notes, 'taken.com'));
+        $this->assertStringContainsString("service #{$holder->service_id}", $order->admin_notes);
+        $this->assertEquals(1, Service::where('domain_name', 'taken.com')->count());
+    }
+
     // ──────────────────────────────────────────────────────────────────
     // Property 15: Equipment Rental Creates Booking via BookingService
     // ──────────────────────────────────────────────────────────────────
@@ -482,9 +437,9 @@ class FulfilmentServiceTest extends TestCase
     /**
      * **Validates: Requirements 6.4, 10.1**
      *
-     * Property 15: Equipment rental creates a Booking with status 'active'.
+     * Property 15: Equipment rental creates a Booking; a future start date leaves it 'confirmed'.
      */
-    public function test_property_equipment_rental_creates_active_booking(): void
+    public function test_property_equipment_rental_creates_confirmed_booking_for_future_start(): void
     {
         $product = Product::factory()->equipmentRental()->create([
             'stock_quantity' => 5,
@@ -504,7 +459,7 @@ class FulfilmentServiceTest extends TestCase
         $booking = $this->service->handleEquipmentRentalPurchase($item, $this->customer);
 
         $this->assertInstanceOf(Booking::class, $booking);
-        $this->assertEquals('active', $booking->status);
+        $this->assertEquals('confirmed', $booking->status);
     }
 
     /**
@@ -569,38 +524,11 @@ class FulfilmentServiceTest extends TestCase
     }
 
     /**
-     * **Validates: Requirements 6.4, 5.4**
-     *
-     * Property 15: Equipment rental decrements stock.
-     */
-    public function test_property_equipment_rental_decrements_stock(): void
-    {
-        $product = Product::factory()->equipmentRental()->create([
-            'stock_quantity' => 7,
-        ]);
-
-        $item = $this->createOrderWithItem([
-            'product_id' => $product->id,
-            'product_name' => $product->name,
-            'product_type' => 'equipment_rental',
-            'price' => $product->price,
-            'rental_start_date' => now()->addDays(1)->toDateString(),
-            'rental_end_date' => now()->addDays(5)->toDateString(),
-            'quantity' => 1,
-        ]);
-
-        $this->service->handleEquipmentRentalPurchase($item, $this->customer);
-
-        $product->refresh();
-        $this->assertEquals(6, $product->stock_quantity);
-    }
-
-    /**
      * **Validates: Requirements 10.1, 10.2, 10.3**
      *
-     * Property 6: fulfilOrder wraps in transaction — activates pending services and bookings.
+     * Property 6: fulfilOrder wraps in transaction — completes the order.
      */
-    public function test_property_fulfil_order_activates_pending_service_and_completes_order(): void
+    public function test_property_fulfil_order_leaves_pending_service_and_completes_order(): void
     {
         $product = Product::factory()->hosting()->create();
 
@@ -617,20 +545,17 @@ class FulfilmentServiceTest extends TestCase
         // First, create the hosting purchase (pending service)
         $service = $this->service->handleHostingPurchase($item, $this->customer);
 
-        $this->assertEquals('pending', $service->status);
+        $this->assertEquals('Pending', $service->status);
         $this->assertEquals('awaiting_fulfilment', $item->order->fresh()->fulfilment_status);
 
-        // Now admin fulfils the order
+        // Now admin fulfils the order (hosting service status is owned by provisioning, task 4.14)
         $this->service->fulfilOrder($item->order);
-
-        // Verify service is now Active
-        $service->refresh();
-        $this->assertEquals('Active', $service->status);
 
         // Verify order is completed with fulfilled_at timestamp
         $item->order->refresh();
         $this->assertEquals('completed', $item->order->fulfilment_status);
         $this->assertNotNull($item->order->fulfilled_at);
+        $this->assertEquals('Pending', $service->fresh()->status);
     }
 
     /**
@@ -695,38 +620,32 @@ class FulfilmentServiceTest extends TestCase
     /**
      * **Validates: Requirements 10.1, 10.2, 10.3**
      *
-     * Property 6: Transactional atomicity — on failure, no records persist.
+     * Property 6: Transactional atomicity — when the injected creator fails, no records persist.
      */
     public function test_property_transactional_rollback_on_failure(): void
     {
-        $product = Product::factory()->equipmentRental()->create([
-            'stock_quantity' => 0, // Will cause RuntimeException on stock decrement
-        ]);
+        $creator = Mockery::mock(HostingServiceCreator::class);
+        $creator->shouldReceive('forOrderItem')->once()->andThrow(new RuntimeException('creator failed'));
+        $this->app->instance(HostingServiceCreator::class, $creator);
+
+        $service = app(FulfilmentService::class);
 
         $item = $this->createOrderWithItem([
-            'product_id' => $product->id,
-            'product_name' => $product->name,
-            'product_type' => 'equipment_rental',
-            'price' => $product->price,
-            'rental_start_date' => now()->addDays(1)->toDateString(),
-            'rental_end_date' => now()->addDays(5)->toDateString(),
-            'quantity' => 1,
+            'product_type' => 'hosting',
+            'domain_name' => 'rollback.com',
         ]);
 
-        $bookingCountBefore = Booking::count();
+        $serviceCountBefore = Service::count();
 
         try {
-            $this->service->handleEquipmentRentalPurchase($item, $this->customer);
+            $service->handleHostingPurchase($item, $this->customer);
             $this->fail('Expected RuntimeException was not thrown');
         } catch (RuntimeException $e) {
-            // Expected — stock is zero
+            $this->assertSame('creator failed', $e->getMessage());
         }
 
-        // Verify no booking was created (transaction rolled back)
-        $this->assertEquals($bookingCountBefore, Booking::count());
-
-        // Verify order fulfilment_status unchanged
-        $item->order->refresh();
-        $this->assertEquals('pending', $item->order->fulfilment_status);
+        $this->assertEquals($serviceCountBefore, Service::count());
+        $this->assertEquals('pending', $item->order->fresh()->fulfilment_status);
+        $this->assertNull($item->fresh()->service_id);
     }
 }

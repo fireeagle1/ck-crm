@@ -9,6 +9,8 @@ use App\Models\Service;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
+use App\Services\CustomerAppService;
 use Tests\TestCase;
 
 /**
@@ -113,22 +115,17 @@ class OneToOneInvariantPropertyTest extends TestCase
                     'codebase_info' => 'PHP 8.3 / Laravel 13',
                 ]);
 
-                $response = $controller->store($request, $service->fresh());
+                try {
+                    $controller->store($request, $service->fresh(), new CustomerAppService);
 
-                if ($attempt === 0) {
-                    // First create succeeds and redirects to the show route.
-                    $this->assertNull(
-                        $response->getSession()?->get('error'),
-                        "first create should not be rejected for case {$case}"
+                    $this->assertSame(0, $attempt, "only the first create may succeed for case {$case}");
+                } catch (ValidationException $e) {
+                    // Every subsequent create is rejected with a service_id validation error.
+                    $this->assertGreaterThan(0, $attempt, "first create should not be rejected for case {$case}");
+                    $this->assertStringContainsStringIgnoringCase(
+                        'already has a linked app',
+                        (string) ($e->errors()['service_id'][0] ?? '')
                     );
-                } else {
-                    // Every subsequent create is rejected and the rejection is reported.
-                    $error = $response->getSession()?->get('error');
-                    $this->assertNotNull(
-                        $error,
-                        "duplicate create should be reported for case {$case} (attempt={$attempt})"
-                    );
-                    $this->assertStringContainsStringIgnoringCase('already has a linked app', (string) $error);
                     $rejectedReports++;
                 }
             }

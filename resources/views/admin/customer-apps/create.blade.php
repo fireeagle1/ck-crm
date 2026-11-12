@@ -25,11 +25,23 @@
                 </div>
 
                 <div>
+                    <label for="domain_id" class="block text-sm font-semibold text-gray-700">Domain</label>
+                    <select name="domain_id" id="domain_id"
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                        <option value="">None</option>
+                        @foreach ($domains as $d)
+                            <option value="{{ $d->id }}" @selected((string) old('domain_id', $service->domain_id) === (string) $d->id)>{{ $d->domain_name }}</option>
+                        @endforeach
+                    </select>
+                    @error('domain_id') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
+                </div>
+
+                <div>
                     <label for="install_url" class="block text-sm font-semibold text-gray-700">App / Installation URL</label>
                     <input type="url" name="install_url" id="install_url"
-                           value="{{ old('install_url') }}"
+                           value="{{ old('install_url', $defaultInstallUrl) }}"
                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                           placeholder="https://app.customer.com">
+                           placeholder="{{ $defaultInstallUrl ?? 'https://app.customer.com' }}">
                     <p class="text-xs text-gray-400 mt-1">Custom location where the app is installed. Shown to the customer and over MCP.</p>
                     @error('install_url') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
                 </div>

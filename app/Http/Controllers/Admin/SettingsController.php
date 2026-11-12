@@ -123,6 +123,7 @@ class SettingsController extends Controller
         $runnableCommands = [
             'stripe:sync' => 'Stripe Sync',
             'enom:sync' => 'eNom Domain Sync',
+            'services:normalise-data' => 'Service Data Normalisation (dry run)',
         ];
 
         return view('admin.settings.scheduled-tasks', compact('logs', 'events', 'runnableCommands'));
@@ -131,12 +132,13 @@ class SettingsController extends Controller
     public function runTask(Request $request)
     {
         $request->validate([
-            'command' => 'required|string|in:stripe:sync,enom:sync',
+            'command' => 'required|string|in:stripe:sync,enom:sync,services:normalise-data',
         ]);
 
         $command = $request->input('command');
 
         // Run with --debug for enom to capture response info
+        // services:normalise-data is always a dry run from the UI (never --apply)
         $params = $command === 'enom:sync' ? ['--debug' => true] : [];
 
         Artisan::call($command, $params);

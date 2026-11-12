@@ -20,6 +20,7 @@ final class CustomerAppDto
     {
         return [
             'id' => $app->id,
+            'public_id' => $app->public_id,
             'service_id' => $app->service_id,
             'service_short' => $app->service?->service_short,
             'company_id' => $app->service?->company_id,

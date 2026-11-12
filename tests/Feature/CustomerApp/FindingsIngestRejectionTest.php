@@ -78,7 +78,7 @@ class FindingsIngestRejectionTest extends TestCase
                 [$packages, $findings, $expectedFragments] = $this->invalidPayload($case);
 
                 try {
-                    $this->service->ingest((string) $app->id, $packages, $findings);
+                    $this->service->ingest($app->public_id, $packages, $findings);
                     $this->fail("case {$case}: expected InvalidFindingsPayloadException for invalid payload");
                 } catch (InvalidFindingsPayloadException $e) {
                     // The error must identify the invalid fields (Req 3.4, 2.2).
@@ -171,7 +171,7 @@ class FindingsIngestRejectionTest extends TestCase
             ]);
         }
 
-        $statuses = SecurityFinding::STATUSES;
+        $statuses = SecurityFinding::PAYLOAD_STATUSES;
         $findingCount = random_int(1, 5);
         for ($i = 0; $i < $findingCount; $i++) {
             SecurityFinding::create([

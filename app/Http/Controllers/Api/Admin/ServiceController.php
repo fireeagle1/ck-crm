@@ -3,12 +3,30 @@
 namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\ServiceRequest;
 use App\Models\Service;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 
 class ServiceController extends Controller
 {
+    /** Service columns the API may persist; web-only request fields are dropped. */
+    private const PERSISTED_FIELDS = [
+        'company_id',
+        'service_short',
+        'service_type',
+        'domain_name',
+        'cpanel_username',
+        'status',
+        'start_date',
+        'end_date',
+        'next_payment_date',
+        'service_monthly_charge',
+        'service_payment_frequency',
+        'stripe_subscription_id',
+    ];
+
     /**
      * Paginated list of services with optional status filter.
      */
@@ -51,21 +69,10 @@ class ServiceController extends Controller
     /**
      * Create a new service.
      */
-    public function store(Request $request): JsonResponse
+    public function store(ServiceRequest $request): JsonResponse
     {
-        $validated = $request->validate([
-            'company_id' => 'required|integer|exists:customers,company_id',
-            'service_short' => 'required|string|max:255',
-            'service_type' => 'nullable|string|max:255',
-            'domain_name' => 'nullable|string|max:255',
-            'status' => 'required|string|max:50',
-            'service_monthly_charge' => 'nullable|numeric|min:0',
-            'service_payment_frequency' => 'nullable|string|max:50',
-            'start_date' => 'nullable|date',
-            'end_date' => 'nullable|date',
-            'next_payment_date' => 'nullable|date',
-            'stripe_subscription_id' => 'nullable|string|max:255',
-        ]);
+        $validated = Arr::only($request->validated(), self::PERSISTED_FIELDS);
+        $validated['status'] ??= 'Active';
 
         $service = Service::create($validated);
 
@@ -89,21 +96,9 @@ class ServiceController extends Controller
     /**
      * Update an existing service.
      */
-    public function update(Request $request, Service $service): JsonResponse
+    public function update(ServiceRequest $request, Service $service): JsonResponse
     {
-        $validated = $request->validate([
-            'company_id' => 'sometimes|required|integer|exists:customers,company_id',
-            'service_short' => 'sometimes|required|string|max:255',
-            'service_type' => 'nullable|string|max:255',
-            'domain_name' => 'nullable|string|max:255',
-            'status' => 'sometimes|required|string|max:50',
-            'service_monthly_charge' => 'nullable|numeric|min:0',
-            'service_payment_frequency' => 'nullable|string|max:50',
-            'start_date' => 'nullable|date',
-            'end_date' => 'nullable|date',
-            'next_payment_date' => 'nullable|date',
-            'stripe_subscription_id' => 'nullable|string|max:255',
-        ]);
+        $validated = Arr::only($request->validated(), self::PERSISTED_FIELDS);
 
         $service->update($validated);
 

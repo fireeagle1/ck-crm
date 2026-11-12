@@ -29,10 +29,7 @@
                             {{ $service->customer?->company_name ?? '—' }}
                         </td>
                         <td class="px-4 py-3">
-                            <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium
-                                {{ $service->status === 'Active' ? 'bg-green-100 text-green-700' : ($service->status === 'Cancelled' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700') }}">
-                                {{ $service->status }}
-                            </span>
+                            <x-status-badge type="service" :status="$service->status" />
                         </td>
                         <td class="px-4 py-3">{{ $service->service_monthly_charge ? '£' . number_format($service->service_monthly_charge, 2) : '—' }}</td>
                         <td class="px-4 py-3 text-gray-500">{{ $service->service_payment_frequency ?? '—' }}</td>

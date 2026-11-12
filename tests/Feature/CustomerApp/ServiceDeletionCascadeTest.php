@@ -5,6 +5,7 @@ namespace Tests\Feature\CustomerApp;
 use App\Models\AppPackage;
 use App\Models\CustomerApp;
 use App\Models\Customer;
+use App\Models\Domain;
 use App\Models\SecurityFinding;
 use App\Models\Service;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -91,6 +92,21 @@ class ServiceDeletionCascadeTest extends TestCase
             // Clean slate for the next generated case.
             $service->customer()->delete();
         }
+    }
+
+    public function test_deleting_service_keeps_the_linked_domain(): void
+    {
+        $domain = Domain::factory()->create();
+        $service = $this->makeService();
+        $service->update(['domain_id' => $domain->id]);
+        $app = $this->makeCustomerApp($service);
+        $app->update(['domain_id' => $domain->id]);
+
+        $service->delete();
+
+        $this->assertDatabaseCount('customer_apps', 0);
+        $this->assertNotNull(Domain::withTrashed()->find($domain->id));
+        $this->assertNull(Domain::withTrashed()->find($domain->id)->deleted_at);
     }
 
     /**

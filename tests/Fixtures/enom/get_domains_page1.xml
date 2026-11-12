@@ -1,0 +1,46 @@
+<interface-response>
+<GetDomains>
+ <tab/>
+ <multirrp>False</multirrp>
+ <domain-list type="Registered">
+  <domain>
+   <DomainNameID>340691704</DomainNameID>
+   <sld>Example</sld>
+   <tld>com</tld>
+   <ns-status>YES</ns-status>
+   <expiration-date>7/7/2027</expiration-date>
+   <auto-renew>Yes</auto-renew>
+   <wppsstatus>disabled</wppsstatus>
+   <RRProcessor>E</RRProcessor>
+  </domain>
+  <domain>
+   <DomainNameID>152708845</DomainNameID>
+   <sld>second</sld>
+   <tld>co.uk</tld>
+   <ns-status>NA</ns-status>
+   <expiration-date>2/4/2027</expiration-date>
+   <auto-renew>No</auto-renew>
+   <wppsstatus>disabled</wppsstatus>
+   <RRProcessor>E</RRProcessor>
+  </domain>
+ </domain-list>
+ <EndPosition>2</EndPosition>
+ <PreviousRecords>0</PreviousRecords>
+ <NextRecords>3</NextRecords>
+ <OrderBy/>
+ <Result>True</Result>
+ <StartPosition>1</StartPosition>
+ <DomainCount>3</DomainCount>
+ <TotalDomainCount>3</TotalDomainCount>
+ <StartLetter/>
+</GetDomains>
+<Command>GETDOMAINS</Command>
+<Language>eng</Language>
+<ErrCount>0</ErrCount>
+<ResponseCount>0</ResponseCount>
+<Server>SJL21WRESELLT01</Server>
+<Site>eNom</Site>
+<Done>true</Done>
+<RequestDateTime>12/8/2011 4:27:04 AM</RequestDateTime>
+<debug></debug>
+</interface-response>

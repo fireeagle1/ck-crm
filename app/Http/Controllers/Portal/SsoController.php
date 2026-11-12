@@ -2,94 +2,46 @@
 
 namespace App\Http\Controllers\Portal;
 
+use App\Exceptions\WhmConnectionException;
 use App\Http\Controllers\Controller;
 use App\Models\Service;
+use App\Services\WhmService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Http;
 
 class SsoController extends Controller
 {
+    public function __construct(private WhmService $whm)
+    {
+    }
+
     /**
      * Generate a cPanel SSO session URL and redirect the user.
      */
     public function cpanel(Request $request, Service $service)
     {
-        $this->guardAccess($request, $service);
-
-        if (!$service->cpanel_username) {
-            return back()->with('error', 'No cPanel username configured for this service.');
-        }
-
-        $url = $this->createSession($service->cpanel_username, 'cpaneld');
-
-        if (!$url) {
-            return back();
-        }
-
-        return redirect($url);
+        return $this->sso($request, $service, 'cpaneld');
     }
 
     public function webmail(Request $request, Service $service)
     {
+        return $this->sso($request, $service, 'webmaild');
+    }
+
+    private function sso(Request $request, Service $service, string $whmService)
+    {
         $this->guardAccess($request, $service);
 
         if (!$service->cpanel_username) {
             return back()->with('error', 'No cPanel username configured for this service.');
         }
 
-        $url = $this->createSession($service->cpanel_username, 'webmaild');
-
-        if (!$url) {
-            return back();
+        try {
+            $url = $this->whm->createUserSession($service->cpanel_username, $whmService);
+        } catch (WhmConnectionException $e) {
+            return back()->with('error', "WHM SSO failed for '{$service->cpanel_username}': {$e->getMessage()}");
         }
 
         return redirect($url);
-    }
-
-    /**
-     * Create a WHM session URL for a given cPanel user.
-     */
-    private function createSession(string $username, string $service = 'cpaneld'): ?string
-    {
-        $host = config('services.whm.host');
-        $whmUser = config('services.whm.username');
-        $token = config('services.whm.token');
-
-        if (!$host || !$whmUser || !$token) {
-            session()->flash('error', 'WHM not configured. Set WHM_HOST, WHM_USERNAME, WHM_API_TOKEN in .env');
-            return null;
-        }
-
-        $apiUrl = "https://{$host}:2087/json-api/create_user_session";
-
-        try {
-            $response = Http::withHeaders([
-                'Authorization' => "WHM {$whmUser}:{$token}",
-            ])
-            ->withOptions([
-                'verify' => true,
-                'timeout' => 15,
-            ])
-            ->get($apiUrl, [
-                'api.version' => 1,
-                'user' => $username,
-                'service' => $service,
-            ]);
-
-            $data = $response->json();
-
-            if (($data['metadata']['result'] ?? 0) == 1 && !empty($data['data']['url'])) {
-                return $data['data']['url'];
-            }
-
-            $reason = $data['metadata']['reason'] ?? $data['errors'][0] ?? 'Unknown WHM error';
-            session()->flash('error', "WHM SSO failed for '{$username}': {$reason}");
-
-            return null;
-        } catch (\Exception $e) {
-            session()->flash('error', "WHM connection error: {$e->getMessage()}");
-            return null;
-        }
     }
 
     private function guardAccess(Request $request, Service $service): void

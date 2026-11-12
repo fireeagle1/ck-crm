@@ -212,7 +212,7 @@ class CustomerAppControllerTest extends TestCase
             ]);
 
         $response->assertRedirect(route('admin.customer-apps.create', $service));
-        $response->assertSessionHas('error', 'This service already has a linked app.');
+        $response->assertSessionHasErrors(['service_id' => 'This service already has a linked app.']);
 
         // Still exactly one app, and it is the original.
         $this->assertSame(1, CustomerApp::where('service_id', $service->service_id)->count());

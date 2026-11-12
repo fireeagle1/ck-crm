@@ -243,7 +243,8 @@ final class ToolRegistry
                 description: 'Read-only. Fetch a single web app by id, returning its '
                     .'customer-facing display_name and install_url plus technical metadata '
                     .'(repo_url, hosting_location, codebase_info) and the linked '
-                    .'service/customer identifiers. Does not modify any data.',
+                    .'service/customer identifiers and the public_id used by record_app_findings. '
+                    .'Does not modify any data.',
                 inputSchema: $this->object(
                     properties: [
                         'id' => $this->integer('The web app primary key (id).'),
@@ -257,8 +258,8 @@ final class ToolRegistry
             new ToolDefinition(
                 name: 'list_apps',
                 description: 'Read-only. List web apps, optionally filtered by service_id and/or '
-                    .'company_id (the owning customer), returning paginated technical metadata. '
-                    .'Does not modify any data.',
+                    .'company_id (the owning customer), returning paginated technical metadata '
+                    .'including each app\'s public_id. Does not modify any data.',
                 inputSchema: $this->object(
                     properties: [
                         'service_id' => $this->integer('Optional filter: the app on a single service (service_id).'),
@@ -299,14 +300,14 @@ final class ToolRegistry
                 description: 'WRITE operation. Records the result of a security review of a web '
                     .'app: the full list of packages (name + version) it uses and the security '
                     .'findings (vulnerabilities) discovered. REPLACES the app\'s stored packages '
-                    .'and findings, so always send the COMPLETE current set, not a delta; a '
+                    .'and upserts its findings by fingerprint (resolved/dismissed are kept, missing open ones become not_reported); send the COMPLETE current set, not a delta; a '
                     .'repeat of the same payload is idempotent. Send an empty findings array to '
                     .'record a clean review. Returns counts only and never echoes the detail '
                     .'back. This changes CRM data. Requires the apps:write scope. Does NOT open '
                     .'an incident — use create_ticket (ticket_type "Incident") for that.',
                 inputSchema: $this->object(
                     properties: [
-                        'app_id' => $this->integer('The web app these findings belong to (id). Must exist.'),
+                        'app_id' => $this->string('The web app these findings belong to: its public_id (string, as returned by get_customer_app). Must exist.'),
                         'packages' => [
                             'type' => 'array',
                             'description' => 'Every dependency the app uses. Replaces the stored set.',

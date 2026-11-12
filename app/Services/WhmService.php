@@ -4,8 +4,6 @@ namespace App\Services;
 
 use App\Exceptions\WhmConnectionException;
 use App\Exceptions\WhmProvisioningException;
-use App\Models\Setting;
-use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -14,151 +12,200 @@ class WhmService
     /**
      * Test connectivity to a WHM server using the provided credentials.
      *
-     * Makes a listaccts API call to verify the hostname and token are valid.
-     *
      * @throws WhmConnectionException on connectivity or authentication failure
      */
-    public function testConnection(string $hostname, string $apiToken): bool
+    public function testConnection(string $hostname, string $apiToken, string $user = 'root'): bool
     {
-        $url = "https://{$hostname}:2087/json-api/listaccts?api.version=1";
+        $this->request(new WhmCredentials($hostname, $apiToken, $user), 'listaccts', [], 15);
 
-        try {
-            $response = $this->buildRequest($hostname)
-                ->withHeaders([
-                    'Authorization' => "WHM root:{$apiToken}",
-                ])
-                ->timeout(15)
-                ->get($url);
-
-            if ($response->failed()) {
-                throw new WhmConnectionException(
-                    "WHM connection failed: HTTP {$response->status()} - " . ($response->body() ?: 'No response body')
-                );
-            }
-
-            $data = $response->json();
-
-            // WHM API returns metadata.result = 1 on success
-            if (isset($data['metadata']['result']) && $data['metadata']['result'] != 1) {
-                throw new WhmConnectionException(
-                    'WHM authentication failed: ' . ($data['metadata']['reason'] ?? 'Invalid credentials')
-                );
-            }
-
-            return true;
-        } catch (WhmConnectionException $e) {
-            throw $e;
-        } catch (\Exception $e) {
-            throw new WhmConnectionException(
-                'WHM connection failed: ' . $e->getMessage(),
-                0,
-                $e
-            );
-        }
+        return true;
     }
 
     /**
-     * Create a hosting account on the WHM server.
-     *
-     * Uses the configured WHM hostname and API token from Settings (encrypted).
+     * Create a hosting account on the WHM server using stored credentials.
      *
      * @return array{username: string} The cPanel username created
      * @throws WhmProvisioningException on account creation failure
      */
-    public function createAccount(string $domain, string $package, string $contactEmail): array
+    public function createAccount(string $domain, string $package, string $contactEmail, ?string $username = null): array
     {
-        $hostname = $this->getDecryptedSetting('whm_hostname');
-        $apiToken = $this->getDecryptedSetting('whm_api_token');
-
-        if (!$hostname || !$apiToken) {
-            throw new WhmProvisioningException('WHM credentials are not configured. Please configure WHM settings first.');
-        }
-
-        $username = $this->generateUsername($domain);
-
-        $url = "https://{$hostname}:2087/json-api/createacct";
+        $username ??= $this->generateUsername($domain);
 
         try {
-            $response = $this->buildRequest($hostname)
-                ->withHeaders([
-                    'Authorization' => "WHM root:{$apiToken}",
-                ])
-                ->timeout(30)
-                ->get($url, [
-                    'api.version' => 1,
-                    'username' => $username,
-                    'domain' => $domain,
-                    'plan' => $package,
-                    'contactemail' => $contactEmail,
-                ]);
-
-            if ($response->failed()) {
-                Log::error('WHM: Account creation HTTP failure', [
-                    'domain' => $domain,
-                    'username' => $username,
-                    'status' => $response->status(),
-                    'body' => $response->body(),
-                ]);
-
-                throw new WhmProvisioningException(
-                    "WHM account creation failed: HTTP {$response->status()}"
-                );
-            }
-
-            $data = $response->json();
-
-            // WHM createacct returns metadata.result = 1 on success
-            if (isset($data['metadata']['result']) && $data['metadata']['result'] != 1) {
-                $reason = $data['metadata']['reason'] ?? 'Unknown error';
-
-                Log::error('WHM: Account creation API failure', [
-                    'domain' => $domain,
-                    'username' => $username,
-                    'reason' => $reason,
-                ]);
-
-                throw new WhmProvisioningException(
-                    "WHM account creation failed: {$reason}"
-                );
-            }
-
-            Log::info('WHM: Account created successfully', [
-                'domain' => $domain,
+            // WHM generates a password when none is sent, but we set our own random one so
+            // the account never has a predictable credential. It is never returned or logged;
+            // sent in the POST body so it stays out of URLs and access logs.
+            $this->request(WhmCredentials::fromSettings(), 'createacct', [
                 'username' => $username,
-                'package' => $package,
-            ]);
-
-            return ['username' => $username];
-        } catch (WhmProvisioningException $e) {
-            throw $e;
-        } catch (\Exception $e) {
-            Log::error('WHM: Account creation exception', [
+                'domain' => $domain,
+                'plan' => $package,
+                'contactemail' => $contactEmail,
+                'password' => $this->randomPassword(),
+            ], 30, true);
+        } catch (WhmConnectionException $e) {
+            Log::error('WHM: Account creation failed', [
                 'domain' => $domain,
                 'username' => $username,
                 'error' => $e->getMessage(),
             ]);
-
-            throw new WhmProvisioningException(
-                'WHM account creation failed: ' . $e->getMessage(),
-                0,
-                $e
-            );
+            throw new WhmProvisioningException('WHM account creation failed: ' . $e->getMessage(), 0, $e);
         }
+
+        Log::info('WHM: Account created successfully', [
+            'domain' => $domain,
+            'username' => $username,
+            'package' => $package,
+        ]);
+
+        return ['username' => $username];
     }
 
     /**
-     * Build an HTTP request, disabling SSL verification only for local connections.
+     * Find the account whose main domain matches exactly, or null.
      *
-     * Remote WHM connections use standard certificate verification.
-     * Local connections (localhost/127.0.0.1) skip verification since there's no network to intercept.
+     * @return array{user: string, domain: string, plan: string, suspended: bool}|null
+     * @throws WhmConnectionException
      */
-    private function buildRequest(string $hostname): \Illuminate\Http\Client\PendingRequest
+    public function findAccountByDomain(string $domain): ?array
     {
-        $isLocal = in_array($hostname, ['localhost', '127.0.0.1', '::1'], true)
-            || str_starts_with($hostname, '192.168.')
-            || str_starts_with($hostname, '10.');
+        $accounts = $this->queryAccounts(['searchtype' => 'domain', 'search' => $domain, 'searchmethod' => 'exact']);
 
-        return $isLocal ? Http::withoutVerifying() : Http::withOptions(['verify' => true]);
+        foreach ($accounts as $a) {
+            if (strcasecmp($a['domain'], $domain) === 0) {
+                return $a;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @throws WhmConnectionException
+     */
+    public function accountExists(string $username): bool
+    {
+        $accounts = $this->queryAccounts(['searchtype' => 'user', 'search' => $username, 'searchmethod' => 'exact']);
+
+        foreach ($accounts as $a) {
+            if ($a['user'] === $username) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @return list<array{user: string, domain: string, plan: string, suspended: bool}>
+     * @throws WhmConnectionException
+     */
+    public function listAccounts(): array
+    {
+        return $this->queryAccounts();
+    }
+
+    /**
+     * @return array{user: string, domain: string, plan: string, suspended: bool}
+     * @throws WhmConnectionException when the account is missing or WHM fails
+     */
+    public function getAccountInfo(string $username): array
+    {
+        $data = $this->request(WhmCredentials::fromSettings(), 'accountsummary', ['user' => $username]);
+        $acct = $data['data']['acct'][0] ?? null;
+
+        if (! is_array($acct)) {
+            throw new WhmConnectionException("WHM account {$username} not found");
+        }
+
+        return $this->normaliseAccount($acct);
+    }
+
+    /**
+     * Create a single-use login URL for a cPanel user.
+     *
+     * @throws WhmConnectionException
+     */
+    public function createUserSession(string $username, string $service): string
+    {
+        $data = $this->request(WhmCredentials::fromSettings(), 'create_user_session', [
+            'user' => $username,
+            'service' => $service,
+        ]);
+
+        $url = $data['data']['url'] ?? null;
+        if (! is_string($url) || $url === '') {
+            throw new WhmConnectionException('WHM request failed: no session URL returned');
+        }
+
+        return $url;
+    }
+
+    /**
+     * @return list<array{user: string, domain: string, plan: string, suspended: bool}>
+     */
+    private function queryAccounts(array $query = []): array
+    {
+        $data = $this->request(WhmCredentials::fromSettings(), 'listaccts', $query, 30);
+        $acct = $data['data']['acct'] ?? [];
+
+        return is_array($acct)
+            ? array_values(array_map(fn ($a) => $this->normaliseAccount($a), array_filter($acct, 'is_array')))
+            : [];
+    }
+
+    private function normaliseAccount(array $a): array
+    {
+        return [
+            'user' => (string) ($a['user'] ?? ''),
+            'domain' => (string) ($a['domain'] ?? ''),
+            'plan' => (string) ($a['plan'] ?? ''),
+            'suspended' => filter_var($a['suspended'] ?? false, FILTER_VALIDATE_BOOLEAN),
+        ];
+    }
+
+    private function randomPassword(): string
+    {
+        // 32 hex chars + fixed mixed-class suffix to satisfy password strength rules.
+        return bin2hex(random_bytes(16)) . 'Aa#1';
+    }
+
+    /**
+     * Single entry point for WHM JSON API calls. Always verifies TLS.
+     *
+     * @return array<string, mixed> decoded response
+     * @throws WhmConnectionException
+     */
+    private function request(WhmCredentials $credentials, string $function, array $query = [], int $timeout = 15, bool $post = false): array
+    {
+        $url = "https://{$credentials->hostname}:2087/json-api/{$function}";
+        $params = ['api.version' => 1] + $query;
+
+        try {
+            $pending = Http::withOptions(['verify' => true])
+                ->withHeaders(['Authorization' => $credentials->authorizationHeader()])
+                ->timeout($timeout);
+            $response = $post ? $pending->asForm()->post($url, $params) : $pending->get($url, $params);
+        } catch (\Throwable $e) {
+            throw new WhmConnectionException('WHM connection failed: ' . $this->redact($e->getMessage(), $credentials), 0, $e);
+        }
+
+        if (! $response->successful()) {
+            throw new WhmConnectionException("WHM request failed: HTTP {$response->status()}");
+        }
+
+        $data = $response->json();
+        $result = is_array($data) ? ($data['metadata']['result'] ?? null) : null;
+        if ($result != 1) {
+            $reason = is_array($data) ? ($data['metadata']['reason'] ?? null) : null;
+            throw new WhmConnectionException('WHM request failed: ' . ($reason ?: 'Unexpected response'));
+        }
+
+        return $data;
+    }
+
+    private function redact(string $message, WhmCredentials $credentials): string
+    {
+        return str_replace($credentials->token(), '***', $message);
     }
 
     /**
@@ -173,27 +220,5 @@ class WhmService
         $clean = preg_replace('/[^a-z0-9]/', '', strtolower($domain));
 
         return substr($clean, 0, 8);
-    }
-
-    /**
-     * Retrieve and decrypt a WHM setting from the database.
-     */
-    private function getDecryptedSetting(string $key): ?string
-    {
-        $value = Setting::get($key);
-
-        if (!$value) {
-            return null;
-        }
-
-        try {
-            return Crypt::decryptString($value);
-        } catch (\Exception $e) {
-            Log::warning("WHM: Failed to decrypt setting '{$key}'", [
-                'error' => $e->getMessage(),
-            ]);
-
-            return null;
-        }
     }
 }

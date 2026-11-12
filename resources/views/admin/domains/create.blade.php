@@ -16,19 +16,14 @@
                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"
                            placeholder="example.co.uk">
                     @error('domain_name') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
+                    @if (session('trashed_domain_id'))
+                        <button type="submit" form="restore-domain-form" class="mt-2 px-3 py-1.5 border rounded-md text-sm font-medium hover:bg-gray-50">Restore deleted domain</button>
+                    @endif
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label for="company_id" class="block text-sm font-medium text-gray-700">Customer</label>
-                        <select name="company_id" id="company_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                            <option value="">Unassigned</option>
-                            @foreach ($customers as $customer)
-                                <option value="{{ $customer->company_id }}" {{ old('company_id') == $customer->company_id ? 'selected' : '' }}>
-                                    {{ $customer->company_name }}
-                                </option>
-                            @endforeach
-                        </select>
+                        <x-customer-picker :selected="$selectedCustomer" />
                     </div>
                     <div>
                         <label for="registrar" class="block text-sm font-medium text-gray-700">Registrar</label>
@@ -71,4 +66,10 @@
             </div>
         </form>
     </div>
+
+    @if (session('trashed_domain_id'))
+        <form id="restore-domain-form" method="POST" action="{{ route('admin.domains.restore', session('trashed_domain_id')) }}">
+            @csrf
+        </form>
+    @endif
 </x-admin-layout>

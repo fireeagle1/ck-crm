@@ -102,7 +102,23 @@
                 <dl class="space-y-3 text-sm">
                     <div>
                         <dt class="text-gray-500">Name</dt>
-                        <dd class="mt-1 font-medium">{{ $customerApp->service?->service_short ?? '—' }}</dd>
+                        <dd class="mt-1 font-medium">
+                            @if ($customerApp->service)
+                                <a href="{{ route('admin.services.show', $customerApp->service) }}" class="text-blue-600 hover:underline">{{ $customerApp->service->service_short }}</a>
+                            @else
+                                —
+                            @endif
+                        </dd>
+                    </div>
+                    <div>
+                        <dt class="text-gray-500">Domain</dt>
+                        <dd class="mt-1 font-medium">
+                            @if ($customerApp->domain)
+                                <a href="{{ route('admin.domains.edit', $customerApp->domain) }}" class="text-blue-600 hover:underline">{{ $customerApp->domain->domain_name }}</a>
+                            @else
+                                —
+                            @endif
+                        </dd>
                     </div>
                     <div>
                         <dt class="text-gray-500">Status</dt>

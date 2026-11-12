@@ -1,0 +1,13 @@
+<interface-response>
+<Command>GETDOMAINS</Command>
+<Language>eng</Language>
+<ErrCount>1</ErrCount>
+<errors>
+<Err1>Bad User name or Password</Err1>
+</errors>
+<ResponseCount>1</ResponseCount>
+<Server>SJL21WRESELLT01</Server>
+<Site>eNom</Site>
+<Done>true</Done>
+<debug></debug>
+</interface-response>

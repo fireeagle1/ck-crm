@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Str;
 
 class CustomerApp extends Model
 {
@@ -13,12 +14,27 @@ class CustomerApp extends Model
 
     protected $fillable = [
         'service_id',
+        'domain_id',
         'display_name',
         'install_url',
         'repo_url',
         'hosting_location',
         'codebase_info',
     ];
+
+    protected static function booted(): void
+    {
+        static::creating(function (CustomerApp $app): void {
+            if (empty($app->public_id)) {
+                $app->public_id = strtolower((string) Str::ulid());
+            }
+        });
+    }
+
+    public function domain(): BelongsTo
+    {
+        return $this->belongsTo(Domain::class);
+    }
 
     public function service(): BelongsTo
     {

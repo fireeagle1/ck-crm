@@ -3,10 +3,21 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\ServiceRequest;
 use App\Models\Customer;
 use App\Models\Domain;
 use App\Models\Service;
+use App\Exceptions\WhmConnectionException;
+use App\Services\DomainLinker;
+use App\Services\ProvisioningDispatcher;
+use App\Services\ServiceBillingService;
+use Illuminate\Database\UniqueConstraintViolationException;
+use Illuminate\Validation\ValidationException;
+use App\Services\WhmService;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class ServiceController extends Controller
@@ -77,87 +88,81 @@ class ServiceController extends Controller
         return view('admin.services.create', compact('customers', 'stripePrices', 'customerEmails', 'existingUsernames'));
     }
 
-    public function store(Request $request)
+    public function store(ServiceRequest $request, ProvisioningDispatcher $dispatcher, DomainLinker $linker, ServiceBillingService $billing)
     {
-        $validated = $request->validate([
-            'company_id' => 'required|exists:customers,company_id',
-            'service_short' => 'required|string|max:255',
-            'service_type' => 'required|in:Technical Support,Web Hosting,Other',
-            'status' => 'in:Active,Suspended,Cancelled',
-            'start_date' => 'nullable|date',
-            'end_date' => 'nullable|date|after_or_equal:start_date',
-            'service_monthly_charge' => 'nullable|numeric|min:0',
-            'service_payment_frequency' => 'nullable|string',
-            'stripe_price_id' => 'nullable|string',
-            'domain_name' => 'required_if:service_type,Web Hosting|nullable|string|max:255',
-            'cpanel_username' => 'nullable|string|max:255',
-            'provision_whm' => 'nullable|boolean',
-            'whm_package' => 'nullable|string|max:255',
-            'contact_email' => 'nullable|required_with:stripe_price_id|email',
-        ]);
+        // Duplicate domains (including variants, which are normalised to the canonical form
+        // before validation) are rejected by ServiceRequest's global unique rule.
+        $validated = $request->validated();
 
-        // Duplicate prevention: check if a service with the same domain already exists for this customer
-        if (!empty($validated['domain_name'])) {
-            $existing = Service::where('company_id', $validated['company_id'])
-                ->where('domain_name', $validated['domain_name'])
-                ->where('status', '!=', 'Cancelled')
-                ->first();
+        // When provisioning is requested, the form username is only the requested
+        // username for the queued job; it is not persisted on the service up front.
+        $provisionRequested = $request->boolean('provision_whm')
+            && !empty($validated['domain_name']);
+        $requestedUsername = $provisionRequested && !empty($validated['cpanel_username'])
+            ? $validated['cpanel_username']
+            : null;
 
-            if ($existing) {
-                return back()->withInput()->with('error',
-                    "A service for '{$validated['domain_name']}' already exists for this customer: {$existing->service_short} (ID: {$existing->service_id}). Edit the existing service instead of creating a duplicate."
-                );
-            }
+        $domainName = $validated['domain_name'] ?? null;
+
+        // Duplicate check, Service creation, and Domain find-or-create/link share one
+        // transaction. The unique index is the final guard against races.
+        try {
+            $service = DB::transaction(function () use (
+                $validated, $domainName, $provisionRequested, $requestedUsername, $dispatcher, $linker
+            ) {
+                $domain = null;
+                if ($domainName !== null && $domainName !== '') {
+                    $domain = $linker->findOrCreate($domainName, (int) $validated['company_id']);
+
+                    $holder = Service::where(function ($q) use ($domain, $domainName) {
+                        $q->where('domain_id', $domain->getKey())->orWhere('domain_name', $domainName);
+                    })->first();
+
+                    if ($holder !== null) {
+                        throw $this->duplicateDomainError($domain->domain_name, $holder);
+                    }
+                }
+
+                $service = Service::create([
+                    'company_id' => $validated['company_id'],
+                    'service_short' => $validated['service_short'],
+                    'service_type' => $validated['service_type'],
+                    'domain_name' => $domainName,
+                    'domain_id' => $domain?->getKey(),
+                    'cpanel_username' => $provisionRequested ? null : ($validated['cpanel_username'] ?? null),
+                    'whm_package' => $provisionRequested ? ($validated['whm_package'] ?? null) : null,
+                    'status' => $validated['status'] ?? 'Active',
+                    'start_date' => $validated['start_date'] ?? now(),
+                    'end_date' => $validated['end_date'] ?? null,
+                    'service_monthly_charge' => $validated['service_monthly_charge'] ?? null,
+                    'service_payment_frequency' => $validated['service_payment_frequency'] ?? null,
+                ]);
+
+                // Queue provisioning once the service row is committed.
+                if ($provisionRequested) {
+                    DB::afterCommit(fn () => $dispatcher->dispatch(
+                        $service,
+                        $requestedUsername,
+                        ProvisioningDispatcher::CONTEXT_ADMIN,
+                    ));
+                }
+
+                return $service;
+            });
+        } catch (UniqueConstraintViolationException $e) {
+            // Lost a race: another request took the domain between check and insert.
+            throw ValidationException::withMessages([
+                'domain_name' => "The domain {$domainName} is already in use by another service.",
+            ]);
         }
 
-        $service = Service::create([
-            'company_id' => $validated['company_id'],
-            'service_short' => $validated['service_short'],
-            'service_type' => $validated['service_type'],
-            'domain_name' => $validated['domain_name'] ?? null,
-            'cpanel_username' => $validated['cpanel_username'] ?? null,
-            'status' => $validated['status'] ?? 'Active',
-            'start_date' => $validated['start_date'] ?? now(),
-            'end_date' => $validated['end_date'] ?? null,
-            'service_monthly_charge' => $validated['service_monthly_charge'] ?? null,
-            'service_payment_frequency' => $validated['service_payment_frequency'] ?? null,
-        ]);
-
-        // Provision WHM account if requested
-        $whmMessage = '';
-        if ($request->boolean('provision_whm') && $validated['cpanel_username'] && $validated['domain_name']) {
-            $whmMessage = $this->provisionWhmAccount(
-                $validated['cpanel_username'],
-                $validated['domain_name'],
-                $validated['whm_package'] ?? 'ckhostco_Basic',
-                $validated['contact_email'] ?? null
-            );
-        }
+        $whmMessage = $provisionRequested ? 'WHM provisioning queued.' : '';
 
         // Create Stripe subscription if a price was selected
         if (!empty($validated['stripe_price_id']) && config('services.stripe.secret')) {
-            try {
-                $customer = Customer::find($validated['company_id']);
-                $stripeCustomerId = $this->ensureStripeCustomer(
-                    $customer,
-                    $validated['contact_email'] ?? null
-                );
-
-                $subscription = \Stripe\Subscription::create([
-                    'customer' => $stripeCustomerId,
-                    'items' => [['price' => $validated['stripe_price_id']]],
-                    'collection_method' => 'send_invoice',
-                    'days_until_due' => 7,
-                    'metadata' => [
-                        'service_id' => $service->service_id,
-                        'company_id' => $validated['company_id'],
-                    ],
-                ]);
-
-                $service->update(['stripe_subscription_id' => $subscription->id]);
-            } catch (\Exception $e) {
+            if (!$billing->setup($service, $validated)) {
                 return redirect()->route('admin.services.index')
-                    ->with('success', 'Service created but Stripe subscription failed: ' . $e->getMessage());
+                    ->with('success', 'Service created but Stripe subscription failed: ' . $service->billing_error);
             }
         }
 
@@ -165,92 +170,67 @@ class ServiceController extends Controller
             ->with('success', 'Service created.' . ($whmMessage ? ' ' . $whmMessage : ''));
     }
 
-    private function provisionWhmAccount(string $username, string $domain, string $package, ?string $email): string
+    /** Validation error naming the duplicate domain and the service holding it (even if Cancelled). */
+    private function duplicateDomainError(string $domain, Service $holder): ValidationException
     {
-        $host = config('services.whm.host');
-        $whmUser = config('services.whm.username');
-        $token = config('services.whm.token');
+        $status = $holder->status instanceof \BackedEnum ? $holder->status->value : (string) $holder->status;
+        $label = $holder->service_short ?: 'service';
 
-        if (!$host || !$whmUser || !$token) {
-            return 'WHM not configured — account not provisioned.';
-        }
-
-        $password = bin2hex(random_bytes(8)) . 'Aa1!';
-
-        try {
-            $response = \Illuminate\Support\Facades\Http::withHeaders([
-                'Authorization' => "WHM {$whmUser}:{$token}",
-            ])->withOptions(['verify' => false, 'timeout' => 30])
-              ->get("https://{$host}:2087/json-api/createacct", [
-                  'api.version' => 1,
-                  'username' => $username,
-                  'domain' => $domain,
-                  'plan' => $package,
-                  'password' => $password,
-                  'contactemail' => $email ?? 'support@ckenterprises.co.uk',
-              ]);
-
-            $data = $response->json();
-
-            if (($data['metadata']['result'] ?? 0) == 1) {
-                return 'WHM account provisioned successfully.';
-            }
-
-            $reason = $data['metadata']['reason'] ?? 'Unknown error';
-            return "WHM provisioning failed: {$reason}";
-        } catch (\Exception $e) {
-            return "WHM error: {$e->getMessage()}";
-        }
-    }
-
-    private function ensureStripeCustomer(Customer $customer, ?string $contactEmail = null): string
-    {
-        $email = $contactEmail ?: $customer->users()
-            ->whereNotNull('email')
-            ->where('email', '!=', '')
-            ->value('email');
-
-        if (!$email) {
-            throw new \InvalidArgumentException(
-                'A valid billing email is required to create an invoiced Stripe subscription.'
-            );
-        }
-
-        if ($customer->stripe_customer_id) {
-            $stripeCustomer = \Stripe\Customer::retrieve($customer->stripe_customer_id);
-
-            if (($stripeCustomer->email ?? null) !== $email) {
-                \Stripe\Customer::update($customer->stripe_customer_id, [
-                    'email' => $email,
-                ]);
-            }
-
-            return $customer->stripe_customer_id;
-        }
-
-        $stripeCustomer = \Stripe\Customer::create([
-            'name' => $customer->company_name,
-            'email' => $email,
-            'phone' => $customer->phone_number,
-            'metadata' => ['company_id' => $customer->company_id],
+        return ValidationException::withMessages([
+            'domain_name' => "The domain {$domain} is already held by service #{$holder->service_id} ({$label}, {$status}).",
         ]);
-
-        $customer->update(['stripe_customer_id' => $stripeCustomer->id]);
-
-        return $stripeCustomer->id;
     }
 
     public function show(Service $service): View
     {
-        $service->load('customer');
+        $service->load(['customer', 'customerApp']);
 
-        // Try to fetch WHM account info if this is a hosting service
-        $whmInfo = null;
-        if ($service->cpanel_username && config('services.whm.host')) {
-            $whmInfo = $this->fetchWhmAccountInfo($service->cpanel_username);
+        return view('admin.services.show', compact('service'));
+    }
+
+    /**
+     * On-demand WHM lookup. The show page itself never calls WHM.
+     */
+    public function refreshWhm(Service $service, WhmService $whm): RedirectResponse
+    {
+        if (! $service->cpanel_username) {
+            return redirect()->route('admin.services.show', $service)
+                ->with('whmError', 'This service has no cPanel username to look up.');
         }
 
-        return view('admin.services.show', compact('service', 'whmInfo'));
+        try {
+            $info = $whm->getAccountInfo($service->cpanel_username);
+        } catch (WhmConnectionException $e) {
+            return redirect()->route('admin.services.show', $service)
+                ->with('whmError', $e->getMessage());
+        }
+
+        return redirect()->route('admin.services.show', $service)
+            ->with('whmInfo', $info);
+    }
+
+    /**
+     * Retry Stripe billing setup for a service flagged billing_failed. The price is not
+     * persisted on the service, so the admin supplies it (and the contact email) again.
+     */
+    public function retryBilling(Request $request, Service $service, ServiceBillingService $billing): RedirectResponse
+    {
+        $back = redirect()->route('admin.services.show', $service);
+
+        if ($service->billing_state !== ServiceBillingService::STATE_FAILED) {
+            return $back->with('error', 'Billing retry is only available for services with failed billing.');
+        }
+
+        $data = $request->validate([
+            'stripe_price_id' => ['required', 'string', 'max:255'],
+            'contact_email' => ['required', 'email'],
+        ]);
+
+        if ($billing->setup($service, $data)) {
+            return $back->with('success', 'Billing set up successfully.');
+        }
+
+        return $back->with('error', 'Billing retry failed: ' . $service->billing_error);
     }
 
     public function edit(Service $service): View
@@ -261,19 +241,20 @@ class ServiceController extends Controller
         return view('admin.services.edit', compact('service', 'customers'));
     }
 
-    public function update(Request $request, Service $service)
+    public function update(ServiceRequest $request, Service $service)
     {
-        $validated = $request->validate([
-            'company_id' => 'required|exists:customers,company_id',
-            'service_short' => 'required|string|max:255',
-            'service_type' => 'nullable|string|max:50',
-            'domain_name' => 'nullable|string|max:255',
-            'cpanel_username' => 'nullable|string|max:255',
-            'status' => 'in:Active,Suspended,Cancelled',
-            'start_date' => 'nullable|date',
-            'end_date' => 'nullable|date',
-            'service_monthly_charge' => 'nullable|numeric|min:0',
-            'service_payment_frequency' => 'nullable|string',
+        // Only persist service columns; web-only create fields (WHM, Stripe price) are ignored here.
+        $validated = Arr::only($request->validated(), [
+            'company_id',
+            'service_short',
+            'service_type',
+            'domain_name',
+            'cpanel_username',
+            'status',
+            'start_date',
+            'end_date',
+            'service_monthly_charge',
+            'service_payment_frequency',
         ]);
 
         $service->update($validated);
@@ -289,46 +270,5 @@ class ServiceController extends Controller
 
         return redirect()->route('admin.services.index')
             ->with('success', "Service '{$name}' deleted.");
-    }
-
-    private function fetchWhmAccountInfo(string $username): ?array
-    {
-        $host = config('services.whm.host');
-        $whmUser = config('services.whm.username');
-        $token = config('services.whm.token');
-
-        if (!$host || !$whmUser || !$token) {
-            return null;
-        }
-
-        try {
-            $response = \Illuminate\Support\Facades\Http::withHeaders([
-                'Authorization' => "WHM {$whmUser}:{$token}",
-            ])->withOptions(['verify' => false, 'timeout' => 10])
-              ->get("https://{$host}:2087/json-api/accountsummary", [
-                  'api.version' => 1,
-                  'user' => $username,
-              ]);
-
-            $data = $response->json();
-
-            if (($data['metadata']['result'] ?? 0) == 1 && !empty($data['data']['acct'][0])) {
-                $acct = $data['data']['acct'][0];
-                return [
-                    'domain' => $acct['domain'] ?? null,
-                    'plan' => $acct['plan'] ?? null,
-                    'disk_used' => $acct['diskused'] ?? null,
-                    'disk_limit' => $acct['disklimit'] ?? null,
-                    'ip' => $acct['ip'] ?? null,
-                    'start_date' => $acct['startdate'] ?? null,
-                    'suspended' => ($acct['suspended'] ?? 0) == 1,
-                    'email' => $acct['email'] ?? null,
-                ];
-            }
-        } catch (\Exception) {
-            // silently fail
-        }
-
-        return null;
     }
 }

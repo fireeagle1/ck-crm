@@ -139,6 +139,67 @@ class McpDispatchWiringTest extends TestCase
         $this->assertNotNull(Ticket::find($summary['ticket_id']));
     }
 
+    public function test_record_app_findings_dispatches_by_public_id_and_rejects_numeric_id(): void
+    {
+        $app = \App\Models\CustomerApp::factory()->create();
+        $findings = [['severity' => 'high', 'description' => 'Vuln A', 'status' => 'open']];
+        $packages = [['name' => 'acme/pkg', 'version' => '1.0.0']];
+
+        $ok = $this->callTool('record_app_findings', ['apps:write'], [
+            'app_id' => $app->public_id,
+            'packages' => $packages,
+            'findings' => $findings,
+        ]);
+
+        $ok->assertOk();
+        $summary = $ok->json('result.structuredContent');
+        $this->assertSame($app->public_id, $summary['app_id']);
+        $this->assertSame(1, $summary['findings']);
+        $this->assertDatabaseHas('security_findings', ['customer_app_id' => $app->id, 'status' => 'open']);
+
+        // Numeric primary keys never resolve (Req 17.1, 17.5).
+        $bad = $this->callTool('record_app_findings', ['apps:write'], [
+            'app_id' => (string) $app->id,
+            'packages' => $packages,
+            'findings' => $findings,
+        ]);
+
+        $this->assertArrayHasKey('error', $bad->json('result.structuredContent'));
+        $this->assertSame(1, \App\Models\SecurityFinding::count());
+    }
+
+    public function test_record_app_findings_schema_declares_app_id_as_string(): void
+    {
+        $tool = collect(app(ToolRegistry::class)->all())->firstWhere('name', 'record_app_findings');
+
+        $this->assertSame('string', $tool->inputSchema['properties']['app_id']['type']);
+    }
+
+    public function test_findings_endpoint_rejects_oversized_content_length_before_reading_body(): void
+    {
+        $app = \App\Models\CustomerApp::factory()->create();
+        $this->authenticateApiGuard(['apps:write']);
+
+        $response = $this->call(
+            'POST',
+            "/api/mcp/apps/{$app->public_id}/findings",
+            [],
+            [],
+            [],
+            [
+                'CONTENT_TYPE' => 'application/json',
+                'HTTP_ACCEPT' => 'application/json',
+                'HTTP_X_FORWARDED_PROTO' => 'https',
+                'CONTENT_LENGTH' => \App\Services\FindingsIngestService::MAX_PAYLOAD_BYTES + 1,
+            ],
+            '{}',
+        );
+
+        $response->assertStatus(422);
+        $response->assertJsonStructure(['error', 'errors']);
+        $this->assertSame(0, \App\Models\SecurityFinding::count());
+    }
+
     // --- helpers -------------------------------------------------------------
 
     /**

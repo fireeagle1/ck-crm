@@ -184,6 +184,37 @@ class CustomerAppDtoAllowListPropertyTest extends TestCase
         }
     }
 
+    /**
+     * The MCP CustomerAppDto exposes public_id (Req 17.1) and still carries
+     * no billing or secret fields.
+     *
+     * **Validates: Requirements 17.1**
+     */
+    public function test_mcp_dto_exposes_public_id_and_no_sensitive_fields(): void
+    {
+        $customer = Customer::factory()->create();
+        $service = Service::create([
+            'company_id' => $customer->company_id,
+            'service_short' => 'Mcp App',
+            'status' => 'Active',
+            'stripe_subscription_id' => 'sub_secret123',
+        ]);
+        $app = CustomerApp::create(['service_id' => $service->service_id])->fresh();
+
+        $dto = \App\Mcp\Dto\CustomerAppDto::fromModel($app->load('service'));
+
+        $this->assertNotEmpty($app->public_id);
+        $this->assertSame($app->public_id, $dto['public_id']);
+        $this->assertSame(
+            ['id', 'public_id', 'service_id', 'service_short', 'company_id', 'display_name',
+                'install_url', 'repo_url', 'hosting_location', 'codebase_info', 'updated_at'],
+            array_keys($dto)
+        );
+        $this->assertStringNotContainsString('sub_secret123', json_encode($dto));
+        $this->assertArrayNotHasKey('stripe_subscription_id', $dto);
+        $this->assertArrayNotHasKey('service_monthly_charge', $dto);
+    }
+
     private function expectedSummary(int $openCount): string
     {
         if ($openCount === 0) {

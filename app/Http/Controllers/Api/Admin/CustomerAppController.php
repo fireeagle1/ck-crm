@@ -5,8 +5,10 @@ namespace App\Http\Controllers\Api\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\AppPackage;
 use App\Models\CustomerApp;
+use App\Models\Domain;
 use App\Models\SecurityFinding;
 use App\Models\Service;
+use App\Services\CustomerAppService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -68,13 +70,15 @@ class CustomerAppController extends Controller
     /**
      * Create a customer app against an existing service.
      *
-     * Rejects when the service already has a linked app (Req 1.4); the DB
-     * unique index on customer_apps.service_id is the backstop.
+     * A duplicate create surfaces as a ValidationException on `service_id`
+     * from CustomerAppService, rendered as the standard 422 validation JSON
+     * (Req 1.4, 16.3). The DB unique index is the source of truth.
      */
-    public function store(Request $request): JsonResponse
+    public function store(Request $request, CustomerAppService $customerApps): JsonResponse
     {
         $validated = $request->validate([
             'service_id' => 'required|integer|exists:services,service_id',
+            'domain_id' => 'nullable|integer|exists:domains,id',
             'display_name' => 'nullable|string|max:255',
             'install_url' => 'nullable|url|max:255',
             'repo_url' => 'nullable|url|max:255',
@@ -84,13 +88,9 @@ class CustomerAppController extends Controller
 
         $service = Service::findOrFail($validated['service_id']);
 
-        if ($service->customerApp()->exists()) {
-            return response()->json([
-                'message' => 'This service already has a linked app.',
-            ], 422);
-        }
+        $domain = isset($validated['domain_id']) ? Domain::find($validated['domain_id']) : null;
 
-        $app = CustomerApp::create($validated);
+        $app = $customerApps->createForService($service, $validated, $domain);
 
         return response()->json([
             'data' => $this->present($app->fresh(['service', 'service.customer', 'packages', 'findings'])),
@@ -113,7 +113,8 @@ class CustomerAppController extends Controller
     }
 
     /**
-     * Update the editable technical fields only (Req 4.2).
+     * Update only display_name, install_url, repo_url, hosting_location and
+     * codebase_info (Req 4.2).
      */
     public function update(Request $request, CustomerApp $customerApp): JsonResponse
     {

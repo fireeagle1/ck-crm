@@ -1,0 +1,36 @@
+<interface-response>
+<GetDomains>
+ <tab/>
+ <multirrp>False</multirrp>
+ <domain-list type="Registered">
+  <domain>
+   <DomainNameID>345245402</DomainNameID>
+   <sld>third</sld>
+   <tld>org</tld>
+   <ns-status>NA</ns-status>
+   <expiration-date>8/7/2027</expiration-date>
+   <auto-renew>No</auto-renew>
+   <wppsstatus>enabled</wppsstatus>
+   <RRProcessor>E</RRProcessor>
+  </domain>
+ </domain-list>
+ <EndPosition>3</EndPosition>
+ <PreviousRecords>1</PreviousRecords>
+ <NextRecords>0</NextRecords>
+ <OrderBy/>
+ <Result>True</Result>
+ <StartPosition>3</StartPosition>
+ <DomainCount>3</DomainCount>
+ <TotalDomainCount>3</TotalDomainCount>
+ <StartLetter/>
+</GetDomains>
+<Command>GETDOMAINS</Command>
+<Language>eng</Language>
+<ErrCount>0</ErrCount>
+<ResponseCount>0</ResponseCount>
+<Server>SJL21WRESELLT01</Server>
+<Site>eNom</Site>
+<Done>true</Done>
+<RequestDateTime>12/8/2011 4:27:05 AM</RequestDateTime>
+<debug></debug>
+</interface-response>

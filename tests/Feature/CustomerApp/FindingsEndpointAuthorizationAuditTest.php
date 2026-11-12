@@ -343,9 +343,9 @@ class FindingsEndpointAuthorizationAuditTest extends TestCase
     private function buildRequestInput(string $flavour, CustomerApp $app, int $case): array
     {
         return match ($flavour) {
-            'success' => [(string) $app->id, $this->validPayload($case)],
+            'success' => [(string) $app->public_id, $this->validPayload($case)],
             'unknown' => [$this->unknownIdentifier($app), $this->validPayload($case)],
-            'invalid' => [(string) $app->id, $this->invalidPayload($case)],
+            'invalid' => [(string) $app->public_id, $this->invalidPayload($case)],
         };
     }
 
@@ -373,7 +373,7 @@ class FindingsEndpointAuthorizationAuditTest extends TestCase
             $findings[] = [
                 'severity' => $severities[random_int(0, count($severities) - 1)],
                 'description' => "Finding {$case}-{$i}",
-                'status' => SecurityFinding::STATUSES[random_int(0, count(SecurityFinding::STATUSES) - 1)],
+                'status' => SecurityFinding::PAYLOAD_STATUSES[random_int(0, count(SecurityFinding::PAYLOAD_STATUSES) - 1)],
             ];
         }
 
@@ -413,7 +413,9 @@ class FindingsEndpointAuthorizationAuditTest extends TestCase
      */
     private function unknownIdentifier(CustomerApp $app): string
     {
-        return match (random_int(0, 2)) {
+        return match (random_int(0, 3)) {
+            // The numeric primary key of an existing app must never resolve (Req 17.1, 17.5).
+            3 => (string) $app->id,
             0 => (string) ($app->id + random_int(1000, 9999)),
             1 => 'missing-'.uniqid('', true),
             default => (string) random_int(100000, 999999),

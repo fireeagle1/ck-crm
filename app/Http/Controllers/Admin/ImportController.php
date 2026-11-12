@@ -11,6 +11,10 @@ use App\Models\Service;
 use App\Models\Ticket;
 use App\Models\TicketReply;
 use App\Models\User;
+use App\Exceptions\InvalidDomainException;
+use App\Services\DomainEditTracker;
+use App\Support\DomainNormaliser;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -89,7 +93,13 @@ class ImportController extends Controller
             $results['assets'] = $this->importAssets($source);
         }
 
-        return back()->with('success', 'Import complete. ' . $this->summarise($results));
+        $response = back()->with('success', 'Import complete. ' . $this->summarise($results));
+
+        if ($this->domainConflicts !== []) {
+            $response->with('import_conflicts', $this->domainConflicts);
+        }
+
+        return $response;
     }
 
     private function truncateTables(Request $request): void
@@ -339,36 +349,72 @@ class ImportController extends Controller
         return $count;
     }
 
-    private function importDomains(\PDO $source): int
+    /**
+     * Per-row problems from the last domain import (invalid names, unique-index conflicts).
+     *
+     * @var array<int, array{domain: string, reason: string}>
+     */
+    private array $domainConflicts = [];
+
+    /** @return array<int, array{domain: string, reason: string}> */
+    public function domainConflicts(): array
+    {
+        return $this->domainConflicts;
+    }
+
+    public function importDomains(\PDO $source): int
     {
         $stmt = $source->query('SELECT * FROM Domains ORDER BY DomainName ASC');
         $count = 0;
+        $this->domainConflicts = [];
+        $tracker = app(DomainEditTracker::class);
 
         $validCompanyIds = DB::table('customers')->pluck('company_id')->toArray();
 
         while ($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
-            $domainName = $row['DomainName'] ?? $row['Domain'] ?? null;
-            if (!$domainName) continue;
+            $rawName = $row['DomainName'] ?? $row['Domain'] ?? null;
+            if (!$rawName) continue;
+
+            try {
+                $domainName = DomainNormaliser::normalise((string) $rawName);
+            } catch (InvalidDomainException $e) {
+                $this->domainConflicts[] = ['domain' => (string) $rawName, 'reason' => 'invalid domain name: ' . $e->getMessage()];
+                continue;
+            }
 
             $companyId = $row['CompanyID'] ?? $row['CustomerID'] ?? null;
             if ($companyId && !in_array((int) $companyId, $validCompanyIds)) {
                 $companyId = null;
             }
 
-            DB::table('domains')->updateOrInsert(
-                ['domain_name' => strtolower($domainName)],
-                [
-                    'company_id' => $companyId,
-                    'registrar' => $row['Registrar'] ?? $row['DomainRegistrar'] ?? null,
-                    'registration_date' => $this->cleanDate($row['RegistrationDate'] ?? null),
-                    'expiry_date' => $this->cleanDate($row['ExpiryDate'] ?? $row['ExpirationDate'] ?? $row['RenewalDate'] ?? null),
-                    'cost' => $row['Cost'] ?? $row['DomainCost'] ?? null,
-                    'domain_admin_notes' => $row['DomainAdminNotes'] ?? $row['AdminNotes'] ?? $row['Notes'] ?? null,
-                    'updated_at' => now(),
-                    'created_at' => now(),
-                ]
-            );
-            $count++;
+            $data = [
+                'company_id' => $companyId,
+                'registrar' => $row['Registrar'] ?? $row['DomainRegistrar'] ?? null,
+                'registration_date' => $this->cleanDate($row['RegistrationDate'] ?? null),
+                'expiry_date' => $this->cleanDate($row['ExpiryDate'] ?? $row['ExpirationDate'] ?? $row['RenewalDate'] ?? null),
+                'cost' => $row['Cost'] ?? $row['DomainCost'] ?? null,
+                'domain_admin_notes' => $row['DomainAdminNotes'] ?? $row['AdminNotes'] ?? $row['Notes'] ?? null,
+            ];
+
+            try {
+                $existing = Domain::withTrashed()->where('domain_name', $domainName)->first();
+
+                if ($existing && $existing->trashed()) {
+                    // A soft-deleted row still owns the unique index; do not resurrect it silently.
+                    $this->domainConflicts[] = ['domain' => $domainName, 'reason' => 'conflicts with a soft-deleted domain'];
+                    continue;
+                }
+
+                if ($existing) {
+                    $tracker->record($existing, $data);
+                    $existing->fill($data)->save();
+                } else {
+                    Domain::create($data + ['domain_name' => $domainName]);
+                }
+                $count++;
+            } catch (UniqueConstraintViolationException $e) {
+                $this->domainConflicts[] = ['domain' => $domainName, 'reason' => 'unique index conflict'];
+            }
         }
 
         return $count;

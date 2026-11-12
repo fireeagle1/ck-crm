@@ -27,7 +27,7 @@
                         <label for="service_type" class="block text-sm font-semibold text-gray-700">Service Type</label>
                         <select name="service_type" id="service_type" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
                             <option value="">—</option>
-                            @foreach (['Web Hosting', 'Technical Support', 'Other'] as $type)
+                            @foreach (\App\Enums\ServiceType::values() as $type)
                                 <option value="{{ $type }}" {{ old('service_type', $service->service_type) === $type ? 'selected' : '' }}>{{ $type }}</option>
                             @endforeach
                         </select>
@@ -99,7 +99,7 @@
                     <div>
                         <label for="status" class="block text-sm font-semibold text-gray-700">Status</label>
                         <select name="status" id="status" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                            @foreach (['Active', 'Suspended', 'Cancelled'] as $s)
+                            @foreach (\App\Enums\ServiceStatus::values() as $s)
                                 <option value="{{ $s }}" {{ old('status', $service->status) === $s ? 'selected' : '' }}>{{ $s }}</option>
                             @endforeach
                         </select>

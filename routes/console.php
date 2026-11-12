@@ -51,8 +51,12 @@ Schedule::call(fn () => Artisan::call('app:cleanup-abandoned-orders'))->everyThi
 // Reset low-stock notification flags for restocked products — hourly
 Schedule::call(fn () => Artisan::call('app:reset-low-stock-flags'))->hourly();
 
+// Fail hosting provisioning stuck in "running" for over 15 minutes — every ten minutes
+Schedule::call(fn () => Artisan::call('hosting:fail-stale'))->everyTenMinutes()->name('hosting-fail-stale');
+
 // Process queued jobs (emails, notifications) — runs every minute via cron
 Schedule::call(fn () => Artisan::call('queue:work', [
     '--stop-when-empty' => true,
     '--tries' => 3,
-]))->everyMinute()->name('queue-work')->withoutOverlapping();
+    '--max-time' => 50,
+]))->everyMinute()->name('queue-work')->withoutOverlapping(10);

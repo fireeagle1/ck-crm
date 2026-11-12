@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Product;
+use App\Support\DomainNormaliser;
 use Carbon\Carbon;
 use InvalidArgumentException;
 
@@ -73,7 +74,9 @@ class CartService
             'quantity' => $quantity,
             'rental_start_date' => $options['rental_start_date'] ?? null,
             'rental_end_date' => $options['rental_end_date'] ?? null,
-            'domain_name' => $options['domain_name'] ?? null,
+            'domain_name' => is_string($options['domain_name'] ?? null)
+                ? (DomainNormaliser::tryNormalise($options['domain_name']) ?? $options['domain_name'])
+                : null,
             'delivery_charge' => $product->hasDeliveryCharge() ? (float) $product->delivery_charge : 0,
         ];
 
@@ -223,14 +226,12 @@ class CartService
     }
 
     /**
-     * Validate a domain name format.
+     * Validate a domain name (true when DomainNormaliser can canonicalise it).
      */
     public function isValidDomain(string $domain): bool
     {
         // Must contain at least one dot, no spaces, only valid domain characters
-        $pattern = '/^(?!-)[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}$/';
-
-        return (bool) preg_match($pattern, $domain);
+        return DomainNormaliser::tryNormalise($domain) !== null;
     }
 
     /**

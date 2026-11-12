@@ -184,13 +184,21 @@ class StripeSyncInvoices extends Command
             $existingService = Service::where('stripe_subscription_id', $sub->id)->first();
 
             if ($existingService) {
-                $existingService->update([
+                $attributes = [
                     'status' => $status,
                     'service_monthly_charge' => $actualCharge,
                     'service_payment_frequency' => $frequency,
                     'next_payment_date' => $sub->current_period_end ? date('Y-m-d', $sub->current_period_end) : null,
                     'end_date' => $sub->canceled_at ? date('Y-m-d', $sub->canceled_at) : null,
-                ]);
+                ];
+
+                // Shop services stay Pending until provisioning succeeds; only
+                // the provisioning job may activate them (Req 1.6, 9.6).
+                if ($existingService->status === 'Pending' && $existingService->order_item_id !== null) {
+                    unset($attributes['status']);
+                }
+
+                $existingService->update($attributes);
                 $count++;
             }
             // Also check domains table for this subscription

@@ -6,6 +6,7 @@ use App\Exceptions\WhmConnectionException;
 use App\Http\Controllers\Controller;
 use App\Models\Setting;
 use App\Services\WhmService;
+use App\Support\Nameservers;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
@@ -18,12 +19,14 @@ class WhmConfigController extends Controller
      */
     public function edit(): View
     {
+        $nameservers = Nameservers::get();
+
         $settings = [
             'whm_hostname' => $this->getDecryptedSetting('whm_hostname'),
             'whm_api_token' => $this->getDecryptedSetting('whm_api_token'),
             'whm_default_package' => Setting::get('whm_default_package'),
-            'whm_nameserver_0' => Setting::get('whm_nameserver_0', 'ns0.thundercloud.uk'),
-            'whm_nameserver_1' => Setting::get('whm_nameserver_1', 'ns1.thundercloud.uk'),
+            'whm_nameserver_0' => $nameservers[0],
+            'whm_nameserver_1' => $nameservers[1],
         ];
 
         return view('admin.settings.whm', compact('settings'));
@@ -60,8 +63,8 @@ class WhmConfigController extends Controller
 
         // Store plain-text settings
         Setting::set('whm_default_package', $request->input('whm_default_package'));
-        Setting::set('whm_nameserver_0', $request->input('whm_nameserver_0', 'ns0.thundercloud.uk'));
-        Setting::set('whm_nameserver_1', $request->input('whm_nameserver_1', 'ns1.thundercloud.uk'));
+        Setting::set('whm_nameserver_0', $request->input('whm_nameserver_0') ?: Nameservers::DEFAULTS[0]);
+        Setting::set('whm_nameserver_1', $request->input('whm_nameserver_1') ?: Nameservers::DEFAULTS[1]);
 
         return back()->with('success', 'WHM configuration saved successfully.');
     }

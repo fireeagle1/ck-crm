@@ -19,6 +19,7 @@
             <thead class="bg-gray-50 border-b">
                 <tr>
                     <th class="px-4 py-3 text-left font-semibold text-gray-600">Service</th>
+                    <th class="px-4 py-3 text-left font-semibold text-gray-600">Domain</th>
                     <th class="px-4 py-3 text-left font-semibold text-gray-600">Display Name</th>
                     <th class="px-4 py-3 text-left font-semibold text-gray-600">Customer</th>
                     <th class="px-4 py-3 text-left font-semibold text-gray-600">Repository</th>
@@ -30,7 +31,20 @@
             <tbody class="divide-y divide-gray-100">
                 @forelse ($customerApps as $app)
                     <tr class="hover:bg-gray-50 cursor-pointer" onclick="window.location='{{ route('admin.customer-apps.show', $app) }}'">
-                        <td class="px-4 py-3 font-medium text-blue-600">{{ $app->service?->service_short ?? '—' }}</td>
+                        <td class="px-4 py-3 font-medium text-blue-600">
+                            @if ($app->service)
+                                <a href="{{ route('admin.services.show', $app->service) }}" class="hover:underline" onclick="event.stopPropagation()">{{ $app->service->service_short }}</a>
+                            @else
+                                —
+                            @endif
+                        </td>
+                        <td class="px-4 py-3">
+                            @if ($app->domain)
+                                <a href="{{ route('admin.domains.edit', $app->domain) }}" class="text-blue-600 hover:underline" onclick="event.stopPropagation()">{{ $app->domain->domain_name }}</a>
+                            @else
+                                —
+                            @endif
+                        </td>
                         <td class="px-4 py-3">{{ $app->display_name ?? '—' }}</td>
                         <td class="px-4 py-3">{{ $app->service?->customer?->company_name ?? '—' }}</td>
                         <td class="px-4 py-3 text-gray-500 max-w-xs truncate">{{ $app->repo_url ?? '—' }}</td>
@@ -50,7 +64,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="7" class="px-4 py-6 text-center text-gray-500">No web apps yet.</td>
+                        <td colspan="8" class="px-4 py-6 text-center text-gray-500">No web apps yet.</td>
                     </tr>
                 @endforelse
             </tbody>

@@ -76,6 +76,31 @@ class FindingsController extends Controller
             ], 403);
         }
 
+        // Early size guard (Req 17.6): reject on the declared Content-Length
+        // before the body is read or parsed. Same response shape as the
+        // InvalidFindingsPayloadException handling below.
+        $declaredLength = $request->headers->get('Content-Length');
+
+        if ($declaredLength !== null && ctype_digit((string) $declaredLength)
+            && (int) $declaredLength > FindingsIngestService::MAX_PAYLOAD_BYTES) {
+            $e = new InvalidFindingsPayloadException([
+                sprintf('payload may be at most %d bytes of JSON.', FindingsIngestService::MAX_PAYLOAD_BYTES),
+            ]);
+
+            $this->auditLogger->error(
+                $request,
+                self::TOOL_NAME,
+                self::REQUIRED_SCOPE,
+                'invalid_payload',
+                ['app' => $identifier],
+            );
+
+            return response()->json([
+                'error' => 'The findings payload failed validation.',
+                'errors' => $e->errors(),
+            ], 422);
+        }
+
         // Shape validation: the payload must carry arrays of packages and
         // findings. Per-item field validation lives in the ingest service's
         // allow-list and surfaces as InvalidFindingsPayloadException below.

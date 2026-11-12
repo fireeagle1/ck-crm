@@ -38,6 +38,7 @@ return [
         'key' => env('STRIPE_KEY'),
         'secret' => env('STRIPE_SECRET'),
         'webhook_secret' => env('STRIPE_WEBHOOK_SECRET'),
+        'currency' => env('STRIPE_CURRENCY', 'gbp'),
     ],
 
     /*
@@ -49,17 +50,6 @@ return [
         'username' => env('ENOM_USERNAME'),
         'password' => env('ENOM_PASSWORD'),
         'sandbox' => env('ENOM_SANDBOX', false),
-    ],
-
-    /*
-    |--------------------------------------------------------------------------
-    | WHM / cPanel
-    |--------------------------------------------------------------------------
-    */
-    'whm' => [
-        'host' => env('WHM_HOST'),
-        'username' => env('WHM_USERNAME'),
-        'token' => env('WHM_API_TOKEN'),
     ],
 
     /*

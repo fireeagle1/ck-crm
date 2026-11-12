@@ -1,0 +1,1720 @@
+{
+  "pbtResults": {},
+  "executionHistory": {
+    "1.1 Run the full test suite and record the baseline": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430793648
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430801451
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430938608
+      }
+    ],
+    "1.2 Add the seeded generator helper `Tests\\Support\\Gen`": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430793698
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430942680
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794431123905
+      }
+    ],
+    "1.3 Add `ServiceFactory` and `DomainFactory`": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430793738
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430942927
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794431124778
+      }
+    ],
+    "1.4 Add `OrderFactory`, `OrderItemFactory`, `CustomerAppFactory` and `SecurityFindingFactory`": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430793766
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430943892
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794431125512
+      }
+    ],
+    "1.5 Add fake Stripe and fake WHM test doubles": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430793798
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430944527
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794431125993
+      }
+    ],
+    "2.1 Create the enums": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430793841
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794431128745
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794431202839
+      }
+    ],
+    "2.3 Implement `DomainNormaliser` and `InvalidDomainException`": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430793874
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794431129453
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794431203774
+      }
+    ],
+    "2.5 Add the `ValidDomain` rule and `NormalisesDomain` request trait": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430793907
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794431207080
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794431245483
+      }
+    ],
+    "2.6 Create the shared `ServiceRequest`": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430793934
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794431248146
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794431400335
+      }
+    ],
+    "2.7 Use `ServiceRequest` in `Admin\\ServiceController` store and update": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430793964
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794431404888
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794431499059
+      }
+    ],
+    "2.8 Use `ServiceRequest` in `Api\\Admin\\ServiceController` store and update": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430793991
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794431502909
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794431565756
+      }
+    ],
+    "2.10 Add migrations M1 and M1b for services and order_items columns": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430794022
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794431130255
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794431204431
+      }
+    ],
+    "2.11 Add migration M2 for the change-log table and model": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430794049
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794431207680
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794431244783
+      }
+    ],
+    "2.12 Implement `ServiceDomainBackfill::plan()` (read-only)": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430794082
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794431248833
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794431401081
+      }
+    ],
+    "2.13 Implement `ServiceDomainBackfill::apply()` with change log and idempotence": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430794107
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794431405241
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794431499838
+      }
+    ],
+    "2.14 Add migration M3 to run the backfill with a reversible `down()`": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430794138
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794431503479
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794431566463
+      }
+    ],
+    "2.15 Implement `UniqueIndexPreflight` and migration M4 (unique indexes)": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430794166
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794431569342
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794431678593
+      }
+    ],
+    "2.18 Add the data migration dry-run command `services:normalise-data`": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430794197
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794431681666
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794431808668
+      }
+    ],
+    "3. Checkpoint - Phase 1 complete": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430794223
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794465237910
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794465283190
+      }
+    ],
+    "4.1 Add configuration for currency and abandoned hosting orders": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430794249
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794431813648
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794431895339
+      }
+    ],
+    "4.2 Add migration M5 for order-item linkage and stock reservation": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430794287
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794431814223
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794431896573
+      }
+    ],
+    "4.3 Implement `StockService`": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430794315
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794431900465
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794432006638
+      }
+    ],
+    "4.4 Implement `DomainLinker::findOrCreate()`": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430794349
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794431901637
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794432007679
+      }
+    ],
+    "4.5 Implement `HostingServiceCreator` and `DomainAlreadyInUseException`": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430794381
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794432015153
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794432152631
+      }
+    ],
+    "4.7 Implement `OrderCancellationService`": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430794408
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794432016062
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794432151653
+      }
+    ],
+    "4.8 Extend `StripeService` for compensation and coupons": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430794439
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794431902671
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794432008586
+      }
+    ],
+    "4.9 Remove legacy checkout methods and update `CheckoutService` wiring": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430794467
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794432157046
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794432312920
+      }
+    ],
+    "4.10 Restructure `processCheckout` into a transaction followed by Stripe calls": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430794499
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794432316572
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794432456657
+      }
+    ],
+    "4.11 Add Stripe failure compensation to checkout": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430794531
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794432460359
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794432581084
+      }
+    ],
+    "4.13 Use `HostingServiceCreator` in `FulfilmentService::handleHostingPurchase`": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430794561
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794432585231
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794432678301
+      }
+    ],
+    "4.14 Remove stock handling from `FulfilmentService` and fix `fulfilOrder`": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430794590
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794432683822
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794432798509
+      }
+    ],
+    "4.15 Rework `CleanupAbandonedOrdersCommand`": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430794633
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794432585932
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794432679367
+      }
+    ],
+    "4.17 Route admin order cancel through `OrderCancellationService`": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430794663
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794432684359
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794432799049
+      }
+    ],
+    "4.18 Make `StripeWebhookController` transactional and exactly-once": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430794695
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794432684860
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794432799673
+      }
+    ],
+    "4.19 Update webhook handlers for statuses and session lookup": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430794723
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794432802524
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794432851758
+      }
+    ],
+    "4.20 Add the `invoice.paid` handler": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430794753
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794432855543
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794432903269
+      }
+    ],
+    "4.21 Guard `StripeSyncInvoices` against activating Pending shop services": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430794781
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794432906557
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794432984968
+      }
+    ],
+    "5. Checkpoint - Phase 2 complete": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430794813
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794465288349
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794465313377
+      }
+    ],
+    "6.1 Add `WhmCredentials` and consolidate WHM requests in `WhmService`": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430794839
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794432990715
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794433074324
+      }
+    ],
+    "6.2 Add the remaining `WhmService` methods": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430794871
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794433077971
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794433159891
+      }
+    ],
+    "6.4 Add `whm:import-env-credentials` and `whm:check` commands": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430794898
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794433163459
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794433246576
+      }
+    ],
+    "6.5 Update `CpanelMappingController` to use `WhmService` and reject duplicates": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430794930
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794433164515
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794433247499
+      }
+    ],
+    "6.6 Update the portal `SsoController` to use `WhmService`": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430794956
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794433165618
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794433245283
+      }
+    ],
+    "6.7 Add one nameservers accessor": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430794984
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794432990810
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794433075068
+      }
+    ],
+    "6.8 Implement `CpanelUsername` and hosting configuration": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430795014
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794432991735
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794433073365
+      }
+    ],
+    "6.10 Add migration M6 for `services.whm_package`": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430795041
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794432992534
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794433073090
+      }
+    ],
+    "6.11 Implement `ProvisioningDispatcher`": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430795075
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794433166359
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794433245465
+      }
+    ],
+    "6.12 Implement `HostingProvisioner` claim and input resolution": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430795106
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794433250509
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794433351282
+      }
+    ],
+    "6.13 Implement `HostingProvisioner` account creation, linking and outcome": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430795136
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794433352191
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794433457246
+      }
+    ],
+    "6.14 Send the provisioned notification after commit": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430795165
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794433461366
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794433512953
+      }
+    ],
+    "6.15 Complete `ProvisionHostingJob` (skeleton created in 6.11)": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430795198
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794433517220
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794433568873
+      }
+    ],
+    "6.19 Add `hosting:fail-stale` and tighten the queue schedule": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430795224
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794433573185
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794433629754
+      }
+    ],
+    "6.20 Dispatch provisioning from `FulfilmentService`": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430795257
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794433573984
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794433631050
+      }
+    ],
+    "6.21 Make `HostingProvisionController` dispatch the job": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430795284
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794433642776
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794433721209
+      }
+    ],
+    "6.22 Move `Admin\\ServiceController` store to queued provisioning": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430795315
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794433642876
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794433722151
+      }
+    ],
+    "6.23 Remove WHM calls from the Admin service show page and add refresh": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430795346
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794433725853
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794433813045
+      }
+    ],
+    "6.24 Remove `.env`-based WHM configuration": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430795374
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794463148253
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794463204350
+      }
+    ],
+    "7. Checkpoint - Phase 3 complete": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430795406
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794465317222
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794465342177
+      }
+    ],
+    "8.1 Add migration M7 for domain sync columns and soft deletes": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430795438
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794463214274
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794463412492
+      }
+    ],
+    "8.2 Backfill `enom_domain_name_id` and add `unique(services.domain_id)` (migration M7b, separate from M7)": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430795464
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794463417912
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794463602960
+      }
+    ],
+    "8.3 Update the `Domain` model and `Service` relations": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430795514
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794463418712
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794463603908
+      }
+    ],
+    "8.4 Implement `DomainEditTracker`": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430795539
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794463607511
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794463675273
+      }
+    ],
+    "8.5 Update `Admin\\DomainController` store and update": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430795566
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794463679813
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794463769388
+      }
+    ],
+    "8.6 Update `ImportController` to normalise and report conflicts": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430795595
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794463681041
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794463770327
+      }
+    ],
+    "8.7 Make `CartService` use `DomainNormaliser`": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430795624
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794463215367
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794463414218
+      }
+    ],
+    "8.8 Make `Admin\\ServiceController` store transactional for domain checks": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430795653
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794463608126
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794463676252
+      }
+    ],
+    "8.9 Implement `EnomClient`": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430795681
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794463216026
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794463413225
+      }
+    ],
+    "8.11 Implement `EnomDomainSync` and make `enom:sync` a thin wrapper": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430795713
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794463681858
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794463769514
+      }
+    ],
+    "8.14 Update the `Admin\\DomainController` index counts and add customer search": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430795740
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794463775043
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794463859802
+      }
+    ],
+    "8.15 Make domain deletion soft and safe": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430795771
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794463864320
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794463932799
+      }
+    ],
+    "8.16 Fix `CleanupController` queries": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430795799
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794463775603
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794463860527
+      }
+    ],
+    "8.17 Update `ReviewWizardController::moveToDomain`": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430795830
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794463864835
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794463934090
+      }
+    ],
+    "9. Checkpoint - Phase 4 complete": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430795861
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794465345751
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794465376550
+      }
+    ],
+    "10.1 Add migration M8 and update the `CustomerApp` model": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430795889
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794463940754
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794464019140
+      }
+    ],
+    "10.2 Implement `CustomerAppService::createForService`": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430795920
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794464024846
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794464094626
+      }
+    ],
+    "10.3 Use the shared action in both `CustomerAppController` classes": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430795948
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794464100073
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794464204891
+      }
+    ],
+    "10.5 Expose `public_id` in the DTO and MCP app tools": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430795978
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794464026105
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794464096466
+      }
+    ],
+    "10.6 Add migration M9 for finding fingerprints": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430796006
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794463941147
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794464019983
+      }
+    ],
+    "10.7 Update the `SecurityFinding` model for `not_reported`": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430796032
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794464026794
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794464095907
+      }
+    ],
+    "10.8 Resolve apps by `public_id` and enforce payload limits in `FindingsIngestService`": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430796063
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794464100758
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794464205995
+      }
+    ],
+    "10.9 Replace delete-and-replace with fingerprint upsert in `FindingsIngestService`": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430796090
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794464208988
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794464370267
+      }
+    ],
+    "10.10 Update the findings route, MCP tool and existing findings tests": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430796126
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794464373623
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794464574738
+      }
+    ],
+    "10.13 Add migration M10 and `ServiceBillingService` for admin-created Stripe billing": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430796156
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794463942028
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794464020952
+      }
+    ],
+    "10.14 Add the billing retry action and persistent warning": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430796186
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794464027346
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794464094765
+      }
+    ],
+    "11. Checkpoint - Phase 5 complete": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430796214
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794465380258
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794465421507
+      }
+    ],
+    "12.1 Add the `x-status-badge` Blade component": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430796240
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794464580709
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794464897418
+      }
+    ],
+    "12.2 Make flash and error display consistent in the admin layout": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430796273
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794464580776
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794464898041
+      }
+    ],
+    "12.3 Render service type and status selectors from the enums": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430796315
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794464902985
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794464982502
+      }
+    ],
+    "12.4 Rebuild the provisioning queue index": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430796346
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794464904042
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794464984039
+      }
+    ],
+    "12.5 Add Retry and Provision actions to the queue": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430796373
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794464988260
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794465041161
+      }
+    ],
+    "12.6 Update the Admin service show page": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430796405
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794464989075
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794465042205
+      }
+    ],
+    "12.7 Prefill the shared web app creation form": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430796431
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794465048038
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794465109304
+      }
+    ],
+    "12.8 Link Domain and Service from the CustomerApp screens": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430796465
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794465048105
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794465110361
+      }
+    ],
+    "12.9 Add the Unassigned and Missing from eNom domain filters": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430796498
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794464904396
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794464984485
+      }
+    ],
+    "12.10 Add inline customer assignment on the domain index": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430796534
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794465048592
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794465108302
+      }
+    ],
+    "12.11 Update the domain show/edit page": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430796564
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794465114186
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794465163271
+      }
+    ],
+    "12.12 Add domain link-service and restore actions": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430796600
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794465167154
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794465231727
+      }
+    ],
+    "13. Final checkpoint - Phase 6 complete and all tests pass": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794430796630
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794465425239
+      },
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794465467376
+      }
+    ],
+    "1. Baseline test run and test groundwork": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794431126037
+      }
+    ],
+    "2. Phase 1: Data model": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794431808699
+      }
+    ],
+    "4. Phase 2: Shop and webhook": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794432985008
+      }
+    ],
+    "6. Phase 3: WHM": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794463204385
+      }
+    ],
+    "8. Phase 4: Domains and eNom": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794463934128
+      }
+    ],
+    "10. Phase 5: Web apps": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794464574795
+      }
+    ],
+    "12. Phase 6: Admin UI": [
+      {
+        "executionId": "f0f703d6-d903-4e50-9b82-3dbcdcaaf08d",
+        "chatSessionId": "sess_42320183-bc6b-489e-a3b9-57035b78d366",
+        "timestamp": 1794465231781
+      }
+    ]
+  }
+}

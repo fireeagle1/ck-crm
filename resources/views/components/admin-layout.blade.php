@@ -16,7 +16,7 @@
     @include('layouts.partials.admin-header')
 
     @if (session('success'))
-        <div class="max-w-7xl mx-auto px-4 mt-4">
+        <div class="max-w-7xl mx-auto px-4 mt-4" data-flash="success">
             <div class="rounded-md bg-green-50 p-4 border border-green-200">
                 <p class="text-sm text-green-700">{{ session('success') }}</p>
             </div>
@@ -24,13 +24,24 @@
     @endif
 
     @if (session('error'))
-        <div class="max-w-7xl mx-auto px-4 mt-4">
+        <div class="max-w-7xl mx-auto px-4 mt-4" data-flash="error">
             <div class="rounded-md bg-red-50 p-4 border border-red-200">
                 <p class="text-sm text-red-700">{{ session('error') }}</p>
             </div>
         </div>
     @endif
 
+    @if ($errors->any())
+        <div class="max-w-7xl mx-auto px-4 mt-4" data-flash="validation">
+            <div class="rounded-md bg-red-50 p-4 border border-red-200" role="alert">
+                <ul class="list-disc ml-5 text-sm text-red-700">
+                    @foreach ($errors->all() as $message)
+                        <li>{{ $message }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        </div>
+    @endif
     <main class="max-w-7xl mx-auto px-4 py-6">
         {{ $slot }}
     </main>

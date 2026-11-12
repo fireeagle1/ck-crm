@@ -8,7 +8,8 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\QuestionAnswer;
-use App\Models\Service;
+use App\Support\DomainNormaliser;
+use App\Support\StripeCreated;
 use App\ValueObjects\CheckoutResult;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -21,6 +22,9 @@ class CheckoutService
         private BookingService $bookingService,
         private NotificationService $notificationService,
         private AssetAssignmentService $assetAssignmentService,
+        private StockService $stockService,
+        private HostingServiceCreator $hostingServiceCreator,
+        private OrderCancellationService $orderCancellationService,
     ) {}
 
     /**
@@ -43,6 +47,10 @@ class CheckoutService
         array $deliveryAddress = [],
         array $checkoutOptions = []
     ): CheckoutResult {
+        // Declared outside the try so failure compensation (task 4.11) can see what exists.
+        $order = null;
+        $created = new StripeCreated();
+
         try {
             $cartItems = $cart->getItems();
 
@@ -56,7 +64,7 @@ class CheckoutService
                 );
             }
 
-            // Ensure the customer has a Stripe customer record
+            // Ensure the customer has a Stripe customer record (outside any transaction)
             $this->stripe->ensureCustomer($customer);
 
             // Determine if address is needed (skip for hosting-only carts)
@@ -75,14 +83,11 @@ class CheckoutService
             $discountCode = $checkoutOptions['discount_code'] ?? null;
             $discountAmount = (float) ($checkoutOptions['discount_amount'] ?? 0);
 
-            // Create Order and OrderItems within a transaction, then handle payments
-            $result = DB::transaction(function () use ($customer, $cartItems, $deliveryAddress, $checkoutOptions, $requiresAddress, $deliveryMethod, $deliveryCharge, $discountCode, $discountAmount) {
-                // Calculate total amount (items + delivery - discount)
+            // Transaction 1: local state only. No Stripe call happens inside it.
+            [$order, $orderItems] = DB::transaction(function () use ($customer, $cartItems, $deliveryAddress, $checkoutOptions, $requiresAddress, $deliveryMethod, $deliveryCharge, $discountCode, $discountAmount) {
                 $itemsTotal = $this->calculateTotalAmount($cartItems);
-                $totalAmount = round($itemsTotal + $deliveryCharge - $discountAmount, 2);
-                $totalAmount = max(0, $totalAmount);
+                $totalAmount = max(0, round($itemsTotal + $deliveryCharge - $discountAmount, 2));
 
-                // Create the Order
                 $orderData = [
                     'company_id' => $customer->company_id,
                     'payment_status' => 'pending',
@@ -94,7 +99,6 @@ class CheckoutService
                     'discount_amount' => $discountAmount,
                 ];
 
-                // Add delivery address if provided and required
                 if ($requiresAddress && !empty($deliveryAddress) && $deliveryMethod === 'delivery') {
                     $orderData['delivery_address_line1'] = $deliveryAddress['address_line1'] ?? null;
                     $orderData['delivery_address_line2'] = $deliveryAddress['address_line2'] ?? null;
@@ -106,7 +110,6 @@ class CheckoutService
 
                 $order = Order::create($orderData);
 
-                // Create OrderItems
                 $orderItems = $this->createOrderItems($order, $cartItems);
 
                 // Store question answers for each order item
@@ -121,32 +124,31 @@ class CheckoutService
                     }
                 }
 
-                // Handle hosting items: create pending Services
-                $this->handleHostingItems($order, $orderItems, $cartItems, $customer);
+                // Hosting items: pending Services through the single creator
+                $this->handleHostingItems($orderItems, $cartItems, $customer);
 
-                // Handle rental items: create Bookings with pessimistic locking
+                // Rental items: Bookings with pessimistic locking
                 $this->handleRentalItems($order, $orderItems, $cartItems, $checkoutOptions);
 
-                // Decrement stock for one-off products with pessimistic locking
-                $this->decrementStockForOneOffItems($cartItems);
+                // One-off items: reserve stock through the shared service
+                $this->reserveStockForOneOffItems($orderItems, $cartItems);
 
-                // Handle Stripe: create Checkout Session for one-off + rental items
-                $checkoutSessionUrl = $this->createStripeCheckoutSession($customer, $order, $cartItems, $orderItems, $deliveryCharge, $discountAmount);
-
-                // Store checkout session ID on the order
-                if ($this->lastCheckoutSessionId) {
-                    $order->update(['stripe_checkout_session_id' => $this->lastCheckoutSessionId]);
-                }
-
-                // Handle recurring/hosting subscriptions
-                $subscriptionIds = $this->processHostingSubscriptions($customer, $cartItems, $orderItems);
-
-                return [
-                    'order' => $order,
-                    'checkoutSessionUrl' => $checkoutSessionUrl,
-                    'subscriptionIds' => $subscriptionIds,
-                ];
+                return [$order, $orderItems];
             });
+
+            // Transaction 1 has committed. Stripe calls follow, outside any transaction.
+            // $created is filled in as each object is created so it can be compensated.
+            try {
+                $stripeResult = $this->runStripeSteps($customer, $order, $cartItems, $orderItems, $deliveryCharge, $discountAmount, $created);
+            } catch (\Throwable $e) {
+                return $this->compensateStripeFailure($customer, $order, $created, $e);
+            }
+
+            $result = [
+                'order' => $order,
+                'checkoutSessionUrl' => $stripeResult['checkoutSessionUrl'],
+                'subscriptionIds' => $stripeResult['subscriptionIds'],
+            ];
 
             $order = $result['order'];
 
@@ -202,67 +204,34 @@ class CheckoutService
     }
 
     /**
-     * Legacy method for backward compatibility.
-     * Processes checkout from raw cart items array (used by existing tests).
-     *
-     * @param Customer $customer
-     * @param array<int, array{product_id: int, name: string, price: float, product_type: string, billing_frequency: ?string}> $cartItems
-     * @return CheckoutResult
+     * A Stripe step failed after the order was committed: fail the order (restores stock,
+     * removes Pending services, cancels bookings) and cancel any Stripe objects already created.
      */
-    public function processCheckoutFromArray(Customer $customer, array $cartItems): CheckoutResult
+    private function compensateStripeFailure(Customer $customer, Order $order, StripeCreated $created, \Throwable $e): CheckoutResult
     {
+        Log::error('Checkout failed after commit: Stripe error, failing order', [
+            'company_id' => $customer->company_id,
+            'order_id' => $order->id,
+            'error' => $e->getMessage(),
+        ]);
+
         try {
-            // Ensure the customer has a Stripe customer record
-            $this->stripe->ensureCustomer($customer);
-
-            // Partition items into one-off and recurring groups
-            $oneOffItems = array_values(
-                array_filter($cartItems, fn (array $item) => $item['product_type'] === 'one_off')
-            );
-            $recurringItems = array_values(
-                array_filter(
-                    $cartItems,
-                    fn (array $item) => in_array($item['product_type'], ['equipment_rental', 'hosting'], true)
-                )
-            );
-
-            // Process each group
-            $checkoutSessionUrl = $this->processOneOffItemsLegacy($customer, $oneOffItems);
-            $subscriptionIds = $this->processRecurringItemsLegacy($customer, $recurringItems);
-
-            // Determine the stripe_checkout_session_id for the order
-            $sessionId = $this->lastCheckoutSessionId;
-
-            // Create Order and OrderItems within a transaction
-            $order = $this->createOrderFromCheckoutLegacy($customer, $cartItems, $sessionId, $subscriptionIds);
-
-            return new CheckoutResult(
-                checkoutSessionUrl: $checkoutSessionUrl,
-                order: $order,
-                subscriptionIds: $subscriptionIds,
-                success: true,
-                errorMessage: null,
-            );
-        } catch (\Throwable $e) {
-            Log::error('Checkout failed', [
-                'company_id' => $customer->company_id,
-                'error' => $e->getMessage(),
+            $this->orderCancellationService->failOrder($order, $created);
+        } catch (\Throwable $inner) {
+            Log::critical('Checkout compensation failed; order needs manual cleanup', [
+                'order_id' => $order->id,
+                'error' => $inner->getMessage(),
             ]);
-
-            return new CheckoutResult(
-                checkoutSessionUrl: null,
-                order: null,
-                subscriptionIds: [],
-                success: false,
-                errorMessage: $e->getMessage(),
-            );
         }
-    }
 
-    /**
-     * Track the last checkout session ID for order creation.
-     */
-    private ?string $lastCheckoutSessionId = null;
+        return new CheckoutResult(
+            checkoutSessionUrl: null,
+            order: null,
+            subscriptionIds: [],
+            success: false,
+            errorMessage: $e->getMessage(),
+        );
+    }
 
     /**
      * Validate the delivery address has all required fields.
@@ -302,44 +271,25 @@ class CheckoutService
     }
 
     /**
-     * Decrement stock for one-off products using pessimistic locking.
+     * Reserve stock for one-off items through StockService (caller owns the transaction).
      *
-     * Locks each product row with SELECT ... FOR UPDATE, re-validates that
-     * sufficient stock exists, and decrements stock_quantity by the ordered quantity.
-     *
+     * @param array<int, OrderItem> $orderItems
      * @throws \InvalidArgumentException If stock is insufficient for any product.
      */
-    private function decrementStockForOneOffItems(array $cartItems): void
+    private function reserveStockForOneOffItems(array $orderItems, array $cartItems): void
     {
-        foreach ($cartItems as $item) {
+        foreach ($cartItems as $index => $item) {
             if (($item['product_type'] ?? '') !== 'one_off') {
                 continue;
             }
 
-            $quantity = $item['quantity'] ?? 1;
-            $productId = $item['product_id'];
-
-            // Lock the product row to prevent race conditions
-            $product = Product::lockForUpdate()->find($productId);
+            $product = Product::find($item['product_id']);
 
             if (!$product) {
                 continue;
             }
 
-            // Skip stock decrement if stock is unlimited (null)
-            if ($product->stock_quantity === null) {
-                continue;
-            }
-
-            // Re-validate stock at checkout time
-            if ($product->stock_quantity < $quantity) {
-                throw new \InvalidArgumentException(
-                    "Insufficient stock for '{$product->name}'. Only {$product->stock_quantity} units available."
-                );
-            }
-
-            // Decrement stock by the ordered quantity
-            $product->decrement('stock_quantity', $quantity);
+            $this->stockService->reserve($product, (int) ($item['quantity'] ?? 1), $orderItems[$index]);
         }
     }
 
@@ -361,7 +311,7 @@ class CheckoutService
                 'price' => $item['price'],
                 'billing_frequency' => $item['billing_frequency'] ?? null,
                 'quantity' => $item['quantity'] ?? 1,
-                'domain_name' => $item['domain_name'] ?? null,
+                'domain_name' => DomainNormaliser::tryNormalise($item['domain_name'] ?? null),
                 'rental_start_date' => $item['rental_start_date'] ?? null,
                 'rental_end_date' => $item['rental_end_date'] ?? null,
             ];
@@ -373,29 +323,18 @@ class CheckoutService
     }
 
     /**
-     * Handle hosting items: create pending Service records.
+     * Handle hosting items: create pending Services through HostingServiceCreator.
+     *
+     * @param array<int, OrderItem> $orderItems
      */
-    private function handleHostingItems(Order $order, array $orderItems, array $cartItems, Customer $customer): void
+    private function handleHostingItems(array $orderItems, array $cartItems, Customer $customer): void
     {
         foreach ($cartItems as $index => $item) {
             if ($item['product_type'] !== 'hosting') {
                 continue;
             }
 
-            $orderItem = $orderItems[$index];
-
-            $service = Service::create([
-                'company_id' => $customer->company_id,
-                'service_short' => $item['name'],
-                'service_type' => 'hosting',
-                'status' => 'pending',
-                'domain_name' => $item['domain_name'] ?? null,
-                'start_date' => now(),
-                'service_monthly_charge' => $item['price'],
-                'service_payment_frequency' => $item['billing_frequency'] ?? null,
-            ]);
-
-            $orderItem->update(['service_id' => $service->service_id]);
+            $this->hostingServiceCreator->forOrderItem($orderItems[$index], $customer);
         }
     }
 
@@ -455,109 +394,55 @@ class CheckoutService
     }
 
     /**
-     * Create a Stripe Checkout Session for one-off items and equipment rental items.
-     * Equipment rental items are included as one-time charges in the session.
-     * Includes delivery charge as a line item and applies discount.
+     * Run the post-commit Stripe steps in order: coupon, Checkout Session, subscriptions.
      *
-     * @return string|null The checkout session URL, or null if no payable items.
+     * Every created object id is recorded in $created (by reference) the moment it exists,
+     * so a failure part-way through still leaves an accurate record for compensation.
+     *
+     * @param array<int, OrderItem> $orderItems
+     * @return array{checkoutSessionUrl: ?string, subscriptionIds: list<string>}
      */
-    private function createStripeCheckoutSession(Customer $customer, Order $order, array $cartItems, array $orderItems, float $deliveryCharge = 0, float $discountAmount = 0): ?string
-    {
-        // Collect items that go through Stripe Checkout Session (one-off + equipment_rental)
-        $lineItems = [];
+    private function runStripeSteps(
+        Customer $customer,
+        Order $order,
+        array $cartItems,
+        array $orderItems,
+        float $deliveryCharge,
+        float $discountAmount,
+        StripeCreated &$created,
+    ): array {
+        $lineItems = $this->buildSessionLineItems($cartItems, $deliveryCharge);
 
-        foreach ($cartItems as $index => $item) {
-            if ($item['product_type'] === 'one_off') {
-                $lineItems[] = [
-                    'price_data' => [
-                        'currency' => 'gbp',
-                        'product_data' => [
-                            'name' => $item['name'],
-                        ],
-                        'unit_amount' => (int) round($item['price'] * 100),
-                    ],
-                    'quantity' => $item['quantity'] ?? 1,
-                ];
-            } elseif ($item['product_type'] === 'equipment_rental') {
-                // Equipment rental total goes as a one-time charge
-                $totalPrice = $item['total_price'] ?? $item['price'];
-                $lineItems[] = [
-                    'price_data' => [
-                        'currency' => 'gbp',
-                        'product_data' => [
-                            'name' => $item['name'] . ' (Rental)',
-                        ],
-                        'unit_amount' => (int) round($totalPrice * 100),
-                    ],
-                    'quantity' => 1,
-                ];
-            }
-        }
+        $checkoutSessionUrl = null;
 
-        // Add delivery charge as a line item
-        if ($deliveryCharge > 0) {
-            $lineItems[] = [
-                'price_data' => [
-                    'currency' => 'gbp',
-                    'product_data' => [
-                        'name' => 'Delivery Charge',
-                    ],
-                    'unit_amount' => (int) round($deliveryCharge * 100),
-                ],
-                'quantity' => 1,
+        if (!empty($lineItems)) {
+            $sessionParams = [
+                'customer' => $customer->stripe_customer_id,
+                'line_items' => $lineItems,
+                'mode' => 'payment',
+                'success_url' => route('portal.orders.index') . '?checkout=success',
+                'cancel_url' => route('portal.cart.index') . '?checkout=cancelled',
+                'client_reference_id' => (string) $order->id,
+                'metadata' => ['order_id' => (string) $order->id],
             ];
-        }
 
-        if (empty($lineItems)) {
-            $this->lastCheckoutSessionId = null;
-            return null;
-        }
-
-        $successUrl = route('portal.orders.index') . '?checkout=success';
-        $cancelUrl = route('portal.cart.index') . '?checkout=cancelled';
-
-        // Build session params
-        $sessionParams = [
-            'customer' => $customer->stripe_customer_id,
-            'line_items' => $lineItems,
-            'mode' => 'payment',
-            'success_url' => $successUrl,
-            'cancel_url' => $cancelUrl,
-        ];
-
-        // Apply discount as a coupon if applicable
-        if ($discountAmount > 0) {
-            // Create an inline coupon for the discount amount
-            try {
-                $coupon = \Stripe\Coupon::create([
+            if ($discountAmount > 0) {
+                $coupon = $this->stripe->createDiscountCoupon([
                     'amount_off' => (int) round($discountAmount * 100),
-                    'currency' => 'gbp',
+                    'currency' => $this->currency(),
                     'duration' => 'once',
                     'name' => 'Discount',
                 ]);
+                $created = $created->withCoupon($coupon->id);
                 $sessionParams['discounts'] = [['coupon' => $coupon->id]];
-            } catch (\Throwable $e) {
-                Log::warning('Failed to create Stripe coupon for discount, proceeding without', [
-                    'discount_amount' => $discountAmount,
-                    'error' => $e->getMessage(),
-                ]);
             }
+
+            $session = $this->stripe->createCheckoutSessionWithParams($sessionParams);
+            $created = $created->withSession($session->id);
+            $order->update(['stripe_checkout_session_id' => $session->id]);
+            $checkoutSessionUrl = $session->url;
         }
 
-        $session = $this->stripe->createCheckoutSessionWithParams($sessionParams);
-
-        $this->lastCheckoutSessionId = $session->id;
-
-        return $session->url;
-    }
-
-    /**
-     * Process hosting items as Stripe subscriptions.
-     *
-     * @return array List of Stripe subscription IDs.
-     */
-    private function processHostingSubscriptions(Customer $customer, array $cartItems, array $orderItems): array
-    {
         $subscriptionIds = [];
 
         foreach ($cartItems as $index => $item) {
@@ -565,6 +450,7 @@ class CheckoutService
                 continue;
             }
 
+            $orderItem = $orderItems[$index];
             $priceId = $item['stripe_price_id'] ?? Product::find($item['product_id'])?->stripe_price_id ?? 'price_hosting_' . $item['product_id'];
 
             $metadata = [
@@ -572,10 +458,11 @@ class CheckoutService
                 'product_name' => $item['name'],
                 'product_type' => $item['product_type'],
                 'company_id' => $customer->company_id,
+                'order_id' => (string) $order->id,
             ];
 
-            if (!empty($item['domain_name'])) {
-                $metadata['domain_name'] = $item['domain_name'];
+            if (!empty($orderItem->domain_name)) {
+                $metadata['domain_name'] = $orderItem->domain_name;
             }
 
             $subscription = $this->stripe->createSubscription(
@@ -584,14 +471,68 @@ class CheckoutService
                 $metadata,
             );
 
+            $created = $created->withSubscription($subscription->id);
             $subscriptionIds[] = $subscription->id;
-
-            // Update the order item with the subscription ID
-            $orderItem = $orderItems[$index];
             $orderItem->update(['stripe_subscription_id' => $subscription->id]);
         }
 
-        return $subscriptionIds;
+        return [
+            'checkoutSessionUrl' => $checkoutSessionUrl,
+            'subscriptionIds' => $subscriptionIds,
+        ];
+    }
+
+    /**
+     * Line items for the Checkout Session: one-off, equipment rental and delivery.
+     */
+    private function buildSessionLineItems(array $cartItems, float $deliveryCharge): array
+    {
+        $currency = $this->currency();
+        $lineItems = [];
+
+        foreach ($cartItems as $item) {
+            if ($item['product_type'] === 'one_off') {
+                $lineItems[] = [
+                    'price_data' => [
+                        'currency' => $currency,
+                        'product_data' => ['name' => $item['name']],
+                        'unit_amount' => (int) round($item['price'] * 100),
+                    ],
+                    'quantity' => $item['quantity'] ?? 1,
+                ];
+            } elseif ($item['product_type'] === 'equipment_rental') {
+                $totalPrice = $item['total_price'] ?? $item['price'];
+                $lineItems[] = [
+                    'price_data' => [
+                        'currency' => $currency,
+                        'product_data' => ['name' => $item['name'] . ' (Rental)'],
+                        'unit_amount' => (int) round($totalPrice * 100),
+                    ],
+                    'quantity' => 1,
+                ];
+            }
+        }
+
+        if ($deliveryCharge > 0) {
+            $lineItems[] = [
+                'price_data' => [
+                    'currency' => $currency,
+                    'product_data' => ['name' => 'Delivery Charge'],
+                    'unit_amount' => (int) round($deliveryCharge * 100),
+                ],
+                'quantity' => 1,
+            ];
+        }
+
+        return $lineItems;
+    }
+
+    /**
+     * The single place CheckoutService reads the Stripe currency (Req 5.6).
+     */
+    private function currency(): string
+    {
+        return (string) (config('services.stripe.currency', 'gbp') ?: 'gbp');
     }
 
     /**
@@ -611,128 +552,6 @@ class CheckoutService
 
         // Hosting only
         return 'completed';
-    }
-
-    // ─── Legacy Methods (backward compatibility with existing tests) ─────
-
-    /**
-     * Process one-off items by creating a Stripe Checkout Session (legacy).
-     */
-    private function processOneOffItemsLegacy(Customer $customer, array $items): ?string
-    {
-        if (empty($items)) {
-            $this->lastCheckoutSessionId = null;
-            return null;
-        }
-
-        $lineItems = [];
-        foreach ($items as $item) {
-            $lineItems[] = [
-                'price_data' => [
-                    'currency' => 'gbp',
-                    'product_data' => [
-                        'name' => $item['name'],
-                    ],
-                    'unit_amount' => (int) round($item['price'] * 100),
-                ],
-                'quantity' => 1,
-            ];
-        }
-
-        $successUrl = route('portal.orders.index') . '?checkout=success';
-        $cancelUrl = route('portal.cart.index') . '?checkout=cancelled';
-
-        $session = $this->stripe->createCheckoutSession(
-            $customer->stripe_customer_id,
-            $lineItems,
-            $successUrl,
-            $cancelUrl,
-        );
-
-        $this->lastCheckoutSessionId = $session->id;
-
-        return $session->url;
-    }
-
-    /**
-     * Process recurring items by creating Stripe subscriptions (legacy).
-     */
-    private function processRecurringItemsLegacy(Customer $customer, array $items): array
-    {
-        if (empty($items)) {
-            return [];
-        }
-
-        $subscriptionIds = [];
-
-        foreach ($items as $item) {
-            $priceId = $item['stripe_price_id'] ?? 'price_placeholder_' . $item['product_id'];
-
-            $metadata = [
-                'product_id' => $item['product_id'],
-                'product_name' => $item['name'],
-                'product_type' => $item['product_type'],
-                'company_id' => $customer->company_id,
-            ];
-
-            $subscription = $this->stripe->createSubscription(
-                $customer->stripe_customer_id,
-                $priceId,
-                $metadata,
-            );
-
-            $subscriptionIds[] = $subscription->id;
-        }
-
-        return $subscriptionIds;
-    }
-
-    /**
-     * Create Order and OrderItem records from checkout (legacy).
-     */
-    private function createOrderFromCheckoutLegacy(
-        Customer $customer,
-        array $items,
-        ?string $sessionId,
-        array $subscriptionIds = []
-    ): Order {
-        return DB::transaction(function () use ($customer, $items, $sessionId, $subscriptionIds) {
-            $totalAmount = array_sum(array_column($items, 'price'));
-
-            $fulfilmentStatus = $this->determineFulfilmentStatus($items);
-
-            $order = Order::create([
-                'company_id' => $customer->company_id,
-                'payment_status' => 'pending',
-                'fulfilment_status' => $fulfilmentStatus,
-                'stripe_checkout_session_id' => $sessionId,
-                'total_amount' => $totalAmount,
-            ]);
-
-            $subscriptionIndex = 0;
-
-            foreach ($items as $item) {
-                $orderItemData = [
-                    'order_id' => $order->id,
-                    'product_id' => $item['product_id'],
-                    'product_name' => $item['name'],
-                    'product_type' => $item['product_type'],
-                    'price' => $item['price'],
-                    'billing_frequency' => $item['billing_frequency'] ?? null,
-                ];
-
-                if (in_array($item['product_type'], ['equipment_rental', 'hosting'], true)) {
-                    if (isset($subscriptionIds[$subscriptionIndex])) {
-                        $orderItemData['stripe_subscription_id'] = $subscriptionIds[$subscriptionIndex];
-                        $subscriptionIndex++;
-                    }
-                }
-
-                OrderItem::create($orderItemData);
-            }
-
-            return $order;
-        });
     }
 
     /**

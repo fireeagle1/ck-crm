@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Customer;
 use Illuminate\Support\Facades\Log;
 use Stripe\Checkout\Session;
+use Stripe\Coupon;
 use Stripe\Customer as StripeCustomer;
 use Stripe\Event;
 use Stripe\Exception\ApiErrorException;
@@ -81,7 +82,7 @@ class StripeService
         try {
             return PaymentIntent::create([
                 'amount' => $amount,
-                'currency' => config('services.stripe.currency', 'gbp'),
+                'currency' => $this->currency(),
                 'customer' => $customerId,
                 'metadata' => $metadata,
                 'automatic_payment_methods' => [
@@ -201,6 +202,123 @@ class StripeService
 
             throw new HttpException(502, 'Unable to create subscription. Please try again or contact support.');
         }
+    }
+
+    /**
+     * Create a discount coupon. Defaults: duration "once", name "Discount".
+     * Pass either `amount_off` (smallest currency unit) or `percent_off`.
+     * The configured currency is added only for fixed-amount coupons.
+     *
+     * @param array $params Stripe coupon params, merged over the defaults.
+     */
+    public function createDiscountCoupon(array $params = []): Coupon
+    {
+        $params += ['duration' => 'once', 'name' => 'Discount'];
+
+        if (isset($params['amount_off']) && !isset($params['currency'])) {
+            $params['currency'] = $this->currency();
+        }
+
+        try {
+            return Coupon::create($params);
+        } catch (ApiErrorException $e) {
+            Log::error('Stripe: Failed to create coupon', [
+                'error' => $e->getMessage(),
+            ]);
+
+            throw new HttpException(502, 'Unable to apply discount. Please try again or contact support.');
+        }
+    }
+
+    /**
+     * Expire an open Checkout Session (compensation). Throws HttpException(502) on failure.
+     */
+    public function expireCheckoutSession(string $sessionId): void
+    {
+        try {
+            Session::retrieve($sessionId)->expire();
+        } catch (ApiErrorException $e) {
+            Log::error('Stripe: Failed to expire checkout session', [
+                'session' => $sessionId,
+                'error' => $e->getMessage(),
+            ]);
+
+            throw new HttpException(502, 'Unable to expire checkout session.');
+        }
+    }
+
+    /**
+     * Cancel a subscription immediately (compensation). Throws HttpException(502) on failure.
+     */
+    public function cancelSubscription(string $subscriptionId): void
+    {
+        try {
+            Subscription::retrieve($subscriptionId)->cancel();
+        } catch (ApiErrorException $e) {
+            Log::error('Stripe: Failed to cancel subscription', [
+                'subscription' => $subscriptionId,
+                'error' => $e->getMessage(),
+            ]);
+
+            throw new HttpException(502, 'Unable to cancel subscription.');
+        }
+    }
+
+    /**
+     * Ensure a Stripe customer exists with the given billing email (admin-created invoiced billing).
+     * Falls back to the first user email. Throws InvalidArgumentException without an email.
+     */
+    public function ensureCustomerWithEmail(Customer $customer, ?string $contactEmail = null): string
+    {
+        $email = $contactEmail ?: $customer->users()
+            ->whereNotNull('email')
+            ->where('email', '!=', '')
+            ->value('email');
+
+        if (!$email) {
+            throw new \InvalidArgumentException(
+                'A valid billing email is required to create an invoiced Stripe subscription.'
+            );
+        }
+
+        if ($customer->stripe_customer_id) {
+            $stripeCustomer = StripeCustomer::retrieve($customer->stripe_customer_id);
+
+            if (($stripeCustomer->email ?? null) !== $email) {
+                StripeCustomer::update($customer->stripe_customer_id, ['email' => $email]);
+            }
+
+            return $customer->stripe_customer_id;
+        }
+
+        $stripeCustomer = StripeCustomer::create([
+            'name' => $customer->company_name,
+            'email' => $email,
+            'phone' => $customer->phone_number,
+            'metadata' => ['company_id' => $customer->company_id],
+        ]);
+
+        $customer->update(['stripe_customer_id' => $stripeCustomer->id]);
+
+        return $stripeCustomer->id;
+    }
+
+    /** Create a send_invoice subscription for an admin-created service. */
+    public function createInvoicedSubscription(string $customerId, string $priceId, array $metadata = []): Subscription
+    {
+        return Subscription::create([
+            'customer' => $customerId,
+            'items' => [['price' => $priceId]],
+            'collection_method' => 'send_invoice',
+            'days_until_due' => 7,
+            'metadata' => $metadata,
+        ]);
+    }
+
+    /** Currency for all Stripe amounts (Req 5.6). */
+    protected function currency(): string
+    {
+        return (string) (config('services.stripe.currency', 'gbp') ?: 'gbp');
     }
 
     /**

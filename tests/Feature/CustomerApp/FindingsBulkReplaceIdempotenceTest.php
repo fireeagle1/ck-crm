@@ -12,14 +12,14 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 /**
- * Feature: customer-app-services, Property 3: Findings ingestion is a full, idempotent bulk replacement.
+ * Feature: customer-app-services, Property 3: Findings ingestion is idempotent.
  *
- * For any existing CustomerApp with any prior set of packages and findings, and any valid submitted
- * payload, after ingestion the app's stored packages and findings equal exactly the submitted set
- * (all prior records gone, all submitted records present with synced_at stamped); and applying the
- * same valid payload a second time leaves the stored state unchanged.
+ * Packages are replaced by the payload. Findings are upserted by fingerprint and never deleted:
+ * payload findings are present with synced_at stamped, prior findings absent from the payload are
+ * kept (stored `open` ones become `not_reported`). Applying the same valid payload a second time
+ * leaves the stored state unchanged.
  *
- * Validates: Requirements 2.3, 2.5, 3.1, 3.2
+ * Validates: Requirements 2.3, 2.5, 3.1, 3.2, 17.2, 17.3, 17.4, 17.7
  *
  * innmind/black-box is not a dependency of this project, so rather than adding a new dependency the
  * universal property is exercised with a loop that generates >= 100 random cases. Each case seeds a
@@ -58,7 +58,7 @@ class FindingsBulkReplaceIdempotenceTest extends TestCase
             $findings = $this->makeFindingPayload($payloadFindingCount, $case);
 
             // Act: first ingestion.
-            $counts = $this->service->ingest((string) $app->id, $packages, $findings);
+            $counts = $this->service->ingest($app->public_id, $packages, $findings);
 
             // Returned counts reflect exactly the submitted set.
             $this->assertSame($payloadPackageCount, $counts['packages'], "package count mismatch, case {$case}");
@@ -66,15 +66,15 @@ class FindingsBulkReplaceIdempotenceTest extends TestCase
 
             // Property: the stored set equals the submitted set exactly, with synced_at stamped and
             // every prior record gone.
-            $this->assertStoredEqualsPayload($app, $packages, $findings, $case, 'after first ingest');
+            $this->assertStoredEqualsPayload($app, $packages, $findings, $case, 'after first ingest', $priorFindings);
 
             $firstState = $this->snapshot($app);
 
             // Act: re-apply the SAME payload.
-            $this->service->ingest((string) $app->id, $packages, $findings);
+            $this->service->ingest($app->public_id, $packages, $findings);
 
             // Property: the stored *content* is unchanged — same packages and findings as before.
-            $this->assertStoredEqualsPayload($app, $packages, $findings, $case, 'after second ingest');
+            $this->assertStoredEqualsPayload($app, $packages, $findings, $case, 'after second ingest', $priorFindings);
 
             $secondState = $this->snapshot($app);
 
@@ -101,14 +101,15 @@ class FindingsBulkReplaceIdempotenceTest extends TestCase
         array $packages,
         array $findings,
         int $case,
-        string $phase
+        string $phase,
+        int $priorCount = 0
     ): void {
         $storedPackages = AppPackage::where('customer_app_id', $app->id)->get();
         $storedFindings = SecurityFinding::where('customer_app_id', $app->id)->get();
 
         // Count matches the submitted set exactly (all prior records gone).
         $this->assertCount(count($packages), $storedPackages, "package set size mismatch {$phase}, case {$case}");
-        $this->assertCount(count($findings), $storedFindings, "finding set size mismatch {$phase}, case {$case}");
+        $this->assertCount(count($findings) + $priorCount, $storedFindings, "finding set size mismatch {$phase}, case {$case}");
 
         // Every stored row has synced_at stamped (Req 2.3).
         foreach ($storedPackages as $package) {
@@ -128,6 +129,12 @@ class FindingsBulkReplaceIdempotenceTest extends TestCase
         $this->assertSame($expectedPackages, $actualPackages, "package content mismatch {$phase}, case {$case}");
 
         $expectedFindings = $this->normaliseFindings($findings);
+        for ($i = 0; $i < $priorCount; $i++) {
+            $status = SecurityFinding::STATUSES[$i % count(SecurityFinding::STATUSES)];
+            $status = $status === SecurityFinding::STATUS_OPEN ? SecurityFinding::STATUS_NOT_REPORTED : $status;
+            $expectedFindings[] = ['low', 'medium', 'high', 'critical'][$i % 4].'|Prior finding '.$i.'|'.$status;
+        }
+        sort($expectedFindings);
         $actualFindings = $storedFindings
             ->map(fn (SecurityFinding $f): string => $f->severity.'|'.$f->description.'|'.$f->status)
             ->sort()
@@ -234,7 +241,7 @@ class FindingsBulkReplaceIdempotenceTest extends TestCase
                 'severity' => $severities[random_int(0, count($severities) - 1)],
                 'description' => "Finding {$case}-{$i} details",
                 // Only valid statuses drawn from the defined set (Req 3.4 valid path).
-                'status' => SecurityFinding::STATUSES[random_int(0, count(SecurityFinding::STATUSES) - 1)],
+                'status' => SecurityFinding::PAYLOAD_STATUSES[random_int(0, count(SecurityFinding::PAYLOAD_STATUSES) - 1)],
             ];
         }
 

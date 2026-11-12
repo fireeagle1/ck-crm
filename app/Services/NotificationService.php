@@ -53,6 +53,30 @@ class NotificationService
     }
 
     /**
+     * Tell admins a paid hosting order is held because its domain is already in use.
+     */
+    public function notifyAdminHostingDomainConflict(Order $order, string $domain, ?int $existingServiceId = null): void
+    {
+        $admins = $this->getAdminEmails();
+
+        if (empty($admins)) {
+            Log::warning('NotificationService: No admin emails found for hosting domain conflict notification', [
+                'order_id' => $order->id,
+            ]);
+            return;
+        }
+
+        try {
+            Mail::to($admins)->queue(new \App\Mail\HostingDomainConflictAdmin($order, $domain, $existingServiceId));
+        } catch (\Exception $e) {
+            Log::error('NotificationService: Failed to dispatch hosting domain conflict notification', [
+                'order_id' => $order->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    /**
      * Send rental end reminder to admin.
      *
      * Dispatches a queued email to all admin users indicating the rental period
@@ -289,10 +313,7 @@ class NotificationService
             return;
         }
 
-        $nameservers = [
-            Setting::get('whm_nameserver_0', 'ns0.thundercloud.uk'),
-            Setting::get('whm_nameserver_1', 'ns1.thundercloud.uk'),
-        ];
+        $nameservers = \App\Support\Nameservers::get();
 
         try {
             Mail::to($customerEmail)->queue(new HostingProvisioned($service, $nameservers));

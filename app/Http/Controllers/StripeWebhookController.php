@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\ServiceStatus;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\ProcessedWebhookEvent;
@@ -9,6 +10,7 @@ use App\Models\Service;
 use App\Services\FulfilmentService;
 use App\Services\NotificationService;
 use App\Services\StripeService;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -42,39 +44,43 @@ class StripeWebhookController extends Controller
         $eventId = $event->id;
         $eventType = $event->type;
 
-        // Check if this event has already been processed (Req 9.2)
-        if (ProcessedWebhookEvent::where('stripe_event_id', $eventId)->exists()) {
-            return response('', 200);
-        }
-
-        // Insert the event_id row before processing (Req 9.1)
-        $webhookRecord = ProcessedWebhookEvent::create([
-            'stripe_event_id' => $eventId,
-            'event_type' => $eventType,
-            'processed_at' => now(),
-        ]);
+        /** @var array<int, \Closure> $afterCommit */
+        $afterCommit = [];
 
         try {
-            // Wrap fulfilment processing in a DB transaction (Req 10.1)
-            DB::transaction(function () use ($event) {
+            // Marker insert and handlers share one transaction (Req 6.2).
+            DB::transaction(function () use ($event, $eventId, $eventType, &$afterCommit) {
+                ProcessedWebhookEvent::create([
+                    'stripe_event_id' => $eventId,
+                    'event_type' => $eventType,
+                    'processed_at' => now(),
+                ]);
+
                 match ($event->type) {
                     'checkout.session.completed' => $this->handleCheckoutSessionCompleted($event->data->object),
-                    'invoice.payment_failed' => $this->handleInvoicePaymentFailed($event->data->object),
+                    'invoice.paid' => $this->handleInvoicePaid($event->data->object),
+                    'invoice.payment_failed' => $this->handleInvoicePaymentFailed($event->data->object, $afterCommit),
                     'customer.subscription.deleted' => $this->handleSubscriptionDeleted($event->data->object),
                     default => Log::info("Stripe webhook: Unhandled event type {$event->type}"),
                 };
             });
+        } catch (UniqueConstraintViolationException) {
+            // Already processed (or concurrently processing): skip (Req 6.3)
+            return response('', 200);
         } catch (\Throwable $e) {
-            // On transaction failure: delete event_id row to allow Stripe retry (Req 10.2, 10.3)
-            $webhookRecord->delete();
+            // Transaction (including marker) rolled back; Stripe will retry (Req 6.4)
+            report($e);
 
-            Log::error('Stripe webhook: Processing failed, event will be retried', [
-                'event_id' => $eventId,
-                'event_type' => $eventType,
-                'error' => $e->getMessage(),
-            ]);
+            return response('', 500);
+        }
 
-            throw $e;
+        // Side effects (emails etc.) run only after commit, each isolated (Req 6.5, 6.6)
+        foreach ($afterCommit as $callback) {
+            try {
+                $callback();
+            } catch (\Throwable $e) {
+                report($e);
+            }
         }
 
         return response('', 200);
@@ -90,8 +96,23 @@ class StripeWebhookController extends Controller
     {
         $order = Order::where('stripe_checkout_session_id', $session->id)->first();
 
+        $clientReferenceId = $session->client_reference_id ?? null;
+        if (!$order && $clientReferenceId) {
+            $order = Order::find($clientReferenceId);
+        }
+
         if (!$order) {
-            Log::warning('Stripe webhook: Order not found for checkout session', [
+            $metadataOrderId = $session->metadata->order_id ?? null;
+
+            if ($metadataOrderId) {
+                // Metadata names an order we cannot see yet; throw so the
+                // transaction rolls back and Stripe retries (Req 6.4).
+                throw new \RuntimeException(
+                    "Stripe webhook: order {$metadataOrderId} named in session metadata not found (session {$session->id})"
+                );
+            }
+
+            Log::warning('Stripe webhook: checkout session does not belong to an order, ignoring', [
                 'session_id' => $session->id,
             ]);
             return;
@@ -118,12 +139,65 @@ class StripeWebhookController extends Controller
     }
 
     /**
+     * Handle invoice.paid: first invoice of a hosting subscription whose order
+     * has no Checkout Session. Marks the order paid and provisions hosting items.
+     * Other billing reasons, unknown orders, checkout-backed orders and orders
+     * already paid are ignored.
+     *
+     * Requirements: 3.4, 6.2
+     */
+    private function handleInvoicePaid(object $invoice): void
+    {
+        if (($invoice->billing_reason ?? null) !== 'subscription_create') {
+            return;
+        }
+
+        $details = $invoice->parent->subscription_details ?? $invoice->subscription_details ?? null;
+        $subscriptionId = $invoice->subscription ?? ($details->subscription ?? null);
+        $metadataOrderId = $details->metadata->order_id ?? null;
+
+        $order = null;
+        if ($subscriptionId) {
+            $orderId = OrderItem::where('stripe_subscription_id', $subscriptionId)->value('order_id');
+            $order = $orderId ? Order::find($orderId) : null;
+        }
+        if (!$order && $metadataOrderId) {
+            $order = Order::find($metadataOrderId);
+        }
+
+        if (!$order) {
+            Log::info('Stripe webhook: invoice.paid does not belong to an order, ignoring', [
+                'invoice_id' => $invoice->id ?? null,
+            ]);
+            return;
+        }
+
+        // Checkout-backed orders are fulfilled by checkout.session.completed.
+        if ($order->stripe_checkout_session_id || $order->payment_status === 'paid') {
+            return;
+        }
+
+        $order->update(['payment_status' => 'paid']);
+
+        $customer = $order->customer;
+        $order->load('items.booking');
+
+        foreach ($order->items as $item) {
+            if ($item->product_type === 'hosting') {
+                $this->fulfilmentService->handleHostingPurchase($item, $customer);
+            }
+        }
+    }
+
+    /**
      * Handle invoice.payment_failed: update the associated service status to "payment_failed"
      * and trigger payment failure notifications to admin and customer.
      *
-     * Requirements: 8.1, 8.2
+     * Requirements: 8.1, 8.2, 6.5
+     *
+     * @param array<int, \Closure> $afterCommit
      */
-    private function handleInvoicePaymentFailed(object $invoice): void
+    private function handleInvoicePaymentFailed(object $invoice, array &$afterCommit): void
     {
         $subscriptionId = $invoice->subscription ?? null;
         $failureReason = $invoice->last_finalization_error->message ?? 'Payment failed';
@@ -142,14 +216,17 @@ class StripeWebhookController extends Controller
             return;
         }
 
-        $service->update(['status' => 'payment_failed']);
+        // Only Active or Pending services are suspended; Cancelled is never changed (Req 1.7)
+        if (in_array($service->status, [ServiceStatus::Active->value, ServiceStatus::Pending->value], true)) {
+            $service->update(['status' => ServiceStatus::Suspended->value]);
+        }
 
         // Find associated order to trigger payment failure notifications (Req 8.1, 8.2)
         $orderItem = OrderItem::where('stripe_subscription_id', $subscriptionId)->first();
         $order = $orderItem?->order;
 
         if ($order) {
-            $this->notificationService->notifyPaymentFailure($order, $failureReason);
+            $afterCommit[] = fn () => $this->notificationService->notifyPaymentFailure($order, $failureReason);
         } else {
             Log::warning('Stripe webhook: Order not found for payment failure notification', [
                 'subscription_id' => $subscriptionId,
@@ -174,6 +251,6 @@ class StripeWebhookController extends Controller
             return;
         }
 
-        $service->update(['status' => 'cancelled']);
+        $service->update(['status' => ServiceStatus::Cancelled->value]);
     }
 }

@@ -28,9 +28,9 @@
                     <div>
                         <label for="service_type" class="block text-sm font-semibold text-gray-700">Service Type <span class="text-red-500">*</span></label>
                         <select name="service_type" id="service_type" required x-model="serviceType" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                            <option value="Web Hosting">Web Hosting</option>
-                            <option value="Technical Support">Technical Support</option>
-                            <option value="Other">Other</option>
+                            @foreach (\App\Enums\ServiceType::values() as $type)
+                                <option value="{{ $type }}" {{ old('service_type', \App\Enums\ServiceType::WebHosting->value) === $type ? 'selected' : '' }}>{{ $type }}</option>
+                            @endforeach
                         </select>
                         <p class="text-xs text-gray-400 mt-1">Domain registrations are managed in the Domains section, not as services.</p>
                     </div>
@@ -49,7 +49,7 @@
                 </div>
 
                 {{-- Hosting details (shows for Web Hosting) --}}
-                <div x-show="serviceType === 'Web Hosting'" x-transition
+                <div x-show="serviceType === @js(\App\Enums\ServiceType::WebHosting->value)" x-transition
                      class="border border-blue-200 rounded-md p-4 bg-blue-50">
                     <h3 class="text-sm font-semibold text-blue-900 mb-3">Hosting Details</h3>
                     <div class="grid grid-cols-2 gap-4">
@@ -58,7 +58,7 @@
                             <input type="text" name="domain_name" id="domain_name" value="{{ old('domain_name') }}"
                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"
                                    placeholder="example.co.uk"
-                                   :required="serviceType === 'Web Hosting'"
+                                   :required="serviceType === @js(\App\Enums\ServiceType::WebHosting->value)"
                                    @input="generateUsername()">
                             @error('domain_name') <p class="text-red-600 text-sm mt-1">{{ $message }}</p> @enderror
                         </div>
@@ -67,7 +67,7 @@
                             <input type="text" name="cpanel_username" id="cpanel_username" x-model="cpanelUsername"
                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"
                                    placeholder="Auto-generated from domain"
-                                   :required="serviceType === 'Web Hosting'" maxlength="16">
+                                   :required="serviceType === @js(\App\Enums\ServiceType::WebHosting->value)" maxlength="16">
                             <p class="text-xs text-gray-400 mt-1">Max 16 chars. Auto-generated — edit if needed.</p>
                         </div>
                     </div>
@@ -151,7 +151,7 @@
     <script>
         function serviceForm() {
             return {
-                serviceType: '{{ old('service_type', 'Web Hosting') }}',
+                serviceType: @js(old('service_type', \App\Enums\ServiceType::WebHosting->value)),
                 cpanelUsername: '{{ old('cpanel_username') }}',
                 contactEmail: '{{ old('contact_email') }}',
                 serviceName: '{{ old('service_short') }}',

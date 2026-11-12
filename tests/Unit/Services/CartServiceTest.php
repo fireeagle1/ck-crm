@@ -233,6 +233,19 @@ class CartServiceTest extends TestCase
         $this->assertEquals('mywebsite.co.uk', $items[0]['domain_name']);
     }
 
+    public function test_hosting_product_stores_canonical_domain_name(): void
+    {
+        $product = $this->makeAvailableProduct([
+            'product_type' => 'hosting',
+            'stock_quantity' => null,
+            'billing_frequency' => 'monthly',
+        ]);
+
+        $this->cartService->addItem($product, ['domain_name' => '  WWW.MyWebsite.CO.UK. ']);
+
+        $this->assertSame('mywebsite.co.uk', $this->cartService->getItems()[0]['domain_name']);
+    }
+
     // ──────────────────────────────────────────────────────────────────
     // addItem — one_off items (no extra validation)
     // ──────────────────────────────────────────────────────────────────
@@ -470,6 +483,8 @@ class CartServiceTest extends TestCase
             'sub.domain.org',
             'test123.io',
             'a.bc',
+            'WWW.Example.COM.',
+            'bücher.de',
         ];
 
         foreach ($validDomains as $domain) {

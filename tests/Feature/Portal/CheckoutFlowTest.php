@@ -6,7 +6,10 @@ use App\Models\Customer;
 use App\Models\Product;
 use App\Models\User;
 use App\Services\StripeService;
+use App\Models\Order;
+use App\Models\Service;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Mockery\MockInterface;
 use Stripe\Checkout\Session as StripeSession;
 use Stripe\Subscription as StripeSubscription;
@@ -45,19 +48,32 @@ class CheckoutFlowTest extends TestCase
             'company_id' => $this->customer->company_id,
             'email_verified_at' => now(),
         ]);
+
+        // The SQLite test schema keeps the original order status CHECK constraints, which
+        // reject 'failed' / 'cancelled' written by failure compensation (MySQL widens them).
+        if (DB::getDriverName() === 'sqlite') {
+            DB::statement('PRAGMA ignore_check_constraints = ON');
+        }
     }
 
     // ─── Helper Methods ──────────────────────────────────────────────────
 
     private function buildCartItem(Product $product): array
     {
-        return [
+        $item = [
             'product_id' => $product->id,
             'name' => $product->name,
             'price' => (float) $product->price,
             'product_type' => $product->product_type,
             'billing_frequency' => $product->billing_frequency,
         ];
+
+        // Hosting items need a domain to create their Service.
+        if ($product->product_type === 'hosting') {
+            $item['domain_name'] = 'checkout-flow-' . $product->id . '.example.com';
+        }
+
+        return $item;
     }
 
     private function makeFakeStripeSession(string $id = 'cs_test_abc', string $url = 'https://checkout.stripe.com/test'): StripeSession
@@ -97,7 +113,7 @@ class CheckoutFlowTest extends TestCase
                     return 'cus_new_stripe_id';
                 });
 
-            $mock->shouldReceive('createCheckoutSession')
+            $mock->shouldReceive('createCheckoutSessionWithParams')
                 ->once()
                 ->andReturn($this->makeFakeStripeSession());
 
@@ -142,7 +158,7 @@ class CheckoutFlowTest extends TestCase
                     return $customer->stripe_customer_id;
                 });
 
-            $mock->shouldReceive('createCheckoutSession')
+            $mock->shouldReceive('createCheckoutSessionWithParams')
                 ->once()
                 ->andReturn($this->makeFakeStripeSession());
 
@@ -188,7 +204,7 @@ class CheckoutFlowTest extends TestCase
                     return $c->stripe_customer_id;
                 });
 
-            $mock->shouldReceive('createCheckoutSession')
+            $mock->shouldReceive('createCheckoutSessionWithParams')
                 ->times(count($scenarios))
                 ->andReturn($this->makeFakeStripeSession('cs_scenario'));
 
@@ -295,7 +311,7 @@ class CheckoutFlowTest extends TestCase
                     return 'cus_test_multi';
                 });
 
-            $mock->shouldReceive('createCheckoutSession')
+            $mock->shouldReceive('createCheckoutSessionWithParams')
                 ->once()
                 ->andThrow(new \Exception('Stripe network error'));
 
@@ -387,7 +403,7 @@ class CheckoutFlowTest extends TestCase
                     return 'cus_test_success';
                 });
 
-            $mock->shouldReceive('createCheckoutSession')
+            $mock->shouldReceive('createCheckoutSessionWithParams')
                 ->once()
                 ->andReturn($this->makeFakeStripeSession('cs_success', 'https://checkout.stripe.com/pay/cs_success'));
 
@@ -426,7 +442,7 @@ class CheckoutFlowTest extends TestCase
                     return 'cus_test_recurring';
                 });
 
-            $mock->shouldReceive('createCheckoutSession')->never();
+            $mock->shouldReceive('createCheckoutSessionWithParams')->never();
 
             $mock->shouldReceive('createSubscription')
                 ->once()
@@ -443,6 +459,55 @@ class CheckoutFlowTest extends TestCase
 
         // Cart should be cleared
         $response->assertSessionMissing('shop_cart');
+
+        // Hosting item created a Pending Web Hosting service
+        $service = Service::where('company_id', $this->customer->company_id)->firstOrFail();
+        $this->assertSame('Web Hosting', $service->service_type);
+        $this->assertSame('Pending', $service->status);
+    }
+
+    /**
+     * Mixed cart (one-off + hosting): redirects to the Checkout Session, creates a
+     * subscription for the hosting item and a Pending Web Hosting service.
+     */
+    public function test_successful_mixed_cart_checkout_creates_session_subscription_and_pending_service(): void
+    {
+        $oneOff = Product::factory()->oneOff()->create(['is_archived' => false, 'stock_quantity' => 10]);
+        $hosting = Product::factory()->hosting()->create(['is_archived' => false]);
+
+        $cartItems = [$this->buildCartItem($oneOff), $this->buildCartItem($hosting)];
+
+        $this->mock(StripeService::class, function (MockInterface $mock) {
+            $mock->shouldReceive('ensureCustomer')
+                ->once()
+                ->andReturnUsing(function (Customer $customer) {
+                    $customer->update(['stripe_customer_id' => 'cus_test_mixed']);
+                    return 'cus_test_mixed';
+                });
+
+            $mock->shouldReceive('createCheckoutSessionWithParams')
+                ->once()
+                ->andReturn($this->makeFakeStripeSession('cs_mixed', 'https://checkout.stripe.com/pay/cs_mixed'));
+
+            $mock->shouldReceive('createSubscription')
+                ->once()
+                ->andReturn($this->makeFakeStripeSubscription('sub_mixed'));
+        });
+
+        $response = $this->actingAs($this->user)
+            ->withSession(['shop_cart' => $cartItems])
+            ->post(route('portal.cart.checkout'));
+
+        $response->assertRedirect('https://checkout.stripe.com/pay/cs_mixed');
+        $response->assertSessionMissing('shop_cart');
+
+        $order = Order::where('company_id', $this->customer->company_id)->firstOrFail();
+        $this->assertSame('cs_mixed', $order->stripe_checkout_session_id);
+        $this->assertSame(9, $oneOff->fresh()->stock_quantity);
+
+        $service = Service::where('company_id', $this->customer->company_id)->firstOrFail();
+        $this->assertSame('Web Hosting', $service->service_type);
+        $this->assertSame('Pending', $service->status);
     }
 
     // ──────────────────────────────────────────────────────────────────

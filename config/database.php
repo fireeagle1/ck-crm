@@ -64,6 +64,23 @@ return [
             ]) : [],
         ],
 
+        // Read-only connection to prod, used for troubleshooting via an SSH tunnel.
+        // Only configured when PROD_RO_* vars exist in the local .env.
+        'prod_readonly' => [
+            'driver' => 'mysql',
+            'host' => env('PROD_RO_HOST', '127.0.0.1'),
+            'port' => env('PROD_RO_PORT', '3307'),
+            'database' => env('PROD_RO_DATABASE'),
+            'username' => env('PROD_RO_USERNAME'),
+            'password' => env('PROD_RO_PASSWORD'),
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'strict' => true,
+            'engine' => null,
+        ],
+
         'mariadb' => [
             'driver' => 'mariadb',
             'url' => env('DB_URL'),

@@ -14,6 +14,33 @@
         </div>
     </div>
 
+    @if ($service->billing_state === 'billing_failed')
+        <div class="mb-6 rounded-md bg-red-50 border border-red-200 p-4 text-sm text-red-700" role="alert" data-billing-warning>
+            <p class="font-semibold">Billing setup failed for this service.</p>
+            @if ($service->billing_error)
+                <p class="mt-1">{{ $service->billing_error }}</p>
+            @endif
+            <form method="POST" action="{{ route('admin.services.retry-billing', $service) }}" class="mt-3 flex flex-wrap items-end gap-3">
+                @csrf
+                <div>
+                    <label for="retry_stripe_price_id" class="block text-xs text-gray-600">Stripe price ID</label>
+                    <input id="retry_stripe_price_id" name="stripe_price_id" type="text" required
+                           value="{{ old('stripe_price_id') }}" placeholder="price_..."
+                           class="mt-1 rounded-md border-gray-300 text-sm">
+                    @error('stripe_price_id') <p class="text-xs text-red-700">{{ $message }}</p> @enderror
+                </div>
+                <div>
+                    <label for="retry_contact_email" class="block text-xs text-gray-600">Contact email</label>
+                    <input id="retry_contact_email" name="contact_email" type="email" required
+                           value="{{ old('contact_email', $service->customer?->users->first()?->email) }}"
+                           class="mt-1 rounded-md border-gray-300 text-sm">
+                    @error('contact_email') <p class="text-xs text-red-700">{{ $message }}</p> @enderror
+                </div>
+                <button type="submit" class="inline-flex items-center px-4 py-2 rounded-md bg-red-600 text-white text-sm font-medium hover:bg-red-700">Retry billing</button>
+            </form>
+        </div>
+    @endif
+
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {{-- Main details --}}
         <div class="lg:col-span-2 space-y-6">
@@ -23,10 +50,7 @@
                     <div>
                         <dt class="text-gray-500">Status</dt>
                         <dd class="mt-1">
-                            <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium
-                                {{ $service->status === 'Active' ? 'bg-green-100 text-green-700' : ($service->status === 'Cancelled' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700') }}">
-                                {{ $service->status }}
-                            </span>
+                            <x-status-badge type="service" :status="$service->status" size="px-2.5 py-0.5" />
                         </dd>
                     </div>
                     <div>
@@ -51,6 +75,25 @@
                         <dt class="text-gray-500">Next Payment</dt>
                         <dd class="mt-1">{{ $service->next_payment_date?->format('M j, Y') ?? '—' }}</dd>
                     </div>
+                    <div>
+                        <dt class="text-gray-500">Provisioning</dt>
+                        <dd class="mt-1">
+                            <x-status-badge type="provisioning" :status="$service->provisioning_status" size="px-2.5 py-0.5" />
+                            @if ($service->provisioning_status === 'failed' && $service->provisioning_error)
+                                <p class="mt-2 text-xs text-red-700" data-provisioning-error>{{ $service->provisioning_error }}</p>
+                            @endif
+                        </dd>
+                    </div>
+                    <div>
+                        <dt class="text-gray-500">Web App</dt>
+                        <dd class="mt-1">
+                            @if ($service->customerApp)
+                                <a href="{{ route('admin.customer-apps.show', $service->customerApp) }}" class="text-blue-600 hover:underline">{{ $service->customerApp->display_name }}</a>
+                            @else
+                                <a href="{{ route('admin.customer-apps.create', $service) }}" class="text-blue-600 hover:underline">Create web app</a>
+                            @endif
+                        </dd>
+                    </div>
                     @if ($service->cpanel_username)
                         <div>
                             <dt class="text-gray-500">cPanel Username</dt>
@@ -66,44 +109,43 @@
                 </dl>
             </div>
 
-            {{-- WHM Server Info --}}
-            @if ($whmInfo)
+            {{-- WHM Server Info (on demand only; the page never calls WHM) --}}
+            @if ($service->cpanel_username)
+                @php($whmInfo = session('whmInfo'))
                 <div class="bg-white rounded-lg shadow-sm border p-6">
-                    <h2 class="text-sm font-semibold text-gray-700 mb-4">Server Resources (WHM)</h2>
-                    <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4 text-sm">
-                        <div>
-                            <dt class="text-gray-500">Domain</dt>
-                            <dd class="mt-1 font-medium">{{ $whmInfo['domain'] ?? '—' }}</dd>
-                        </div>
-                        <div>
-                            <dt class="text-gray-500">Package</dt>
-                            <dd class="mt-1">{{ $whmInfo['plan'] ?? '—' }}</dd>
-                        </div>
-                        <div>
-                            <dt class="text-gray-500">Disk Usage</dt>
-                            <dd class="mt-1">
-                                {{ $whmInfo['disk_used'] ?? '?' }} / {{ $whmInfo['disk_limit'] ?? 'unlimited' }}
-                            </dd>
-                        </div>
-                        <div>
-                            <dt class="text-gray-500">IP Address</dt>
-                            <dd class="mt-1 font-mono text-xs">{{ $whmInfo['ip'] ?? '—' }}</dd>
-                        </div>
-                        <div>
-                            <dt class="text-gray-500">Created</dt>
-                            <dd class="mt-1">{{ $whmInfo['start_date'] ?? '—' }}</dd>
-                        </div>
-                        <div>
-                            <dt class="text-gray-500">Status</dt>
-                            <dd class="mt-1">
-                                @if ($whmInfo['suspended'])
-                                    <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium bg-red-100 text-red-700">Suspended</span>
-                                @else
-                                    <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium bg-green-100 text-green-700">Active</span>
-                                @endif
-                            </dd>
-                        </div>
-                    </dl>
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-sm font-semibold text-gray-700">Server Resources (WHM)</h2>
+                        <form method="POST" action="{{ route('admin.services.refresh-whm', $service) }}">
+                            @csrf
+                            <button type="submit" class="px-3 py-1 border rounded-md text-xs hover:bg-gray-50">Refresh from WHM</button>
+                        </form>
+                    </div>
+                    @if (session('whmError'))
+                        <p class="rounded-md bg-red-50 border border-red-200 p-3 text-sm text-red-700">{{ session('whmError') }}</p>
+                    @elseif (is_array($whmInfo))
+                        <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4 text-sm">
+                            <div>
+                                <dt class="text-gray-500">Domain</dt>
+                                <dd class="mt-1 font-medium">{{ $whmInfo['domain'] ?: '—' }}</dd>
+                            </div>
+                            <div>
+                                <dt class="text-gray-500">Package</dt>
+                                <dd class="mt-1">{{ $whmInfo['plan'] ?: '—' }}</dd>
+                            </div>
+                            <div>
+                                <dt class="text-gray-500">Status</dt>
+                                <dd class="mt-1">
+                                    @if (! empty($whmInfo['suspended']))
+                                        <x-status-badge type="service" status="Suspended" />
+                                    @else
+                                        <x-status-badge type="service" status="Active" />
+                                    @endif
+                                </dd>
+                            </div>
+                        </dl>
+                    @else
+                        <p class="text-sm text-gray-500">Not loaded. Use refresh to query WHM.</p>
+                    @endif
                 </div>
             @endif
         </div>

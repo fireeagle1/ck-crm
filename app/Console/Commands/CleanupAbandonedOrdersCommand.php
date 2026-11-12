@@ -2,10 +2,9 @@
 
 namespace App\Console\Commands;
 
-use App\Models\Booking;
 use App\Models\Order;
 use App\Models\ScheduledTaskLog;
-use App\Services\AssetAssignmentService;
+use App\Services\OrderCancellationService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -13,26 +12,32 @@ use Illuminate\Support\Facades\Log;
 class CleanupAbandonedOrdersCommand extends Command
 {
     protected $signature = 'app:cleanup-abandoned-orders
-                            {--hours=2 : Hours after which an unpaid order is considered abandoned}';
+                            {--hours=2 : Hours after which an unpaid order with a Stripe Checkout session is considered abandoned}';
 
-    protected $description = 'Cancel orders stuck in "pending" payment status beyond the threshold, releasing reserved assets and freeing booking availability';
+    protected $description = 'Expire orders stuck in "pending" payment status beyond the threshold, restoring stock, cancelling bookings and releasing assets';
 
-    public function handle(AssetAssignmentService $assetAssignmentService): int
+    public function handle(OrderCancellationService $cancellation): int
     {
         $log = ScheduledTaskLog::begin('app:cleanup-abandoned-orders');
 
-        $hours = (int) $this->option('hours');
-        $cutoff = now()->subHours($hours);
+        $cutoff = now()->subHours((int) $this->option('hours'));
+        $hostingCutoff = now()->subHours((int) config('shop.abandoned_hosting_hours', 48));
 
-        // Find orders that are still pending payment and older than the threshold.
-        // Stripe Checkout sessions expire after ~24h by default; 2h is a safe window.
-        $abandonedOrders = Order::where('payment_status', 'pending')
-            ->where('created_at', '<', $cutoff)
-            ->whereNotNull('stripe_checkout_session_id')
-            ->with('items.booking.assignedAssets')
-            ->get();
+        // Orders with a Checkout session: abandoned after --hours.
+        // Orders without one (hosting-only, paid via subscriptions): abandoned after the longer hosting window.
+        $candidateIds = Order::where('payment_status', 'pending')
+            ->where(function ($q) use ($cutoff, $hostingCutoff) {
+                $q->where(function ($q) use ($cutoff) {
+                    $q->whereNotNull('stripe_checkout_session_id')
+                        ->where('created_at', '<', $cutoff);
+                })->orWhere(function ($q) use ($hostingCutoff) {
+                    $q->whereNull('stripe_checkout_session_id')
+                        ->where('created_at', '<', $hostingCutoff);
+                });
+            })
+            ->pluck('id');
 
-        if ($abandonedOrders->isEmpty()) {
+        if ($candidateIds->isEmpty()) {
             $this->info('No abandoned orders found.');
             $log->complete('No abandoned orders found.', ['count' => 0]);
 
@@ -40,66 +45,40 @@ class CleanupAbandonedOrdersCommand extends Command
         }
 
         $cleaned = 0;
-        $assetsReleased = 0;
-        $bookingsCancelled = 0;
 
-        foreach ($abandonedOrders as $order) {
+        foreach ($candidateIds as $orderId) {
             try {
-                DB::transaction(function () use ($order, $assetAssignmentService, &$assetsReleased, &$bookingsCancelled) {
-                    // Cancel all bookings tied to this order and release their assets
-                    foreach ($order->items as $item) {
-                        if (!$item->booking) {
-                            continue;
-                        }
+                $expired = DB::transaction(function () use ($orderId, $cancellation) {
+                    $order = Order::whereKey($orderId)->lockForUpdate()->first();
 
-                        $booking = $item->booking;
-
-                        // Release any reserved assets back to the pool
-                        $activeAssets = $booking->assignedAssets()->whereNull('released_at')->count();
-                        if ($activeAssets > 0) {
-                            $assetAssignmentService->releaseAssets($booking);
-                            $assetsReleased += $activeAssets;
-                        }
-
-                        // Cancel the booking so it no longer blocks availability
-                        $booking->update(['status' => 'cancelled']);
-                        $bookingsCancelled++;
+                    if ($order === null || $order->payment_status !== 'pending') {
+                        return false;
                     }
 
-                    // Mark the order as expired (distinct from admin-cancelled)
-                    $order->update([
-                        'payment_status' => 'expired',
-                        'fulfilment_status' => 'cancelled',
-                        'admin_notes' => trim(
-                            ($order->admin_notes ? $order->admin_notes . "\n\n" : '')
-                            . '[' . now()->format('Y-m-d H:i') . '] Auto-cancelled: payment not received within threshold.'
-                        ),
-                    ]);
+                    // Restores stock, cancels bookings, releases assets, deletes never-provisioned
+                    // Pending services and marks the order expired.
+                    return $cancellation->expire($order);
                 });
 
-                $cleaned++;
+                if ($expired) {
+                    $cleaned++;
+                }
             } catch (\Throwable $e) {
                 Log::error('CleanupAbandonedOrders: Failed to clean order', [
-                    'order_id' => $order->id,
+                    'order_id' => $orderId,
                     'error' => $e->getMessage(),
                 ]);
             }
         }
 
-        $summary = "Cleaned {$cleaned} abandoned order(s). Released {$assetsReleased} asset(s). Cancelled {$bookingsCancelled} booking(s).";
+        $summary = "Expired {$cleaned} abandoned order(s).";
         $this->info($summary);
         Log::info('CleanupAbandonedOrders: Completed', [
             'cleaned' => $cleaned,
-            'assets_released' => $assetsReleased,
-            'bookings_cancelled' => $bookingsCancelled,
-            'total_found' => $abandonedOrders->count(),
+            'total_found' => $candidateIds->count(),
         ]);
 
-        $log->complete($summary, [
-            'cleaned' => $cleaned,
-            'assets_released' => $assetsReleased,
-            'bookings_cancelled' => $bookingsCancelled,
-        ]);
+        $log->complete($summary, ['cleaned' => $cleaned]);
 
         return Command::SUCCESS;
     }

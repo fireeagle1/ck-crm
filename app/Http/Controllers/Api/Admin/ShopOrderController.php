@@ -10,9 +10,9 @@ use App\Services\BookingInspectionService;
 use App\Services\FulfilmentService;
 use App\Services\FulfilmentStageService;
 use App\Services\NotificationService;
+use App\Services\OrderCancellationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
 
 class ShopOrderController extends Controller
@@ -149,24 +149,11 @@ class ShopOrderController extends Controller
     /**
      * Cancel an order and associated bookings/services.
      */
-    public function cancel(Order $order): JsonResponse
+    public function cancel(Order $order, OrderCancellationService $cancellation): JsonResponse
     {
-        if ($order->fulfilment_status === 'cancelled') {
+        if (!$cancellation->cancel($order)) {
             return response()->json(['message' => 'Order is already cancelled.'], 422);
         }
-
-        DB::transaction(function () use ($order) {
-            $order->update(['fulfilment_status' => 'cancelled']);
-
-            foreach ($order->items as $item) {
-                if ($item->booking && in_array($item->booking->status, ['confirmed', 'active'])) {
-                    $item->booking->update(['status' => 'cancelled']);
-                }
-                if ($item->service && $item->service->status === 'pending') {
-                    $item->service->update(['status' => 'cancelled']);
-                }
-            }
-        });
 
         return response()->json(['message' => 'Order cancelled.']);
     }

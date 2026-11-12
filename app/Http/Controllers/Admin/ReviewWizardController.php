@@ -6,7 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Models\Customer;
 use App\Models\Domain;
 use App\Models\Service;
+use App\Services\DomainLinker;
+use App\Support\DomainNormaliser;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class ReviewWizardController extends Controller
@@ -51,7 +54,7 @@ class ReviewWizardController extends Controller
         return back()->with('success', "{$count} service(s) deleted.");
     }
 
-    public function moveToDomain(Request $request)
+    public function moveToDomain(Request $request, DomainLinker $linker)
     {
         $validated = $request->validate([
             'service_id' => 'required|exists:services,service_id',
@@ -64,34 +67,40 @@ class ReviewWizardController extends Controller
             return back()->with('error', 'This service has no domain name to move.');
         }
 
-        $existing = Domain::where('domain_name', strtolower($service->domain_name))->first();
+        $canonical = DomainNormaliser::tryNormalise($service->domain_name);
 
-        if ($existing) {
-            // Update the existing domain with subscription ID if the service had one
-            if ($service->stripe_subscription_id && !$existing->stripe_subscription_id) {
-                $existing->update([
-                    'stripe_subscription_id' => $service->stripe_subscription_id,
-                    'cost' => $service->service_monthly_charge,
-                ]);
-            }
-            $service->delete();
-            return redirect()->route('admin.cleanup.review', ['customer' => $validated['customer']])
-                ->with('success', "Domain '{$service->domain_name}' already exists. Subscription transferred. Service deleted.");
+        if ($canonical === null) {
+            return back()->with('error', 'This service has an invalid domain name and cannot be moved.');
         }
 
-        // Create domain record from the service
-        Domain::create([
-            'company_id' => $service->company_id,
-            'domain_name' => strtolower($service->domain_name),
-            'registrar' => 'Unknown',
-            'stripe_subscription_id' => $service->stripe_subscription_id,
-            'cost' => $service->service_monthly_charge,
-        ]);
+        // The Service is never deleted: it is linked to the Domain instead.
+        DB::transaction(function () use ($service, $canonical, $linker) {
+            $domain = $linker->findOrCreate($canonical, $service->company_id);
 
-        $domainName = $service->domain_name;
-        $service->delete();
+            $domainUpdates = [];
+            $serviceUpdates = ['domain_id' => $domain->id];
+
+            // Move billing data only where the Domain has none; existing values win.
+            if ($service->stripe_subscription_id) {
+                if (!$domain->stripe_subscription_id) {
+                    $domainUpdates['stripe_subscription_id'] = $service->stripe_subscription_id;
+                    $serviceUpdates['stripe_subscription_id'] = null;
+                } elseif ($domain->stripe_subscription_id === $service->stripe_subscription_id) {
+                    // Already held by the Domain: drop the duplicate copy.
+                    $serviceUpdates['stripe_subscription_id'] = null;
+                }
+            }
+            if ($domain->cost === null && $service->service_monthly_charge !== null) {
+                $domainUpdates['cost'] = $service->service_monthly_charge;
+            }
+
+            if ($domainUpdates) {
+                $domain->update($domainUpdates);
+            }
+            $service->update($serviceUpdates);
+        });
 
         return redirect()->route('admin.cleanup.review', ['customer' => $validated['customer']])
-            ->with('success', "Moved '{$domainName}' to domains table (with subscription) and removed the service.");
+            ->with('success', "Linked '{$canonical}' to its domain record. Subscription and cost moved where the domain had none. Service kept.");
     }
 }
