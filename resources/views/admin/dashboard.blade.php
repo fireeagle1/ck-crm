@@ -9,6 +9,9 @@
             <p class="text-sm text-gray-500">Monthly Recurring Revenue</p>
             <p class="text-3xl font-semibold mt-1">£{{ number_format($mrr, 2) }}</p>
             <p class="text-xs text-gray-400 mt-1">ARR: £{{ number_format($arr, 2) }}</p>
+            @foreach ($mrrByType as $type => $amount)
+                <p class="text-xs text-gray-400">{{ $type }}: £{{ number_format($amount, 2) }}</p>
+            @endforeach
         </div>
         <div class="bg-white rounded-lg p-5 shadow-sm border">
             <p class="text-sm text-gray-500">Revenue This Month</p>
@@ -18,14 +21,52 @@
             <p class="text-sm text-gray-500">Overdue Invoices</p>
             <p class="text-3xl font-semibold mt-1 {{ $overdueInvoices > 0 ? 'text-red-600' : '' }}">{{ $overdueInvoices }}</p>
             @if ($overdueAmount > 0)
-                <p class="text-xs text-red-500 mt-1">£{{ number_format($overdueAmount, 2) }} outstanding</p>
+                <p class="text-xs text-red-500 mt-1">£{{ number_format($overdueAmount, 2) }} overdue</p>
             @endif
+            <p class="text-xs text-gray-400 mt-1">£{{ number_format($outstandingAmount, 2) }} total unpaid</p>
         </div>
         <div class="bg-white rounded-lg p-5 shadow-sm border">
-            <p class="text-sm text-gray-500">Active Customers</p>
+            <p class="text-sm text-gray-500">Customers</p>
             <p class="text-3xl font-semibold mt-1">{{ $totalCustomers }}</p>
-            <p class="text-xs text-gray-400 mt-1">{{ $activeServices }} active services</p>
+            <p class="text-xs text-gray-400 mt-1">{{ $customersWithServices }} with active services</p>
         </div>
+    </div>
+
+    {{-- Services & Domains --}}
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+        <a href="{{ route('admin.services.index') }}" class="bg-white rounded-lg p-5 shadow-sm border block hover:bg-gray-50">
+            <p class="text-sm text-gray-500">Active Services</p>
+            <p class="text-3xl font-semibold mt-1">{{ $activeServices }}</p>
+            <div class="mt-2 space-y-1 text-xs text-gray-500">
+                @foreach ($servicesByType as $type => $n)
+                    <p>{{ $n }} {{ $type }}</p>
+                @endforeach
+                @if ($pendingServices > 0)
+                    <p class="text-amber-600 font-medium">{{ $pendingServices }} pending</p>
+                @endif
+                @if ($problemServices > 0)
+                    <p class="text-red-600 font-medium">{{ $problemServices }} provisioning failed</p>
+                @endif
+            </div>
+        </a>
+        <a href="{{ route('admin.domains.index') }}" class="bg-white rounded-lg p-5 shadow-sm border block hover:bg-gray-50">
+            <p class="text-sm text-gray-500">Domains</p>
+            <p class="text-3xl font-semibold mt-1">{{ $domainsActive }}</p>
+            <div class="mt-2 space-y-1 text-xs text-gray-500">
+                @if ($domainsExpiringCount > 0)
+                    <p class="text-amber-600 font-medium">{{ $domainsExpiringCount }} expiring in 30 days</p>
+                @endif
+                @if ($domainsExpiredCount > 0)
+                    <p class="text-red-600 font-medium">{{ $domainsExpiredCount }} expired (last 12 months)</p>
+                @endif
+                @if ($domainsNoAutoRenew > 0)
+                    <p>{{ $domainsNoAutoRenew }} without auto-renew</p>
+                @endif
+                @if ($domainsUnassigned > 0)
+                    <p>{{ $domainsUnassigned }} unassigned to a customer</p>
+                @endif
+            </div>
+        </a>
     </div>
 
     {{-- Tickets & Quick stats --}}

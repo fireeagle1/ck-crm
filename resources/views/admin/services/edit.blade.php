@@ -72,7 +72,7 @@
                 @else
                     <div class="grid grid-cols-3 gap-4">
                         <div>
-                            <label for="service_monthly_charge" class="block text-sm font-medium text-gray-700">Monthly (£)</label>
+                            <label for="service_monthly_charge" class="block text-sm font-medium text-gray-700">Charge per billing cycle (£)</label>
                             <input type="number" step="0.01" name="service_monthly_charge" id="service_monthly_charge"
                                    value="{{ old('service_monthly_charge', $service->service_monthly_charge) }}"
                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
