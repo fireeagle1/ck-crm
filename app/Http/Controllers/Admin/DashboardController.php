@@ -45,6 +45,29 @@ class DashboardController extends Controller
         $mrr = app(MrrCalculator::class)->calculate();
         $arr = $mrr * 12;
 
+        $mrrByType = app(MrrCalculator::class)->breakdownByType();
+
+        // Service counts
+        $servicesByStatus = Service::selectRaw('status, COUNT(*) as n')->groupBy('status')->pluck('n', 'status');
+        $pendingServices = (int) ($servicesByStatus['Pending'] ?? 0);
+        $problemServices = Service::where('status', 'Active')
+            ->whereIn('provisioning_status', ['failed', 'Failed'])->count();
+        $servicesByType = Service::where('status', 'Active')
+            ->selectRaw("COALESCE(NULLIF(service_type, ''), 'Other') as type, COUNT(*) as n")
+            ->groupBy('type')->orderByDesc('n')->pluck('n', 'type');
+        $customersWithServices = Service::where('status', 'Active')->distinct('company_id')->count('company_id');
+
+        // Domain stats (soft-deleted domains are excluded automatically)
+        $domainsActive = Domain::where(fn ($q) => $q->whereNull('expiry_date')->orWhereDate('expiry_date', '>=', now()))->count();
+        $domainsExpiringCount = Domain::expiring()->count();
+        $domainsExpiredCount = Domain::expired()->count();
+        $domainsNoAutoRenew = Domain::where(fn ($q) => $q->whereNull('expiry_date')->orWhereDate('expiry_date', '>=', now()))
+            ->where('auto_renew', false)->count();
+        $domainsUnassigned = Domain::unassigned()->count();
+
+        // Outstanding (unpaid, not yet overdue + overdue)
+        $outstandingAmount = Invoice::where('invoice_status', 'Unpaid')->sum('invoice_amount');
+
         // Overdue invoices — exclude void/uncollectible
         $overdueInvoices = Invoice::where('invoice_status', 'Unpaid')
             ->whereNotIn('invoice_status', self::EXCLUDED_STATUSES)
@@ -132,6 +155,17 @@ class DashboardController extends Controller
             'totalCustomers',
             'mrr',
             'arr',
+            'mrrByType',
+            'pendingServices',
+            'problemServices',
+            'servicesByType',
+            'customersWithServices',
+            'domainsActive',
+            'domainsExpiringCount',
+            'domainsExpiredCount',
+            'domainsNoAutoRenew',
+            'domainsUnassigned',
+            'outstandingAmount',
             'overdueInvoices',
             'overdueAmount',
             'revenueThisMonth',

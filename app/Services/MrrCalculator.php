@@ -7,41 +7,57 @@ use App\Models\Service;
 class MrrCalculator
 {
     /**
-     * Calculate true MRR by normalising each service's charge to a monthly value.
+     * Number of months covered by one billing cycle for each frequency.
+     */
+    private const CYCLE_MONTHS = [
+        'Weekly'     => 12 / 52,
+        'Monthly'    => 1,
+        'Quarterly'  => 3,
+        'Biannually' => 6,
+        'Annually'   => 12,
+        'Biennially' => 24,
+    ];
+
+    /**
+     * Calculate true MRR by normalising each active service's charge to a monthly value.
      *
-     * For Stripe-managed services: `service_monthly_charge` stores the charge per
-     * billing cycle (from Stripe's unit_amount), so we divide by the cycle length.
-     *
-     * For manually-entered services (no stripe_subscription_id): the charge is
-     * already entered as a monthly amount by the admin, so we use it as-is.
+     * `service_monthly_charge` holds the charge per billing cycle (Stripe's unit_amount for
+     * synced services, or the amount the admin entered alongside a frequency), so every
+     * service is divided by the length of its billing cycle. A missing frequency is
+     * treated as monthly.
      */
     public function calculate(): float
+    {
+        return array_sum($this->breakdownByType());
+    }
+
+    /**
+     * Monthly-normalised revenue grouped by service type, highest first.
+     *
+     * @return array<string, float>
+     */
+    public function breakdownByType(): array
     {
         $services = Service::where('status', 'Active')
             ->whereNotNull('service_monthly_charge')
             ->where('service_monthly_charge', '>', 0)
-            ->get(['service_monthly_charge', 'service_payment_frequency', 'stripe_subscription_id']);
+            ->get(['service_type', 'service_monthly_charge', 'service_payment_frequency']);
 
-        return $services->sum(function ($service) {
-            $charge = (float) $service->service_monthly_charge;
+        $totals = [];
+        foreach ($services as $service) {
+            $type = $service->service_type ?: 'Other';
+            $totals[$type] = ($totals[$type] ?? 0) + $this->monthlyValue($service);
+        }
 
-            // Manual services are entered as monthly — no conversion needed
-            if (empty($service->stripe_subscription_id)) {
-                return $charge;
-            }
+        arsort($totals);
 
-            // Stripe-synced: divide by number of months in the billing cycle
-            $months = match ($service->service_payment_frequency) {
-                'Weekly'     => 0.25,   // ~1 week ≈ 0.25 months
-                'Monthly'    => 1,
-                'Quarterly'  => 3,
-                'Biannually' => 6,
-                'Annually'   => 12,
-                'Biennially' => 24,
-                default      => 1,
-            };
+        return array_map(fn ($v) => round($v, 2), $totals);
+    }
 
-            return $charge / $months;
-        });
+    public function monthlyValue(Service $service): float
+    {
+        $months = self::CYCLE_MONTHS[$service->service_payment_frequency] ?? 1;
+
+        return (float) $service->service_monthly_charge / $months;
     }
 }
